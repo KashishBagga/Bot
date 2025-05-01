@@ -7,6 +7,14 @@ import webbrowser
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import logging
+from typing import Dict, List, Optional, Tuple
+from functools import lru_cache
+import backoff
+from dataclasses import dataclass
+import json
+import os
+from dotenv import load_dotenv
 """
 In order to get started with Fyers API we would like you to do the following things first.
 1. Checkout our API docs :   https://myapi.fyers.in/docsv3
@@ -14,6 +22,56 @@ In order to get started with Fyers API we would like you to do the following thi
 
 Once you have created an APP you can start using the below SDK 
 """
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('trading_bot.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class Config:
+    """Configuration class for the trading bot"""
+    client_id: str = os.getenv('FYERS_CLIENT_ID')
+    secret_key: str = os.getenv('FYERS_SECRET_KEY')
+    redirect_uri: str = os.getenv('FYERS_REDIRECT_URI')
+    grant_type: str = os.getenv('FYERS_GRANT_TYPE')
+    response_type: str = os.getenv('FYERS_RESPONSE_TYPE')
+    state: str = os.getenv('FYERS_STATE')
+    symbols: Dict[str, str] = None
+    resolution: str = "5"
+    rsi_period: int = 14
+    macd_fast: int = 12
+    macd_slow: int = 26
+    macd_signal: int = 9
+    ema_period: int = 20
+    atr_period: int = 14
+    confirmation_count: int = 2
+    rsi_upper: float = 65
+    rsi_lower: float = 35
+    macd_threshold: float = 5
+    price_threshold: float = 0.001
+
+    def __post_init__(self):
+        # Validate required environment variables
+        required_vars = ['client_id', 'secret_key', 'redirect_uri', 'grant_type', 'response_type', 'state']
+        missing_vars = [var for var in required_vars if not getattr(self, var)]
+        if missing_vars:
+            raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
+            
+        if self.symbols is None:
+            self.symbols = {
+                "NSE:NIFTY50-INDEX": "NIFTY50",
+                "NSE:NIFTYBANK-INDEX": "BANKNIFTY"
+            }
 
 redirect_uri= "https://trade.fyers.in/"  ## redircet_uri you entered while creating APP.
 client_id = "C607KIH6W0-100"                       ## Client_id here refers to APP_ID of the created app
@@ -345,8 +403,8 @@ def generate_signal_all(df, index_name, sheet, lot_size, summary_sheet, insights
 # 🔥 Main runner
 def run_bot(fyers):
     symbols = {
-        "NSE:NIFTY25MAYFUT": "NIFTY50",
-        "NSE:BANKNIFTY25MAYFUT": "BANKNIFTY"
+        "NSE:NIFTY50-INDEX": "NIFTY50",
+        "NSE:NIFTYBANK-INDEX": "BANKNIFTY"
     }
 
     lot_sizes = {
