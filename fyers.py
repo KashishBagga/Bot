@@ -6,7 +6,7 @@ from fyers_apiv3 import fyersModel
 import webbrowser
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from typing import Dict, List, Optional, Tuple
 from functools import lru_cache
@@ -15,6 +15,12 @@ from dataclasses import dataclass
 import json
 import os
 from dotenv import load_dotenv
+import math
+import pytz
+import schedule
+import threading
+from db import log_trade_sql
+
 """
 In order to get started with Fyers API we would like you to do the following things first.
 1. Checkout our API docs :   https://myapi.fyers.in/docsv3
@@ -25,6 +31,15 @@ Once you have created an APP you can start using the below SDK
 
 # Load environment variables
 load_dotenv()
+
+# Get Fyers API credentials from environment variables
+redirect_uri = os.getenv("FYERS_REDIRECT_URI")
+client_id = os.getenv("FYERS_CLIENT_ID")
+secret_key = os.getenv("FYERS_SECRET_KEY")
+grant_type = os.getenv("FYERS_GRANT_TYPE")
+response_type = os.getenv("FYERS_RESPONSE_TYPE")
+state = os.getenv("FYERS_STATE")
+auth_code = os.getenv("FYERS_AUTH_CODE")
 
 # Configure logging
 logging.basicConfig(
@@ -73,32 +88,29 @@ class Config:
                 "NSE:NIFTYBANK-INDEX": "BANKNIFTY"
             }
 
-redirect_uri= "https://trade.fyers.in/"  ## redircet_uri you entered while creating APP.
-client_id = "C607KIH6W0-100"                       ## Client_id here refers to APP_ID of the created app
-secret_key = "ZYDRASER94"                          ## app_secret key which you got after creating the app 
-grant_type = "authorization_code"                  ## The grant_type always has to be "authorization_code"
-response_type = "code"                             ## The response_type always has to be "code"
-state = "sample"                                   ##  The state field here acts as a session manager. you will be sent with the state field after successfull generation of auth_code 
-
-
-appSession = fyersModel.SessionModel(client_id = client_id, redirect_uri = redirect_uri,response_type=response_type,state=state,secret_key=secret_key,grant_type=grant_type)
+# Initialize Fyers session
+appSession = fyersModel.SessionModel(
+    client_id=client_id,
+    redirect_uri=redirect_uri,
+    response_type=response_type,
+    state=state,
+    secret_key=secret_key,
+    grant_type=grant_type
+)
 
 generateTokenUrl = appSession.generate_authcode()
-
 print((generateTokenUrl))  
 # webbrowser.open(generateTokenUrl,new=1)
 
-auth_code = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfaWQiOiJDNjA3S0lINlcwIiwidXVpZCI6IjIwY2E4MjdiMDMxYzQyMWFiOTU3MDJjZTVkYjU4NzRhIiwiaXBBZGRyIjoiIiwibm9uY2UiOiIiLCJzY29wZSI6IiIsImRpc3BsYXlfbmFtZSI6IllLMTc3MDUiLCJvbXMiOiJLMSIsImhzbV9rZXkiOiI1YjgwOWJmNjVjZTI0MWFjOTZhZGVkMzNlNjc4NTEzMzc3YWM2Y2E0ZmVhNjc3ZWE0NGI5YWJlZSIsImlzRGRwaUVuYWJsZWQiOiJOIiwiaXNNdGZFbmFibGVkIjoiTiIsImF1ZCI6IltcImQ6MVwiLFwiZDoyXCIsXCJ4OjBcIixcIng6MVwiXSIsImV4cCI6MTc0NjEwNzk5NywiaWF0IjoxNzQ2MDc3OTk3LCJpc3MiOiJhcGkubG9naW4uZnllcnMuaW4iLCJuYmYiOjE3NDYwNzc5OTcsInN1YiI6ImF1dGhfY29kZSJ9._amAMLd0mzQhg0ubJsnhDY32afZSldgxUuFxWc0VoPs"
 appSession.set_token(auth_code)
 response = appSession.generate_token()
-# print("Response",response)
 
 try: 
     access_token = response["access_token"]
 except Exception as e:
     print(e,response)  
 
-fyers = fyersModel.FyersModel(token=access_token,is_async=False,client_id=client_id,log_path="")
+fyers = fyersModel.FyersModel(token=access_token, is_async=False, client_id=client_id, log_path="")
 # print(fyers.get_profile()) 
 
 # # CONNECTION ESTABLISHED ABOVE
@@ -180,7 +192,7 @@ def basic_failure_reason(rsi, macd, macd_signal, close, ema_20, targets_hit, out
 
 
 # 🔥 Fetch candles
-def fetch_candles(symbol, fyers, resolution="5", range_from="2025-04-01", range_to="2025-04-30"):
+def fetch_candles(symbol, fyers, resolution="5", range_from="2025-04-20", range_to="2025-05-02"):
     data = {
         "symbol": symbol,
         "resolution": resolution,
