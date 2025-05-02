@@ -4,8 +4,8 @@ import ta
 import time
 from fyers_apiv3 import fyersModel
 import webbrowser
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+# import gspread
+# from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime, timedelta
 import logging
 from typing import Dict, List, Optional, Tuple
@@ -19,7 +19,7 @@ import math
 import pytz
 import schedule
 import threading
-from db import log_trade_sql
+from db import log_trade_sql, log_backtesting_sql
 
 """
 In order to get started with Fyers API we would like you to do the following things first.
@@ -116,57 +116,6 @@ fyers = fyersModel.FyersModel(token=access_token, is_async=False, client_id=clie
 # # CONNECTION ESTABLISHED ABOVE
 
 
-# # 🔥 Function to setup Google Sheet connection
-# # 🔥 Setup Sheet
-
-# # 🔧 SETUP GOOGLE SHEET
-def setup_sheet(spreadsheet):
-    signal_headers = [
-        "Timestamp", "Index", "Signal", "Strike Price", "Stop Loss", "Target",
-        "Target 2", "Target 3", "Exit TS 1", "Exit TS 2", "Exit TS 3",
-        "Price", "RSI", "MACD", "MACD Signal", "EMA 20", "ATR",
-        "Outcome", "RSI Reason", "MACD Reason", "Price Reason",
-        "Confidence", "Trade Type", "Option Chain Confirmation", "P&L (1 Lot)",
-        "Targets Hit", "Stoploss Count", "Failure Reason"
-    ]
-    sheet = spreadsheet.sheet1
-    if sheet.row_values(1) != signal_headers:
-        sheet.clear()
-        sheet.append_row(signal_headers)
-        print("✅ Headers added to Signal Sheet.")
-
-    try:
-        summary_sheet = spreadsheet.worksheet("Summary")
-    except gspread.exceptions.WorksheetNotFound:
-        summary_sheet = spreadsheet.add_worksheet(title="Summary", rows="1000", cols="5")
-        summary_sheet.append_row(["Date", "Index", "P&L (1 Lot)", "Targets Hit", "Stoplosses"])
-        print("✅ Created 'Summary' sheet.")
-
-    try:
-        insights_sheet = spreadsheet.worksheet("Insights")
-    except gspread.exceptions.WorksheetNotFound:
-        insights_sheet = spreadsheet.add_worksheet(title="Insights", rows="1000", cols="7")
-        insights_sheet.append_row(["Index", "Total Trades", "Accuracy %", "Total P&L", "Avg Profit", "Avg Loss", "Win Ratio"])
-        print("✅ Created 'Insights' sheet.")
-
-    return sheet, summary_sheet, insights_sheet
-
-
-def log_signal(sheet, index_name, signal, strike_price, stoploss, target, target2, target3,
-               exit_ts1, exit_ts2, exit_ts3, price, rsi, macd, macd_signal, ema_20, atr,
-               outcome, rsi_reason, macd_reason, price_reason, confidence, trade_type,
-               option_chain_confirmation, pnl_1lot, targets_hit, stoploss_count, failure_reason, timestamp):
-
-    row = [
-        timestamp, index_name, signal, strike_price, stoploss, target, target2, target3,
-        exit_ts1, exit_ts2, exit_ts3,
-        price, rsi, macd, macd_signal, ema_20, atr,
-        outcome, rsi_reason, macd_reason, price_reason,
-        confidence, trade_type, option_chain_confirmation, pnl_1lot,
-        targets_hit, stoploss_count, failure_reason
-    ]
-    sheet.append_row(row, value_input_option='USER_ENTERED')
-    print(f"✅ {timestamp} | {index_name} - {signal} logged with P&L ₹{pnl_1lot}")
 
 
 def basic_failure_reason(rsi, macd, macd_signal, close, ema_20, targets_hit, outcome):
@@ -192,7 +141,7 @@ def basic_failure_reason(rsi, macd, macd_signal, close, ema_20, targets_hit, out
 
 
 # 🔥 Fetch candles
-def fetch_candles(symbol, fyers, resolution="5", range_from="2025-04-20", range_to="2025-05-02"):
+def fetch_candles(symbol, fyers, resolution="5", range_from="2025-04-02", range_to="2025-05-02"):
     data = {
         "symbol": symbol,
         "resolution": resolution,
@@ -232,8 +181,7 @@ def is_long_wick_candle(candle):
     lower_wick = min(candle['close'], candle['open']) - candle['low']
     return upper_wick > body or lower_wick > body
 
-def generate_signal_all(df, index_name, sheet, lot_size, summary_sheet, insights_sheet):
-    import ta
+def generate_signal_all(df, index_name, lot_size):
     df['supertrend'] = ta.trend.stc(df['close'])
 
     last_signal = "NO TRADE"
@@ -252,30 +200,17 @@ def generate_signal_all(df, index_name, sheet, lot_size, summary_sheet, insights
     for idx in range(50, len(df) - 24):
         candle = df.iloc[idx]
 
-        # ✨ Skip low body candles
         body = abs(candle['close'] - candle['open'])
         full_range = candle['high'] - candle['low']
         if full_range == 0 or body / full_range < 0.6:
             continue
 
-        # ✨ Reject if Supertrend not in favor
         if candle['supertrend'] < 0.5:
             continue
 
-        # ✨ Avoid overextended candles
-        last2 = df.iloc[idx-2:idx]
-        # if (last2['close'] - last2['open']).abs().sum() > 3 * candle['atr']:
-        #     continue
-
-        # ✨ Skip trades after 2:45 PM
         ist_time_check = candle['time'].tz_localize("UTC").tz_convert("Asia/Kolkata")
         if ist_time_check.hour >= 14 and ist_time_check.minute >= 45:
             continue
-
-        # ✨ Skip if volume isn't strong
-        avg_vol = df['volume'][idx-20:idx].mean()
-        # if candle['volume'] < 1.2 * avg_vol:
-        #     continue
 
         current_signal = "NO TRADE"
         rsi_reason = ""
@@ -315,15 +250,14 @@ def generate_signal_all(df, index_name, sheet, lot_size, summary_sheet, insights
         if confirmation_counter == 2:
             price = candle['close']
             atr = candle['atr']
-            strike_price = int(round(price / 50) * 50)
             stoploss = int(round(atr))
             target = int(round(1.5 * atr))
             target2 = int(round(2.0 * atr))
             target3 = int(round(2.5 * atr))
 
             utc_time = candle['time'].tz_localize("UTC")
-            ist_time = utc_time.tz_convert("Asia/Kolkata")
-            timestamp = ist_time.strftime("%Y-%m-%d %H:%M:%S")
+            ist_time = utc_time.astimezone(pytz.timezone("Asia/Kolkata"))
+            signal_time = ist_time.strftime("%Y-%m-%d %H:%M:%S")
             date_str = ist_time.date().isoformat()
 
             next_df = df.iloc[idx + 1: idx + 25]
@@ -373,15 +307,29 @@ def generate_signal_all(df, index_name, sheet, lot_size, summary_sheet, insights
                 candle['ema_20'], targets_hit, outcome
             )
 
-            log_signal(
-                sheet, index_name, current_signal, strike_price, stoploss,
-                target, target2, target3, exit_ts1, exit_ts2, exit_ts3,
-                round(price, 2), round(candle['rsi'], 2), round(candle['macd'], 2),
-                round(candle['macd_signal'], 2), round(candle['ema_20'], 2), round(candle['atr'], 2),
-                outcome, rsi_reason, macd_reason, price_reason, confidence, trade_type,
-                option_chain_confirmation, pnl, targets_hit, stoploss_count.get(date_str, 0),
-                failure_reason, timestamp
-            )
+            signal_data = {
+                "signal_time": signal_time,
+                "signal": current_signal,
+                "price": price,
+                "rsi": candle['rsi'],
+                "macd": candle['macd'],
+                "macd_signal": candle['macd_signal'],
+                "ema_20": candle['ema_20'],
+                "atr": candle['atr'],
+                "confidence": confidence,
+                "rsi_reason": rsi_reason,
+                "macd_reason": macd_reason,
+                "price_reason": price_reason,
+                "trade_type": trade_type,
+                "option_chain_confirmation": option_chain_confirmation,
+                "outcome": outcome,
+                "pnl": pnl,
+                "targets_hit": targets_hit,
+                "stoploss_count": stoploss_count.get(date_str, 0),
+                "failure_reason": failure_reason
+            }
+
+            log_backtesting_sql(index_name, signal_data)
 
             confirmation_counter = 0
             total_signals += 1
@@ -398,21 +346,11 @@ def generate_signal_all(df, index_name, sheet, lot_size, summary_sheet, insights
     print("📈 Daily P&L Summary:")
     for d, p in daily_pnl.items():
         print(f"{d}: ₹{p:.2f}")
-        summary_sheet.append_row([d, index_name, p, targets_hit_count.get(d, 0), stoploss_count.get(d, 0)])
 
-    insights_sheet.append_row([
-        index_name,
-        total_signals,
-        round(accuracy, 2),
-        round(total_pnl, 2),
-        round(avg_profit, 2),
-        round(avg_loss, 2),
-        round(win_ratio, 2)
-    ])
+    return accuracy, total_pnl, total_wins, total_losses, win_amount, loss_amount, win_ratio
 
 
 
-# 🔥 Main runner
 def run_bot(fyers):
     symbols = {
         "NSE:NIFTY50-INDEX": "NIFTY50",
@@ -424,19 +362,6 @@ def run_bot(fyers):
         "BANKNIFTY": 15
     }
 
-    client = gspread.authorize(
-        ServiceAccountCredentials.from_json_keyfile_name(
-            "analysis-test-458117-64b56a994c55.json",
-            ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        )
-    )
-
-    spreadsheet = client.open("Trading Signals Tracker")
-    
-    # ✅ Use setup_sheet to get all 3 sheets
-    sheet, summary_sheet, insights_sheet = setup_sheet(spreadsheet)
-
-
     for symbol, index_name in symbols.items():
         try:
             df = fetch_candles(symbol, fyers)
@@ -444,18 +369,14 @@ def run_bot(fyers):
                 print(f"❗ No candles available for {index_name}")
                 continue
             df = calculate_indicators(df)
-            generate_signal_all(
+            accuracy, total_pnl, total_wins, total_losses, win_amount, loss_amount, win_ratio = generate_signal_all(
                 df,
                 index_name,
-                sheet,
-                lot_sizes[index_name],
-                summary_sheet,
-                insights_sheet
+                lot_sizes[index_name]
             )
+            print(f"✅✅✅ Historical Data Processing Finished for {index_name} ✅✅✅")
         except Exception as e:
             print(f"❌ Error processing {index_name}: {e}")
-
-    print("✅✅✅ Historical Data Processing Finished ✅✅✅")
 
 # 🔥 Entry point
 if __name__ == "__main__":
