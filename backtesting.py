@@ -20,6 +20,8 @@ import pytz
 import schedule
 import threading
 from db import log_trade_sql, log_backtesting_sql
+from strategies.supertrend_macd_rsi_ema import execute_supertrend_macd_rsi_ema_strategy
+from utils import basic_failure_reason
 
 """
 In order to get started with Fyers API we would like you to do the following things first.
@@ -115,31 +117,6 @@ fyers = fyersModel.FyersModel(token=access_token, is_async=False, client_id=clie
 
 # # CONNECTION ESTABLISHED ABOVE
 
-
-
-
-def basic_failure_reason(rsi, macd, macd_signal, close, ema_20, targets_hit, outcome):
-    if "Stoploss" in outcome:
-        reasons = []
-        if rsi < 68:
-            reasons.append("Weak RSI")
-        if macd < macd_signal + 8:
-            reasons.append("Weak MACD crossover")
-        if close < ema_20 * 1.003:
-            reasons.append("Low EMA strength")
-        if not reasons:
-            return "Sudden reversal or volatility"
-        return ", ".join(reasons)
-    elif targets_hit == 0:
-        return "No momentum after entry"
-    return ""
-
-
-# ✅ You can now call `basic_failure_reason()` from within generate_signal_all()
-# and pass the returned value to `log_signal` under the `failure_reason` parameter
-
-
-
 # 🔥 Fetch candles
 def fetch_candles(symbol, fyers, resolution="5", range_from="2025-04-02", range_to="2025-05-02"):
     data = {
@@ -159,6 +136,28 @@ def fetch_candles(symbol, fyers, resolution="5", range_from="2025-04-02", range_
     return df
 
 # 🔥 Calculate indicators
+def calculate_supertrend(df, period=10, multiplier=3):
+    hl2 = (df['high'] + df['low']) / 2
+    atr = ta.volatility.AverageTrueRange(df['high'], df['low'], df['close'], window=period).average_true_range()
+    upperband = hl2 + (multiplier * atr)
+    lowerband = hl2 - (multiplier * atr)
+
+    supertrend = [True] * len(df)
+
+    for i in range(1, len(df.index)):
+        if df['close'][i] > upperband[i-1]:
+            supertrend[i] = True
+        elif df['close'][i] < lowerband[i-1]:
+            supertrend[i] = False
+        else:
+            supertrend[i] = supertrend[i-1]
+            if supertrend[i] and lowerband[i] < lowerband[i-1]:
+                lowerband[i] = lowerband[i-1]
+            if not supertrend[i] and upperband[i] > upperband[i-1]:
+                upperband[i] = upperband[i-1]
+    df['supertrend'] = supertrend
+    return df
+
 def calculate_indicators(df):
     df['rsi'] = ta.momentum.RSIIndicator(df['close'], window=14).rsi()
     macd = ta.trend.MACD(df['close'])
@@ -166,6 +165,7 @@ def calculate_indicators(df):
     df['macd_signal'] = macd.macd_signal()
     df['ema_20'] = ta.trend.EMAIndicator(df['close'], window=20).ema_indicator()
     df['atr'] = ta.volatility.AverageTrueRange(df['high'], df['low'], df['close'], window=14).average_true_range()
+    df = calculate_supertrend(df)
     return df
 
 # 🔥 Generate and log signals
@@ -182,172 +182,7 @@ def is_long_wick_candle(candle):
     return upper_wick > body or lower_wick > body
 
 def generate_signal_all(df, index_name, lot_size):
-    df['supertrend'] = ta.trend.stc(df['close'])
-
-    last_signal = "NO TRADE"
-    confirmation_counter = 0
-    total_signals = 0
-    successful_signals = 0
-    daily_pnl = {}
-    total_pnl = 0
-    total_wins = 0
-    total_losses = 0
-    win_amount = 0
-    loss_amount = 0
-    targets_hit_count = {}
-    stoploss_count = {}
-
-    for idx in range(50, len(df) - 24):
-        candle = df.iloc[idx]
-
-        body = abs(candle['close'] - candle['open'])
-        full_range = candle['high'] - candle['low']
-        if full_range == 0 or body / full_range < 0.6:
-            continue
-
-        if candle['supertrend'] < 0.5:
-            continue
-
-        ist_time_check = candle['time'].tz_localize("UTC").tz_convert("Asia/Kolkata")
-        if ist_time_check.hour >= 14 and ist_time_check.minute >= 45:
-            continue
-
-        current_signal = "NO TRADE"
-        rsi_reason = ""
-        macd_reason = ""
-        price_reason = ""
-        confidence = "Medium"
-        trade_type = "Intraday"
-        option_chain_confirmation = "Pending"
-
-        if (
-            candle['rsi'] > 65 and
-            candle['macd'] > candle['macd_signal'] + 7 and
-            candle['close'] > candle['ema_20'] * 1.001
-        ):
-            current_signal = "BUY CALL"
-            rsi_reason = f"RSI {candle['rsi']:.2f} > 65"
-            macd_reason = f"MACD {candle['macd']:.2f} > MACD Signal +7 ({candle['macd_signal'] + 7:.2f})"
-            price_reason = f"Price {candle['close']:.2f} > EMA {candle['ema_20']:.2f}"
-            confidence = "High" if candle['rsi'] > 70 else "Medium"
-
-        elif (
-            candle['rsi'] < 35 and
-            candle['macd'] < candle['macd_signal'] - 5 and
-            candle['close'] < candle['ema_20'] * 0.999
-        ):
-            current_signal = "BUY PUT"
-            rsi_reason = f"RSI {candle['rsi']:.2f} < 35"
-            macd_reason = f"MACD {candle['macd']:.2f} < MACD Signal -5 ({candle['macd_signal'] - 5:.2f})"
-            price_reason = f"Price {candle['close']:.2f} < EMA {candle['ema_20']:.2f}"
-            confidence = "High" if candle['rsi'] < 30 else "Medium"
-
-        if current_signal == last_signal and current_signal != "NO TRADE":
-            confirmation_counter += 1
-        else:
-            confirmation_counter = 0
-
-        if confirmation_counter == 2:
-            price = candle['close']
-            atr = candle['atr']
-            stoploss = int(round(atr))
-            target = int(round(1.5 * atr))
-            target2 = int(round(2.0 * atr))
-            target3 = int(round(2.5 * atr))
-
-            utc_time = candle['time'].tz_localize("UTC")
-            ist_time = utc_time.astimezone(pytz.timezone("Asia/Kolkata"))
-            signal_time = ist_time.strftime("%Y-%m-%d %H:%M:%S")
-            date_str = ist_time.date().isoformat()
-
-            next_df = df.iloc[idx + 1: idx + 25]
-            low_hit = next_df['low'] <= (price - stoploss)
-            high_hit1 = next_df['high'] >= (price + target)
-            high_hit2 = next_df['high'] >= (price + target2)
-            high_hit3 = next_df['high'] >= (price + target3)
-
-            exit_ts1 = next_df[high_hit1].iloc[0]['time'].tz_localize("UTC").tz_convert("Asia/Kolkata").strftime("%Y-%m-%d %H:%M:%S") if high_hit1.any() else ""
-            exit_ts2 = next_df[high_hit2].iloc[0]['time'].tz_localize("UTC").tz_convert("Asia/Kolkata").strftime("%Y-%m-%d %H:%M:%S") if high_hit2.any() else ""
-            exit_ts3 = next_df[high_hit3].iloc[0]['time'].tz_localize("UTC").tz_convert("Asia/Kolkata").strftime("%Y-%m-%d %H:%M:%S") if high_hit3.any() else ""
-
-            if low_hit.any():
-                outcome = "Stoploss Hit"
-                pnl = -stoploss * lot_size
-                total_losses += 1
-                loss_amount += pnl
-                stoploss_count[date_str] = stoploss_count.get(date_str, 0) + 1
-                targets_hit = 0
-            else:
-                lots_hit = 0
-                pnl = 0
-                if high_hit1.any():
-                    pnl += target * lot_size
-                    lots_hit += 1
-                if high_hit2.any():
-                    pnl += target2 * lot_size
-                    lots_hit += 1
-                if high_hit3.any():
-                    pnl += target3 * lot_size
-                    lots_hit += 1
-                outcome = f"{lots_hit} Targets Hit"
-                if lots_hit > 0:
-                    successful_signals += 1
-                    total_wins += 1
-                    win_amount += pnl
-                targets_hit = lots_hit
-
-            total_pnl += pnl
-            daily_pnl[date_str] = daily_pnl.get(date_str, 0) + pnl
-            targets_hit_count[date_str] = targets_hit_count.get(date_str, 0) + targets_hit
-
-            option_chain_confirmation = "Yes" if confidence == "High" else "No"
-
-            failure_reason = basic_failure_reason(
-                candle['rsi'], candle['macd'], candle['macd_signal'], price,
-                candle['ema_20'], targets_hit, outcome
-            )
-
-            signal_data = {
-                "signal_time": signal_time,
-                "signal": current_signal,
-                "price": price,
-                "rsi": candle['rsi'],
-                "macd": candle['macd'],
-                "macd_signal": candle['macd_signal'],
-                "ema_20": candle['ema_20'],
-                "atr": candle['atr'],
-                "confidence": confidence,
-                "rsi_reason": rsi_reason,
-                "macd_reason": macd_reason,
-                "price_reason": price_reason,
-                "trade_type": trade_type,
-                "option_chain_confirmation": option_chain_confirmation,
-                "outcome": outcome,
-                "pnl": pnl,
-                "targets_hit": targets_hit,
-                "stoploss_count": stoploss_count.get(date_str, 0),
-                "failure_reason": failure_reason
-            }
-
-            log_backtesting_sql(index_name, signal_data)
-
-            confirmation_counter = 0
-            total_signals += 1
-
-        last_signal = current_signal
-
-    accuracy = (successful_signals / total_signals * 100) if total_signals else 0
-    avg_profit = (win_amount / total_wins) if total_wins else 0
-    avg_loss = (loss_amount / total_losses) if total_losses else 0
-    win_ratio = (total_wins / total_signals * 100) if total_signals else 0
-
-    print(f"\n📊 Accuracy for {index_name}: {accuracy:.2f}% ({successful_signals}/{total_signals})")
-    print(f"✅ Wins: {total_wins}, ❌ Losses: {total_losses}, 💰 Net P&L: ₹{total_pnl:.2f}")
-    print("📈 Daily P&L Summary:")
-    for d, p in daily_pnl.items():
-        print(f"{d}: ₹{p:.2f}")
-
-    return accuracy, total_pnl, total_wins, total_losses, win_amount, loss_amount, win_ratio
+    return execute_supertrend_macd_rsi_ema_strategy(df, index_name, lot_size)
 
 
 
@@ -368,7 +203,11 @@ def run_bot(fyers):
             if df.empty:
                 print(f"❗ No candles available for {index_name}")
                 continue
+            # Debugging: Check the type of df['close'] before calculating indicators
+            print(f"Type of df['close'] before indicators: {type(df['close'])}")
             df = calculate_indicators(df)
+            # Debugging: Check the type of df['close'] after calculating indicators
+            print(f"Type of df['close'] after indicators: {type(df['close'])}")
             accuracy, total_pnl, total_wins, total_losses, win_amount, loss_amount, win_ratio = generate_signal_all(
                 df,
                 index_name,
