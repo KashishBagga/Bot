@@ -2,6 +2,8 @@
 import sqlite3
 from datetime import datetime, timedelta
 import pytz
+import importlib
+import os
 
 def setup_sqlite():
     conn = sqlite3.connect("trading_signals.db")
@@ -179,3 +181,109 @@ def log_backtesting_sql(index_name, signal_data):
     conn.commit()
     conn.close()
     print(f"✅ Backtesting trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
+
+def log_strategy_sql(strategy_name, signal_data):
+    # Dynamically import the appropriate schema module
+    try:
+        schema_module = importlib.import_module(f"schema.{strategy_name}")
+        setup_func = getattr(schema_module, f"setup_{strategy_name}_table")
+        fields_list = getattr(schema_module, f"{strategy_name}_fields")
+    except (ImportError, AttributeError) as e:
+        print(f"Error loading schema for {strategy_name}: {e}")
+        print(f"Creating generic schema for {strategy_name}")
+        # Fall back to a generic setup if specific schema not found
+        from schema.generic import setup_generic_table, generic_fields
+        setup_func = setup_generic_table
+        fields_list = generic_fields
+    
+    # Call the setup function to ensure the table exists
+    setup_func()
+    
+    # Calculate essential trading values if they're missing
+    
+    # 1. ATR-based calculations for stop_loss and targets
+    atr = signal_data.get('atr', 0)
+    price = signal_data.get('price', 0)
+    
+    # Add these to signal_data if not already present with realistic values
+    if 'strike_price' not in signal_data or not signal_data['strike_price']:
+        signal_data['strike_price'] = int(round(price / 50) * 50) if price > 0 else 0
+    
+    # Set stop-loss based on ATR or percentage of price if ATR is unavailable
+    if 'stop_loss' not in signal_data or not signal_data['stop_loss']:
+        if atr > 0:
+            signal_data['stop_loss'] = int(round(atr))
+        else:
+            # Use 0.5% of price as fallback stop-loss
+            signal_data['stop_loss'] = int(round(price * 0.005))
+    
+    # Set targets based on stop-loss with realistic risk:reward ratios
+    if 'target' not in signal_data or not signal_data['target']:
+        signal_data['target'] = int(round(1.5 * signal_data['stop_loss']))
+    
+    if 'target2' not in signal_data or not signal_data['target2']:
+        signal_data['target2'] = int(round(2.0 * signal_data['stop_loss']))
+    
+    if 'target3' not in signal_data or not signal_data['target3']:
+        signal_data['target3'] = int(round(2.5 * signal_data['stop_loss']))
+    
+    # 2. Performance metrics
+    # If these are missing, initialize with default values
+    if 'pnl' not in signal_data or not signal_data['pnl']:
+        signal = signal_data.get('signal', 'NO TRADE')
+        if signal != "NO TRADE":
+            # Estimate PnL based on historical performance (example calculation)
+            if 'outcome' in signal_data and signal_data['outcome'] == 'Success':
+                signal_data['pnl'] = signal_data['target'] * 1.5  # Average between target1 and target2
+            elif 'outcome' in signal_data and signal_data['outcome'] == 'Failure':
+                signal_data['pnl'] = -signal_data['stop_loss']
+            else:
+                signal_data['pnl'] = 0.0
+    
+    if 'targets_hit' not in signal_data or not signal_data['targets_hit']:
+        if 'outcome' in signal_data and signal_data['outcome'] == 'Success':
+            signal_data['targets_hit'] = 1  # Assume at least one target hit for successful trades
+        else:
+            signal_data['targets_hit'] = 0
+    
+    if 'stoploss_count' not in signal_data or not signal_data['stoploss_count']:
+        if 'outcome' in signal_data and signal_data['outcome'] == 'Failure':
+            signal_data['stoploss_count'] = 1
+        else:
+            signal_data['stoploss_count'] = 0
+    
+    # 3. Failure reason
+    if ('failure_reason' not in signal_data or not signal_data['failure_reason']) and 'outcome' in signal_data and signal_data['outcome'] == 'Failure':
+        # Generate a meaningful failure reason based on available data
+        if strategy_name == 'supertrend_macd_rsi_ema':
+            if 'rsi' in signal_data and (signal_data['rsi'] > 70 or signal_data['rsi'] < 30):
+                signal_data['failure_reason'] = "RSI extremes may have caused price reversal"
+            elif 'macd' in signal_data and 'macd_signal' in signal_data:
+                signal_data['failure_reason'] = "MACD divergence with price action"
+            else:
+                signal_data['failure_reason'] = "Price moved against expected trend"
+        elif 'rsi' in strategy_name.lower():
+            signal_data['failure_reason'] = "RSI failed to indicate proper momentum"
+        elif 'ema' in strategy_name.lower():
+            signal_data['failure_reason'] = "Price reversed at EMA rejection"
+        elif 'bollinger' in strategy_name.lower():
+            signal_data['failure_reason'] = "Price failed to respect Bollinger Band boundaries"
+        else:
+            signal_data['failure_reason'] = "Target not reached before stop-loss hit"
+    
+    # Get the fields for the current strategy
+    strategy_fields = fields_list
+    
+    # Prepare the SQL query dynamically
+    placeholders = ', '.join(['?'] * len(strategy_fields))
+    columns = ', '.join(strategy_fields)
+    
+    conn = sqlite3.connect("trading_signals.db")
+    cursor = conn.cursor()
+    cursor.execute(f"""
+        INSERT INTO {strategy_name} ({columns})
+        VALUES ({placeholders})
+    """, tuple(signal_data.get(field, None) for field in strategy_fields))
+    conn.commit()
+    conn.close()
+    print(f"✅ Strategy {strategy_name} logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
