@@ -195,6 +195,11 @@ def log_strategy_sql(strategy_name, signal_data):
     Log strategy signals to the corresponding table in the database.
     Validates schema and removes fields that don't exist in the table.
     """
+    # Skip logging if this is a NO TRADE signal or None
+    signal = signal_data.get('signal')
+    if not signal or signal == 'NO TRADE' or signal == 'None':
+        return
+        
     # Handle strategy name backward compatibility
     original_strategy_name = strategy_name
     

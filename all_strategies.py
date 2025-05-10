@@ -415,19 +415,25 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
                         try:
                             from db import log_strategy_sql
                             
-                            # print(f"🔄 Saving {len(all_signals)} signals to database table '{strategy_name}'...")
+                            # Filter out NO TRADE signals for database logging
+                            trading_signals = [s for s in all_signals if s.get('signal') != 'NO TRADE']
                             
                             records_saved = 0
-                            for signal_info in all_signals:
-                                try:
-                                    # Log to the database using the strategy-specific function
-                                    log_strategy_sql(strategy_name, signal_info)
-                                    records_saved += 1
-                                except Exception as e:
-                                    print(f"❌ Error saving signal to database: {e}")
-                                    continue
-                            
-                            # print(f"✅ Saved {records_saved} signals to database table '{strategy_name}'")
+                            if trading_signals:
+                                # print(f"🔄 Saving {len(trading_signals)} trading signals to database table '{strategy_name}'...")
+                                for signal_info in trading_signals:
+                                    try:
+                                        # Log to the database using the strategy-specific function
+                                        log_strategy_sql(strategy_name, signal_info)
+                                        records_saved += 1
+                                    except Exception as e:
+                                        print(f"❌ Error saving signal to database: {e}")
+                                        continue
+                                
+                                # print(f"✅ Saved {records_saved} signals to database table '{strategy_name}'")
+                            else:
+                                # print(f"ℹ️ No trading signals (BUY CALL/BUY PUT) to save for '{strategy_name}'")
+                                pass
                             
                             strategy_results[index_name] = {
                                 'candles': candle_count,

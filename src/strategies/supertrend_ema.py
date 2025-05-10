@@ -3,8 +3,10 @@ SupertrendEma strategy.
 Trading strategy implementation.
 """
 import pandas as pd
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from datetime import datetime
 from src.core.strategy import Strategy
+from db import log_strategy_sql
 
 class SupertrendEma(Strategy):
     """Trading strategy implementation for Supertrend with EMA confirmation.
@@ -76,11 +78,102 @@ class SupertrendEma(Strategy):
                         
         return data
     
-    def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
+    def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
+                             target: float, target2: float, target3: float,
+                             future_data: pd.DataFrame) -> Dict[str, Any]:
+        """Calculate performance metrics based on future data.
+        
+        Args:
+            signal: The trading signal (BUY CALL or BUY PUT)
+            entry_price: The price at signal generation
+            stop_loss: The stop loss price
+            target: The first target price
+            target2: The second target price
+            target3: The third target price
+            future_data: Future candles after signal generation
+            
+        Returns:
+            Dict containing outcome, pnl, targets_hit, stoploss_count, and failure_reason
+        """
+        if future_data is None or future_data.empty:
+            return {
+                "outcome": "Pending",
+                "pnl": 0.0,
+                "targets_hit": 0,
+                "stoploss_count": 0,
+                "failure_reason": ""
+            }
+        
+        # Initialize performance metrics
+        outcome = "Pending"
+        pnl = 0.0
+        targets_hit = 0
+        stoploss_count = 0
+        failure_reason = ""
+        
+        # For BUY CALL, check if future prices went up to targets or down to stop loss
+        if signal == "BUY CALL":
+            max_future_price = future_data['high'].max()
+            min_future_price = future_data['low'].min()
+            
+            # Check if stop loss was hit
+            if min_future_price <= (entry_price - stop_loss):
+                outcome = "Loss"
+                pnl = -1.0 * stop_loss  # Negative value for stop loss
+                stoploss_count = 1
+                failure_reason = f"Stop loss hit at {entry_price - stop_loss:.2f}"
+            else:
+                outcome = "Win"
+                # Check which targets were hit
+                if max_future_price >= (entry_price + target):
+                    targets_hit += 1
+                    pnl += 1.0 * target
+                if max_future_price >= (entry_price + target2):
+                    targets_hit += 1
+                    pnl += 1.0 * (target2 - target)
+                if max_future_price >= (entry_price + target3):
+                    targets_hit += 1
+                    pnl += 1.0 * (target3 - target2)
+        
+        # For BUY PUT, check if future prices went down to targets or up to stop loss
+        elif signal == "BUY PUT":
+            max_future_price = future_data['high'].max()
+            min_future_price = future_data['low'].min()
+            
+            # Check if stop loss was hit
+            if max_future_price >= (entry_price + stop_loss):
+                outcome = "Loss"
+                pnl = -1.0 * stop_loss
+                stoploss_count = 1
+                failure_reason = f"Stop loss hit at {entry_price + stop_loss:.2f}"
+            else:
+                outcome = "Win"
+                # Check which targets were hit
+                if min_future_price <= (entry_price - target):
+                    targets_hit += 1
+                    pnl += 1.0 * target
+                if min_future_price <= (entry_price - target2):
+                    targets_hit += 1
+                    pnl += 1.0 * (target2 - target)
+                if min_future_price <= (entry_price - target3):
+                    targets_hit += 1
+                    pnl += 1.0 * (target3 - target2)
+        
+        return {
+            "outcome": outcome,
+            "pnl": pnl,
+            "targets_hit": targets_hit,
+            "stoploss_count": stoploss_count,
+            "failure_reason": failure_reason
+        }
+    
+    def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
         
         Args:
             data: Market data with indicators
+            index_name: Optional index name for database logging
+            future_data: Optional future data for performance tracking
             
         Returns:
             Dict[str, Any]: Signal data
@@ -96,6 +189,13 @@ class SupertrendEma(Strategy):
         confidence = "Low"
         trade_type = "Intraday"
         price_reason = ""
+        
+        # Initialize performance metrics
+        outcome = "Pending"
+        pnl = 0.0
+        targets_hit = 0
+        stoploss_count = 0
+        failure_reason = ""
         
         # Calculate price to EMA ratio if not already available
         price_to_ema_ratio = candle.get('price_to_ema_ratio', 
@@ -135,8 +235,28 @@ class SupertrendEma(Strategy):
         target2 = int(round(2.0 * atr))
         target3 = int(round(2.5 * atr))
         
+        # Calculate performance metrics if a signal was generated and future data is available
+        if signal != "NO TRADE" and future_data is not None and not future_data.empty:
+            entry_price = candle['close']
+            performance = self.calculate_performance(
+                signal=signal,
+                entry_price=entry_price,
+                stop_loss=stop_loss,
+                target=target1,
+                target2=target2,
+                target3=target3,
+                future_data=future_data
+            )
+            
+            # Update performance metrics
+            outcome = performance["outcome"]
+            pnl = performance["pnl"]
+            targets_hit = performance["targets_hit"]
+            stoploss_count = performance["stoploss_count"]
+            failure_reason = performance["failure_reason"]
+        
         # Return the signal data
-        return {
+        signal_data = {
             "signal": signal,
             "price": candle['close'],
             "ema_20": candle['ema_20'],
@@ -144,10 +264,24 @@ class SupertrendEma(Strategy):
             "price_to_ema_ratio": price_to_ema_ratio,
             "supertrend": supertrend_value,
             "stop_loss": stop_loss,
-            "target1": target1,
+            "target": target1,
             "target2": target2,
             "target3": target3,
             "confidence": confidence,
             "price_reason": price_reason,
-            "trade_type": trade_type
+            "trade_type": trade_type,
+            "outcome": outcome,
+            "pnl": pnl,
+            "targets_hit": targets_hit,
+            "stoploss_count": stoploss_count,
+            "failure_reason": failure_reason
         }
+        
+        # If index_name is provided, log to database
+        if index_name and signal != "NO TRADE":
+            db_signal_data = signal_data.copy()
+            db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            db_signal_data["index_name"] = index_name
+            log_strategy_sql('supertrend_ema', db_signal_data)
+        
+        return signal_data

@@ -78,6 +78,108 @@ class BreakoutRsi(Strategy):
             
         return data
     
+    def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
+                             target: float, target2: float, target3: float,
+                             future_data: pd.DataFrame) -> Dict[str, Any]:
+        """Calculate performance metrics based on future data.
+        
+        Args:
+            signal: The trading signal (BUY CALL or BUY PUT)
+            entry_price: The price at signal generation
+            stop_loss: The stop loss price
+            target: The first target price
+            target2: The second target price
+            target3: The third target price
+            future_data: Future candles after signal generation
+            
+        Returns:
+            Dict containing outcome, pnl, targets_hit, stoploss_count, and failure_reason
+        """
+        if future_data is None or future_data.empty:
+            return {
+                "outcome": "Pending",
+                "pnl": 0.0,
+                "targets_hit": 0,
+                "stoploss_count": 0,
+                "failure_reason": ""
+            }
+        
+        # Initialize performance metrics
+        outcome = "Pending"
+        pnl = 0.0
+        targets_hit = 0
+        stoploss_count = 0
+        failure_reason = ""
+        
+        # Calculate stop loss and target prices
+        if signal == "BUY CALL":
+            stop_loss_price = entry_price - stop_loss
+            target1_price = entry_price + target
+            target2_price = entry_price + target2
+            target3_price = entry_price + target3
+            
+            # Process each future candle chronologically
+            for i, candle in future_data.iterrows():
+                # Check if stop loss is hit first
+                if candle['low'] <= stop_loss_price:
+                    outcome = "Loss"
+                    pnl = -stop_loss
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    break  # Exit the loop as trade is closed
+                
+                # Check which targets are hit
+                if targets_hit == 0 and candle['high'] >= target1_price:
+                    targets_hit = 1
+                    pnl = target
+                    outcome = "Win"
+                
+                if targets_hit == 1 and candle['high'] >= target2_price:
+                    targets_hit = 2
+                    pnl += (target2 - target)
+                
+                if targets_hit == 2 and candle['high'] >= target3_price:
+                    targets_hit = 3
+                    pnl += (target3 - target2)
+        
+        elif signal == "BUY PUT":
+            stop_loss_price = entry_price + stop_loss
+            target1_price = entry_price - target
+            target2_price = entry_price - target2
+            target3_price = entry_price - target3
+            
+            # Process each future candle chronologically
+            for i, candle in future_data.iterrows():
+                # Check if stop loss is hit first
+                if candle['high'] >= stop_loss_price:
+                    outcome = "Loss"
+                    pnl = -stop_loss
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    break  # Exit the loop as trade is closed
+                
+                # Check which targets are hit
+                if targets_hit == 0 and candle['low'] <= target1_price:
+                    targets_hit = 1
+                    pnl = target
+                    outcome = "Win"
+                
+                if targets_hit == 1 and candle['low'] <= target2_price:
+                    targets_hit = 2
+                    pnl += (target2 - target)
+                
+                if targets_hit == 2 and candle['low'] <= target3_price:
+                    targets_hit = 3
+                    pnl += (target3 - target2)
+        
+        return {
+            "outcome": outcome,
+            "pnl": round(pnl, 2),
+            "targets_hit": targets_hit,
+            "stoploss_count": stoploss_count,
+            "failure_reason": failure_reason
+        }
+    
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
         
@@ -149,6 +251,26 @@ class BreakoutRsi(Strategy):
                         confidence = "High"
                         rsi_reason = f"Weak RSI momentum: {candle.get('rsi', 0):.1f}"
         
+        # Calculate performance metrics if a signal was generated and future data is available
+        if signal != "NO TRADE" and future_data is not None and not future_data.empty:
+            entry_price = candle['close']
+            performance = self.calculate_performance(
+                signal=signal,
+                entry_price=entry_price,
+                stop_loss=stop_loss,
+                target=target,
+                target2=target2,
+                target3=target3,
+                future_data=future_data
+            )
+            
+            # Update performance metrics
+            outcome = performance["outcome"]
+            pnl = performance["pnl"]
+            targets_hit = performance["targets_hit"]
+            stoploss_count = performance["stoploss_count"]
+            failure_reason = performance["failure_reason"]
+        
         # Create the signal data dictionary
         signal_data = {
             "signal": signal,
@@ -193,6 +315,7 @@ def run_strategy(candle, prev_candle=None, index_name=None, future_data=None, br
     
     # Create a single-row DataFrame from the candle
     if not isinstance(candle, pd.DataFrame):
+        # Import pandas here to avoid circular imports
         import pandas as pd
         data = pd.DataFrame([candle])
     else:
