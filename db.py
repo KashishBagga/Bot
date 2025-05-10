@@ -182,19 +182,50 @@ def log_backtesting_sql(index_name, signal_data):
     conn.close()
     print(f"✅ Backtesting trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
 
+def get_table_columns(cursor, table_name):
+    """Get a list of column names for a given table"""
+    try:
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        return [col[1] for col in cursor.fetchall()]
+    except:
+        return []
+
 def log_strategy_sql(strategy_name, signal_data):
+    """
+    Log strategy signals to the corresponding table in the database.
+    Validates schema and removes fields that don't exist in the table.
+    """
+    # Handle strategy name backward compatibility
+    original_strategy_name = strategy_name
+    
+    # Remove 'strategy_' prefix if it exists, for schema module lookup
+    if strategy_name.startswith('strategy_'):
+        strategy_name = strategy_name[9:]  # Remove 'strategy_' prefix for newer files
+    
     # Dynamically import the appropriate schema module
     try:
-        schema_module = importlib.import_module(f"schema.{strategy_name}")
+        schema_module = importlib.import_module(f"src.models.schema.{strategy_name}")
         setup_func = getattr(schema_module, f"setup_{strategy_name}_table")
         fields_list = getattr(schema_module, f"{strategy_name}_fields")
     except (ImportError, AttributeError) as e:
-        print(f"Error loading schema for {strategy_name}: {e}")
-        print(f"Creating generic schema for {strategy_name}")
-        # Fall back to a generic setup if specific schema not found
-        from schema.generic import setup_generic_table, generic_fields
-        setup_func = setup_generic_table
-        fields_list = generic_fields
+        # Try with 'strategy_' prefix as fallback for backward compatibility
+        try:
+            schema_module = importlib.import_module(f"src.models.schema.strategy_{strategy_name}")
+            setup_func = getattr(schema_module, f"setup_strategy_{strategy_name}_table")
+            fields_list = getattr(schema_module, f"strategy_{strategy_name}_fields")
+            
+            # If we found it with the prefix, update the strategy name for table name
+            strategy_name = f"strategy_{strategy_name}"
+        except (ImportError, AttributeError):
+            print(f"Error loading schema for {original_strategy_name}: {e}")
+            print(f"Creating generic schema for {original_strategy_name}")
+            # Fall back to a generic setup if specific schema not found
+            from src.models.schema.generic import setup_generic_table, generic_fields
+            setup_func = setup_generic_table
+            fields_list = generic_fields
+            
+            # Use the original strategy name for the table
+            strategy_name = original_strategy_name
     
     # Call the setup function to ensure the table exists
     setup_func()
@@ -271,19 +302,69 @@ def log_strategy_sql(strategy_name, signal_data):
         else:
             signal_data['failure_reason'] = "Target not reached before stop-loss hit"
     
-    # Get the fields for the current strategy
-    strategy_fields = fields_list
-    
-    # Prepare the SQL query dynamically
-    placeholders = ', '.join(['?'] * len(strategy_fields))
-    columns = ', '.join(strategy_fields)
-    
+    # Connect to the database
     conn = sqlite3.connect("trading_signals.db")
     cursor = conn.cursor()
-    cursor.execute(f"""
-        INSERT INTO {strategy_name} ({columns})
-        VALUES ({placeholders})
-    """, tuple(signal_data.get(field, None) for field in strategy_fields))
-    conn.commit()
-    conn.close()
-    print(f"✅ Strategy {strategy_name} logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
+    
+    # Get the list of actual columns in the table
+    actual_columns = get_table_columns(cursor, strategy_name)
+    
+    if not actual_columns:
+        print(f"Error: Table {strategy_name} not found in database")
+        # Create a basic table if it doesn't exist
+        cursor.execute(f"""
+            CREATE TABLE IF NOT EXISTS {strategy_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                signal_time TEXT,
+                index_name TEXT,
+                signal TEXT,
+                price REAL,
+                confidence TEXT
+            )
+        """)
+        conn.commit()
+        actual_columns = ["id", "signal_time", "index_name", "signal", "price", "confidence"]
+    
+    # Make sure we have the required fields
+    if "time" in signal_data and "signal_time" not in signal_data:
+        signal_data["signal_time"] = signal_data["time"]
+    
+    if "signal_time" not in signal_data:
+        signal_data["signal_time"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    if "index_name" not in signal_data:
+        signal_data["index_name"] = "UNKNOWN"
+    
+    # Filter signal_data to only include fields that exist in the table
+    filtered_data = {}
+    for field in signal_data:
+        if field in actual_columns:
+            filtered_data[field] = signal_data[field]
+    
+    # Add missing required fields with default values
+    for col in ["signal", "price", "confidence"]:
+        if col not in filtered_data and col in actual_columns:
+            if col == "signal":
+                filtered_data[col] = "NO TRADE"
+            elif col == "price":
+                filtered_data[col] = 0.0
+            elif col == "confidence":
+                filtered_data[col] = "Low"
+    
+    # Prepare columns and values for SQL
+    columns = list(filtered_data.keys())
+    placeholders = ', '.join(['?'] * len(columns))
+    columns_str = ', '.join(columns)
+    
+    try:
+        # Execute the SQL query
+        cursor.execute(f"""
+            INSERT INTO {strategy_name} ({columns_str})
+            VALUES ({placeholders})
+        """, tuple(filtered_data[col] for col in columns))
+        conn.commit()
+        # print(f"✅ Strategy {strategy_name} logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
+    except Exception as e:
+        print(f"❌ Error inserting data into {strategy_name}: {e}")
+    finally:
+        conn.close()

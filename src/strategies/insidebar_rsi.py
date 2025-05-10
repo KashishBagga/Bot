@@ -1,0 +1,134 @@
+"""
+InsidebarRsi strategy.
+Trading strategy implementation.
+"""
+import pandas as pd
+from typing import Dict, Any
+from src.core.strategy import Strategy
+from src.core.indicators import indicators
+
+class InsidebarRsi(Strategy):
+    """Trading strategy implementation for Inside Bar with RSI confirmation."""
+    
+    def __init__(self, params: Dict[str, Any] = None):
+        """Initialize the strategy.
+        
+        Args:
+            params: Strategy parameters
+        """
+        default_params = {
+            'rsi_overbought': 60,
+            'rsi_extreme_overbought': 70,
+            'rsi_oversold': 40,
+            'rsi_extreme_oversold': 30
+        }
+        
+        # Use provided params or defaults
+        if params:
+            for key, value in default_params.items():
+                if key not in params:
+                    params[key] = value
+        else:
+            params = default_params
+            
+        super().__init__("insidebar_rsi", params)
+    
+    def add_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
+        """Add strategy-specific indicators to the data.
+        
+        Args:
+            data: Market data with common indicators
+            
+        Returns:
+            pd.DataFrame: Data with added strategy-specific indicators
+        """
+        # Identify inside bars
+        data['prev_high'] = data['high'].shift(1)
+        data['prev_low'] = data['low'].shift(1)
+        data['is_inside'] = (data['high'] < data['prev_high']) & (data['low'] > data['prev_low'])
+        
+        # Calculate RSI levels based on thresholds
+        def get_rsi_level(rsi):
+            if rsi < self.params['rsi_extreme_oversold']:
+                return "Extreme Oversold"
+            elif rsi < self.params['rsi_oversold']:
+                return "Oversold"
+            elif rsi < self.params['rsi_overbought']:
+                return "Neutral"
+            elif rsi < self.params['rsi_extreme_overbought']:
+                return "Overbought"
+            else:
+                return "Extreme Overbought"
+        
+        # Apply the function to create an RSI level column
+        data['rsi_level'] = data['rsi'].apply(get_rsi_level)
+        
+        return data
+    
+    def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """Analyze data and generate trading signals.
+        
+        Args:
+            data: Market data with indicators
+            
+        Returns:
+            Dict[str, Any]: Signal data
+        """
+        # Calculate indicators if they haven't been calculated yet
+        if 'is_inside' not in data.columns:
+            data = self.calculate_indicators(data)
+        
+        # Get the latest candle
+        candle = data.iloc[-1]
+        
+        # Set default values
+        signal = "None"
+        confidence = "Low"
+        trade_type = "Intraday"
+        rsi_reason = ""
+        macd_reason = ""
+        price_reason = ""
+        
+        # Check if we have an inside bar
+        is_inside = candle['is_inside']
+        rsi_level = candle['rsi_level']
+        
+        # Implement strategy logic
+        if is_inside and candle['rsi'] > self.params['rsi_overbought']:
+            signal = "BUY CALL"
+            confidence = "High" if candle['rsi'] > self.params['rsi_extreme_overbought'] else "Medium"
+            rsi_reason = f"RSI {candle['rsi']:.2f} > {self.params['rsi_overbought']} ({rsi_level})"
+            price_reason = "Inside bar pattern"
+        elif is_inside and candle['rsi'] < self.params['rsi_oversold']:
+            signal = "BUY PUT"
+            confidence = "High" if candle['rsi'] < self.params['rsi_extreme_oversold'] else "Medium"
+            rsi_reason = f"RSI {candle['rsi']:.2f} < {self.params['rsi_oversold']} ({rsi_level})"
+            price_reason = "Inside bar pattern"
+        
+        # Calculate stops and targets based on ATR
+        atr = candle['atr']
+        stop_loss = int(round(atr))
+        target1 = int(round(1.5 * atr))
+        target2 = int(round(2.0 * atr))
+        target3 = int(round(2.5 * atr))
+        
+        # Return the signal data
+        return {
+            "signal": signal,
+            "price": candle['close'],
+            "rsi": candle['rsi'],
+            "rsi_level": rsi_level,
+            "macd": candle['macd'] if 'macd' in candle else 0,
+            "macd_signal": candle['macd_signal'] if 'macd_signal' in candle else 0,
+            "ema_20": candle['ema'] if 'ema' in candle else 0,
+            "atr": candle['atr'],
+            "confidence": confidence,
+            "rsi_reason": rsi_reason,
+            "macd_reason": macd_reason,
+            "price_reason": price_reason,
+            "trade_type": trade_type,
+            "stop_loss": stop_loss,
+            "target": target1,
+            "target2": target2,
+            "target3": target3
+        }

@@ -1,0 +1,28 @@
+# API clients
+fyers-apiv3==3.0.3
+requests==2.31.0
+
+# Data analysis and processing
+pandas==2.1.2
+numpy==1.26.0
+ta==0.11.0
+
+# Database
+SQLAlchemy==2.0.23
+
+# Scheduling and time
+schedule==1.2.1
+pytz==2023.3
+
+# Configuration
+python-dotenv==1.0.0
+
+# Utilities
+argparse==1.4.0
+
+# Visualization (optional)
+matplotlib==3.8.1
+seaborn==0.13.0
+
+# Testing
+pytest==7.4.3 

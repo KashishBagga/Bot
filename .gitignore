@@ -1,5 +1,7 @@
 # Environment variables
 .env
+.env.*
+!.env.example
 
 # Python
 __pycache__/
@@ -19,7 +21,6 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -27,16 +28,28 @@ wheels/
 # Logs
 *.log
 logs/
-trading_bot.log
 
-# IDE
+# Database
+*.db
+*.sqlite3
+
+# Credentials
+*.json
+!requirements.json
+
+# IDE specific files
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# OS
+# OS specific files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 analysis-test-458117-64b56a994c55.json
