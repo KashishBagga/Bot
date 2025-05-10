@@ -198,7 +198,7 @@ class InsidebarBollinger(Strategy):
         signal = "NO TRADE"
         confidence = "Low"
         trade_type = "Intraday"
-        rsi_reason = macd_reason = price_reason = ""
+        rsi_reason = price_reason = ""
         option_chain_confirmation = "No"
         
         # Performance tracking variables
@@ -287,7 +287,6 @@ class InsidebarBollinger(Strategy):
             "inside_bar_size": inside_bar_size if inside_bar_size is not None else 0,
             "confidence": confidence,
             "rsi_reason": rsi_reason,
-            "macd_reason": macd_reason,
             "price_reason": price_reason,
             "trade_type": trade_type,
             "option_chain_confirmation": option_chain_confirmation,

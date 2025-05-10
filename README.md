@@ -180,12 +180,12 @@ python run_backtesting.py --strategy supertrend_ema --days 60 --resolution 15
 The following strategies can be backtested:
 
 - `supertrend_ema`: Combines Supertrend indicator with EMA confirmation
-- `strategy_range_breakout_volatility`: Identifies breakouts from a price range when volatility is high
+- `range_breakout_volatility`: Identifies breakouts from a price range when volatility is high
 - `insidebar_rsi`: Detects inside bar patterns with RSI confirmation
-- `strategy_ema_crossover`: Generates signals based on EMA crossovers
-- `strategy_donchian_breakout`: Identifies breakouts from Donchian channels
-- `strategy_insidebar_bollinger`: Combines inside bar patterns with Bollinger Bands
-- `strategy_breakout_rsi`: Detects price breakouts with RSI confirmation
+- `ema_crossover`: Generates signals based on EMA crossovers
+- `donchian_breakout`: Identifies breakouts from Donchian channels
+- `insidebar_bollinger`: Combines inside bar patterns with Bollinger Bands
+- `breakout_rsi`: Detects price breakouts with RSI confirmation
 
 ### Backtesting Results
 

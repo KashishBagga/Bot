@@ -48,11 +48,13 @@ class SupertrendMacdRsiEma(Strategy):
         
         return data
     
-    def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
+    def analyze(self, data: pd.DataFrame, index_name: str = None, future_data = None) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
         
         Args:
             data: Market data with indicators
+            index_name: Name of the index or symbol being analyzed
+            future_data: Future candles for performance calculation
             
         Returns:
             Dict[str, Any]: Signal data
@@ -65,15 +67,22 @@ class SupertrendMacdRsiEma(Strategy):
         candle = data.iloc[-1]
         
         # Set default values
-        signal = "None"
+        signal = "NO TRADE"
         confidence = "Low"
         trade_type = "Intraday"
         rsi_reason = macd_reason = price_reason = ""
         
+        # Performance tracking variables
+        outcome = "Pending"
+        pnl = 0.0
+        targets_hit = 0
+        stoploss_count = 0
+        failure_reason = ""
+        
         # Check if the candle is valid for analysis
         if candle['full_range'] == 0:
             return {
-                "signal": "None",
+                "signal": "NO TRADE",
                 "price": candle['close'],
                 "rsi": candle['rsi'],
                 "macd": candle['macd'],
@@ -84,25 +93,30 @@ class SupertrendMacdRsiEma(Strategy):
                 "rsi_reason": "",
                 "macd_reason": "",
                 "price_reason": "Invalid candle with zero range",
-                "trade_type": trade_type
+                "trade_type": trade_type,
+                "outcome": outcome,
+                "pnl": pnl,
+                "targets_hit": targets_hit,
+                "stoploss_count": stoploss_count,
+                "failure_reason": failure_reason
             }
         
         # Check for bullish signal (RSI, MACD, EMA)
-        if (candle['rsi'] > 55 and  # Relaxed from 65
+        if (candle['rsi'] > 65 and  # Relaxed from 65
             candle['macd'] > candle['macd_signal'] and  # MACD above signal line
-            candle['close'] > candle['ema'] * 0.99 and  # Close near or above EMA
+            candle['close'] > candle['ema'] * 0.1 and  # Close near or above EMA
             candle['supertrend_direction'] > 0):  # Supertrend is bullish (1 for uptrend)
             
             signal = "BUY CALL"
             confidence = "High" if candle['rsi'] > 70 else "Medium"
             
             # Provide reasons for the signal
-            rsi_reason = f"RSI {candle['rsi']:.2f} > 55"
+            rsi_reason = f"RSI {candle['rsi']:.2f} > 65"
             macd_reason = f"MACD {candle['macd']:.2f} > Signal {candle['macd_signal']:.2f}"
             price_reason = f"Price {candle['close']:.2f} > EMA {candle['ema']:.2f}, Supertrend bullish"
         
         # Check for bearish signal (RSI, MACD, EMA)
-        elif (candle['rsi'] < 45 and  # Relaxed from 35
+        elif (candle['rsi'] < 35 and  # Relaxed from 35
               candle['macd'] < candle['macd_signal'] and  # MACD below signal line
               candle['close'] < candle['ema'] * 1.01 and  # Close near or below EMA
               candle['supertrend_direction'] < 0):  # Supertrend is bearish (-1 for downtrend)
@@ -121,6 +135,69 @@ class SupertrendMacdRsiEma(Strategy):
         target = int(round(1.5 * atr))
         target2 = int(round(2.0 * atr))
         target3 = int(round(2.5 * atr))
+        
+        # Calculate performance if we have a signal and future data
+        if signal != "NO TRADE" and future_data is not None and not future_data.empty:
+            # Calculate performance metrics
+            if signal == "BUY CALL":
+                stop_loss_price = candle['close'] - stop_loss
+                target1_price = candle['close'] + target
+                target2_price = candle['close'] + target2
+                target3_price = candle['close'] + target3
+                
+                # Process each future candle chronologically
+                for i, future_candle in future_data.iterrows():
+                    # Check if stop loss is hit first
+                    if future_candle['low'] <= stop_loss_price:
+                        outcome = "Loss"
+                        pnl = -stop_loss
+                        stoploss_count = 1
+                        failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                        break  # Exit the loop as trade is closed
+                    
+                    # Check which targets are hit
+                    if targets_hit == 0 and future_candle['high'] >= target1_price:
+                        targets_hit = 1
+                        pnl = target
+                        outcome = "Win"
+                    
+                    if targets_hit == 1 and future_candle['high'] >= target2_price:
+                        targets_hit = 2
+                        pnl += (target2 - target)
+                    
+                    if targets_hit == 2 and future_candle['high'] >= target3_price:
+                        targets_hit = 3
+                        pnl += (target3 - target2)
+            
+            elif signal == "BUY PUT":
+                stop_loss_price = candle['close'] + stop_loss
+                target1_price = candle['close'] - target
+                target2_price = candle['close'] - target2
+                target3_price = candle['close'] - target3
+                
+                # Process each future candle chronologically
+                for i, future_candle in future_data.iterrows():
+                    # Check if stop loss is hit first
+                    if future_candle['high'] >= stop_loss_price:
+                        outcome = "Loss"
+                        pnl = -stop_loss
+                        stoploss_count = 1
+                        failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                        break  # Exit the loop as trade is closed
+                    
+                    # Check which targets are hit
+                    if targets_hit == 0 and future_candle['low'] <= target1_price:
+                        targets_hit = 1
+                        pnl = target
+                        outcome = "Win"
+                    
+                    if targets_hit == 1 and future_candle['low'] <= target2_price:
+                        targets_hit = 2
+                        pnl += (target2 - target)
+                    
+                    if targets_hit == 2 and future_candle['low'] <= target3_price:
+                        targets_hit = 3
+                        pnl += (target3 - target2)
         
         # Return the signal data
         return {
@@ -142,5 +219,10 @@ class SupertrendMacdRsiEma(Strategy):
             "macd_reason": macd_reason,
             "price_reason": price_reason,
             "trade_type": trade_type,
-            "option_chain_confirmation": "Yes" if confidence == "High" else "No"
+            "option_chain_confirmation": "Yes" if confidence == "High" else "No",
+            "outcome": outcome,
+            "pnl": pnl,
+            "targets_hit": targets_hit,
+            "stoploss_count": stoploss_count,
+            "failure_reason": failure_reason
         } 

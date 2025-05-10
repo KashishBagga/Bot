@@ -302,7 +302,7 @@ def log_strategy_sql(strategy_name, signal_data):
     
     # Skip logging if this is a NO TRADE signal or None
     signal = signal_data.get('signal')
-    if not signal or signal == 'NO TRADE' or signal == 'None':
+    if not signal or signal == 'NO TRADE' or signal == 'None' or signal == None:
         return
     
     # Calculate essential trading values if they're missing
@@ -335,47 +335,20 @@ def log_strategy_sql(strategy_name, signal_data):
     
     # 2. Performance metrics
     # If these are missing, initialize with default values
+    if 'outcome' not in signal_data or not signal_data['outcome']:
+        signal_data['outcome'] = 'Pending'
+        
     if 'pnl' not in signal_data or not signal_data['pnl']:
-        signal = signal_data.get('signal', 'NO TRADE')
-        if signal != "NO TRADE":
-            # Estimate PnL based on historical performance (example calculation)
-            if 'outcome' in signal_data and signal_data['outcome'] == 'Success':
-                signal_data['pnl'] = signal_data['target'] * 1.5  # Average between target1 and target2
-            elif 'outcome' in signal_data and signal_data['outcome'] == 'Failure':
-                signal_data['pnl'] = -signal_data['stop_loss']
-            else:
-                signal_data['pnl'] = 0.0
+        signal_data['pnl'] = 0.0
     
     if 'targets_hit' not in signal_data or not signal_data['targets_hit']:
-        if 'outcome' in signal_data and signal_data['outcome'] == 'Success':
-            signal_data['targets_hit'] = 1  # Assume at least one target hit for successful trades
-        else:
-            signal_data['targets_hit'] = 0
+        signal_data['targets_hit'] = 0
     
     if 'stoploss_count' not in signal_data or not signal_data['stoploss_count']:
-        if 'outcome' in signal_data and signal_data['outcome'] == 'Failure':
-            signal_data['stoploss_count'] = 1
-        else:
-            signal_data['stoploss_count'] = 0
+        signal_data['stoploss_count'] = 0
     
-    # 3. Failure reason
-    if ('failure_reason' not in signal_data or not signal_data['failure_reason']) and 'outcome' in signal_data and signal_data['outcome'] == 'Failure':
-        # Generate a meaningful failure reason based on available data
-        if strategy_name == 'supertrend_macd_rsi_ema':
-            if 'rsi' in signal_data and (signal_data['rsi'] > 70 or signal_data['rsi'] < 30):
-                signal_data['failure_reason'] = "RSI extremes may have caused price reversal"
-            elif 'macd' in signal_data and 'macd_signal' in signal_data:
-                signal_data['failure_reason'] = "MACD divergence with price action"
-            else:
-                signal_data['failure_reason'] = "Price moved against expected trend"
-        elif 'rsi' in strategy_name.lower():
-            signal_data['failure_reason'] = "RSI failed to indicate proper momentum"
-        elif 'ema' in strategy_name.lower():
-            signal_data['failure_reason'] = "Price reversed at EMA rejection"
-        elif 'bollinger' in strategy_name.lower():
-            signal_data['failure_reason'] = "Price failed to respect Bollinger Band boundaries"
-        else:
-            signal_data['failure_reason'] = "Target not reached before stop-loss hit"
+    if 'failure_reason' not in signal_data or not signal_data['failure_reason']:
+        signal_data['failure_reason'] = ""
     
     # Connect to the database
     conn = sqlite3.connect("trading_signals.db")
@@ -407,8 +380,23 @@ def log_strategy_sql(strategy_name, signal_data):
     if "signal_time" not in signal_data:
         signal_data["signal_time"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    if "index_name" not in signal_data:
-        signal_data["index_name"] = "UNKNOWN"
+    # Ensure index_name is set correctly - don't default to UNKNOWN
+    if "index_name" not in signal_data or not signal_data["index_name"] or signal_data["index_name"] == "UNKNOWN":
+        # Try to get index name from proper sources:
+        # 1. Check if we're backtesting one of the main indices
+        if "price" in signal_data:
+            price = signal_data["price"]
+            # Rough price-based guessing for main indices
+            if 15000 <= price <= 25000:
+                signal_data["index_name"] = "NIFTY50"
+            elif 35000 <= price <= 60000:
+                signal_data["index_name"] = "BANKNIFTY"
+            else:
+                # Default to NIFTY50 if we can't determine
+                signal_data["index_name"] = "NIFTY50"
+        else:
+            # Default to NIFTY50 if we have no other information
+            signal_data["index_name"] = "NIFTY50"
     
     # Filter signal_data to only include fields that exist in the table
     filtered_data = {}

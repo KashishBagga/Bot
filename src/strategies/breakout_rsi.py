@@ -201,7 +201,7 @@ class BreakoutRsi(Strategy):
         signal = "NO TRADE"
         confidence = "Low"
         trade_type = "Intraday"
-        rsi_reason = macd_reason = price_reason = ""
+        rsi_reason = price_reason = ""
         
         # Performance tracking variables
         outcome = "Pending"
@@ -285,7 +285,6 @@ class BreakoutRsi(Strategy):
             "target2": target2,
             "target3": target3,
             "rsi_reason": rsi_reason,
-            "macd_reason": macd_reason,
             "price_reason": price_reason,
             "outcome": outcome,
             "pnl": pnl,

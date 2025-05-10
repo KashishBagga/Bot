@@ -303,7 +303,19 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
                             # Process all candles
                             for i in range(candle_count):
                                 candle_data = df_with_indicators.iloc[i:i+1]
-                                signal_result = strategy.analyze(candle_data)
+                                
+                                # Get future data for performance calculation (next 5-10 candles)
+                                future_data = None
+                                if i + 1 < candle_count:
+                                    # Get up to 10 future candles or whatever is available
+                                    future_end = min(i + 11, candle_count)
+                                    future_data = df_with_indicators.iloc[i+1:future_end]
+                                
+                                # Some strategies do not accept index_name parameter
+                                if strategy_name in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
+                                    signal_result = strategy.analyze(candle_data, future_data=future_data)
+                                else:
+                                    signal_result = strategy.analyze(candle_data, index_name=index_name, future_data=future_data)
                                 
                                 # Safe access to values - some strategies might return different keys
                                 price = signal_result.get('price', df_with_indicators.iloc[i]['close'])
@@ -318,7 +330,8 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
                                     'time': df_with_indicators.iloc[i]['time'].strftime('%Y-%m-%d %H:%M:%S'),
                                     'signal': signal,
                                     'price': price,
-                                    'confidence': confidence
+                                    'confidence': confidence,
+                                    'index_name': index_name  # Explicitly set index_name
                                 }
                                 
                                 # Add other fields available in signal_result
@@ -391,7 +404,8 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
                                     'time': candle['time'].strftime('%Y-%m-%d %H:%M:%S'),
                                     'signal': signal,
                                     'price': price,
-                                    'confidence': confidence
+                                    'confidence': confidence,
+                                    'index_name': index_name  # Explicitly set index_name
                                 }
                                 
                                 # Add other fields available in result
@@ -423,8 +437,8 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
                         try:
                             from db import log_strategy_sql
                             
-                            # Filter out NO TRADE signals for database logging
-                            trading_signals = [s for s in all_signals if s.get('signal') != 'NO TRADE']
+                            # Filter out NO TRADE signals and "None" signals for database logging
+                            trading_signals = [s for s in all_signals if s.get('signal') != 'NO TRADE' and s.get('signal') != 'None']
                             
                             records_saved = 0
                             if trading_signals:
