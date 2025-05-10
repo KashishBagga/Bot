@@ -190,16 +190,81 @@ def get_table_columns(cursor, table_name):
     except:
         return []
 
+def ensure_strategy_tables_exist(strategy_names):
+    """
+    Create tables for all strategies upfront, even if they don't produce any signals.
+    This ensures consistent database structure across runs.
+    """
+    print("Creating tables for all strategies...")
+    conn = sqlite3.connect("trading_signals.db")
+    cursor = conn.cursor()
+    
+    for strategy_name in strategy_names:
+        # Handle strategy name backward compatibility
+        original_strategy_name = strategy_name
+        
+        # Remove 'strategy_' prefix if it exists, for schema module lookup
+        if strategy_name.startswith('strategy_'):
+            strategy_name = strategy_name[9:]  # Remove 'strategy_' prefix for newer files
+        
+        try:
+            # First try to import the specific schema module
+            try:
+                schema_module = importlib.import_module(f"src.models.schema.{strategy_name}")
+                setup_func = getattr(schema_module, f"setup_{strategy_name}_table")
+            except (ImportError, AttributeError):
+                try:
+                    schema_module = importlib.import_module(f"src.models.schema.strategy_{strategy_name}")
+                    setup_func = getattr(schema_module, f"setup_strategy_{strategy_name}_table")
+                    # Use strategy_ prefix for table name
+                    strategy_name = f"strategy_{strategy_name}"
+                except (ImportError, AttributeError):
+                    # Fall back to a generic setup
+                    from src.models.schema.generic import setup_generic_table
+                    setup_func = setup_generic_table
+                    # Use the original strategy name for the table
+                    strategy_name = original_strategy_name
+            
+            # Call the setup function to ensure the table exists
+            setup_func()
+            print(f"  ✅ Table created/verified: {strategy_name}")
+            
+        except Exception as e:
+            # If all else fails, create a basic table
+            print(f"  ⚠️ Creating basic table for {original_strategy_name}: {e}")
+            try:
+                cursor.execute(f"""
+                    CREATE TABLE IF NOT EXISTS {original_strategy_name} (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        signal_time TEXT,
+                        index_name TEXT,
+                        signal TEXT,
+                        price REAL,
+                        confidence TEXT,
+                        outcome TEXT,
+                        pnl REAL,
+                        stop_loss REAL,
+                        target REAL,
+                        target2 REAL,
+                        target3 REAL,
+                        targets_hit INTEGER,
+                        stoploss_count INTEGER,
+                        failure_reason TEXT
+                    )
+                """)
+                conn.commit()
+                print(f"  ✅ Basic table created: {original_strategy_name}")
+            except Exception as create_e:
+                print(f"  ❌ Failed to create table for {original_strategy_name}: {create_e}")
+    
+    conn.close()
+    print("Table creation completed.")
+
 def log_strategy_sql(strategy_name, signal_data):
     """
     Log strategy signals to the corresponding table in the database.
     Validates schema and removes fields that don't exist in the table.
     """
-    # Skip logging if this is a NO TRADE signal or None
-    signal = signal_data.get('signal')
-    if not signal or signal == 'NO TRADE' or signal == 'None':
-        return
-        
     # Handle strategy name backward compatibility
     original_strategy_name = strategy_name
     
@@ -234,6 +299,11 @@ def log_strategy_sql(strategy_name, signal_data):
     
     # Call the setup function to ensure the table exists
     setup_func()
+    
+    # Skip logging if this is a NO TRADE signal or None
+    signal = signal_data.get('signal')
+    if not signal or signal == 'NO TRADE' or signal == 'None':
+        return
     
     # Calculate essential trading values if they're missing
     

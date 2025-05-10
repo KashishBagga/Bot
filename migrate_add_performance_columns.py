@@ -11,7 +11,6 @@ STRATEGY_TABLES = [
     'insidebar_bollinger',
     'range_breakout_volatility',
     'ema_crossover',
-    'ema_crossover_original',
     'supertrend_ema',
     'supertrend_macd_rsi_ema',
     'insidebar_rsi',

@@ -15,7 +15,6 @@ from src.strategies.donchian_breakout import DonchianBreakout
 from src.strategies.insidebar_bollinger import InsidebarBollinger
 from src.strategies.range_breakout_volatility import RangeBreakoutVolatility
 from src.strategies.ema_crossover import EmaCrossover
-from src.strategies.ema_crossover_original import EmaCrossoverOriginal
 from src.strategies.supertrend_ema import SupertrendEma
 from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
 from src.strategies.insidebar_rsi import InsidebarRsi
@@ -27,7 +26,6 @@ STRATEGY_DB_TABLES = {
     'InsidebarBollinger': 'insidebar_bollinger',
     'RangeBreakoutVolatility': 'range_breakout_volatility',
     'EmaCrossover': 'ema_crossover',
-    'EmaCrossoverOriginal': 'ema_crossover_original',
     'SupertrendEma': 'supertrend_ema',
     'SupertrendMacdRsiEma': 'supertrend_macd_rsi_ema',
     'InsidebarRsi': 'insidebar_rsi'
@@ -505,7 +503,6 @@ def main():
         (InsidebarBollinger, "InsidebarBollinger"),
         (RangeBreakoutVolatility, "RangeBreakoutVolatility"),
         (EmaCrossover, "EmaCrossover"),
-        (EmaCrossoverOriginal, "EmaCrossoverOriginal"),
         (SupertrendEma, "SupertrendEma"),
         (SupertrendMacdRsiEma, "SupertrendMacdRsiEma"),
         (InsidebarRsi, "InsidebarRsi")

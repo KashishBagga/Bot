@@ -8,10 +8,13 @@ from importlib import import_module
 from pathlib import Path
 import os
 
+# Skip list for redundant strategies
+SKIP_STRATEGIES = ['ema_crossover_original', 'strategy_ema_crossover']
+
 # Dynamically get all strategy modules (excluding __init__.py)
 _strategy_files = [
     f.stem for f in Path(__file__).parent.glob("*.py")
-    if f.name != "__init__.py" and not f.name.startswith("_")
+    if f.name != "__init__.py" and not f.name.startswith("_") and f.stem not in SKIP_STRATEGIES
 ]
 
 # Dictionary to store available strategies

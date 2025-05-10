@@ -167,6 +167,14 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
     
     print(f"🔄 Found {len(strategies)} strategies to run")
     
+    # If we're saving to the database, initialize all tables now
+    if save_to_db:
+        try:
+            from db import ensure_strategy_tables_exist
+            ensure_strategy_tables_exist(strategies)
+        except Exception as e:
+            print(f"Warning: Failed to pre-create strategy tables: {e}")
+    
     # Process symbols if not provided
     if not symbols:
         symbols = {
