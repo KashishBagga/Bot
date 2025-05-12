@@ -162,7 +162,19 @@ class Strategy(ABC):
             
             # If a signal was generated, log it
             if signal and signal.get('signal') != 'None':
-                signal['signal_time'] = current_data.index[-1]
+                # Use the actual timestamp from the data instead of current time
+                if current_data.index.name == 'time' or 'time' in current_data.columns:
+                    # If time is the index or a column
+                    if current_data.index.name == 'time':
+                        # Time is the index
+                        signal['signal_time'] = current_data.index[-1].strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        # Time is a column
+                        signal['signal_time'] = current_data.iloc[-1]['time'].strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    # Default to index value if no explicit time column
+                    signal['signal_time'] = current_data.index[-1]
+                
                 self.signals.append(signal)
         
         # Calculate performance metrics

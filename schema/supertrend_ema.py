@@ -7,7 +7,7 @@ supertrend_ema_fields = [
     'ema_20', 'atr',  # Primary indicators for this strategy
     'price_to_ema_ratio',  # Store how far price is from EMA (%) to determine confidence
     'confidence', 'trade_type',
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason', 'exit_time'
 ]
 
 def setup_supertrend_ema_table():
@@ -38,7 +38,8 @@ def setup_supertrend_ema_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

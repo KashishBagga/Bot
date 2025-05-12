@@ -5,7 +5,7 @@ Trading strategy based on price breakouts with RSI confirmation.
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from db import log_strategy_sql
 
@@ -81,27 +81,15 @@ class BreakoutRsi(Strategy):
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,
                              future_data: pd.DataFrame) -> Dict[str, Any]:
-        """Calculate performance metrics based on future data.
-        
-        Args:
-            signal: The trading signal (BUY CALL or BUY PUT)
-            entry_price: The price at signal generation
-            stop_loss: The stop loss price
-            target: The first target price
-            target2: The second target price
-            target3: The third target price
-            future_data: Future candles after signal generation
-            
-        Returns:
-            Dict containing outcome, pnl, targets_hit, stoploss_count, and failure_reason
-        """
+        """Calculate performance metrics for future candles."""
         if future_data is None or future_data.empty:
             return {
-                "outcome": "Pending",
-                "pnl": 0.0,
+                "outcome": "Pending", 
+                "pnl": 0.0, 
                 "targets_hit": 0,
                 "stoploss_count": 0,
-                "failure_reason": ""
+                "failure_reason": "",
+                "exit_time": None
             }
         
         # Initialize performance metrics
@@ -110,74 +98,121 @@ class BreakoutRsi(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
-        # Calculate stop loss and target prices
+        # For BUY CALL, check if future prices went up to targets or down to stop loss
         if signal == "BUY CALL":
-            stop_loss_price = entry_price - stop_loss
-            target1_price = entry_price + target
-            target2_price = entry_price + target2
-            target3_price = entry_price + target3
-            
             # Process each future candle chronologically
-            for i, candle in future_data.iterrows():
-                # Check if stop loss is hit first
-                if candle['low'] <= stop_loss_price:
+            for idx, candle in future_data.iterrows():
+                # Get candle timestamp for exit_time
+                current_time = None
+                if isinstance(idx, pd.Timestamp):
+                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                elif 'time' in candle and candle['time'] is not None:
+                    if isinstance(candle['time'], pd.Timestamp):
+                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        current_time = str(candle['time'])
+                
+                # Convert timestamp to IST if it's not None
+                if current_time:
+                    try:
+                        # Convert to datetime object first
+                        dt_obj = datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S")
+                        # Add IST offset (+5:30)
+                        ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                        current_time = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+                    except:
+                        # If conversion fails, use the original timestamp
+                        pass
+                
+                # Check if stop loss was hit
+                if candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
-                    pnl = -stop_loss
+                    pnl = -1.0 * stop_loss  # Negative value for stop loss
                     stoploss_count = 1
-                    failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    failure_reason = f"Stop loss hit at {entry_price - stop_loss:.2f}"
+                    exit_time = current_time
                     break  # Exit the loop as trade is closed
                 
-                # Check which targets are hit
-                if targets_hit == 0 and candle['high'] >= target1_price:
+                # Check which targets were hit
+                if targets_hit == 0 and candle['high'] >= (entry_price + target):
                     targets_hit = 1
                     pnl = target
                     outcome = "Win"
+                    exit_time = current_time
                 
-                if targets_hit == 1 and candle['high'] >= target2_price:
+                if targets_hit == 1 and candle['high'] >= (entry_price + target2):
                     targets_hit = 2
                     pnl += (target2 - target)
                 
-                if targets_hit == 2 and candle['high'] >= target3_price:
+                if targets_hit == 2 and candle['high'] >= (entry_price + target3):
                     targets_hit = 3
                     pnl += (target3 - target2)
+                    break  # Exit the loop as all targets are hit
         
+        # For BUY PUT, check if future prices went down to targets or up to stop loss
         elif signal == "BUY PUT":
-            stop_loss_price = entry_price + stop_loss
-            target1_price = entry_price - target
-            target2_price = entry_price - target2
-            target3_price = entry_price - target3
-            
             # Process each future candle chronologically
-            for i, candle in future_data.iterrows():
-                # Check if stop loss is hit first
-                if candle['high'] >= stop_loss_price:
+            for idx, candle in future_data.iterrows():
+                # Get candle timestamp for exit_time
+                current_time = None
+                if isinstance(idx, pd.Timestamp):
+                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                elif 'time' in candle and candle['time'] is not None:
+                    if isinstance(candle['time'], pd.Timestamp):
+                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        current_time = str(candle['time'])
+                
+                # Convert timestamp to IST if it's not None
+                if current_time:
+                    try:
+                        # Convert to datetime object first
+                        dt_obj = datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S")
+                        # Add IST offset (+5:30)
+                        ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                        current_time = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+                    except:
+                        # If conversion fails, use the original timestamp
+                        pass
+                
+                # Check if stop loss was hit
+                if candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
-                    pnl = -stop_loss
+                    pnl = -1.0 * stop_loss
                     stoploss_count = 1
-                    failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    failure_reason = f"Stop loss hit at {entry_price + stop_loss:.2f}"
+                    exit_time = current_time
                     break  # Exit the loop as trade is closed
                 
-                # Check which targets are hit
-                if targets_hit == 0 and candle['low'] <= target1_price:
+                # Check which targets were hit
+                if targets_hit == 0 and candle['low'] <= (entry_price - target):
                     targets_hit = 1
                     pnl = target
                     outcome = "Win"
+                    exit_time = current_time
                 
-                if targets_hit == 1 and candle['low'] <= target2_price:
+                if targets_hit == 1 and candle['low'] <= (entry_price - target2):
                     targets_hit = 2
                     pnl += (target2 - target)
                 
-                if targets_hit == 2 and candle['low'] <= target3_price:
+                if targets_hit == 2 and candle['low'] <= (entry_price - target3):
                     targets_hit = 3
                     pnl += (target3 - target2)
+                    break  # Exit the loop as all targets are hit
         
         return {
             "outcome": outcome,
-            "pnl": round(pnl, 2),
+            "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
     
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
@@ -209,6 +244,7 @@ class BreakoutRsi(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
         # Get parameters
         breakout_strength_threshold = self.breakout_strength
@@ -270,6 +306,7 @@ class BreakoutRsi(Strategy):
             targets_hit = performance["targets_hit"]
             stoploss_count = performance["stoploss_count"]
             failure_reason = performance["failure_reason"]
+            exit_time = performance["exit_time"]
         
         # Create the signal data dictionary
         signal_data = {
@@ -290,13 +327,38 @@ class BreakoutRsi(Strategy):
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Get signal_time
+            signal_time = None
+            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                # If candle has a timestamp index
+                signal_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+            elif 'time' in data.columns and len(data) > 0:
+                # If time is a column in the dataframe
+                signal_time = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            else:
+                # Fallback to current time if no timestamp is available
+                signal_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Convert signal_time to IST (+5:30)
+            try:
+                # Parse the signal time string to a datetime object
+                dt_obj = datetime.strptime(signal_time, "%Y-%m-%d %H:%M:%S")
+                # Add 5 hours and 30 minutes to convert to IST
+                ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                db_signal_data["signal_time"] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception as e:
+                # Use original time if conversion fails
+                print(f"Failed to convert signal_time to IST: {e}")
+                db_signal_data["signal_time"] = signal_time
+                
             db_signal_data["index_name"] = index_name
             log_strategy_sql('breakout_rsi', db_signal_data)
         

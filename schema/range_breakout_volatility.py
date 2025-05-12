@@ -10,7 +10,8 @@ range_breakout_volatility_fields = [
     'breakout_size',  # How far price broke out of the range (%)
     'confidence', 'trade_type',
     'price_reason',  # Used to store ATR-based reasoning
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason',
+    'exit_time'
 ]
 
 def setup_range_breakout_volatility_table():
@@ -43,7 +44,8 @@ def setup_range_breakout_volatility_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

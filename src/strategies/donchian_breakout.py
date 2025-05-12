@@ -100,7 +100,8 @@ class DonchianBreakout(Strategy):
                 "pnl": 0.0,
                 "targets_hit": 0,
                 "stoploss_count": 0,
-                "failure_reason": ""
+                "failure_reason": "",
+                "exit_time": None
             }
             
         # Initialize performance metrics
@@ -109,6 +110,7 @@ class DonchianBreakout(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None  # Initialize exit_time here
         
         # Calculate stop loss and target prices
         if signal == "BUY CALL":
@@ -125,6 +127,7 @@ class DonchianBreakout(Strategy):
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    exit_time = candle['time']
                     break  # Exit the loop as trade is closed
                 
                 # Check which targets are hit
@@ -155,6 +158,7 @@ class DonchianBreakout(Strategy):
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    exit_time = candle['time']
                     break  # Exit the loop as trade is closed
                 
                 # Check which targets are hit
@@ -176,7 +180,8 @@ class DonchianBreakout(Strategy):
             "pnl": round(pnl, 2),
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
     
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
@@ -208,6 +213,7 @@ class DonchianBreakout(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None  # Initialize exit_time here
         
         # Get parameters
         breakout_strength = self.breakout_strength
@@ -270,6 +276,7 @@ class DonchianBreakout(Strategy):
             targets_hit = performance["targets_hit"]
             stoploss_count = performance["stoploss_count"]
             failure_reason = performance["failure_reason"]
+            exit_time = performance["exit_time"]
         
         # Create the signal data dictionary
         signal_data = {
@@ -291,13 +298,24 @@ class DonchianBreakout(Strategy):
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Use the actual candle time for signal_time instead of current time
+            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                # If candle has a timestamp index
+                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+            elif 'time' in data.columns and len(data) > 0:
+                # If time is a column in the dataframe
+                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            else:
+                # Fallback to current time if no timestamp is available
+                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             db_signal_data["index_name"] = index_name
             log_strategy_sql('donchian_breakout', db_signal_data)
         

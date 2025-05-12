@@ -205,13 +205,109 @@ class EmaCrossover(Strategy):
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": None  # Initialize exit_time as None
         }
+        
+        # If future data is available, try to determine exit time
+        if future_data is not None and not future_data.empty and signal != "NO TRADE":
+            exit_time = None
+            
+            # For BUY CALL scenario
+            if signal == "BUY CALL":
+                price = candle['close']
+                stop_loss_price = price - stop_loss
+                target1_price = price + target1
+                target2_price = price + target2
+                target3_price = price + target3
+                
+                # Iterate through future candles chronologically
+                for idx, future_candle in future_data.iterrows():
+                    # Get timestamp in the correct format
+                    current_time = None
+                    if isinstance(idx, pd.Timestamp):
+                        current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                    elif 'time' in future_candle and future_candle['time'] is not None:
+                        if isinstance(future_candle['time'], pd.Timestamp):
+                            current_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        else:
+                            current_time = str(future_candle['time'])
+                    
+                    # Check stop loss first (exit on low price)
+                    if future_candle['low'] <= stop_loss_price:
+                        exit_time = current_time
+                        break
+                    
+                    # Check targets (exit on the highest target reached)
+                    highest_target_reached = 0
+                    if future_candle['high'] >= target3_price:
+                        highest_target_reached = 3
+                    elif future_candle['high'] >= target2_price:
+                        highest_target_reached = 2
+                    elif future_candle['high'] >= target1_price:
+                        highest_target_reached = 1
+                    
+                    if highest_target_reached > 0:
+                        exit_time = current_time
+                        if highest_target_reached == 3:  # If highest target reached, we're done
+                            break
+            
+            # For BUY PUT scenario
+            elif signal == "BUY PUT":
+                price = candle['close']
+                stop_loss_price = price + stop_loss
+                target1_price = price - target1
+                target2_price = price - target2
+                target3_price = price - target3
+                
+                # Iterate through future candles chronologically
+                for idx, future_candle in future_data.iterrows():
+                    # Get timestamp in the correct format
+                    current_time = None
+                    if isinstance(idx, pd.Timestamp):
+                        current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                    elif 'time' in future_candle and future_candle['time'] is not None:
+                        if isinstance(future_candle['time'], pd.Timestamp):
+                            current_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        else:
+                            current_time = str(future_candle['time'])
+                    
+                    # Check stop loss first (exit on high price)
+                    if future_candle['high'] >= stop_loss_price:
+                        exit_time = current_time
+                        break
+                    
+                    # Check targets (exit on the lowest target reached)
+                    lowest_target_reached = 0
+                    if future_candle['low'] <= target3_price:
+                        lowest_target_reached = 3
+                    elif future_candle['low'] <= target2_price:
+                        lowest_target_reached = 2
+                    elif future_candle['low'] <= target1_price:
+                        lowest_target_reached = 1
+                    
+                    if lowest_target_reached > 0:
+                        exit_time = current_time
+                        if lowest_target_reached == 3:  # If lowest target reached, we're done
+                            break
+            
+            # Update the signal data with the exit time
+            signal_data["exit_time"] = exit_time
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Use the actual candle time for signal_time instead of current time
+            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                # If candle has a timestamp index
+                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+            elif 'time' in data.columns and len(data) > 0:
+                # If time is a column in the dataframe
+                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            else:
+                # Fallback to current time if no timestamp is available
+                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             db_signal_data["index_name"] = index_name
             log_strategy_sql('ema_crossover', db_signal_data)
         

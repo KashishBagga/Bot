@@ -5,7 +5,7 @@ Trading strategy based on price breakouts from established ranges with volatilit
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from db import log_strategy_sql
 
@@ -116,7 +116,8 @@ class RangeBreakoutVolatility(Strategy):
                 "pnl": 0.0,
                 "targets_hit": 0,
                 "stoploss_count": 0,
-                "failure_reason": ""
+                "failure_reason": "",
+                "exit_time": None
             }
         
         # Initialize performance metrics
@@ -125,6 +126,7 @@ class RangeBreakoutVolatility(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
         # Calculate stop loss and target prices
         if signal == "BUY CALL":
@@ -141,6 +143,24 @@ class RangeBreakoutVolatility(Strategy):
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    # Set exit_time when stop loss is hit
+                    if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                        exit_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                    elif 'time' in future_data.columns:
+                        exit_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    # Convert exit_time to IST (+5:30)
+                    if exit_time:
+                        try:
+                            # Convert to datetime object
+                            dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
+                            # Add IST offset (+5:30)
+                            ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                            exit_time = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+                        except Exception as e:
+                            # If conversion fails, use original time
+                            print(f"Warning: Failed to convert exit_time to IST: {e}")
+                            
                     break  # Exit the loop as trade is closed
                 
                 # Check which targets are hit
@@ -148,6 +168,23 @@ class RangeBreakoutVolatility(Strategy):
                     targets_hit = 1
                     pnl = target
                     outcome = "Win"
+                    # Set exit_time when first target is hit
+                    if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                        exit_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                    elif 'time' in future_data.columns:
+                        exit_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    # Convert exit_time to IST (+5:30)
+                    if exit_time:
+                        try:
+                            # Convert to datetime object
+                            dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
+                            # Add IST offset (+5:30)
+                            ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                            exit_time = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+                        except Exception as e:
+                            # If conversion fails, use original time
+                            print(f"Warning: Failed to convert exit_time to IST: {e}")
                 
                 if targets_hit == 1 and candle['high'] >= target2_price:
                     targets_hit = 2
@@ -171,6 +208,24 @@ class RangeBreakoutVolatility(Strategy):
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                    # Set exit_time when stop loss is hit
+                    if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                        exit_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                    elif 'time' in future_data.columns:
+                        exit_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    # Convert exit_time to IST (+5:30)
+                    if exit_time:
+                        try:
+                            # Convert to datetime object
+                            dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
+                            # Add IST offset (+5:30)
+                            ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                            exit_time = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+                        except Exception as e:
+                            # If conversion fails, use original time
+                            print(f"Warning: Failed to convert exit_time to IST: {e}")
+                            
                     break  # Exit the loop as trade is closed
                 
                 # Check which targets are hit
@@ -178,6 +233,23 @@ class RangeBreakoutVolatility(Strategy):
                     targets_hit = 1
                     pnl = target
                     outcome = "Win"
+                    # Set exit_time when first target is hit
+                    if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                        exit_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                    elif 'time' in future_data.columns:
+                        exit_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    # Convert exit_time to IST (+5:30)
+                    if exit_time:
+                        try:
+                            # Convert to datetime object
+                            dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
+                            # Add IST offset (+5:30)
+                            ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                            exit_time = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+                        except Exception as e:
+                            # If conversion fails, use original time
+                            print(f"Warning: Failed to convert exit_time to IST: {e}")
                 
                 if targets_hit == 1 and candle['low'] <= target2_price:
                     targets_hit = 2
@@ -192,7 +264,8 @@ class RangeBreakoutVolatility(Strategy):
             "pnl": round(pnl, 2),
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
     
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
@@ -224,6 +297,7 @@ class RangeBreakoutVolatility(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
         # Get parameters
         breakout_threshold = self.breakout_threshold
@@ -307,6 +381,7 @@ class RangeBreakoutVolatility(Strategy):
             targets_hit = performance["targets_hit"]
             stoploss_count = performance["stoploss_count"]
             failure_reason = performance["failure_reason"]
+            exit_time = performance["exit_time"]
         
         # Create the signal data dictionary
         signal_data = {
@@ -325,13 +400,38 @@ class RangeBreakoutVolatility(Strategy):
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Use the actual candle time for signal_time instead of current time
+            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                # If candle has a timestamp index
+                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+            elif 'time' in data.columns and len(data) > 0:
+                # If time is a column in the dataframe
+                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            else:
+                # Fallback to current time if no timestamp is available
+                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Convert signal_time to IST (+5:30)
+            try:
+                # Parse the signal time string to a datetime object
+                signal_time = db_signal_data["signal_time"]
+                dt_obj = datetime.strptime(signal_time, "%Y-%m-%d %H:%M:%S")
+                
+                # Check if it might not be in IST already (assuming IST trading hours 9:15 AM - 3:30 PM)
+                if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
+                    # Add 5 hours and 30 minutes to convert to IST
+                    ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                    db_signal_data["signal_time"] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception as e:
+                print(f"Warning: Failed to convert signal_time to IST: {e}")
+            
             db_signal_data["index_name"] = index_name
             log_strategy_sql('range_breakout_volatility', db_signal_data)
         

@@ -19,7 +19,8 @@ generic_fields = [
     "outcome",
     "confidence",
     "trade_type",
-    "pnl"
+    "pnl",
+    "exit_time"
 ]
 
 def setup_generic_table():
@@ -41,7 +42,8 @@ def setup_generic_table():
             outcome TEXT,
             confidence TEXT,
             trade_type TEXT,
-            pnl REAL
+            pnl REAL,
+            exit_time TEXT
         )
     """)
     conn.commit()

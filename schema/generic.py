@@ -5,7 +5,7 @@ generic_fields = [
     'signal_time', 'index_name', 'signal', 'price', 
     'strike_price', 'stop_loss', 'target', 'target2', 'target3',
     'confidence', 'trade_type',
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason', 'exit_time'
 ]
 
 def setup_generic_table(strategy_name="generic"):
@@ -33,7 +33,8 @@ def setup_generic_table(strategy_name="generic"):
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

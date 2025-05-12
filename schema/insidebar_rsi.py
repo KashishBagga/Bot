@@ -7,7 +7,8 @@ insidebar_rsi_fields = [
     'rsi',  # Primary indicator for this strategy
     'rsi_level',  # Store the RSI level category (Extreme Oversold, Oversold, Neutral, Overbought, Extreme Overbought)
     'confidence', 'trade_type',
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason',
+    'exit_time'
 ]
 
 def setup_insidebar_rsi_table():
@@ -37,7 +38,8 @@ def setup_insidebar_rsi_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

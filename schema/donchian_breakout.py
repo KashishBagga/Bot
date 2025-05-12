@@ -8,7 +8,8 @@ donchian_breakout_fields = [
     'breakout_size',  # How far price broke out beyond the channel (%)
     'volume_ratio',  # Volume compared to average (breakout confirmation)
     'confidence', 'trade_type',
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason',
+    'exit_time'
 ]
 
 def setup_donchian_breakout_table():
@@ -39,7 +40,8 @@ def setup_donchian_breakout_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

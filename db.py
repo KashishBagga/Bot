@@ -5,6 +5,9 @@ import pytz
 import importlib
 import os
 
+# Define the timezone for consistent timestamp format
+TIMEZONE = pytz.timezone('Asia/Kolkata')  # Indian Standard Time
+
 def setup_sqlite():
     conn = sqlite3.connect("trading_signals.db")
     cursor = conn.cursor()
@@ -36,6 +39,7 @@ def setup_sqlite():
             targets_hit INTEGER,
             stoploss_count INTEGER,
             failure_reason TEXT,
+            exit_time TEXT,
             UNIQUE(index_name, signal_time)
         )
     """)
@@ -60,8 +64,8 @@ def log_trade_sql(index_name, signal_data):
                 signal_time, index_name, signal, strike_price, stop_loss, target, target2, target3,
                 price, rsi, macd, macd_signal, ema_20, atr, outcome,
                 rsi_reason, macd_reason, price_reason, confidence, trade_type,
-                option_chain_confirmation, pnl, targets_hit, stoploss_count, failure_reason
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                option_chain_confirmation, pnl, targets_hit, stoploss_count, failure_reason, exit_time
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             signal_time,
             index_name,
@@ -87,7 +91,8 @@ def log_trade_sql(index_name, signal_data):
             0.0,
             0,
             0,
-            ""
+            "",
+            None
         ))
         conn.commit()
         print(f"✅ Trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
@@ -126,7 +131,8 @@ def setup_backtesting_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()
@@ -149,8 +155,8 @@ def log_backtesting_sql(index_name, signal_data):
             signal_time, index_name, signal, strike_price, stop_loss, target, target2, target3,
             price, rsi, macd, macd_signal, ema_20, atr, outcome,
             rsi_reason, macd_reason, price_reason, confidence, trade_type,
-            option_chain_confirmation, pnl, targets_hit, stoploss_count, failure_reason
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            option_chain_confirmation, pnl, targets_hit, stoploss_count, failure_reason, exit_time
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         signal_time,
         index_name,
@@ -176,7 +182,8 @@ def log_backtesting_sql(index_name, signal_data):
         signal_data.get('pnl', 0.0),
         signal_data.get('targets_hit', 0),
         signal_data.get('stoploss_count', 0),
-        signal_data.get('failure_reason', '')
+        signal_data.get('failure_reason', ''),
+        signal_data.get('exit_time', None)
     ))
     conn.commit()
     conn.close()
@@ -249,7 +256,8 @@ def ensure_strategy_tables_exist(strategy_names):
                         target3 REAL,
                         targets_hit INTEGER,
                         stoploss_count INTEGER,
-                        failure_reason TEXT
+                        failure_reason TEXT,
+                        exit_time TEXT
                     )
                 """)
                 conn.commit()
@@ -299,6 +307,40 @@ def log_strategy_sql(strategy_name, signal_data):
     
     # Call the setup function to ensure the table exists
     setup_func()
+    
+    # Ensure signal_time is present or add it
+    if 'signal_time' not in signal_data:
+        # Only set the current time if signal_time doesn't exist
+        signal_data['signal_time'] = datetime.now(TIMEZONE).strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        # Convert signal_time to IST if it's not already
+        try:
+            # Parse the signal time string to a datetime object
+            signal_time = signal_data['signal_time']
+            dt_obj = datetime.strptime(signal_time, "%Y-%m-%d %H:%M:%S")
+            
+            # Check if it might not be in IST already (assuming IST trading hours 9:15 AM - 3:30 PM)
+            if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
+                # Add 5 hours and 30 minutes to convert to IST
+                ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                signal_data['signal_time'] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            print(f"Warning: Failed to convert signal_time to IST: {e}")
+    
+    # Handle exit_time conversion to IST if present
+    if 'exit_time' in signal_data and signal_data['exit_time']:
+        try:
+            # Parse the exit time string to a datetime object
+            exit_time = signal_data['exit_time']
+            dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
+            
+            # Check if it might not be in IST already
+            if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
+                # Add 5 hours and 30 minutes to convert to IST
+                ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                signal_data['exit_time'] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            print(f"Warning: Failed to convert exit_time to IST: {e}")
     
     # Skip logging if this is a NO TRADE signal or None
     signal = signal_data.get('signal')

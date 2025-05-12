@@ -24,6 +24,7 @@ range_breakout_volatility_fields = [
     "targets_hit",
     "stoploss_count",
     "failure_reason"
+    "exit_time"
 ]
 
 def setup_range_breakout_volatility_table():
@@ -49,7 +50,8 @@ def setup_range_breakout_volatility_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

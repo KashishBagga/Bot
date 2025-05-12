@@ -9,7 +9,8 @@ ema_crossover_fields = [
     'crossover_strength',  # Distance between EMAs at crossover (larger = stronger signal)
     'momentum',  # Direction and strength of momentum
     'confidence', 'trade_type',
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason',
+    'exit_time'
 ]
 
 def setup_ema_crossover_table():
@@ -41,7 +42,8 @@ def setup_ema_crossover_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

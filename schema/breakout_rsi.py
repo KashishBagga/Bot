@@ -8,7 +8,7 @@ breakout_rsi_fields = [
     'breakout_strength',  # How strong the breakout is (% beyond previous high/low)
     'rsi_alignment',  # Whether RSI aligns with breakout direction (confirming/diverging)
     'confidence', 'trade_type',
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason', 'exit_time'
 ]
 
 def setup_breakout_rsi_table():
@@ -39,7 +39,8 @@ def setup_breakout_rsi_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

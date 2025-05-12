@@ -93,7 +93,7 @@ class SupertrendEma(Strategy):
             future_data: Future candles after signal generation
             
         Returns:
-            Dict containing outcome, pnl, targets_hit, stoploss_count, and failure_reason
+            Dict containing outcome, pnl, targets_hit, stoploss_count, failure_reason, and exit_time
         """
         if future_data is None or future_data.empty:
             return {
@@ -101,7 +101,8 @@ class SupertrendEma(Strategy):
                 "pnl": 0.0,
                 "targets_hit": 0,
                 "stoploss_count": 0,
-                "failure_reason": ""
+                "failure_reason": "",
+                "exit_time": None
             }
         
         # Initialize performance metrics
@@ -110,61 +111,101 @@ class SupertrendEma(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
         # For BUY CALL, check if future prices went up to targets or down to stop loss
         if signal == "BUY CALL":
-            max_future_price = future_data['high'].max()
-            min_future_price = future_data['low'].min()
-            
-            # Check if stop loss was hit
-            if min_future_price <= (entry_price - stop_loss):
-                outcome = "Loss"
-                pnl = -1.0 * stop_loss  # Negative value for stop loss
-                stoploss_count = 1
-                failure_reason = f"Stop loss hit at {entry_price - stop_loss:.2f}"
-            else:
-                outcome = "Win"
+            # Process each future candle chronologically
+            for idx, candle in future_data.iterrows():
+                # Get candle timestamp for exit_time
+                current_time = None
+                if isinstance(idx, pd.Timestamp):
+                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                elif 'time' in candle and candle['time'] is not None:
+                    if isinstance(candle['time'], pd.Timestamp):
+                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        current_time = str(candle['time'])
+                
+                # Check if stop loss was hit
+                if candle['low'] <= (entry_price - stop_loss):
+                    outcome = "Loss"
+                    pnl = -1.0 * stop_loss  # Negative value for stop loss
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {entry_price - stop_loss:.2f}"
+                    exit_time = current_time
+                    break  # Exit the loop as trade is closed
+                
                 # Check which targets were hit
-                if max_future_price >= (entry_price + target):
-                    targets_hit += 1
-                    pnl += 1.0 * target
-                if max_future_price >= (entry_price + target2):
-                    targets_hit += 1
-                    pnl += 1.0 * (target2 - target)
-                if max_future_price >= (entry_price + target3):
-                    targets_hit += 1
-                    pnl += 1.0 * (target3 - target2)
+                if targets_hit == 0 and candle['high'] >= (entry_price + target):
+                    targets_hit = 1
+                    pnl = target
+                    outcome = "Win"
+                    exit_time = current_time
+                
+                if targets_hit == 1 and candle['high'] >= (entry_price + target2):
+                    targets_hit = 2
+                    pnl += (target2 - target)
+                    exit_time = current_time
+                
+                if targets_hit == 2 and candle['high'] >= (entry_price + target3):
+                    targets_hit = 3
+                    pnl += (target3 - target2)
+                    exit_time = current_time
+                    break  # Exit the loop as all targets are hit
         
         # For BUY PUT, check if future prices went down to targets or up to stop loss
         elif signal == "BUY PUT":
-            max_future_price = future_data['high'].max()
-            min_future_price = future_data['low'].min()
-            
-            # Check if stop loss was hit
-            if max_future_price >= (entry_price + stop_loss):
-                outcome = "Loss"
-                pnl = -1.0 * stop_loss
-                stoploss_count = 1
-                failure_reason = f"Stop loss hit at {entry_price + stop_loss:.2f}"
-            else:
-                outcome = "Win"
+            # Process each future candle chronologically
+            for idx, candle in future_data.iterrows():
+                # Get candle timestamp for exit_time
+                current_time = None
+                if isinstance(idx, pd.Timestamp):
+                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                elif 'time' in candle and candle['time'] is not None:
+                    if isinstance(candle['time'], pd.Timestamp):
+                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        current_time = str(candle['time'])
+                
+                # Check if stop loss was hit
+                if candle['high'] >= (entry_price + stop_loss):
+                    outcome = "Loss"
+                    pnl = -1.0 * stop_loss
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {entry_price + stop_loss:.2f}"
+                    exit_time = current_time
+                    break  # Exit the loop as trade is closed
+                
                 # Check which targets were hit
-                if min_future_price <= (entry_price - target):
-                    targets_hit += 1
-                    pnl += 1.0 * target
-                if min_future_price <= (entry_price - target2):
-                    targets_hit += 1
-                    pnl += 1.0 * (target2 - target)
-                if min_future_price <= (entry_price - target3):
-                    targets_hit += 1
-                    pnl += 1.0 * (target3 - target2)
+                if targets_hit == 0 and candle['low'] <= (entry_price - target):
+                    targets_hit = 1
+                    pnl = target
+                    outcome = "Win"
+                    exit_time = current_time
+                
+                if targets_hit == 1 and candle['low'] <= (entry_price - target2):
+                    targets_hit = 2
+                    pnl += (target2 - target)
+                    exit_time = current_time
+                
+                if targets_hit == 2 and candle['low'] <= (entry_price - target3):
+                    targets_hit = 3
+                    pnl += (target3 - target2)
+                    exit_time = current_time
+                    break  # Exit the loop as all targets are hit
         
         return {
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
     
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
@@ -196,6 +237,7 @@ class SupertrendEma(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
         # Calculate price to EMA ratio if not already available
         price_to_ema_ratio = candle.get('price_to_ema_ratio', 
@@ -254,6 +296,7 @@ class SupertrendEma(Strategy):
             targets_hit = performance["targets_hit"]
             stoploss_count = performance["stoploss_count"]
             failure_reason = performance["failure_reason"]
+            exit_time = performance["exit_time"]
         
         # Return the signal data
         signal_data = {
@@ -274,13 +317,24 @@ class SupertrendEma(Strategy):
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Use the actual candle time for signal_time instead of current time
+            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                # If candle has a timestamp index
+                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+            elif 'time' in data.columns and len(data) > 0:
+                # If time is a column in the dataframe
+                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            else:
+                # Fallback to current time if no timestamp is available
+                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             db_signal_data["index_name"] = index_name
             log_strategy_sql('supertrend_ema', db_signal_data)
         

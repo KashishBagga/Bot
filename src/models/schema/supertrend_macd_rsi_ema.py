@@ -34,6 +34,7 @@ supertrend_macd_rsi_ema_fields = [
     "targets_hit",
     "stoploss_count",
     "failure_reason"
+    "exit_time"
 ]
 
 def setup_supertrend_macd_rsi_ema_table():
@@ -96,7 +97,8 @@ def setup_supertrend_macd_rsi_ema_table():
                 pnl REAL,
                 targets_hit INTEGER,
                 stoploss_count INTEGER,
-                failure_reason TEXT
+                failure_reason TEXT,
+                exit_time TEXT
             )
         """)
         conn.commit()

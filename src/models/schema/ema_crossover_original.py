@@ -31,6 +31,7 @@ ema_crossover_original_fields = [
     "targets_hit",
     "stoploss_count",
     "failure_reason"
+    "exit_time"
 ]
 
 def setup_ema_crossover_original_table():
@@ -63,7 +64,8 @@ def setup_ema_crossover_original_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

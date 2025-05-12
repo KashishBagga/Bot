@@ -27,6 +27,7 @@ donchian_breakout_fields = [
     "targets_hit",
     "stoploss_count",
     "failure_reason"
+    "exit_time"
 ]
 
 def setup_donchian_breakout_table():
@@ -55,7 +56,8 @@ def setup_donchian_breakout_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()

@@ -95,6 +95,7 @@ class InsidebarRsi(Strategy):
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
+        exit_time = None
         
         # Check if we have an inside bar
         is_inside = candle['is_inside']
@@ -136,6 +137,11 @@ class InsidebarRsi(Strategy):
                         pnl = -stop_loss
                         stoploss_count = 1
                         failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                        # Set exit_time when stop loss is hit
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                         break  # Exit the loop as trade is closed
                     
                     # Check which targets are hit
@@ -143,6 +149,11 @@ class InsidebarRsi(Strategy):
                         targets_hit = 1
                         pnl = target1
                         outcome = "Win"
+                        # Set exit_time when first target is hit
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                     
                     if targets_hit == 1 and future_candle['high'] >= target2_price:
                         targets_hit = 2
@@ -166,6 +177,11 @@ class InsidebarRsi(Strategy):
                         pnl = -stop_loss
                         stoploss_count = 1
                         failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                        # Set exit_time when stop loss is hit
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                         break  # Exit the loop as trade is closed
                     
                     # Check which targets are hit
@@ -173,6 +189,11 @@ class InsidebarRsi(Strategy):
                         targets_hit = 1
                         pnl = target1
                         outcome = "Win"
+                        # Set exit_time when first target is hit
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                     
                     if targets_hit == 1 and future_candle['low'] <= target2_price:
                         targets_hit = 2
@@ -202,5 +223,6 @@ class InsidebarRsi(Strategy):
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
         }

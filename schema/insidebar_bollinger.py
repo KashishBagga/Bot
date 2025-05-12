@@ -9,7 +9,8 @@ insidebar_bollinger_fields = [
     'inside_bar_size',  # Size of inside bar relative to previous bar
     'confidence', 'trade_type',
     'price_reason',  # This stores the Bollinger Band related reasoning
-    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason'
+    'outcome', 'pnl', 'targets_hit', 'stoploss_count', 'failure_reason',
+    'exit_time'
 ]
 
 def setup_insidebar_bollinger_table():
@@ -41,7 +42,8 @@ def setup_insidebar_bollinger_table():
             pnl REAL,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            failure_reason TEXT
+            failure_reason TEXT,
+            exit_time TEXT
         )
     """)
     conn.commit()
