@@ -7,6 +7,7 @@ from datetime import datetime
 import importlib
 import os
 from src.config.settings import DATABASE_PATH, TIMEZONE
+import logging
 
 class Database:
     """Database manager for the trading bot application."""
@@ -21,24 +22,22 @@ class Database:
     
     def execute_query(self, query, params=None, commit=True):
         """Execute a SQL query with optional parameters."""
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
-            
-            if commit:
-                conn.commit()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                if params:
+                    cursor.execute(query, params)
+                else:
+                    cursor.execute(query)
                 
-            return cursor
-        except Exception as e:
-            print(f"Database error: {e}")
-            conn.rollback()
-            raise
-        finally:
-            conn.close()
+                if commit:
+                    conn.commit()
+                
+                return cursor
+            except Exception as e:
+                logging.error(f"Database error: {e}")
+                conn.rollback()
+                raise
     
     def setup_signals_table(self):
         """Create the signals table if it doesn't exist."""

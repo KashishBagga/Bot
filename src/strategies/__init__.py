@@ -7,6 +7,7 @@ Contains all available trading strategy implementations.
 from importlib import import_module
 from pathlib import Path
 import os
+import logging
 
 # Skip list for redundant strategies
 SKIP_STRATEGIES = ['ema_crossover_original', 'strategy_ema_crossover']
@@ -17,10 +18,13 @@ _strategy_files = [
     if f.name != "__init__.py" and not f.name.startswith("_") and f.stem not in SKIP_STRATEGIES
 ]
 
+# Initialize logger
+logger = logging.getLogger(__name__)
+
 # Dictionary to store available strategies
 available_strategies = {}
 
-# Import each strategy
+# Import each strategy lazily
 for strategy_name in _strategy_files:
     try:
         # Import the module
@@ -33,9 +37,11 @@ for strategy_name in _strategy_files:
         if hasattr(module, class_name):
             # Add to available strategies
             available_strategies[strategy_name] = getattr(module, class_name)
-    except (ImportError, AttributeError):
-        # Skip if there's an error importing
-        pass
+    except (ImportError, AttributeError) as e:
+        # Log the error
+        logger.error(f"Error importing strategy {strategy_name}: {e}")
+
+logger.info(f"Available strategies: {list(available_strategies.keys())}")
 
 def get_available_strategies():
     """Get a list of available strategy names."""
