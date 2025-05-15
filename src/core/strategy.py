@@ -47,29 +47,25 @@ class Strategy(ABC):
         # Make a copy to avoid modifying the original
         df = data.copy()
         
-        # Cache indicators to avoid recalculating
-        if 'rsi' not in df.columns:
-            rsi_period = self.params.get('rsi_period', 14)
-            df['rsi'] = indicators.rsi(df, period=rsi_period)
+        # Calculate indicators without caching
+        rsi_period = self.params.get('rsi_period', 14)
+        df['rsi'] = indicators.rsi(df, period=rsi_period)
         
-        if 'macd' not in df.columns:
-            macd_fast = self.params.get('macd_fast', 12)
-            macd_slow = self.params.get('macd_slow', 26)
-            macd_signal_period = self.params.get('macd_signal', 9)
-            macd_data = indicators.macd(df, fast_period=macd_fast, 
-                                       slow_period=macd_slow, 
-                                       signal_period=macd_signal_period)
-            df['macd'] = macd_data['macd']
-            df['macd_signal'] = macd_data['signal']
-            df['macd_histogram'] = macd_data['histogram']
+        macd_fast = self.params.get('macd_fast', 12)
+        macd_slow = self.params.get('macd_slow', 26)
+        macd_signal_period = self.params.get('macd_signal', 9)
+        macd_data = indicators.macd(df, fast_period=macd_fast, 
+                                   slow_period=macd_slow, 
+                                   signal_period=macd_signal_period)
+        df['macd'] = macd_data['macd']
+        df['macd_signal'] = macd_data['signal']
+        df['macd_histogram'] = macd_data['histogram']
         
-        if 'ema' not in df.columns:
-            ema_period = self.params.get('ema_period', 20)
-            df['ema'] = indicators.ema(df, period=ema_period)
+        ema_period = self.params.get('ema_period', 20)
+        df['ema'] = indicators.ema(df, period=ema_period)
         
-        if 'atr' not in df.columns:
-            atr_period = self.params.get('atr_period', 14)
-            df['atr'] = indicators.atr(df, period=atr_period)
+        atr_period = self.params.get('atr_period', 14)
+        df['atr'] = indicators.atr(df, period=atr_period)
         
         # Allow child classes to add their own indicators
         return self.add_indicators(df)
