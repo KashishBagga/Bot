@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import argparse
 import backoff
 import pandas as pd
+import concurrent.futures
 
 def check_dependencies():
     """Check if all required dependencies are installed"""
@@ -148,8 +149,141 @@ def get_available_strategies():
         print("❌ Could not import strategies module")
         return []
 
+# Function to run a single strategy
+# This function should encapsulate the logic for running a single strategy
+# and return the results
+
+def run_strategy(strategy_name, dataframes, save_to_db):
+    strategy_results = {}
+    try:
+        print(f"\n====== Running strategy: {strategy_name} ======")
+        
+        for index_name, df in dataframes.items():
+            try:
+                # print(f"\n🔄 Analyzing {index_name} with strategy '{strategy_name}'...")
+                
+                # Track all signals for database logging
+                all_signals = []
+                signal_count = {"NO TRADE": 0, "BUY CALL": 0, "BUY PUT": 0}
+                candle_count = 0
+                # For running our new class-based strategies from src
+                if os.path.exists(f"src/strategies/{strategy_name}.py"):
+                    # print(f"🔄 Using class-based strategy from src/strategies/{strategy_name}.py")
+                    from src.strategies import get_strategy_class
+                    strategy_class = get_strategy_class(strategy_name)
+                    if strategy_class:
+                        strategy = strategy_class()
+                        df_with_indicators = strategy.add_indicators(df.copy())
+                        
+                        # Generate signals for all candles in the dataframe
+                        candle_count = len(df_with_indicators)
+                        # print(f"Generating signals for {candle_count} candles...")
+                        
+                        # Process all candles
+                        for i in range(candle_count):
+                            candle_data = df_with_indicators.iloc[i:i+1]
+                            
+                            # Get future data for performance calculation (next 5-10 candles)
+                            future_data = None
+                            if i + 1 < candle_count:
+                                # Get up to 10 future candles or whatever is available
+                                future_end = min(i + 11, candle_count)
+                                future_data = df_with_indicators.iloc[i+1:future_end]
+                            
+                            # Some strategies do not accept index_name parameter
+                            if strategy_name in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
+                                signal_result = strategy.analyze(candle_data, future_data=future_data)
+                            else:
+                                signal_result = strategy.analyze(candle_data, index_name=index_name, future_data=future_data)
+                            
+                            # Safe access to values - some strategies might return different keys
+                            price = signal_result.get('price', df_with_indicators.iloc[i]['close'])
+                            signal = signal_result.get('signal', 'NO TRADE')
+                            confidence = signal_result.get('confidence', 'Low')
+                            
+                            # Count signal types
+                            signal_count[signal] = signal_count.get(signal, 0) + 1
+                            
+                            # Record the signal
+                            signal_info = {
+                                'time': df_with_indicators.iloc[i]['time'].strftime('%Y-%m-%d %H:%M:%S'),
+                                'signal_time': df_with_indicators.iloc[i]['time'].strftime('%Y-%m-%d %H:%M:%S'),  # Use actual candle time
+                                'signal': signal,
+                                'price': price,
+                                'confidence': confidence,
+                                'index_name': index_name  # Explicitly set index_name
+                            }
+                            
+                            # Add other fields available in signal_result
+                            for key, value in signal_result.items():
+                                if key not in ['time', 'signal_time'] and key not in signal_info:
+                                    signal_info[key] = value
+                            
+                            all_signals.append(signal_info)
+                            
+                    else:
+                        print(f"❌ Strategy class '{strategy_name}' not found in src/strategies")
+                        continue
+                
+                # Save signals to database if requested
+                if save_to_db and all_signals:
+                    try:
+                        from db import log_strategy_sql
+                        
+                        # Filter out NO TRADE signals and "None" signals for database logging
+                        trading_signals = [s for s in all_signals if s.get('signal') != 'NO TRADE' and s.get('signal') != 'None']
+                        
+                        records_saved = 0
+                        if trading_signals:
+                            # print(f"🔄 Saving {len(trading_signals)} trading signals to database table '{strategy_name}'...")
+                            for signal_info in trading_signals:
+                                try:
+                                    # Log to the database using the strategy-specific function
+                                    log_strategy_sql(strategy_name, signal_info)
+                                    records_saved += 1
+                                except Exception as e:
+                                    print(f"❌ Error saving signal to database: {e}")
+                                    continue
+                            
+                            # print(f"✅ Saved {records_saved} signals to database table '{strategy_name}'")
+                        else:
+                            # print(f"ℹ️ No trading signals (BUY CALL/BUY PUT) to save for '{strategy_name}'")
+                            pass
+                        
+                        strategy_results[index_name] = {
+                            'candles': candle_count,
+                            'signals': signal_count,
+                            'records_saved': records_saved
+                        }
+                    except Exception as e:
+                        print(f"❌ Error accessing database module: {e}")
+                        strategy_results[index_name] = {
+                            'candles': candle_count,
+                            'signals': signal_count,
+                            'records_saved': 0
+                        }
+                else:
+                    strategy_results[index_name] = {
+                        'candles': candle_count,
+                        'signals': signal_count
+                    }
+                
+            except Exception as e:
+                print(f"❌ Error processing {index_name} with strategy {strategy_name}: {e}")
+                traceback.print_exc()
+        
+        print(f"====== Completed: {strategy_name} ======\n")
+        
+    except Exception as e:
+        print(f"❌ Strategy {strategy_name} failed with error: {e}")
+        traceback.print_exc()
+        strategy_results[strategy_name] = {"error": str(e)}
+    
+    return strategy_results
+
+# Modify the run_all_strategies function to use concurrent.futures
+
 def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=None):
-    """Run all available strategies at once"""
     # Check dependencies first
     if not check_dependencies():
         return False
@@ -248,10 +382,6 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
             df['bollinger_lower'] = bb.bollinger_lband()
             df['bollinger_mid'] = bb.bollinger_mavg()
             
-            # Display sample data
-            # print("\n📊 Sample Data:")
-            # print(df[['time', 'open', 'high', 'low', 'close', 'ema_20', 'ema', 'rsi', 'atr']].tail(5))
-            
             # Store the dataframe for later use with all strategies
             dataframes[index_name] = df
             
@@ -263,231 +393,22 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
         print("❌ No data available to run strategies")
         return False
     
-    # Import our strategy modules
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    
-    # Now run each strategy with the fetched data
+    # Run each strategy in parallel
     results = {}
     start_time = time.time()
     
-    for strategy_name in strategies:
-        try:
-            print(f"\n====== Running strategy: {strategy_name} ======")
-            strategy_results = {}
-            
-            for index_name, df in dataframes.items():
-                try:
-                    # print(f"\n🔄 Analyzing {index_name} with strategy '{strategy_name}'...")
-                    
-                    # Track all signals for database logging
-                    all_signals = []
-                    signal_count = {"NO TRADE": 0, "BUY CALL": 0, "BUY PUT": 0}
-                    
-                    # For running our new class-based strategies from src
-                    if os.path.exists(f"src/strategies/{strategy_name}.py"):
-                        # print(f"🔄 Using class-based strategy from src/strategies/{strategy_name}.py")
-                        from src.strategies import get_strategy_class
-                        strategy_class = get_strategy_class(strategy_name)
-                        if strategy_class:
-                            strategy = strategy_class()
-                            df_with_indicators = strategy.add_indicators(df.copy())
-                            
-                            # Generate signals for all candles in the dataframe
-                            candle_count = len(df_with_indicators)
-                            # print(f"Generating signals for {candle_count} candles...")
-                            
-                            # For very large datasets, just print samples and count signals
-                            signal_samples = min(10, candle_count)
-                            print_interval = max(1, candle_count // 10)  # Print 10% of signals
-                            
-                            # Process all candles
-                            for i in range(candle_count):
-                                candle_data = df_with_indicators.iloc[i:i+1]
-                                
-                                # Get future data for performance calculation (next 5-10 candles)
-                                future_data = None
-                                if i + 1 < candle_count:
-                                    # Get up to 10 future candles or whatever is available
-                                    future_end = min(i + 11, candle_count)
-                                    future_data = df_with_indicators.iloc[i+1:future_end]
-                                
-                                # Some strategies do not accept index_name parameter
-                                if strategy_name in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
-                                    signal_result = strategy.analyze(candle_data, future_data=future_data)
-                                else:
-                                    signal_result = strategy.analyze(candle_data, index_name=index_name, future_data=future_data)
-                                
-                                # Safe access to values - some strategies might return different keys
-                                price = signal_result.get('price', df_with_indicators.iloc[i]['close'])
-                                signal = signal_result.get('signal', 'NO TRADE')
-                                confidence = signal_result.get('confidence', 'Low')
-                                
-                                # Count signal types
-                                signal_count[signal] = signal_count.get(signal, 0) + 1
-                                
-                                # Record the signal
-                                signal_info = {
-                                    'time': df_with_indicators.iloc[i]['time'].strftime('%Y-%m-%d %H:%M:%S'),
-                                    'signal_time': df_with_indicators.iloc[i]['time'].strftime('%Y-%m-%d %H:%M:%S'),  # Use actual candle time
-                                    'signal': signal,
-                                    'price': price,
-                                    'confidence': confidence,
-                                    'index_name': index_name  # Explicitly set index_name
-                                }
-                                
-                                # Add other fields available in signal_result
-                                for key, value in signal_result.items():
-                                    if key not in ['time', 'signal_time'] and key not in signal_info:
-                                        signal_info[key] = value
-                                
-                                all_signals.append(signal_info)
-                                
-                                # Print some samples (last few and some distributed across the dataset)
-                                if i >= candle_count - signal_samples or i % print_interval == 0:
-                                    # print(f"Time: {df_with_indicators.iloc[i]['time']} - Signal: {signal} (Price: {price:.2f})")
-                                    pass
-                        else:
-                            print(f"❌ Strategy class '{strategy_name}' not found in src/strategies")
-                            continue
-                    
-                    # For running our old function-based strategies
-                    elif os.path.exists(f"strategies/{strategy_name}.py"):
-                        print(f"🔄 Using function-based strategy from strategies/{strategy_name}.py")
-                        try:
-                            # Import the module (handles both naming patterns)
-                            module = __import__(f"strategies.{strategy_name}", fromlist=[strategy_name])
-                            
-                            # First try with the exact function name
-                            strategy_func = getattr(module, strategy_name, None)
-                            
-                            # If not found, try with strategy_ prefix for backward compatibility
-                            if strategy_func is None and not strategy_name.startswith("strategy_"):
-                                strategy_func = getattr(module, f"strategy_{strategy_name}", None)
-                            
-                            # If still not found, try removing strategy_ prefix
-                            if strategy_func is None and strategy_name.startswith("strategy_"):
-                                clean_name = strategy_name[9:]  # Remove 'strategy_' prefix
-                                strategy_func = getattr(module, clean_name, None)
-                            
-                            if strategy_func is None:
-                                print(f"❌ Function '{strategy_name}' not found in module strategies.{strategy_name}")
-                                continue
-                            
-                            # Process all candles
-                            candle_count = len(df)
-                            print(f"Generating signals for {candle_count} candles...")
-                            
-                            # For very large datasets, just print samples and count signals
-                            signal_samples = min(10, candle_count)
-                            print_interval = max(1, candle_count // 10)  # Print 10% of signals
-                            
-                            for i in range(candle_count):
-                                candle = df.iloc[i]
-                                # Call strategy function
-                                try:
-                                    # Call the function directly
-                                    result = strategy_func(candle, index_name)
-                                except Exception as e:
-                                    print(f"❌ Error executing {strategy_name} for candle {i}: {e}")
-                                    # Use a default result with no trade signal
-                                    result = {'signal': 'NO TRADE'}
-                                
-                                # Rest of the code remains the same
-                                signal = result.get('signal', 'NO TRADE')
-                                price = candle['close']
-                                confidence = result.get('confidence', 'Low')
-                                
-                                # Count signal types
-                                signal_count[signal] = signal_count.get(signal, 0) + 1
-                                
-                                # Record the signal
-                                signal_info = {
-                                    'time': candle['time'].strftime('%Y-%m-%d %H:%M:%S'),
-                                    'signal_time': candle['time'].strftime('%Y-%m-%d %H:%M:%S'),  # Use actual candle time
-                                    'signal': signal,
-                                    'price': price,
-                                    'confidence': confidence,
-                                    'index_name': index_name  # Explicitly set index_name
-                                }
-                                
-                                # Add other fields available in result
-                                for key, value in result.items():
-                                    if key not in ['time', 'signal_time'] and key not in signal_info:
-                                        signal_info[key] = value
-                                
-                                all_signals.append(signal_info)
-                                
-                                # Print some samples
-                                if i >= candle_count - signal_samples or i % print_interval == 0:
-                                    # print(f"Time: {candle['time']} - Signal: {signal} (Price: {price:.2f})")
-                                    pass
-                        except ImportError as e:
-                            print(f"❌ Error importing strategy module: {e}")
-                            continue
-                    else:
-                        print(f"❌ Strategy file for '{strategy_name}' not found")
-                        continue
-                        
-                    # Display signal distribution
-                    # print(f"\n📊 Signal Distribution:")
-                    for signal_type, count in signal_count.items():
-                        percentage = (count / candle_count) * 100 if candle_count > 0 else 0
-                        # print(f"{signal_type}: {count} ({percentage:.1f}%)")
-                    
-                    # Save signals to database if requested
-                    if save_to_db and all_signals:
-                        try:
-                            from db import log_strategy_sql
-                            
-                            # Filter out NO TRADE signals and "None" signals for database logging
-                            trading_signals = [s for s in all_signals if s.get('signal') != 'NO TRADE' and s.get('signal') != 'None']
-                            
-                            records_saved = 0
-                            if trading_signals:
-                                # print(f"🔄 Saving {len(trading_signals)} trading signals to database table '{strategy_name}'...")
-                                for signal_info in trading_signals:
-                                    try:
-                                        # Log to the database using the strategy-specific function
-                                        log_strategy_sql(strategy_name, signal_info)
-                                        records_saved += 1
-                                    except Exception as e:
-                                        print(f"❌ Error saving signal to database: {e}")
-                                        continue
-                                
-                                # print(f"✅ Saved {records_saved} signals to database table '{strategy_name}'")
-                            else:
-                                # print(f"ℹ️ No trading signals (BUY CALL/BUY PUT) to save for '{strategy_name}'")
-                                pass
-                            
-                            strategy_results[index_name] = {
-                                'candles': candle_count,
-                                'signals': signal_count,
-                                'records_saved': records_saved
-                            }
-                        except Exception as e:
-                            print(f"❌ Error accessing database module: {e}")
-                            strategy_results[index_name] = {
-                                'candles': candle_count,
-                                'signals': signal_count,
-                                'records_saved': 0
-                            }
-                    else:
-                        strategy_results[index_name] = {
-                            'candles': candle_count,
-                            'signals': signal_count
-                        }
-                    
-                except Exception as e:
-                    print(f"❌ Error processing {index_name} with strategy {strategy_name}: {e}")
-                    traceback.print_exc()
-            
-            results[strategy_name] = strategy_results
-            print(f"====== Completed: {strategy_name} ======\n")
-            
-        except Exception as e:
-            print(f"❌ Strategy {strategy_name} failed with error: {e}")
-            traceback.print_exc()
-            results[strategy_name] = {"error": str(e)}
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Submit all strategies to the executor
+        future_to_strategy = {executor.submit(run_strategy, strategy_name, dataframes, save_to_db): strategy_name for strategy_name in strategies}
+        
+        for future in concurrent.futures.as_completed(future_to_strategy):
+            strategy_name = future_to_strategy[future]
+            try:
+                result = future.result()
+                results[strategy_name] = result
+            except Exception as e:
+                print(f"❌ Strategy {strategy_name} failed with error: {e}")
+                results[strategy_name] = {"error": str(e)}
     
     # Final summary
     end_time = time.time()
