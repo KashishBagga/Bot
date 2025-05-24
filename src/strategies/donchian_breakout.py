@@ -257,26 +257,136 @@ class DonchianBreakout(Strategy):
                 confidence = "High"
                 rsi_reason = f"Strong RSI momentum: {candle.get('rsi', 0):.1f}"
                 
-        # Calculate performance metrics if a signal was generated and future data is available
+        # Calculate performance metrics with trailing stop logic
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:
-            entry_price = candle['close']
-            performance = self.calculate_performance(
-                signal=signal,
-                entry_price=entry_price,
-                stop_loss=stop_loss,
-                target=target,
-                target2=target2,
-                target3=target3,
-                future_data=future_data
-            )
-            
-            # Update performance metrics
-            outcome = performance["outcome"]
-            pnl = performance["pnl"]
-            targets_hit = performance["targets_hit"]
-            stoploss_count = performance["stoploss_count"]
-            failure_reason = performance["failure_reason"]
-            exit_time = performance["exit_time"]
+            if signal == "BUY CALL":
+                stop_loss_price = candle['close'] - stop_loss
+                target1_price = candle['close'] + target
+                target2_price = candle['close'] + target2
+                target3_price = candle['close'] + target3
+
+                highest_price = candle['close']
+                trailing_sl = None
+                target1_hit = target2_hit = target3_hit = False
+                for i, future_candle in future_data.iterrows():
+                    if not target1_hit and future_candle['low'] <= stop_loss_price:
+                        outcome = "Loss"
+                        pnl = -stop_loss
+                        stoploss_count = 1
+                        failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        break
+                    if not target1_hit and future_candle['high'] >= target1_price:
+                        target1_hit = True
+                        targets_hit = 1
+                        pnl = target
+                        highest_price = max(highest_price, future_candle['high'])
+                        trailing_sl = highest_price - stop_loss
+                        outcome = "Win"
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        continue
+                    if target1_hit and not target2_hit and future_candle['high'] >= target2_price:
+                        target2_hit = True
+                        targets_hit = 2
+                        pnl += (target2 - target)
+                        highest_price = max(highest_price, future_candle['high'])
+                        trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    if target2_hit and not target3_hit and future_candle['high'] >= target3_price:
+                        target3_hit = True
+                        targets_hit = 3
+                        pnl += (target3 - target2)
+                        highest_price = max(highest_price, future_candle['high'])
+                        trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    if target1_hit:
+                        highest_price = max(highest_price, future_candle['high'])
+                        trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                        if future_candle['low'] <= trailing_sl:
+                            outcome = "Win"
+                            pnl = trailing_sl - candle['close']
+                            failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
+                            if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                                exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                            elif 'time' in future_data.columns:
+                                exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                            break
+            elif signal == "BUY PUT":
+                stop_loss_price = candle['close'] + stop_loss
+                target1_price = candle['close'] - target
+                target2_price = candle['close'] - target2
+                target3_price = candle['close'] - target3
+
+                lowest_price = candle['close']
+                trailing_sl = None
+                target1_hit = target2_hit = target3_hit = False
+                for i, future_candle in future_data.iterrows():
+                    if not target1_hit and future_candle['high'] >= stop_loss_price:
+                        outcome = "Loss"
+                        pnl = -stop_loss
+                        stoploss_count = 1
+                        failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        break
+                    if not target1_hit and future_candle['low'] <= target1_price:
+                        target1_hit = True
+                        targets_hit = 1
+                        pnl = target
+                        lowest_price = min(lowest_price, future_candle['low'])
+                        trailing_sl = lowest_price + stop_loss
+                        outcome = "Win"
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        continue
+                    if target1_hit and not target2_hit and future_candle['low'] <= target2_price:
+                        target2_hit = True
+                        targets_hit = 2
+                        pnl += (target2 - target)
+                        lowest_price = min(lowest_price, future_candle['low'])
+                        trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    if target2_hit and not target3_hit and future_candle['low'] <= target3_price:
+                        target3_hit = True
+                        targets_hit = 3
+                        pnl += (target3 - target2)
+                        lowest_price = min(lowest_price, future_candle['low'])
+                        trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                        elif 'time' in future_data.columns:
+                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    if target1_hit:
+                        lowest_price = min(lowest_price, future_candle['low'])
+                        trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                        if future_candle['high'] >= trailing_sl:
+                            outcome = "Win"
+                            pnl = candle['close'] - trailing_sl
+                            failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
+                            if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
+                                exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                            elif 'time' in future_data.columns:
+                                exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                            break
         
         # Create the signal data dictionary
         signal_data = {

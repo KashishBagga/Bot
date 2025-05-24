@@ -81,20 +81,7 @@ class SupertrendEma(Strategy):
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,
                              future_data: pd.DataFrame) -> Dict[str, Any]:
-        """Calculate performance metrics based on future data.
-        
-        Args:
-            signal: The trading signal (BUY CALL or BUY PUT)
-            entry_price: The price at signal generation
-            stop_loss: The stop loss price
-            target: The first target price
-            target2: The second target price
-            target3: The third target price
-            future_data: Future candles after signal generation
-            
-        Returns:
-            Dict containing outcome, pnl, targets_hit, stoploss_count, failure_reason, and exit_time
-        """
+        """Calculate performance metrics based on future data with trailing stop after target1, and let profits run after target3."""
         if future_data is None or future_data.empty:
             return {
                 "outcome": "Pending",
@@ -105,7 +92,6 @@ class SupertrendEma(Strategy):
                 "exit_time": None
             }
         
-        # Initialize performance metrics
         outcome = "Pending"
         pnl = 0.0
         targets_hit = 0
@@ -113,11 +99,11 @@ class SupertrendEma(Strategy):
         failure_reason = ""
         exit_time = None
         
-        # For BUY CALL, check if future prices went up to targets or down to stop loss
         if signal == "BUY CALL":
-            # Process each future candle chronologically
+            highest_price = entry_price
+            trailing_sl = None
+            target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                # Get candle timestamp for exit_time
                 current_time = None
                 if isinstance(idx, pd.Timestamp):
                     current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
@@ -128,39 +114,56 @@ class SupertrendEma(Strategy):
                         current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         current_time = str(candle['time'])
-                
-                # Check if stop loss was hit
-                if candle['low'] <= (entry_price - stop_loss):
+                # Check if stop loss was hit before target1
+                if not target1_hit and candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
-                    pnl = -1.0 * stop_loss  # Negative value for stop loss
+                    pnl = -1.0 * stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {entry_price - stop_loss:.2f}"
                     exit_time = current_time
-                    break  # Exit the loop as trade is closed
-                
-                # Check which targets were hit
-                if targets_hit == 0 and candle['high'] >= (entry_price + target):
+                    break
+                # Check if target1 is hit
+                if not target1_hit and candle['high'] >= (entry_price + target):
+                    target1_hit = True
                     targets_hit = 1
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = highest_price - stop_loss
                     pnl = target
                     outcome = "Win"
                     exit_time = current_time
-                
-                if targets_hit == 1 and candle['high'] >= (entry_price + target2):
+                    continue
+                # Check if target2 is hit
+                if target1_hit and not target2_hit and candle['high'] >= (entry_price + target2):
+                    target2_hit = True
                     targets_hit = 2
-                    pnl += (target2 - target)
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                    pnl = target2
                     exit_time = current_time
-                
-                if targets_hit == 2 and candle['high'] >= (entry_price + target3):
+                # Check if target3 is hit
+                if target2_hit and not target3_hit and candle['high'] >= (entry_price + target3):
+                    target3_hit = True
                     targets_hit = 3
-                    pnl += (target3 - target2)
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                    pnl = target3
                     exit_time = current_time
-                    break  # Exit the loop as all targets are hit
-        
-        # For BUY PUT, check if future prices went down to targets or up to stop loss
+                # After target1, always trail SL at highest_price - stop_loss
+                if target1_hit:
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                    # If price hits trailing SL, exit
+                    if candle['low'] <= trailing_sl:
+                        outcome = "Win"
+                        pnl = trailing_sl - entry_price
+                        failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
+                        exit_time = current_time
+                        break
         elif signal == "BUY PUT":
-            # Process each future candle chronologically
+            lowest_price = entry_price
+            trailing_sl = None
+            target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                # Get candle timestamp for exit_time
                 current_time = None
                 if isinstance(idx, pd.Timestamp):
                     current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
@@ -171,34 +174,51 @@ class SupertrendEma(Strategy):
                         current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         current_time = str(candle['time'])
-                
-                # Check if stop loss was hit
-                if candle['high'] >= (entry_price + stop_loss):
+                # Check if stop loss was hit before target1
+                if not target1_hit and candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
                     pnl = -1.0 * stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {entry_price + stop_loss:.2f}"
                     exit_time = current_time
-                    break  # Exit the loop as trade is closed
-                
-                # Check which targets were hit
-                if targets_hit == 0 and candle['low'] <= (entry_price - target):
+                    break
+                # Check if target1 is hit
+                if not target1_hit and candle['low'] <= (entry_price - target):
+                    target1_hit = True
                     targets_hit = 1
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = lowest_price + stop_loss
                     pnl = target
                     outcome = "Win"
                     exit_time = current_time
-                
-                if targets_hit == 1 and candle['low'] <= (entry_price - target2):
+                    continue
+                # Check if target2 is hit
+                if target1_hit and not target2_hit and candle['low'] <= (entry_price - target2):
+                    target2_hit = True
                     targets_hit = 2
-                    pnl += (target2 - target)
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                    pnl = target2
                     exit_time = current_time
-                
-                if targets_hit == 2 and candle['low'] <= (entry_price - target3):
+                # Check if target3 is hit
+                if target2_hit and not target3_hit and candle['low'] <= (entry_price - target3):
+                    target3_hit = True
                     targets_hit = 3
-                    pnl += (target3 - target2)
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                    pnl = target3
                     exit_time = current_time
-                    break  # Exit the loop as all targets are hit
-        
+                # After target1, always trail SL at lowest_price + stop_loss
+                if target1_hit:
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                    # If price hits trailing SL, exit
+                    if candle['high'] >= trailing_sl:
+                        outcome = "Win"
+                        pnl = entry_price - trailing_sl
+                        failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
+                        exit_time = current_time
+                        break
         return {
             "outcome": outcome,
             "pnl": pnl,

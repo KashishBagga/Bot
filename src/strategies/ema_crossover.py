@@ -313,6 +313,156 @@ class EmaCrossover(Strategy):
         
         return signal_data
         
+    def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
+                             target: float, target2: float, target3: float,
+                             future_data: pd.DataFrame) -> Dict[str, Any]:
+        """Calculate performance metrics based on future data with trailing stop after target1, and let profits run after target3."""
+        if future_data is None or future_data.empty:
+            return {
+                "outcome": "Pending",
+                "pnl": 0.0,
+                "targets_hit": 0,
+                "stoploss_count": 0,
+                "failure_reason": "",
+                "exit_time": None
+            }
+        
+        outcome = "Pending"
+        pnl = 0.0
+        targets_hit = 0
+        stoploss_count = 0
+        failure_reason = ""
+        exit_time = None
+        
+        if signal == "BUY CALL":
+            highest_price = entry_price
+            trailing_sl = None
+            target1_hit = target2_hit = target3_hit = False
+            for idx, candle in future_data.iterrows():
+                current_time = None
+                if isinstance(idx, pd.Timestamp):
+                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                elif 'time' in candle and candle['time'] is not None:
+                    if isinstance(candle['time'], pd.Timestamp):
+                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        current_time = str(candle['time'])
+                # Check if stop loss was hit before target1
+                if not target1_hit and candle['low'] <= (entry_price - stop_loss):
+                    outcome = "Loss"
+                    pnl = -1.0 * stop_loss
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {entry_price - stop_loss:.2f}"
+                    exit_time = current_time
+                    break
+                # Check if target1 is hit
+                if not target1_hit and candle['high'] >= (entry_price + target):
+                    target1_hit = True
+                    targets_hit = 1
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = highest_price - stop_loss
+                    pnl = target
+                    outcome = "Win"
+                    exit_time = current_time
+                    continue
+                # Check if target2 is hit
+                if target1_hit and not target2_hit and candle['high'] >= (entry_price + target2):
+                    target2_hit = True
+                    targets_hit = 2
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                    pnl = target2
+                    exit_time = current_time
+                # Check if target3 is hit
+                if target2_hit and not target3_hit and candle['high'] >= (entry_price + target3):
+                    target3_hit = True
+                    targets_hit = 3
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                    pnl = target3
+                    exit_time = current_time
+                # After target1, always trail SL at highest_price - stop_loss
+                if target1_hit:
+                    highest_price = max(highest_price, candle['high'])
+                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
+                    # If price hits trailing SL, exit
+                    if candle['low'] <= trailing_sl:
+                        outcome = "Win"
+                        pnl = trailing_sl - entry_price
+                        failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
+                        exit_time = current_time
+                        break
+        elif signal == "BUY PUT":
+            lowest_price = entry_price
+            trailing_sl = None
+            target1_hit = target2_hit = target3_hit = False
+            for idx, candle in future_data.iterrows():
+                current_time = None
+                if isinstance(idx, pd.Timestamp):
+                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
+                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
+                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                elif 'time' in candle and candle['time'] is not None:
+                    if isinstance(candle['time'], pd.Timestamp):
+                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        current_time = str(candle['time'])
+                # Check if stop loss was hit before target1
+                if not target1_hit and candle['high'] >= (entry_price + stop_loss):
+                    outcome = "Loss"
+                    pnl = -1.0 * stop_loss
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {entry_price + stop_loss:.2f}"
+                    exit_time = current_time
+                    break
+                # Check if target1 is hit
+                if not target1_hit and candle['low'] <= (entry_price - target):
+                    target1_hit = True
+                    targets_hit = 1
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = lowest_price + stop_loss
+                    pnl = target
+                    outcome = "Win"
+                    exit_time = current_time
+                    continue
+                # Check if target2 is hit
+                if target1_hit and not target2_hit and candle['low'] <= (entry_price - target2):
+                    target2_hit = True
+                    targets_hit = 2
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                    pnl = target2
+                    exit_time = current_time
+                # Check if target3 is hit
+                if target2_hit and not target3_hit and candle['low'] <= (entry_price - target3):
+                    target3_hit = True
+                    targets_hit = 3
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                    pnl = target3
+                    exit_time = current_time
+                # After target1, always trail SL at lowest_price + stop_loss
+                if target1_hit:
+                    lowest_price = min(lowest_price, candle['low'])
+                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
+                    # If price hits trailing SL, exit
+                    if candle['high'] >= trailing_sl:
+                        outcome = "Win"
+                        pnl = entry_price - trailing_sl
+                        failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
+                        exit_time = current_time
+                        break
+        return {
+            "outcome": outcome,
+            "pnl": pnl,
+            "targets_hit": targets_hit,
+            "stoploss_count": stoploss_count,
+            "failure_reason": failure_reason,
+            "exit_time": exit_time
+        }
+        
 # Backward compatibility function
 def run_strategy(candle, index_name, future_data=None, crossover_strength=None, momentum=None):
     """Legacy wrapper function for backward compatibility with function-based approach."""
