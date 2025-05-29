@@ -29,11 +29,16 @@ supertrend_macd_rsi_ema_fields = [
     "macd_reason",
     "price_reason",
     "option_chain_confirmation",
+    "option_symbol",
+    "option_expiry",
+    "option_strike",
+    "option_type",
+    "option_entry_price",
     "outcome",
     "pnl",
     "targets_hit",
     "stoploss_count",
-    "failure_reason"
+    "failure_reason",
     "exit_time"
 ]
 
@@ -93,6 +98,11 @@ def setup_supertrend_macd_rsi_ema_table():
                 macd_reason TEXT,
                 price_reason TEXT,
                 option_chain_confirmation TEXT,
+                option_symbol TEXT,
+                option_expiry TEXT,
+                option_strike INTEGER,
+                option_type TEXT,
+                option_entry_price REAL,
                 outcome TEXT,
                 pnl REAL,
                 targets_hit INTEGER,

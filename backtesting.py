@@ -8,7 +8,7 @@ import os
 import subprocess
 
 # Ensure all DB tables and rows are up-to-date before running backtesting
-subprocess.run([sys.executable, 'auto_ensure_performance_metrics.py'], check=True)
+# subprocess.run([sys.executable, 'auto_ensure_performance_metrics.py'], check=True)
 
 if __name__ == "__main__":
     # Simply call the all_strategies.py script with the system arguments

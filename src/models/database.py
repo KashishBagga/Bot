@@ -243,6 +243,22 @@ class Database:
         # Call the setup function to ensure the table exists
         setup_func(self)
         
+        # Ensure option-related fields are properly formatted
+        if 'option_expiry' in signal_data and signal_data['option_expiry']:
+            signal_data['option_expiry'] = str(signal_data['option_expiry'])
+        
+        if 'option_strike' in signal_data and signal_data['option_strike']:
+            try:
+                signal_data['option_strike'] = int(signal_data['option_strike'])
+            except (ValueError, TypeError):
+                signal_data['option_strike'] = None
+        
+        if 'option_entry_price' in signal_data and signal_data['option_entry_price']:
+            try:
+                signal_data['option_entry_price'] = float(signal_data['option_entry_price'])
+            except (ValueError, TypeError):
+                signal_data['option_entry_price'] = None
+        
         # Generate the query and parameters dynamically from the fields list
         placeholders = ", ".join(["?"] * len(fields_list))
         columns = ", ".join(fields_list)
