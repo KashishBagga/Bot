@@ -313,34 +313,30 @@ def log_strategy_sql(strategy_name, signal_data):
         # Only set the current time if signal_time doesn't exist
         signal_data['signal_time'] = datetime.now(TIMEZONE).strftime("%Y-%m-%d %H:%M:%S")
     else:
-        # Convert signal_time to IST if it's not already
-        try:
-            # Parse the signal time string to a datetime object
-            signal_time = signal_data['signal_time']
-            dt_obj = datetime.strptime(signal_time, "%Y-%m-%d %H:%M:%S")
-            
-            # Check if it might not be in IST already (assuming IST trading hours 9:15 AM - 3:30 PM)
-            if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
-                # Add 5 hours and 30 minutes to convert to IST
-                ist_dt = dt_obj + timedelta(hours=5, minutes=30)
-                signal_data['signal_time'] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception as e:
-            print(f"Warning: Failed to convert signal_time to IST: {e}")
-    
-    # Handle exit_time conversion to IST if present
+        # Convert signal_time to IST if it's a valid datetime string in the expected format
+        signal_time = signal_data['signal_time']
+        if isinstance(signal_time, str):
+            try:
+                dt_obj = datetime.strptime(signal_time, "%Y-%m-%d %H:%M:%S")
+                # Check if it might not be in IST already (assuming IST trading hours 9:15 AM - 3:30 PM)
+                if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
+                    # Add 5 hours and 30 minutes to convert to IST
+                    ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                    signal_data['signal_time'] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                # If not a valid datetime string, skip conversion and leave as-is
+                pass
+    # Handle exit_time conversion to IST if present and valid
     if 'exit_time' in signal_data and signal_data['exit_time']:
-        try:
-            # Parse the exit time string to a datetime object
-            exit_time = signal_data['exit_time']
-            dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
-            
-            # Check if it might not be in IST already
-            if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
-                # Add 5 hours and 30 minutes to convert to IST
-                ist_dt = dt_obj + timedelta(hours=5, minutes=30)
-                signal_data['exit_time'] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception as e:
-            print(f"Warning: Failed to convert exit_time to IST: {e}")
+        exit_time = signal_data['exit_time']
+        if isinstance(exit_time, str):
+            try:
+                dt_obj = datetime.strptime(exit_time, "%Y-%m-%d %H:%M:%S")
+                if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
+                    ist_dt = dt_obj + timedelta(hours=5, minutes=30)
+                    signal_data['exit_time'] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                pass
     
     # Skip logging if this is a NO TRADE signal or None
     signal = signal_data.get('signal')

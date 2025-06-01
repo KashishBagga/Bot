@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from indicators.supertrend import get_supertrend_instance
 
@@ -53,6 +53,15 @@ class SupertrendEma(Strategy):
             "st_data": st_data
         }
 
+    def safe_signal_time(self, val):
+        return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
+
+    def to_ist_str(self, val):
+        if isinstance(val, (pd.Timestamp, datetime)):
+            ist_dt = val + timedelta(hours=5, minutes=30)
+            return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return None
+
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,
                              future_data: pd.DataFrame) -> Dict[str, Any]:
@@ -74,11 +83,7 @@ class SupertrendEma(Strategy):
         exit_time = None
         if signal == "BUY CALL":
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if isinstance(idx, pd.Timestamp):
-                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
-                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                current_time = self.safe_signal_time(candle.get('time', None))
                 if candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
                     pnl = -stop_loss
@@ -97,14 +102,11 @@ class SupertrendEma(Strategy):
                 if targets_hit == 2 and candle['high'] >= (entry_price + target3):
                     targets_hit = 3
                     pnl += (target3 - target2)
+                    exit_time = current_time
                     break
         elif signal == "BUY PUT":
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if isinstance(idx, pd.Timestamp):
-                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
-                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
+                current_time = self.safe_signal_time(candle.get('time', None))
                 if candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
                     pnl = -stop_loss
@@ -123,14 +125,17 @@ class SupertrendEma(Strategy):
                 if targets_hit == 2 and candle['low'] <= (entry_price - target3):
                     targets_hit = 3
                     pnl += (target3 - target2)
+                    exit_time = current_time
                     break
+        # Defensive IST conversion for exit_time
+        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         return {
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
 
     def analyze(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
@@ -189,6 +194,7 @@ class SupertrendEma(Strategy):
             stoploss_count = perf["stoploss_count"]
             failure_reason = perf["failure_reason"]
             exit_time = perf["exit_time"]
+        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         return {
             "signal": signal,
             "confidence": round(confidence, 2),
@@ -203,7 +209,7 @@ class SupertrendEma(Strategy):
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
 
 # Optional legacy adapter

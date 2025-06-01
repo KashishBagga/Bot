@@ -4,7 +4,7 @@ Trading strategy based on crossing of exponential moving averages.
 """
 import pandas as pd
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from src.core.indicators import indicators
 from db import log_strategy_sql
@@ -59,6 +59,15 @@ class EmaCrossover(Strategy):
         
         return data
     
+    def safe_signal_time(self, val):
+        return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
+    
+    def to_ist_str(self, val):
+        if isinstance(val, (pd.Timestamp, datetime)):
+            ist_dt = val + timedelta(hours=5, minutes=30)
+            return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return None
+    
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
         
@@ -70,6 +79,14 @@ class EmaCrossover(Strategy):
         Returns:
             Dict[str, Any]: Signal data
         """
+        # Ensure 'time' column exists and is valid, and set as index
+        if 'time' in data.columns:
+            data = data.copy()
+            data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+            data = data.set_index('time')
+        if not isinstance(data.index, pd.DatetimeIndex):
+            raise ValueError("DataFrame index must be a DatetimeIndex")
+        
         # Calculate indicators if they haven't been calculated yet
         if 'ema_fast' not in data.columns:
             data = self.add_indicators(data)
@@ -224,14 +241,7 @@ class EmaCrossover(Strategy):
                 # Iterate through future candles chronologically
                 for idx, future_candle in future_data.iterrows():
                     # Get timestamp in the correct format
-                    current_time = None
-                    if isinstance(idx, pd.Timestamp):
-                        current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
-                    elif 'time' in future_candle and future_candle['time'] is not None:
-                        if isinstance(future_candle['time'], pd.Timestamp):
-                            current_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                        else:
-                            current_time = str(future_candle['time'])
+                    current_time = self.safe_signal_time(future_candle.get('time', None))
                     
                     # Check stop loss first (exit on low price)
                     if future_candle['low'] <= stop_loss_price:
@@ -263,14 +273,7 @@ class EmaCrossover(Strategy):
                 # Iterate through future candles chronologically
                 for idx, future_candle in future_data.iterrows():
                     # Get timestamp in the correct format
-                    current_time = None
-                    if isinstance(idx, pd.Timestamp):
-                        current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
-                    elif 'time' in future_candle and future_candle['time'] is not None:
-                        if isinstance(future_candle['time'], pd.Timestamp):
-                            current_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                        else:
-                            current_time = str(future_candle['time'])
+                    current_time = self.safe_signal_time(future_candle.get('time', None))
                     
                     # Check stop loss first (exit on high price)
                     if future_candle['high'] >= stop_loss_price:
@@ -292,22 +295,14 @@ class EmaCrossover(Strategy):
                             break
             
             # Update the signal data with the exit time
-            signal_data["exit_time"] = exit_time
+            signal_data["exit_time"] = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            # Use the actual candle time for signal_time instead of current time
-            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                # If candle has a timestamp index
-                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-            elif 'time' in data.columns and len(data) > 0:
-                # If time is a column in the dataframe
-                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
-            else:
-                # Fallback to current time if no timestamp is available
-                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
+            # Always use safe_signal_time for signal_time
+            signal_time = self.safe_signal_time(candle.name)
+            db_signal_data["signal_time"] = self.to_ist_str(signal_time) or (str(signal_time) if signal_time is not None else None)
             db_signal_data["index_name"] = index_name
             log_strategy_sql('ema_crossover', db_signal_data)
         
@@ -339,16 +334,7 @@ class EmaCrossover(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if isinstance(idx, pd.Timestamp):
-                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
-                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                elif 'time' in candle and candle['time'] is not None:
-                    if isinstance(candle['time'], pd.Timestamp):
-                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        current_time = str(candle['time'])
+                current_time = self.safe_signal_time(candle.get('time', None))
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
@@ -383,6 +369,7 @@ class EmaCrossover(Strategy):
                     trailing_sl = max(trailing_sl, highest_price - stop_loss)
                     pnl = target3
                     exit_time = current_time
+                    break
                 # After target1, always trail SL at highest_price - stop_loss
                 if target1_hit:
                     highest_price = max(highest_price, candle['high'])
@@ -399,16 +386,7 @@ class EmaCrossover(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if isinstance(idx, pd.Timestamp):
-                    current_time = idx.strftime("%Y-%m-%d %H:%M:%S")
-                elif hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                elif 'time' in candle and candle['time'] is not None:
-                    if isinstance(candle['time'], pd.Timestamp):
-                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        current_time = str(candle['time'])
+                current_time = self.safe_signal_time(candle.get('time', None))
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
@@ -443,6 +421,7 @@ class EmaCrossover(Strategy):
                     trailing_sl = min(trailing_sl, lowest_price + stop_loss)
                     pnl = target3
                     exit_time = current_time
+                    break
                 # After target1, always trail SL at lowest_price + stop_loss
                 if target1_hit:
                     lowest_price = min(lowest_price, candle['low'])
@@ -454,13 +433,15 @@ class EmaCrossover(Strategy):
                         failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
                         exit_time = current_time
                         break
+        # Defensive IST conversion for exit_time
+        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         return {
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
         
 # Backward compatibility function
@@ -476,5 +457,11 @@ def run_strategy(candle, index_name, future_data=None, crossover_strength=None, 
         data = pd.DataFrame([candle])
     else:
         data = candle
-        
+    
+    # Only set 'time' as index if it is a valid datetime
+    if 'time' in data.columns:
+        data = data.copy()
+        data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+        if pd.api.types.is_datetime64_any_dtype(data['time']):
+            data = data.set_index('time')
     return strategy.analyze(data, index_name, future_data)

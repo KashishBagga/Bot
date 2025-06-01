@@ -5,7 +5,7 @@ Trading strategy based on breakouts from Donchian channels.
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from db import log_strategy_sql
 
@@ -127,7 +127,7 @@ class DonchianBreakout(Strategy):
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                    exit_time = candle['time']
+                    exit_time = self.safe_signal_time(candle.get('time', None))
                     break  # Exit the loop as trade is closed
                 
                 # Check which targets are hit
@@ -158,7 +158,7 @@ class DonchianBreakout(Strategy):
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                    exit_time = candle['time']
+                    exit_time = self.safe_signal_time(candle.get('time', None))
                     break  # Exit the loop as trade is closed
                 
                 # Check which targets are hit
@@ -175,16 +175,39 @@ class DonchianBreakout(Strategy):
                     targets_hit = 3
                     pnl += (target3 - target2)
                 
+        # Defensive IST conversion for exit_time
+        exit_time_str = None
+        if isinstance(exit_time, (pd.Timestamp, datetime)):
+            ist_dt = exit_time + timedelta(hours=5, minutes=30)
+            exit_time_str = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        elif exit_time is not None:
+            exit_time_str = str(exit_time)
         return {
             "outcome": outcome,
             "pnl": round(pnl, 2),
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
     
+    def safe_signal_time(self, val):
+        return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
+    
+    def to_ist_str(self, val):
+        if isinstance(val, (pd.Timestamp, datetime)):
+            ist_dt = val + timedelta(hours=5, minutes=30)
+            return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return None
+    
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        # Ensure 'time' column exists and is valid, and set as index
+        if 'time' in data.columns:
+            data = data.copy()
+            data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+            data = data.set_index('time')
+        if not isinstance(data.index, pd.DatetimeIndex):
+            raise ValueError("DataFrame index must be a DatetimeIndex")
         """Analyze data and generate trading signals.
         
         Args:
@@ -274,10 +297,7 @@ class DonchianBreakout(Strategy):
                         pnl = -stop_loss
                         stoploss_count = 1
                         failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
                         break
                     if not target1_hit and future_candle['high'] >= target1_price:
                         target1_hit = True
@@ -286,10 +306,7 @@ class DonchianBreakout(Strategy):
                         highest_price = max(highest_price, future_candle['high'])
                         trailing_sl = highest_price - stop_loss
                         outcome = "Win"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
                         continue
                     if target1_hit and not target2_hit and future_candle['high'] >= target2_price:
                         target2_hit = True
@@ -297,20 +314,16 @@ class DonchianBreakout(Strategy):
                         pnl += (target2 - target)
                         highest_price = max(highest_price, future_candle['high'])
                         trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
+                        continue
                     if target2_hit and not target3_hit and future_candle['high'] >= target3_price:
                         target3_hit = True
                         targets_hit = 3
                         pnl += (target3 - target2)
                         highest_price = max(highest_price, future_candle['high'])
                         trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
+                        continue
                     if target1_hit:
                         highest_price = max(highest_price, future_candle['high'])
                         trailing_sl = max(trailing_sl, highest_price - stop_loss)
@@ -318,10 +331,7 @@ class DonchianBreakout(Strategy):
                             outcome = "Win"
                             pnl = trailing_sl - candle['close']
                             failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
-                            if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                                exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                            elif 'time' in future_data.columns:
-                                exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                            exit_time = self.safe_signal_time(future_candle.get('time', None))
                             break
             elif signal == "BUY PUT":
                 stop_loss_price = candle['close'] + stop_loss
@@ -338,10 +348,7 @@ class DonchianBreakout(Strategy):
                         pnl = -stop_loss
                         stoploss_count = 1
                         failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
                         break
                     if not target1_hit and future_candle['low'] <= target1_price:
                         target1_hit = True
@@ -350,10 +357,7 @@ class DonchianBreakout(Strategy):
                         lowest_price = min(lowest_price, future_candle['low'])
                         trailing_sl = lowest_price + stop_loss
                         outcome = "Win"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
                         continue
                     if target1_hit and not target2_hit and future_candle['low'] <= target2_price:
                         target2_hit = True
@@ -361,20 +365,16 @@ class DonchianBreakout(Strategy):
                         pnl += (target2 - target)
                         lowest_price = min(lowest_price, future_candle['low'])
                         trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
+                        continue
                     if target2_hit and not target3_hit and future_candle['low'] <= target3_price:
                         target3_hit = True
                         targets_hit = 3
                         pnl += (target3 - target2)
                         lowest_price = min(lowest_price, future_candle['low'])
                         trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                        exit_time = self.safe_signal_time(future_candle.get('time', None))
+                        continue
                     if target1_hit:
                         lowest_price = min(lowest_price, future_candle['low'])
                         trailing_sl = min(trailing_sl, lowest_price + stop_loss)
@@ -382,10 +382,7 @@ class DonchianBreakout(Strategy):
                             outcome = "Win"
                             pnl = candle['close'] - trailing_sl
                             failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
-                            if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                                exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                            elif 'time' in future_data.columns:
-                                exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
+                            exit_time = self.safe_signal_time(future_candle.get('time', None))
                             break
         
         # Create the signal data dictionary
@@ -409,23 +406,18 @@ class DonchianBreakout(Strategy):
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         }
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            # Use the actual candle time for signal_time instead of current time
-            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                # If candle has a timestamp index
-                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-            elif 'time' in data.columns and len(data) > 0:
-                # If time is a column in the dataframe
-                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            signal_time = self.safe_signal_time(candle.name)
+            # Only convert to IST if signal_time is a datetime
+            if isinstance(signal_time, (pd.Timestamp, datetime)):
+                db_signal_data["signal_time"] = self.to_ist_str(signal_time)
             else:
-                # Fallback to current time if no timestamp is available
-                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
+                db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
             db_signal_data["index_name"] = index_name
             log_strategy_sql('donchian_breakout', db_signal_data)
         
@@ -442,10 +434,15 @@ def run_strategy(candle, prev_candle=None, index_name=None, future_data=None, ch
     
     # Create a single-row DataFrame from the candle
     if not isinstance(candle, pd.DataFrame):
-        # Import pandas here to avoid circular imports
         import pandas as pd
         data = pd.DataFrame([candle])
     else:
         data = candle
-        
+
+    # Only set 'time' as index if it is a valid datetime
+    if 'time' in data.columns:
+        data = data.copy()
+        data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+        if pd.api.types.is_datetime64_any_dtype(data['time']):
+            data = data.set_index('time')
     return strategy.analyze(data, index_name, future_data)

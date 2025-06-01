@@ -8,6 +8,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from db import log_strategy_sql
+import re
 
 class RangeBreakoutVolatility(Strategy):
     """Trading strategy implementation for Range Breakout with Volatility.
@@ -119,14 +120,7 @@ class RangeBreakoutVolatility(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                elif 'time' in candle and candle['time'] is not None:
-                    if isinstance(candle['time'], pd.Timestamp):
-                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        current_time = str(candle['time'])
+                current_time = self.safe_signal_time(candle.get('time', None))
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
@@ -177,14 +171,7 @@ class RangeBreakoutVolatility(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                elif 'time' in candle and candle['time'] is not None:
-                    if isinstance(candle['time'], pd.Timestamp):
-                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        current_time = str(candle['time'])
+                current_time = self.safe_signal_time(candle.get('time', None))
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
@@ -230,14 +217,32 @@ class RangeBreakoutVolatility(Strategy):
                         failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
                         exit_time = current_time
                         break
+        
+        # Defensive IST conversion for exit_time
+        exit_time_str = None
+        if isinstance(exit_time, (pd.Timestamp, datetime)):
+            ist_dt = exit_time + timedelta(hours=5, minutes=30)
+            exit_time_str = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        elif exit_time is not None:
+            exit_time_str = str(exit_time)
+        
         return {
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
+    
+    def safe_signal_time(self, val):
+        return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
+    
+    def to_ist_str(self, val):
+        if isinstance(val, (pd.Timestamp, datetime)):
+            ist_dt = val + timedelta(hours=5, minutes=30)
+            return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return None
     
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
@@ -250,6 +255,14 @@ class RangeBreakoutVolatility(Strategy):
         Returns:
             Dict[str, Any]: Signal data
         """
+        # Ensure 'time' column exists and is valid, and set as index
+        if 'time' in data.columns:
+            data = data.copy()
+            data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+            data = data.set_index('time')
+        if not isinstance(data.index, pd.DatetimeIndex):
+            raise ValueError("DataFrame index must be a DatetimeIndex")
+        
         # Ensure indicators are calculated
         data = self.add_indicators(data)
         
@@ -372,37 +385,18 @@ class RangeBreakoutVolatility(Strategy):
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         }
         
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            # Use the actual candle time for signal_time instead of current time
-            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                # If candle has a timestamp index
-                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-            elif 'time' in data.columns and len(data) > 0:
-                # If time is a column in the dataframe
-                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            signal_time = self.safe_signal_time(candle.name)
+            # Only convert to IST if signal_time is a datetime
+            if isinstance(signal_time, (pd.Timestamp, datetime)):
+                db_signal_data["signal_time"] = self.to_ist_str(signal_time)
             else:
-                # Fallback to current time if no timestamp is available
-                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
-            # Convert signal_time to IST (+5:30)
-            try:
-                # Parse the signal time string to a datetime object
-                signal_time = db_signal_data["signal_time"]
-                dt_obj = datetime.strptime(signal_time, "%Y-%m-%d %H:%M:%S")
-                
-                # Check if it might not be in IST already (assuming IST trading hours 9:15 AM - 3:30 PM)
-                if dt_obj.hour < 9 or (dt_obj.hour == 9 and dt_obj.minute < 15):
-                    # Add 5 hours and 30 minutes to convert to IST
-                    ist_dt = dt_obj + timedelta(hours=5, minutes=30)
-                    db_signal_data["signal_time"] = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
-            except Exception as e:
-                print(f"Warning: Failed to convert signal_time to IST: {e}")
-            
+                db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
             db_signal_data["index_name"] = index_name
             log_strategy_sql('range_breakout_volatility', db_signal_data)
         
@@ -420,10 +414,15 @@ def run_strategy(candle, prev_candle=None, index_name=None, future_data=None, ra
     
     # Create a single-row DataFrame from the candle
     if not isinstance(candle, pd.DataFrame):
-        # Import pandas here to avoid circular imports
         import pandas as pd
         data = pd.DataFrame([candle])
     else:
         data = candle
-        
+
+    # Only set 'time' as index if it is a valid datetime
+    if 'time' in data.columns:
+        data = data.copy()
+        data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+        if pd.api.types.is_datetime64_any_dtype(data['time']):
+            data = data.set_index('time')
     return strategy.analyze(data, index_name, future_data)

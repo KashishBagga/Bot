@@ -7,6 +7,7 @@ from typing import Dict, Any
 from src.core.strategy import Strategy
 from src.core.indicators import indicators
 from src.models.database import db
+from datetime import datetime, timedelta
 
 class InsidebarRsi(Strategy):
     """Trading strategy implementation for Inside Bar with RSI confirmation."""
@@ -65,6 +66,15 @@ class InsidebarRsi(Strategy):
         data['rsi_level'] = data['rsi'].apply(get_rsi_level)
         
         return data
+    
+    def safe_signal_time(self, val):
+        return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
+    
+    def to_ist_str(self, val):
+        if isinstance(val, (pd.Timestamp, datetime)):
+            ist_dt = val + timedelta(hours=5, minutes=30)
+            return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return None
     
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data = None) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
@@ -261,8 +271,13 @@ class InsidebarRsi(Strategy):
                                 exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                             break
         
+        # In all places where exit_time is set, use self.safe_signal_time
+        # Defensive IST conversion for exit_time in signal_data
+        exit_time_val = exit_time
+        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
+        
         # Return the signal data
-        return {
+        signal_data = {
             "signal": signal,
             "price": candle['close'],
             "rsi": candle['rsi'],
@@ -282,5 +297,19 @@ class InsidebarRsi(Strategy):
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
+        
+        # If index_name is provided, log to database
+        if index_name and signal != "NO TRADE":
+            db_signal_data = signal_data.copy()
+            signal_time = self.safe_signal_time(candle.name)
+            # Only convert to IST if signal_time is a datetime
+            if isinstance(signal_time, (pd.Timestamp, datetime)):
+                db_signal_data["signal_time"] = self.to_ist_str(signal_time)
+            else:
+                db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
+            db_signal_data["index_name"] = index_name
+            db.log_strategy('insidebar_rsi', db_signal_data)
+        
+        return signal_data

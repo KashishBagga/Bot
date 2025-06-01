@@ -5,7 +5,7 @@ Trading strategy based on inside bars and Bollinger Bands.
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from db import log_strategy_sql
 
@@ -101,14 +101,7 @@ class InsidebarBollinger(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                elif 'time' in candle and candle['time'] is not None:
-                    if isinstance(candle['time'], pd.Timestamp):
-                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        current_time = str(candle['time'])
+                current_time = self.safe_signal_time(candle.get('time', None))
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
@@ -159,14 +152,7 @@ class InsidebarBollinger(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = None
-                if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                    current_time = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                elif 'time' in candle and candle['time'] is not None:
-                    if isinstance(candle['time'], pd.Timestamp):
-                        current_time = candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        current_time = str(candle['time'])
+                current_time = self.safe_signal_time(candle.get('time', None))
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
@@ -212,16 +198,39 @@ class InsidebarBollinger(Strategy):
                         failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
                         exit_time = current_time
                         break
+        # Defensive IST conversion for exit_time
+        exit_time_str = None
+        if isinstance(exit_time, (pd.Timestamp, datetime)):
+            ist_dt = exit_time + timedelta(hours=5, minutes=30)
+            exit_time_str = ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        elif exit_time is not None:
+            exit_time_str = str(exit_time)
         return {
             "outcome": outcome,
             "pnl": round(pnl, 2),
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time
+            "exit_time": exit_time_str
         }
     
+    def safe_signal_time(self, val):
+        return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
+    
+    def to_ist_str(self, val):
+        if isinstance(val, (pd.Timestamp, datetime)):
+            ist_dt = val + timedelta(hours=5, minutes=30)
+            return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return None
+    
     def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        # Ensure 'time' column exists and is valid, and set as index
+        if 'time' in data.columns:
+            data = data.copy()
+            data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+            data = data.set_index('time')
+        if not isinstance(data.index, pd.DatetimeIndex):
+            raise ValueError("DataFrame index must be a DatetimeIndex")
         """Analyze data and generate trading signals.
         
         Args:
@@ -347,19 +356,18 @@ class InsidebarBollinger(Strategy):
         # If index_name is provided, log to database
         if index_name and signal != "NO TRADE":
             db_signal_data = signal_data.copy()
-            # Use the actual candle time for signal_time instead of current time
-            if hasattr(candle, 'name') and isinstance(candle.name, pd.Timestamp):
-                # If candle has a timestamp index
-                db_signal_data["signal_time"] = candle.name.strftime("%Y-%m-%d %H:%M:%S")
-            elif 'time' in data.columns and len(data) > 0:
-                # If time is a column in the dataframe
-                db_signal_data["signal_time"] = data.iloc[-1]['time'].strftime("%Y-%m-%d %H:%M:%S") 
+            signal_time = self.safe_signal_time(candle.name)
+            # Only convert to IST if signal_time is a datetime
+            if isinstance(signal_time, (pd.Timestamp, datetime)):
+                db_signal_data["signal_time"] = self.to_ist_str(signal_time)
             else:
-                # Fallback to current time if no timestamp is available
-                db_signal_data["signal_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
+                db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
             db_signal_data["index_name"] = index_name
             log_strategy_sql('insidebar_bollinger', db_signal_data)
+        
+        # Defensive IST conversion for exit_time in signal_data
+        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
+        signal_data["exit_time"] = exit_time_str
         
         return signal_data
 
@@ -377,7 +385,6 @@ def run_strategy(candle, prev_candle, index_name, future_data=None, bollinger_wi
     
     # Create a single-row DataFrame from the candle
     if not isinstance(candle, pd.DataFrame):
-        # Import pandas here to avoid circular imports
         import pandas as pd
         data = pd.DataFrame([candle])
         # Add prev candle data
@@ -387,5 +394,11 @@ def run_strategy(candle, prev_candle, index_name, future_data=None, bollinger_wi
         data['is_partial_inside'] = ((candle['high'] < prev_candle['high']) or (candle['low'] > prev_candle['low']))
     else:
         data = candle
-        
+    
+    # Only set 'time' as index if it is a valid datetime
+    if 'time' in data.columns:
+        data = data.copy()
+        data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
+        if pd.api.types.is_datetime64_any_dtype(data['time']):
+            data = data.set_index('time')
     return strategy.analyze(data, index_name, future_data)
