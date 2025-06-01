@@ -377,9 +377,9 @@ def log_strategy_sql(strategy_name, signal_data):
     
     # 2. Performance metrics
     # If these are missing, initialize with default values
-    if 'outcome' not in signal_data or not signal_data['outcome']:
+    if 'outcome' not in signal_data or signal_data['outcome'] is None or signal_data['outcome'] == '':
         signal_data['outcome'] = 'Pending'
-        
+    
     if 'pnl' not in signal_data or not signal_data['pnl']:
         signal_data['pnl'] = 0.0
     
@@ -391,6 +391,9 @@ def log_strategy_sql(strategy_name, signal_data):
     
     if 'failure_reason' not in signal_data or not signal_data['failure_reason']:
         signal_data['failure_reason'] = ""
+
+    # Debug print for outcome
+    # print(f"[DB DEBUG] Logging outcome: {signal_data.get('outcome')}")
     
     # Connect to the database
     conn = sqlite3.connect("trading_signals.db")

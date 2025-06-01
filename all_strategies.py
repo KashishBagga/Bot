@@ -268,9 +268,9 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
             # Process each candle
             for i in range(candle_count):
                 row = df_with_indicators.iloc[i]
-                # For supertrend_ema, always use the new signature
                 if strategy_name == 'supertrend_ema':
-                    signal_result = strategy.analyze(row, i, df_with_indicators)
+                    future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
+                    signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
                 elif hasattr(strategy, 'analyze') and 'timeframe_data' in strategy.__init__.__code__.co_varnames:
                     signal_result = strategy.analyze(row, i, df_with_indicators)
                 else:

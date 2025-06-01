@@ -15,8 +15,8 @@ if __name__ == "__main__":
     from all_strategies import run_all_strategies
     
     # Default parameters
-    days_back = 60
-    resolution = "15"
+    days_back = 30
+    resolution = "3"
     save_to_db = True
     symbols = None
     
