@@ -16,7 +16,16 @@ class Supertrend:
 
     def _calculate_atr(self, tr):
         self.atr_values.append(tr)
-        return sum(self.atr_values) / len(self.atr_values) if self.atr_values else tr
+        if len(self.atr_values) < self.period:
+            return np.mean(self.atr_values)  # Simple average until period is met
+        else:
+            # Wilder's smoothing: ATR_t = (ATR_{t-1} * (period-1) + TR_t) / period
+            if hasattr(self, 'prev_atr'):
+                atr = (self.prev_atr * (self.period - 1) + tr) / self.period
+            else:
+                atr = np.mean(self.atr_values)
+            self.prev_atr = atr
+            return atr
 
     def update(self, candle):
         """
@@ -135,3 +144,13 @@ def calculate_supertrend_live(candle, prev_candle=None, prev_supertrend=None, mu
         'upperband': final_upperband,
         'lowerband': final_lowerband
     }
+
+
+# --- Global instances dictionary ---
+
+_supertrend_instances = {}
+
+def get_supertrend_instance(symbol, period=7, multiplier=3):
+    if symbol not in _supertrend_instances:
+        _supertrend_instances[symbol] = Supertrend(period=period, multiplier=multiplier)
+    return _supertrend_instances[symbol]

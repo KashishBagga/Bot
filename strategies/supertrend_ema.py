@@ -2,49 +2,10 @@ from datetime import datetime
 from db import log_strategy_sql
 import numpy as np
 import pandas as pd
-
-def calculate_supertrend(candle, prev_candle=None, prev_supertrend=None, period=7, multiplier=3):
-    tr1 = abs(candle['high'] - candle['low'])
-    tr2 = abs(candle['high'] - candle['close'])
-    tr3 = abs(candle['low'] - candle['close'])
-    true_range = max(tr1, tr2, tr3)
-    atr = candle.get('atr', true_range)
-
-    hl2 = (candle['high'] + candle['low']) / 2
-    basic_upperband = hl2 + (multiplier * atr)
-    basic_lowerband = hl2 - (multiplier * atr)
-
-    final_upperband = basic_upperband
-    final_lowerband = basic_lowerband
-
-    if prev_candle and prev_supertrend:
-        if prev_candle['close'] <= prev_supertrend['upperband']:
-            final_upperband = min(basic_upperband, prev_supertrend['upperband'])
-        if prev_candle['close'] >= prev_supertrend['lowerband']:
-            final_lowerband = max(basic_lowerband, prev_supertrend['lowerband'])
-
-    if candle['close'] > final_upperband:
-        direction = 1
-        supertrend = final_lowerband
-    elif candle['close'] < final_lowerband:
-        direction = -1
-        supertrend = final_upperband
-    else:
-        if prev_supertrend:
-            direction = prev_supertrend['direction']
-            supertrend = prev_supertrend['value']
-        else:
-            direction = 1 if candle['close'] > (final_upperband + final_lowerband) / 2 else -1
-            supertrend = final_lowerband if direction == 1 else final_upperband
-
-    return {
-        "value": supertrend,
-        "direction": direction,
-        "upperband": final_upperband,
-        "lowerband": final_lowerband
-    }
+from indicators.supertrend import Supertrend, calculate_supertrend_live
 
 def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_ratio=None):
+    """Supertrend with EMA confirmation."""
     signal = "NO TRADE"
     confidence = "Low"
     trade_type = "Intraday"
@@ -54,25 +15,33 @@ def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_r
     outcome = "Pending"
     failure_reason = ""
 
+    supertrend_instance = get_supertrend_instance(index_name)
+    supertrend_data = supertrend_instance.update(candle)
+    
     if price_to_ema_ratio is None and 'ema_20' in candle:
         price_to_ema_ratio = (candle['close'] / candle['ema_20'] - 1) * 100
 
-    supertrend_data = calculate_supertrend(
-        candle=candle
-    )
+    # Use the Supertrend instance to maintain state
     supertrend_value = supertrend_data['value']
     supertrend_direction = supertrend_data['direction']
-
+    
+    # Enhanced signal generation with band confirmation
     if 'ema_20' in candle:
         if candle['close'] > candle['ema_20'] and supertrend_direction > 0:
             signal = "BUY CALL"
-            if price_to_ema_ratio > 0.5 and candle['close'] > supertrend_value:
+            # Higher confidence when price is above both EMA and upper band
+            if (price_to_ema_ratio > 0.5 and 
+                candle['close'] > supertrend_value and 
+                candle['close'] > supertrend_data['upperband']):
                 confidence = "High"
             else:
                 confidence = "Medium"
         elif candle['close'] < candle['ema_20'] and supertrend_direction < 0:
             signal = "BUY PUT"
-            if price_to_ema_ratio < -0.5 and candle['close'] < supertrend_value:
+            # Higher confidence when price is below both EMA and lower band
+            if (price_to_ema_ratio < -0.5 and 
+                candle['close'] < supertrend_value and 
+                candle['close'] < supertrend_data['lowerband']):
                 confidence = "High"
             else:
                 confidence = "Medium"
@@ -127,6 +96,7 @@ def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_r
         if outcome == "Pending":
             outcome = "Win" if targets_hit > 0 else "Pending"
 
+    # Enhanced signal data with Supertrend bands
     signal_data = {
         "signal_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "index_name": index_name,
@@ -145,7 +115,11 @@ def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_r
         "pnl": pnl,
         "targets_hit": targets_hit,
         "stoploss_count": stoploss_count,
-        "failure_reason": failure_reason
+        "failure_reason": failure_reason,
+        "supertrend_value": supertrend_value,
+        "supertrend_direction": supertrend_direction,
+        "supertrend_upperband": supertrend_data['upperband'],
+        "supertrend_lowerband": supertrend_data['lowerband']
     }
     log_strategy_sql('supertrend_ema', signal_data)
 
@@ -158,5 +132,7 @@ def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_r
         "targets_hit": targets_hit,
         "stoploss_count": stoploss_count,
         "supertrend_value": supertrend_value,
-        "supertrend_direction": supertrend_direction
+        "supertrend_direction": supertrend_direction,
+        "supertrend_upperband": supertrend_data['upperband'],
+        "supertrend_lowerband": supertrend_data['lowerband']
     }
