@@ -12,6 +12,7 @@ import backoff
 import pandas as pd
 import concurrent.futures
 from collections import defaultdict
+from src.core.multi_timeframe import prepare_multi_timeframe_data
 
 def check_dependencies():
     """Check if all required dependencies are installed"""
@@ -154,6 +155,7 @@ def fetch_all_symbol_data(fyers, symbols, resolution, days_back):
     end_date = datetime.now().strftime('%Y-%m-%d')
 
     dataframes = {}
+    multi_timeframe_dataframes = {}
     for symbol, name in symbols.items():
         try:
             print(f"\n📈 {name}")
@@ -178,10 +180,12 @@ def fetch_all_symbol_data(fyers, symbols, resolution, days_back):
             df['bollinger_mid'] = bb.bollinger_mavg()
 
             dataframes[name] = df
+            # Prepare multi-timeframe data for each symbol
+            multi_timeframe_dataframes[name] = prepare_multi_timeframe_data(df, base_resolution='3min')
         except Exception as e:
             print(f"❌ Error fetching {name}: {e}")
             traceback.print_exc()
-    return dataframes
+    return dataframes, multi_timeframe_dataframes
 
 def print_summary(results, duration):
     print("\n📊 Overall Execution Summary:")
@@ -219,12 +223,13 @@ def print_summary(results, duration):
             if 'records_saved' in stats:
                 print(f"    Records saved: {stats['records_saved']}")
 
-def run_strategy(strategy_name, dataframes, save_to_db):
+def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_db):
     """Run a single strategy on all provided dataframes.
     
     Args:
         strategy_name: Name of the strategy to run
         dataframes: Dict of dataframes keyed by index name
+        multi_timeframe_dataframes: Dict of multi-timeframe dataframes keyed by index name
         save_to_db: Whether to save results to database
     
     Returns:
@@ -236,7 +241,6 @@ def run_strategy(strategy_name, dataframes, save_to_db):
     else:
         def log_strategy_sql(*args, **kwargs):
             pass  # no-op if not saving to DB
-    
     strategy_results = {}
     print(f"\n====== Running strategy: {strategy_name} ======")
 
@@ -246,51 +250,59 @@ def run_strategy(strategy_name, dataframes, save_to_db):
         print(f"❌ Strategy class '{strategy_name}' not found")
         return {strategy_name: {"error": "Strategy class not found"}}
 
-    # Initialize the strategy
-    strategy = strategy_class()
-
     # Process each index
     for index_name, df in dataframes.items():
         try:
             # Add indicators to the dataframe
-            df_with_indicators = strategy.add_indicators(df.copy())
+            df_with_indicators = strategy_class().add_indicators(df.copy())
             candle_count = len(df_with_indicators)
             signal_count = defaultdict(int)
             all_signals = []
-
+            # Prepare multi-timeframe data for this symbol
+            timeframe_data = multi_timeframe_dataframes.get(index_name)
+            # Initialize the strategy with timeframe_data if supported
+            try:
+                strategy = strategy_class(timeframe_data=timeframe_data)
+            except TypeError:
+                strategy = strategy_class()
             # Process each candle
             for i in range(candle_count):
                 row = df_with_indicators.iloc[i]
-                candle_data = df_with_indicators.iloc[i:i+1]
-                future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
-
-                # Generate signal
-                analyze_kwargs = {"future_data": future_data}
-                if strategy_name not in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
-                    analyze_kwargs["index_name"] = index_name
-
-                signal_result = strategy.analyze(candle_data, **analyze_kwargs)
+                # For supertrend_ema, always use the new signature
+                if strategy_name == 'supertrend_ema':
+                    signal_result = strategy.analyze(row, i, df_with_indicators)
+                elif hasattr(strategy, 'analyze') and 'timeframe_data' in strategy.__init__.__code__.co_varnames:
+                    signal_result = strategy.analyze(row, i, df_with_indicators)
+                else:
+                    # Fallback for legacy strategies
+                    candle_data = df_with_indicators.iloc[i:i+1]
+                    future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
+                    analyze_kwargs = {"future_data": future_data}
+                    if strategy_name not in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
+                        analyze_kwargs["index_name"] = index_name
+                    signal_result = strategy.analyze(candle_data, **analyze_kwargs)
+                # If signal_result is None, treat as NO TRADE
+                if signal_result is None:
+                    signal_result = {'signal': 'NO TRADE'}
                 signal = signal_result.get('signal', 'NO TRADE')
                 signal_count[signal] += 1
-
                 # Prepare signal info for database
+                if isinstance(row.name, pd.Timestamp):
+                    time_str = row.name.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    time_str = str(row.name)
                 signal_info = {
-                    'time': row['time'].strftime('%Y-%m-%d %H:%M:%S'),
-                    'signal_time': row['time'].strftime('%Y-%m-%d %H:%M:%S'),
+                    'time': time_str,
+                    'signal_time': time_str,
                     'signal': signal,
                     'price': signal_result.get('price', row['close']),
                     'confidence': signal_result.get('confidence', 'Low'),
                     'index_name': index_name
                 }
-
-                # Add all other signal result fields
                 for key, value in signal_result.items():
                     if key not in signal_info:
                         signal_info[key] = value
-
                 all_signals.append(signal_info)
-
-            # Save signals to database
             records_saved = 0
             if save_to_db:
                 trading_signals = [s for s in all_signals if s['signal'] not in ['NO TRADE', None]]
@@ -300,14 +312,11 @@ def run_strategy(strategy_name, dataframes, save_to_db):
                         records_saved += 1
                     except Exception as e:
                         print(f"❌ DB Save error: {e}")
-
-            # Store results
             strategy_results[index_name] = {
                 'candles': candle_count,
                 'signals': dict(signal_count),
                 'records_saved': records_saved if save_to_db else None
             }
-
         except Exception as e:
             print(f"❌ Error in {index_name}: {e}")
             traceback.print_exc()
@@ -332,7 +341,7 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
 
     print(f"🔄 Running {len(strategies)} strategies")
     fyers = initialize_fyers_client()
-    dataframes = fetch_all_symbol_data(fyers, symbols, resolution, days_back)
+    dataframes, multi_timeframe_dataframes = fetch_all_symbol_data(fyers, symbols, resolution, days_back)
 
     if not dataframes:
         print("❌ No data available")
@@ -343,7 +352,7 @@ def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=No
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = {
-            executor.submit(run_strategy, name, dataframes, save_to_db): name
+            executor.submit(run_strategy, name, dataframes, multi_timeframe_dataframes, save_to_db): name
             for name in strategies
         }
         for future in concurrent.futures.as_completed(futures):
