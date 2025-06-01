@@ -376,7 +376,7 @@ if __name__ == "__main__":
     parser.add_argument('--symbols', type=str, help='Symbols to test, comma separated (default: NIFTY50,BANKNIFTY)')
     
     args = parser.parse_args()
-    
+     
     # Process symbols if provided
     symbols = None
     if args.symbols:
