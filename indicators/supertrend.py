@@ -1,3 +1,4 @@
+import numpy as np
 from collections import deque
 
 class Supertrend:
@@ -9,6 +10,12 @@ class Supertrend:
         self.prev_supertrend = None
 
     def _calculate_true_range(self, candle, prev_candle):
+        # Convert pandas Series to dict if needed
+        if hasattr(candle, 'to_dict'):
+            candle = candle.to_dict()
+        if prev_candle is not None and hasattr(prev_candle, 'to_dict'):
+            prev_candle = prev_candle.to_dict()
+            
         tr1 = abs(candle['high'] - candle['low'])
         tr2 = abs(candle['high'] - (prev_candle['close'] if prev_candle else candle['close']))
         tr3 = abs(candle['low'] - (prev_candle['close'] if prev_candle else candle['close']))
@@ -42,6 +49,10 @@ class Supertrend:
                 'lowerband': Final lower band
             }
         """
+        # Convert pandas Series to dict if needed
+        if hasattr(candle, 'to_dict'):
+            candle = candle.to_dict()
+            
         tr = self._calculate_true_range(candle, self.prev_candle)
         atr = self._calculate_atr(tr)
 
@@ -82,7 +93,7 @@ class Supertrend:
             'lowerband': final_lower
         }
 
-        self.prev_candle = candle
+        self.prev_candle = candle  # Store as dict
         self.prev_supertrend = result
         return result
 
