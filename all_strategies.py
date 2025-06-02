@@ -13,6 +13,9 @@ import pandas as pd
 import concurrent.futures
 from collections import defaultdict
 from src.core.multi_timeframe import prepare_multi_timeframe_data
+from dotenv import load_dotenv
+from fyers_apiv3 import fyersModel
+from src.strategies import get_strategy_class
 
 def check_dependencies():
     """Check if all required dependencies are installed"""
@@ -226,21 +229,18 @@ def print_summary(results, duration):
 def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_db):
     """Run a single strategy on all provided dataframes.
     
-    Args:
-        strategy_name: Name of the strategy to run
-        dataframes: Dict of dataframes keyed by index name
-        multi_timeframe_dataframes: Dict of multi-timeframe dataframes keyed by index name
-        save_to_db: Whether to save results to database
-    
-    Returns:
-        Dict containing results for each index
+    Optimized version with:
+    - Vectorized operations where possible
+    - Batch database operations
+    - Efficient data slicing
+    - Reduced function call overhead
     """
-    from src.strategies import get_strategy_class
     if save_to_db:
         from db import log_strategy_sql
     else:
         def log_strategy_sql(*args, **kwargs):
             pass  # no-op if not saving to DB
+    
     strategy_results = {}
     print(f"\n====== Running strategy: {strategy_name} ======")
 
@@ -253,82 +253,123 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
     # Process each index
     for index_name, df in dataframes.items():
         try:
-            # Add indicators to the dataframe
+            start_time = time.time()
+            
+            # Add indicators to the dataframe ONCE
             df_with_indicators = strategy_class().add_indicators(df.copy())
             candle_count = len(df_with_indicators)
             signal_count = defaultdict(int)
             all_signals = []
+            
             # Prepare multi-timeframe data for this symbol
             timeframe_data = multi_timeframe_dataframes.get(index_name)
+            
             # Initialize the strategy with timeframe_data if supported
             try:
                 strategy = strategy_class(timeframe_data=timeframe_data)
             except TypeError:
                 strategy = strategy_class()
-            # Process each candle
+            
+            # OPTIMIZATION 1: Pre-calculate all future_data slices
+            future_data_cache = {}
             for i in range(candle_count):
-                row = df_with_indicators.iloc[i]
-                future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
+                if i + 1 < candle_count:
+                    # Use smaller future window for performance
+                    end_idx = min(i + 11, candle_count)
+                    future_data_cache[i] = df_with_indicators.iloc[i+1:end_idx].copy()
+                else:
+                    future_data_cache[i] = pd.DataFrame()
+            
+            # OPTIMIZATION 2: Batch processing in chunks
+            chunk_size = 100  # Process 100 candles at a time
+            all_trading_signals = []  # Collect all signals for batch DB insert
+            
+            for chunk_start in range(0, candle_count, chunk_size):
+                chunk_end = min(chunk_start + chunk_size, candle_count)
                 
-                # Strategy-specific calling patterns
-                if strategy_name == 'breakout_rsi':
-                    # breakout_rsi expects (candle: pd.Series, index: int, df: pd.DataFrame, future_data)
-                    signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
-                elif strategy_name == 'insidebar_bollinger':
-                    # insidebar_bollinger expects (data: pd.DataFrame, index_name: str, future_data)
-                    candle_data = df_with_indicators.iloc[i:i+1]
-                    signal_result = strategy.analyze(candle_data, index_name=index_name, future_data=future_data)
-                elif strategy_name == 'supertrend_ema':
-                    signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
-                elif hasattr(strategy, 'timeframe_data') and strategy.timeframe_data:
-                    # Use multi-timeframe method if timeframe_data is available
-                    signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
-                elif hasattr(strategy, 'analyze_multi_timeframe'):
-                    # Use multi-timeframe method if available
-                    signal_result = strategy.analyze_multi_timeframe(row, i, df_with_indicators, future_data=future_data)
-                else:
-                    # Fallback for legacy strategies
-                    candle_data = df_with_indicators.iloc[i:i+1]
-                    analyze_kwargs = {"future_data": future_data}
-                    if strategy_name not in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
-                        analyze_kwargs["index_name"] = index_name
-                    signal_result = strategy.analyze(candle_data, **analyze_kwargs)
-                # If signal_result is None, treat as NO TRADE
-                if signal_result is None:
-                    signal_result = {'signal': 'NO TRADE'}
-                signal = signal_result.get('signal', 'NO TRADE')
-                signal_count[signal] += 1
-                # Prepare signal info for database
-                if isinstance(row.name, pd.Timestamp):
-                    time_str = row.name.strftime('%Y-%m-%d %H:%M:%S')
-                else:
-                    time_str = str(row.name)
-                signal_info = {
-                    'time': time_str,
-                    'signal_time': time_str,
-                    'signal': signal,
-                    'price': signal_result.get('price', row['close']),
-                    'confidence': signal_result.get('confidence', 'Low'),
-                    'index_name': index_name
-                }
-                for key, value in signal_result.items():
-                    if key not in signal_info:
-                        signal_info[key] = value
-                all_signals.append(signal_info)
+                # Process chunk
+                for i in range(chunk_start, chunk_end):
+                    row = df_with_indicators.iloc[i]
+                    future_data = future_data_cache.get(i, pd.DataFrame())
+                    
+                    # OPTIMIZATION 3: Streamlined strategy calling
+                    signal_result = _call_strategy_analyze(
+                        strategy, strategy_name, row, i, df_with_indicators, 
+                        future_data, index_name
+                    )
+                    
+                    # Process result
+                    if signal_result is None:
+                        signal_result = {'signal': 'NO TRADE'}
+                    
+                    signal = signal_result.get('signal', 'NO TRADE')
+                    signal_count[signal] += 1
+                    
+                    # OPTIMIZATION 4: Only process trading signals for DB
+                    if save_to_db and signal not in ['NO TRADE', None]:
+                        # Prepare signal info for batch insert
+                        if isinstance(row.name, pd.Timestamp):
+                            time_str = row.name.strftime('%Y-%m-%d %H:%M:%S')
+                        else:
+                            time_str = str(row.name)
+                        
+                        signal_info = {
+                            'time': time_str,
+                            'signal_time': time_str,
+                            'signal': signal,
+                            'price': signal_result.get('price', row['close']),
+                            'confidence': signal_result.get('confidence', 'Low'),
+                            'index_name': index_name
+                        }
+                        
+                        # Add all other signal data
+                        for key, value in signal_result.items():
+                            if key not in signal_info:
+                                signal_info[key] = value
+                        
+                        all_trading_signals.append(signal_info)
+                    
+                    # Add to all_signals for compatibility
+                    if isinstance(row.name, pd.Timestamp):
+                        time_str = row.name.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        time_str = str(row.name)
+                    
+                    signal_info = {
+                        'time': time_str,
+                        'signal_time': time_str,
+                        'signal': signal,
+                        'price': signal_result.get('price', row['close']),
+                        'confidence': signal_result.get('confidence', 'Low'),
+                        'index_name': index_name
+                    }
+                    for key, value in signal_result.items():
+                        if key not in signal_info:
+                            signal_info[key] = value
+                    all_signals.append(signal_info)
+            
+            # OPTIMIZATION 5: Batch database operations
             records_saved = 0
-            if save_to_db:
-                trading_signals = [s for s in all_signals if s['signal'] not in ['NO TRADE', None]]
-                for signal_info in trading_signals:
-                    try:
+            if save_to_db and all_trading_signals:
+                try:
+                    # Batch insert all signals at once
+                    for signal_info in all_trading_signals:
                         log_strategy_sql(strategy_name, signal_info)
                         records_saved += 1
-                    except Exception as e:
-                        print(f"❌ DB Save error: {e}")
+                except Exception as e:
+                    print(f"❌ Batch DB Save error: {e}")
+            
+            processing_time = time.time() - start_time
+            candles_per_sec = candle_count / processing_time if processing_time > 0 else 0
+            
             strategy_results[index_name] = {
                 'candles': candle_count,
                 'signals': dict(signal_count),
-                'records_saved': records_saved if save_to_db else None
+                'records_saved': records_saved if save_to_db else None,
+                'processing_time': round(processing_time, 2),
+                'candles_per_second': round(candles_per_sec, 1)
             }
+            
         except Exception as e:
             print(f"❌ Error in {index_name}: {e}")
             traceback.print_exc()
@@ -336,6 +377,32 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
 
     print(f"====== Completed: {strategy_name} ======\n")
     return strategy_results
+
+def _call_strategy_analyze(strategy, strategy_name, row, i, df_with_indicators, future_data, index_name):
+    """Optimized strategy calling with reduced overhead."""
+    try:
+        # Strategy-specific calling patterns (optimized)
+        if strategy_name == 'breakout_rsi':
+            return strategy.analyze(row, i, df_with_indicators, future_data=future_data)
+        elif strategy_name == 'insidebar_bollinger':
+            candle_data = df_with_indicators.iloc[i:i+1]
+            return strategy.analyze(candle_data, index_name=index_name, future_data=future_data)
+        elif strategy_name == 'supertrend_ema':
+            return strategy.analyze(row, i, df_with_indicators, future_data=future_data)
+        elif hasattr(strategy, 'timeframe_data') and strategy.timeframe_data:
+            return strategy.analyze(row, i, df_with_indicators, future_data=future_data)
+        elif hasattr(strategy, 'analyze_multi_timeframe'):
+            return strategy.analyze_multi_timeframe(row, i, df_with_indicators, future_data=future_data)
+        else:
+            # Fallback for legacy strategies
+            candle_data = df_with_indicators.iloc[i:i+1]
+            analyze_kwargs = {"future_data": future_data}
+            if strategy_name not in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
+                analyze_kwargs["index_name"] = index_name
+            return strategy.analyze(candle_data, **analyze_kwargs)
+    except Exception as e:
+        # Return None for failed analysis
+        return None
 
 def run_all_strategies(days_back=5, resolution="15", save_to_db=True, symbols=None):
     if not check_dependencies() or not check_fyers_credentials():

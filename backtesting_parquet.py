@@ -16,7 +16,7 @@ from typing import Dict, List
 sys.path.append(str(Path(__file__).parent / "src"))
 
 from src.data.parquet_data_store import ParquetDataStore
-from all_strategies import run_strategy, get_available_strategies
+from all_strategies import get_available_strategies, run_strategy
 from dotenv import load_dotenv
 
 def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min", 
@@ -43,25 +43,55 @@ def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min",
         print("❌ No data found in parquet store. Run setup_parquet_data.py first.")
         return False
     
-    # Process symbols
+    # Clean up duplicate symbols (prioritize NSE: format over simple names)
+    cleaned_symbols = []
+    nse_symbols = [s for s in available_symbols if s.startswith('NSE:')]
+    simple_symbols = [s for s in available_symbols if not s.startswith('NSE:')]
+    
+    # Add NSE symbols first
+    cleaned_symbols.extend(nse_symbols)
+    
+    # Add simple symbols only if no NSE equivalent exists
+    for simple in simple_symbols:
+        # Check if there's already an NSE equivalent
+        nse_equivalent = None
+        if simple == 'NIFTY50':
+            nse_equivalent = 'NSE:NIFTY50-INDEX'
+        elif simple == 'NIFTYBANK' or simple == 'BANKNIFTY':
+            nse_equivalent = 'NSE:NIFTYBANK-INDEX'
+        
+        if nse_equivalent not in nse_symbols:
+            cleaned_symbols.append(simple)
+    
+    symbols_to_test = cleaned_symbols
+    
+    # Process user-specified symbols if provided
     if symbols:
         symbol_list = []
         for symbol in symbols:
             if symbol.upper() == 'NIFTY50':
-                symbol_list.append('NSE:NIFTY50-INDEX')
+                # Prefer NSE format if available, fallback to simple
+                if 'NSE:NIFTY50-INDEX' in cleaned_symbols:
+                    symbol_list.append('NSE:NIFTY50-INDEX')
+                elif 'NIFTY50' in cleaned_symbols:
+                    symbol_list.append('NIFTY50')
             elif symbol.upper() == 'BANKNIFTY':
-                symbol_list.append('NSE:NIFTYBANK-INDEX')
+                # Prefer NSE format if available, fallback to simple
+                if 'NSE:NIFTYBANK-INDEX' in cleaned_symbols:
+                    symbol_list.append('NSE:NIFTYBANK-INDEX')
+                elif 'BANKNIFTY' in cleaned_symbols:
+                    symbol_list.append('BANKNIFTY')
             else:
                 symbol_list.append(f'NSE:{symbol.upper()}-EQ')
         
         # Filter to available symbols
-        symbols_to_test = [s for s in symbol_list if s in available_symbols]
+        symbols_to_test = [s for s in symbol_list if s in cleaned_symbols]
         if not symbols_to_test:
             print(f"❌ None of the specified symbols found in data store.")
-            print(f"Available symbols: {available_symbols}")
+            print(f"Available symbols: {cleaned_symbols}")
             return False
     else:
-        symbols_to_test = available_symbols
+        symbols_to_test = cleaned_symbols
     
     # Get available strategies
     all_strategies = get_available_strategies()
@@ -87,7 +117,7 @@ def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min",
     print(f"  📅 Period: Last {days_back} days")
     print(f"  ⏰ Timeframe: {timeframe}")
     print(f"  💿 Save to DB: {save_to_db}")
-    print(f"  📈 Symbols: {len(symbols_to_test)} ({', '.join([s.split(':')[1].replace('-INDEX', '').replace('-EQ', '') for s in symbols_to_test])})")
+    print(f"  📈 Symbols: {len(symbols_to_test)} ({', '.join([s.split(':')[1].replace('-INDEX', '').replace('-EQ', '') if ':' in s else s for s in symbols_to_test])})")
     print(f"  🧠 Strategies: {len(strategies_to_test)} ({', '.join(strategies_to_test)})")
     print(f"  ⚡ Execution: {execution_mode}")
     
@@ -111,7 +141,12 @@ def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min",
         elif 'NIFTYBANK' in symbol:
             display_name = 'BANKNIFTY'
         else:
-            display_name = symbol.split(':')[1].replace('-EQ', '')
+            display_name = symbol.split(':')[1].replace('-EQ', '') if ':' in symbol else symbol
+        
+        # Check if we already have this display name (avoid duplicates)
+        if display_name in dataframes:
+            print(f"⚠️ Skipping duplicate symbol: {symbol} (already loaded as {display_name})")
+            continue
         
         dataframes[display_name] = df
         
@@ -192,9 +227,12 @@ def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min",
             
         strategy_signals = 0
         for index_name, stats in strategy_results.items():
-            if isinstance(stats, dict) and 'records_saved' in stats:
-                records_saved = stats.get('records_saved', 0)
-                strategy_signals += records_saved if records_saved is not None else 0
+            if isinstance(stats, dict) and 'signals' in stats:
+                # Count all signals except 'NO TRADE'
+                signals_dict = stats.get('signals', {})
+                for signal_type, count in signals_dict.items():
+                    if signal_type != 'NO TRADE':
+                        strategy_signals += count
         
         total_signals += strategy_signals
         print(f"  📈 {strategy_name}: {strategy_signals} signals")
