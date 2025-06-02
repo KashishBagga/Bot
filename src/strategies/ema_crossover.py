@@ -153,12 +153,12 @@ class EmaCrossover(Strategy):
                 
                 # Check if stop loss was hit
                 if min_future_price <= (price - stop_loss):
-                    outcome = "Failure"
+                    outcome = "Loss"
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {price - stop_loss}"
                 else:
-                    outcome = "Success"
+                    outcome = "Win"
                     # Check which targets were hit
                     if max_future_price >= (price + target1):
                         targets_hit += 1
@@ -177,12 +177,12 @@ class EmaCrossover(Strategy):
                 
                 # Check if stop loss was hit
                 if max_future_price >= (price + stop_loss):
-                    outcome = "Failure"
+                    outcome = "Loss"
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {price + stop_loss}"
                 else:
-                    outcome = "Success"
+                    outcome = "Win"
                     # Check which targets were hit
                     if min_future_price <= (price - target1):
                         targets_hit += 1
@@ -193,6 +193,16 @@ class EmaCrossover(Strategy):
                     if min_future_price <= (price - target3):
                         targets_hit += 1
                         pnl += (target3 - target2)
+        
+        # --- Outcome logic fix ---
+        # If a trade was simulated and outcome is set, keep it as 'Win' or 'Loss'
+        # Otherwise, set outcome to 'No Trade' or 'Data Missing' as appropriate
+        if signal == "NO TRADE":
+            outcome = "No Trade"
+        elif (signal.startswith("BUY") and (future_data is None or future_data.empty)):
+            outcome = "Data Missing"
+        elif outcome not in ["Win", "Loss"]:
+            outcome = "No Trade"
         
         # Create the signal data dictionary
         signal_data = {
