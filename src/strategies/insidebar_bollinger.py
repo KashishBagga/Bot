@@ -27,11 +27,11 @@ class InsidebarBollinger(Strategy):
         self.bollinger_width = params.get('bollinger_width', None)
         self.price_to_band_ratio = params.get('price_to_band_ratio', None)
         self.inside_bar_size = params.get('inside_bar_size', None)
-        # Added proximity threshold parameter (percent of price)
-        self.proximity_threshold = params.get('proximity_threshold', 0.5)
-        # Added flag to check for near bands instead of strict crossing
+        # Increased proximity threshold to be more lenient (from 0.5% to 2.0%)
+        self.proximity_threshold = params.get('proximity_threshold', 2.0)
+        # Enable near bands check by default (more lenient than strict crossing)
         self.near_bands = params.get('near_bands', True)
-        # Added parameter to relax inside bar condition
+        # Enable partial inside bar by default (more lenient than strict inside bar)
         self.partial_inside = params.get('partial_inside', True)
         super().__init__("insidebar_bollinger", params)
     
@@ -67,12 +67,12 @@ class InsidebarBollinger(Strategy):
         
         # Calculate inside bar size as percentage of previous bar
         data['inside_bar_size'] = (data['high'] - data['low']) / (data['prev_high'] - data['prev_low']) * 100
-            
-        # Calculate proximity to Bollinger Bands as percentage of price
-        if 'bollinger_lower' in data.columns and 'bollinger_upper' in data.columns:
-            data['lower_band_proximity'] = (data['close'] - data['bollinger_lower']) / data['close'] * 100
-            data['upper_band_proximity'] = (data['bollinger_upper'] - data['close']) / data['close'] * 100
-            
+        
+        # Calculate proximity to Bollinger Bands (as percentage of price)
+        if 'bollinger_upper' in data.columns and 'bollinger_lower' in data.columns:
+            data['lower_band_proximity'] = abs(data['close'] - data['bollinger_lower']) / data['close'] * 100
+            data['upper_band_proximity'] = abs(data['close'] - data['bollinger_upper']) / data['close'] * 100
+        
         return data
     
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
@@ -311,6 +311,19 @@ class InsidebarBollinger(Strategy):
                 price_reason += f", Bollinger width: {bollinger_width:.2f}%"
             if inside_bar_size:
                 price_reason += f", Inside bar size: {inside_bar_size:.2f}%"
+        
+        # Alternative conditions: Bollinger Band signals without requiring inside bar
+        elif signal == "NO TRADE":
+            # BUY CALL when price is near lower Bollinger Band (without inside bar requirement)
+            if lower_proximity < self.proximity_threshold:
+                signal = "BUY CALL"
+                confidence = "Low"
+                price_reason = f"Price near lower Bollinger Band (proximity: {lower_proximity:.2f}%)"
+            # BUY PUT when price is near upper Bollinger Band (without inside bar requirement)
+            elif upper_proximity < self.proximity_threshold:
+                signal = "BUY PUT"
+                confidence = "Low"
+                price_reason = f"Price near upper Bollinger Band (proximity: {upper_proximity:.2f}%)"
         
         # Calculate performance metrics if a signal was generated and future data is available
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:

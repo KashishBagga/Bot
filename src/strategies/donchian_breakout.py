@@ -10,27 +10,22 @@ from src.core.strategy import Strategy
 from db import log_strategy_sql
 
 class DonchianBreakout(Strategy):
-    """Trading strategy implementation for Donchian Channel Breakout.
-    
-    Generates signals based on price breakouts from Donchian channels.
-    Buy Call signals when price breaks above the upper Donchian channel.
-    Buy Put signals when price breaks below the lower Donchian channel.
+    """
+    Multi-timeframe Donchian Channel Breakout strategy with signal confirmation across 3min, 15min, and 30min charts.
     """
     
-    def __init__(self, params: Dict[str, Any] = None):
+    def __init__(self, params: Dict[str, Any] = None, timeframe_data: Optional[Dict[str, pd.DataFrame]] = None):
         """Initialize the strategy.
         
         Args:
             params: Strategy parameters including channel_period, breakout_strength, volume_trigger
+            timeframe_data: Optional dictionary of timeframes with their corresponding data
         """
-        params = params or {}
-        # Reduced channel period from 20 to 10 for more frequent channels
-        self.channel_period = params.get('channel_period', 10)
-        # Reduced breakout strength requirement from 0.5 to 0.1
-        self.breakout_strength = params.get('breakout_strength', 0.1)
-        # Reduced volume trigger from 1.5 to 1.0
-        self.volume_trigger = params.get('volume_trigger', 1.0)
         super().__init__("donchian_breakout", params)
+        self.channel_period = params.get("channel_period", 10) if params else 10
+        self.breakout_strength = params.get("breakout_strength", 0.1) if params else 0.1
+        self.volume_trigger = params.get("volume_trigger", 1.0) if params else 1.0
+        self.timeframe_data = timeframe_data or {}
     
     def add_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """Add strategy-specific indicators to the data.
@@ -200,7 +195,38 @@ class DonchianBreakout(Strategy):
             return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
         return None
     
-    def analyze(self, data: pd.DataFrame, index_name: str = None, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+    def analyze(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
+        """Analyze data and generate trading signals.
+        
+        Args:
+            candle: Current candle data
+            index: Current index in the dataframe
+            df: Full dataframe with indicators
+            future_data: Optional future candles for performance tracking
+            
+        Returns:
+            Dict[str, Any]: Signal data
+        """
+        # Ensure DataFrame has DatetimeIndex
+        if not isinstance(df.index, pd.DatetimeIndex):
+            if 'time' in df.columns:
+                df['time'] = pd.to_datetime(df['time'])
+                df = df.set_index('time')
+            else:
+                raise ValueError("DataFrame must have a datetime index or 'time' column")
+
+        if index >= len(df):
+            return None
+
+        # If we have timeframe data, use multi-timeframe analysis
+        if self.timeframe_data:
+            return self.analyze_multi_timeframe(candle, index, df, future_data)
+        
+        # Fall back to single timeframe analysis
+        return self.analyze_single_timeframe(df.iloc[index:index+1], future_data)
+
+    def analyze_single_timeframe(self, data: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        """Single timeframe analysis method."""
         # Ensure 'time' column exists and is valid, and set as index
         if 'time' in data.columns:
             data = data.copy()
@@ -208,16 +234,7 @@ class DonchianBreakout(Strategy):
             data = data.set_index('time')
         if not isinstance(data.index, pd.DatetimeIndex):
             raise ValueError("DataFrame index must be a DatetimeIndex")
-        """Analyze data and generate trading signals.
         
-        Args:
-            data: Market data with indicators
-            index_name: Name of the index or symbol being analyzed
-            future_data: Optional future candles for performance tracking
-            
-        Returns:
-            Dict[str, Any]: Signal data
-        """
         # Ensure indicators are calculated
         data = self.add_indicators(data)
         
@@ -409,19 +426,144 @@ class DonchianBreakout(Strategy):
             "exit_time": self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
         }
         
-        # If index_name is provided, log to database
-        if index_name and signal != "NO TRADE":
-            db_signal_data = signal_data.copy()
-            signal_time = self.safe_signal_time(candle.name)
-            # Only convert to IST if signal_time is a datetime
-            if isinstance(signal_time, (pd.Timestamp, datetime)):
-                db_signal_data["signal_time"] = self.to_ist_str(signal_time)
-            else:
-                db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
-            db_signal_data["index_name"] = index_name
-            log_strategy_sql('donchian_breakout', db_signal_data)
-        
         return signal_data
+
+    def _evaluate_timeframe(self, df: pd.DataFrame, timeframe: str, ts: datetime) -> Optional[Dict[str, Any]]:
+        """Evaluate a specific timeframe for signal confirmation."""
+        df = df[df.index <= ts].copy()
+        if df.empty or len(df) < 20:  # Need at least 20 candles for indicators
+            return None
+
+        # Add indicators to this timeframe data
+        try:
+            df = self.add_indicators(df)
+        except (IndexError, ValueError):
+            # Not enough data for indicators
+            return None
+            
+        candle = df.iloc[-1]
+
+        # Check for breakouts in this timeframe
+        signal_direction = 0
+        
+        # BUY CALL on upper channel breakout
+        if candle['close'] > candle['prev_upper']:
+            signal_direction = 1
+            
+        # BUY PUT on lower channel breakout
+        elif candle['close'] < candle['prev_lower']:
+            signal_direction = -1
+
+        return {
+            "signal_direction": signal_direction,
+            "channel_width": candle.get('channel_width', 0),
+            "breakout_size": candle.get('breakout_size', 0),
+            "volume_ratio": candle.get('volume_ratio', 0),
+            "rsi": candle.get('rsi', 50),
+            "candle": candle
+        }
+
+    def analyze_multi_timeframe(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
+        """Multi-timeframe analysis method."""
+        # Ensure DataFrame has DatetimeIndex
+        if not isinstance(df.index, pd.DatetimeIndex):
+            if 'time' in df.columns:
+                df['time'] = pd.to_datetime(df['time'])
+                df = df.set_index('time')
+            else:
+                raise ValueError("DataFrame must have a datetime index or 'time' column")
+
+        if index >= len(df):
+            return None
+
+        ts = df.index[index]
+        
+        # If we have timeframe data, use multi-timeframe analysis
+        if self.timeframe_data:
+            results = []
+            timeframes = {
+                "3min": df, 
+                "15min": self.timeframe_data.get("15min"), 
+                "30min": self.timeframe_data.get("30min")
+            }
+            
+            for tf, tf_df in timeframes.items():
+                if tf_df is None or tf_df.empty:
+                    # If any timeframe is missing, fall back to single timeframe
+                    break
+                tf_result = self._evaluate_timeframe(tf_df, tf, ts)
+                if tf_result is None:
+                    break
+                results.append(tf_result)
+            
+            # If we have all timeframe results, use multi-timeframe logic
+            if len(results) == 3:
+                bullish_votes = sum(1 for r in results if r["signal_direction"] == 1)
+                bearish_votes = sum(1 for r in results if r["signal_direction"] == -1)
+                
+                if bullish_votes >= 2:
+                    signal = "BUY CALL"
+                    confidence = "High" if bullish_votes == 3 else "Medium"
+                elif bearish_votes >= 2:
+                    signal = "BUY PUT"
+                    confidence = "High" if bearish_votes == 3 else "Medium"
+                else:
+                    return None  # No clear signal across timeframes
+                
+                # Use base timeframe (3min) candle for calculations
+                base_candle = results[0]["candle"]
+                
+                # Calculate performance if future data is available
+                outcome = "Pending"
+                pnl = 0.0
+                targets_hit = 0
+                stoploss_count = 0
+                failure_reason = ""
+                exit_time = ""
+                
+                if future_data is not None and not future_data.empty:
+                    atr = base_candle.get('atr', 0)
+                    stop_loss = round(atr * 1.0, 2) if atr > 0 else 0
+                    target = round(atr * 1.5, 2) if atr > 0 else 0
+                    target2 = round(atr * 2.0, 2) if atr > 0 else 0
+                    target3 = round(atr * 2.5, 2) if atr > 0 else 0
+                    
+                    result = self.calculate_performance(
+                        signal, base_candle['close'], stop_loss, target, target2, target3, future_data
+                    )
+                    outcome = result['outcome']
+                    pnl = result['pnl']
+                    targets_hit = result['targets_hit']
+                    stoploss_count = result['stoploss_count']
+                    failure_reason = result['failure_reason']
+                    exit_time = result['exit_time']
+                
+                return {
+                    "signal": signal,
+                    "price": base_candle['close'],
+                    "confidence": confidence,
+                    "trade_type": "Intraday",
+                    "channel_width": base_candle.get('channel_width', 0),
+                    "breakout_size": base_candle.get('breakout_size', 0),
+                    "volume_ratio": base_candle.get('volume_ratio', 0),
+                    "stop_loss": round(base_candle.get('atr', 0) * 1.0, 2) if base_candle.get('atr', 0) > 0 else 0,
+                    "target": round(base_candle.get('atr', 0) * 1.5, 2) if base_candle.get('atr', 0) > 0 else 0,
+                    "target2": round(base_candle.get('atr', 0) * 2.0, 2) if base_candle.get('atr', 0) > 0 else 0,
+                    "target3": round(base_candle.get('atr', 0) * 2.5, 2) if base_candle.get('atr', 0) > 0 else 0,
+                    "rsi": base_candle.get('rsi', 50),
+                    "rsi_reason": f"Multi-timeframe confirmation ({bullish_votes if signal == 'BUY CALL' else bearish_votes}/3 timeframes)",
+                    "macd_reason": "",
+                    "price_reason": f"Donchian breakout confirmed across {bullish_votes if signal == 'BUY CALL' else bearish_votes} timeframes",
+                    "outcome": outcome,
+                    "pnl": pnl,
+                    "targets_hit": targets_hit,
+                    "stoploss_count": stoploss_count,
+                    "failure_reason": failure_reason,
+                    "exit_time": exit_time
+                }
+        
+        # Fall back to single timeframe analysis if multi-timeframe data not available
+        return self.analyze_single_timeframe(df.iloc[index:index+1], future_data)
 
 # Backward compatibility function
 def run_strategy(candle, prev_candle=None, index_name=None, future_data=None, channel_period=10, breakout_strength=0.1, volume_trigger=1.0):

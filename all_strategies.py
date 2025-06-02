@@ -268,15 +268,27 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
             # Process each candle
             for i in range(candle_count):
                 row = df_with_indicators.iloc[i]
-                if strategy_name == 'supertrend_ema':
-                    future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
+                future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
+                
+                # Strategy-specific calling patterns
+                if strategy_name == 'breakout_rsi':
+                    # breakout_rsi expects (candle: pd.Series, index: int, df: pd.DataFrame, future_data)
                     signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
-                elif hasattr(strategy, 'analyze') and 'timeframe_data' in strategy.__init__.__code__.co_varnames:
-                    signal_result = strategy.analyze(row, i, df_with_indicators)
+                elif strategy_name == 'insidebar_bollinger':
+                    # insidebar_bollinger expects (data: pd.DataFrame, index_name: str, future_data)
+                    candle_data = df_with_indicators.iloc[i:i+1]
+                    signal_result = strategy.analyze(candle_data, index_name=index_name, future_data=future_data)
+                elif strategy_name == 'supertrend_ema':
+                    signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
+                elif hasattr(strategy, 'timeframe_data') and strategy.timeframe_data:
+                    # Use multi-timeframe method if timeframe_data is available
+                    signal_result = strategy.analyze(row, i, df_with_indicators, future_data=future_data)
+                elif hasattr(strategy, 'analyze_multi_timeframe'):
+                    # Use multi-timeframe method if available
+                    signal_result = strategy.analyze_multi_timeframe(row, i, df_with_indicators, future_data=future_data)
                 else:
                     # Fallback for legacy strategies
                     candle_data = df_with_indicators.iloc[i:i+1]
-                    future_data = df_with_indicators.iloc[i+1:i+11] if i + 1 < candle_count else None
                     analyze_kwargs = {"future_data": future_data}
                     if strategy_name not in ["insidebar_rsi", "supertrend_macd_rsi_ema"]:
                         analyze_kwargs["index_name"] = index_name

@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from src.core.strategy import Strategy
 from src.core.indicators import indicators
 from src.models.database import db
@@ -9,20 +9,37 @@ from datetime import datetime
 import pytz
 
 class SupertrendMacdRsiEma(Strategy):
-    def __init__(self, params: Dict[str, Any] = None):
+    def __init__(self, params: Dict[str, Any] = None, timeframe_data: Optional[Dict[str, pd.DataFrame]] = None):
         super().__init__("supertrend_macd_rsi_ema", params)
         self.params.setdefault('supertrend_period', 10)
         self.params.setdefault('supertrend_multiplier', 3.0)
+        self.timeframe_data = timeframe_data or {}
 
     def add_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
+        # Add Supertrend indicator
         period = self.params['supertrend_period']
         multiplier = self.params['supertrend_multiplier']
         supertrend_data = indicators.supertrend(data, period=period, multiplier=multiplier)
         data['supertrend'] = supertrend_data['supertrend']
         data['supertrend_direction'] = supertrend_data['direction']
+        
+        # Add MACD indicator
+        macd_data = indicators.macd(data)
+        data['macd'] = macd_data['macd']
+        data['macd_signal'] = macd_data['signal']
+        data['macd_histogram'] = macd_data['histogram']
+        
+        # Add RSI indicator
+        data['rsi'] = indicators.rsi(data)
+        
+        # Add EMA indicator
+        data['ema'] = indicators.ema(data, period=20)
+        
+        # Add body ratio calculations
         data['body'] = abs(data['close'] - data['open'])
         data['full_range'] = data['high'] - data['low']
         data['body_ratio'] = data['body'] / data['full_range'].replace(0, float('nan'))
+        
         return data
 
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
@@ -224,9 +241,121 @@ class SupertrendMacdRsiEma(Strategy):
             pass
         return None
 
-    def analyze(self, data: pd.DataFrame, index_name: str = None, future_data=None) -> Dict[str, Any]:
+    def analyze(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
+        """Multi-timeframe analysis method."""
+        # Ensure DataFrame has DatetimeIndex
+        if not isinstance(df.index, pd.DatetimeIndex):
+            if 'time' in df.columns:
+                df['time'] = pd.to_datetime(df['time'])
+                df = df.set_index('time')
+            else:
+                raise ValueError("DataFrame must have a datetime index or 'time' column")
+
+        if index >= len(df):
+            return None
+
+        ts = df.index[index]
+        
+        # If we have timeframe data, use multi-timeframe analysis
+        if self.timeframe_data:
+            results = []
+            timeframes = {
+                "3min": df, 
+                "15min": self.timeframe_data.get("15min"), 
+                "30min": self.timeframe_data.get("30min")
+            }
+            
+            for tf, tf_df in timeframes.items():
+                if tf_df is None or tf_df.empty:
+                    # If any timeframe is missing, fall back to single timeframe
+                    break
+                tf_result = self._evaluate_timeframe(tf_df, tf, ts)
+                if tf_result is None:
+                    break
+                results.append(tf_result)
+            
+            # If we have all timeframe results, use multi-timeframe logic
+            if len(results) == 3:
+                bullish_votes = sum(1 for r in results if r["signal_direction"] == 1)
+                bearish_votes = sum(1 for r in results if r["signal_direction"] == -1)
+                
+                if bullish_votes >= 2:
+                    signal = "BUY CALL"
+                    confidence = "High" if bullish_votes == 3 else "Medium"
+                elif bearish_votes >= 2:
+                    signal = "BUY PUT"
+                    confidence = "High" if bearish_votes == 3 else "Medium"
+                else:
+                    return None  # No clear signal across timeframes
+                
+                # Use base timeframe (3min) candle for calculations
+                base_candle = results[0]["candle"]
+                
+                # Calculate performance if future data is available
+                outcome = "Pending"
+                pnl = 0.0
+                targets_hit = 0
+                stoploss_count = 0
+                failure_reason = ""
+                exit_time = ""
+                
+                if future_data is not None and not future_data.empty:
+                    atr = base_candle['atr']
+                    stop_loss = math.ceil(atr)
+                    target = math.ceil(1.5 * atr)
+                    target2 = math.ceil(2.0 * atr)
+                    target3 = math.ceil(2.5 * atr)
+                    
+                    result = self.calculate_performance(
+                        signal, base_candle['close'], stop_loss, target, target2, target3, future_data
+                    )
+                    outcome = result['outcome']
+                    pnl = result['pnl']
+                    targets_hit = result['targets_hit']
+                    stoploss_count = result['stoploss_count']
+                    failure_reason = result['failure_reason']
+                    exit_time = self.to_ist_str(result['exit_time']) or ""
+                
+                return {
+                    "signal": signal,
+                    "price": base_candle['close'],
+                    "rsi": base_candle['rsi'],
+                    "macd": base_candle['macd'],
+                    "macd_signal": base_candle['macd_signal'],
+                    "ema_20": base_candle['ema'],
+                    "atr": base_candle['atr'],
+                    "supertrend": base_candle['supertrend'],
+                    "supertrend_direction": base_candle['supertrend_direction'],
+                    "stop_loss": math.ceil(base_candle['atr']),
+                    "target": math.ceil(1.5 * base_candle['atr']),
+                    "target2": math.ceil(2.0 * base_candle['atr']),
+                    "target3": math.ceil(2.5 * base_candle['atr']),
+                    "confidence": confidence,
+                    "rsi_reason": f"RSI {base_candle['rsi']:.2f}",
+                    "macd_reason": f"MACD {base_candle['macd']:.2f} vs Signal {base_candle['macd_signal']:.2f}",
+                    "price_reason": f"Multi-timeframe confirmation ({bullish_votes if signal == 'BUY CALL' else bearish_votes}/3 timeframes)",
+                    "trade_type": "Intraday",
+                    "option_chain_confirmation": "Yes" if confidence == "High" else "No",
+                    "outcome": outcome,
+                    "pnl": pnl,
+                    "targets_hit": targets_hit,
+                    "stoploss_count": stoploss_count,
+                    "failure_reason": failure_reason,
+                    "exit_time": exit_time,
+                    "option_symbol": "",
+                    "option_expiry": "",
+                    "option_strike": 0,
+                    "option_type": "",
+                    "option_entry_price": 0.0
+                }
+        
+        # Fall back to single timeframe analysis if multi-timeframe data not available
+        return self.analyze_single_timeframe(df.iloc[index:index+1], future_data)
+
+    def analyze_single_timeframe(self, data: pd.DataFrame, future_data=None) -> Dict[str, Any]:
+        """Original single timeframe analysis method."""
         if 'supertrend' not in data.columns:
-            data = self.calculate_indicators(data)
+            data = self.add_indicators(data)
 
         candle = data.iloc[-1]
         signal = "NO TRADE"
@@ -244,23 +373,23 @@ class SupertrendMacdRsiEma(Strategy):
         target3 = math.ceil(2.5 * atr)
 
         is_buy_call = (
-            candle['rsi'] > 65 and
+            candle['rsi'] > 55 and
             candle['macd'] > candle['macd_signal'] and
-            candle['close'] > candle['ema'] * 0.1 and
+            candle['close'] > candle['ema'] * 1.005 and
             candle['supertrend_direction'] > 0
         )
 
         is_buy_put = (
-            candle['rsi'] < 35 and
+            candle['rsi'] < 45 and
             candle['macd'] < candle['macd_signal'] and
-            candle['close'] < candle['ema'] * 1.01 and
+            candle['close'] < candle['ema'] * 0.995 and
             candle['supertrend_direction'] < 0
         )
 
         if is_buy_call:
             signal = "BUY CALL"
             confidence = "High" if candle['rsi'] > 70 else "Medium"
-            rsi_reason = f"RSI {candle['rsi']:.2f} > 65"
+            rsi_reason = f"RSI {candle['rsi']:.2f} > 55"
             macd_reason = f"MACD {candle['macd']:.2f} > Signal {candle['macd_signal']:.2f}"
             price_reason = f"Price {candle['close']:.2f} > EMA {candle['ema']:.2f}, Supertrend bullish"
             option_type = "CE"
@@ -273,45 +402,8 @@ class SupertrendMacdRsiEma(Strategy):
             price_reason = f"Price {candle['close']:.2f} < EMA {candle['ema']:.2f}, Supertrend bearish"
             option_type = "PE"
 
-        if signal.startswith("BUY") and index_name:
-            option_expiry = get_nearest_expiry(candle.get('time'))
-            option_strike = int(round(candle['close'] / 50) * 50)
-            option_symbol = construct_option_symbol(index_name, option_expiry, option_strike, option_type)
-            entry_time = candle.get('time')
-
-            if entry_time:
-                entry_date = entry_time.strftime('%Y-%m-%d')
-                option_ohlcv = fetch_option_ohlcv(option_symbol, entry_date, entry_date, resolution="5")
-                if not option_ohlcv.empty:
-                    option_ohlcv['timedelta'] = (option_ohlcv['time'] - entry_time).abs()
-                    entry_row = option_ohlcv.loc[option_ohlcv['timedelta'].idxmin()]
-                    option_entry_price = entry_row['close']
-                else:
-                    failure_reason = f"No option data for {option_symbol} on {entry_date}"
-
-            if option_entry_price and future_data is not None and not future_data.empty:
-                option_future_ohlcv = fetch_option_ohlcv(
-                    option_symbol,
-                    future_data['time'].iloc[0].strftime('%Y-%m-%d'),
-                    future_data['time'].iloc[-1].strftime('%Y-%m-%d'),
-                    resolution="5"
-                )
-                if not option_future_ohlcv.empty:
-                    option_future_ohlcv = option_future_ohlcv[option_future_ohlcv['time'] > entry_time]
-                    result = self.calculate_performance(
-                        signal, option_entry_price, stop_loss, target, target2, target3, option_future_ohlcv
-                    )
-                    outcome = result['outcome']
-                    pnl = result['pnl']
-                    targets_hit = result['targets_hit']
-                    stoploss_count = result['stoploss_count']
-                    failure_reason = result['failure_reason']
-                    exit_time = result['exit_time']
-                else:
-                    failure_reason = f"No future option data for {option_symbol} after {entry_time}"
-
         # Fallback: If option data is missing, simulate on underlying
-        if signal.startswith("BUY") and (not option_entry_price or future_data is None or future_data.empty):
+        if signal.startswith("BUY") and future_data is not None and not future_data.empty:
             option_entry_price = candle['close']
             result = self.calculate_performance(
                 signal, option_entry_price, stop_loss, target, target2, target3, future_data
@@ -385,4 +477,50 @@ class SupertrendMacdRsiEma(Strategy):
             "option_strike": option_strike,
             "option_type": option_type,
             "option_entry_price": option_entry_price
+        }
+
+    def _evaluate_timeframe(self, df: pd.DataFrame, timeframe: str, ts: datetime) -> Optional[Dict[str, Any]]:
+        """Evaluate a specific timeframe for signal confirmation."""
+        df = df[df.index <= ts].copy()
+        if df.empty or len(df) < 20:  # Need at least 20 candles for indicators
+            return None
+
+        # Add indicators to this timeframe data
+        try:
+            df = self.add_indicators(df)
+        except (IndexError, ValueError):
+            # Not enough data for indicators
+            return None
+            
+        candle = df.iloc[-1]
+
+        # Check conditions for this timeframe
+        is_buy_call = (
+            candle['rsi'] > 55 and
+            candle['macd'] > candle['macd_signal'] and
+            candle['close'] > candle['ema'] * 1.005 and
+            candle['supertrend_direction'] > 0
+        )
+
+        is_buy_put = (
+            candle['rsi'] < 45 and
+            candle['macd'] < candle['macd_signal'] and
+            candle['close'] < candle['ema'] * 0.995 and
+            candle['supertrend_direction'] < 0
+        )
+
+        signal_direction = 0
+        if is_buy_call:
+            signal_direction = 1
+        elif is_buy_put:
+            signal_direction = -1
+
+        return {
+            "signal_direction": signal_direction,
+            "rsi": candle['rsi'],
+            "macd": candle['macd'],
+            "macd_signal": candle['macd_signal'],
+            "ema": candle['ema'],
+            "supertrend_direction": candle['supertrend_direction'],
+            "candle": candle
         }

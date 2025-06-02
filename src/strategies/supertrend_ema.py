@@ -35,15 +35,19 @@ class SupertrendEma(Strategy):
 
     def _evaluate_timeframe(self, df: pd.DataFrame, timeframe: str, ts: datetime) -> Optional[Dict[str, Any]]:
         df = df[df.index <= ts].copy()
-        if df.empty:
+        if df.empty or len(df) < 20:  # Need at least 20 candles for indicators
             return None
 
-        candle = df.iloc[-1]
-        st_instance = self._get_supertrend_instance(timeframe)
-        st_data = st_instance.update(candle)
+        try:
+            candle = df.iloc[-1]
+            st_instance = self._get_supertrend_instance(timeframe)
+            st_data = st_instance.update(candle)
 
-        ema = df["close"].ewm(span=self.ema_period).mean().iloc[-1]
-        price_above_ema = candle["close"] > ema
+            ema = df["close"].ewm(span=self.ema_period).mean().iloc[-1]
+            price_above_ema = candle["close"] > ema
+        except (IndexError, ValueError):
+            # Not enough data for indicators
+            return None
 
         return {
             "supertrend": st_data["direction"],
