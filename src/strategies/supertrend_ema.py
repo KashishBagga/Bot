@@ -151,31 +151,192 @@ class SupertrendEma(Strategy):
             return None
 
         ts = df.index[index]
+        
+        # Calculate confidence score based on multiple market conditions instead of time filter
+        confidence_score = 0
+        confidence_reasons = []
+        
+        # Get current candle data
+        candle = df.iloc[index]
+        
+        # 1. SuperTrend Signal Strength (0-25 points)
+        st_instance = self._get_supertrend_instance("3min")
+        st_data = st_instance.update(candle)
+        supertrend_direction = st_data["direction"]
+        
+        if supertrend_direction != 0:  # Valid SuperTrend signal
+            confidence_score += 25
+            direction = "bullish" if supertrend_direction > 0 else "bearish"
+            confidence_reasons.append(f"Strong SuperTrend {direction} signal")
+        else:
+            confidence_score += 5
+            confidence_reasons.append("Weak SuperTrend signal")
+        
+        # 2. EMA Alignment (0-20 points)
+        ema = df["close"].ewm(span=self.ema_period).mean().iloc[index]
+        price_above_ema = candle["close"] > ema
+        ema_distance = ((candle["close"] - ema) / ema) * 100
+        
+        if abs(ema_distance) > 1.0:  # Strong price-EMA separation
+            confidence_score += 20
+            direction = "above" if price_above_ema else "below"
+            confidence_reasons.append(f"Price strongly {direction} EMA ({ema_distance:.2f}%)")
+        elif abs(ema_distance) > 0.5:  # Good price-EMA separation
+            confidence_score += 15
+            direction = "above" if price_above_ema else "below"
+            confidence_reasons.append(f"Price {direction} EMA ({ema_distance:.2f}%)")
+        elif abs(ema_distance) > 0.2:  # Mild separation
+            confidence_score += 10
+            direction = "above" if price_above_ema else "below"
+            confidence_reasons.append(f"Price slightly {direction} EMA ({ema_distance:.2f}%)")
+        
+        # 3. Multi-timeframe Consensus (0-30 points)
         df = self.add_indicators(df)
-
+        
         results = []
         timeframes = {"3min": df, "15min": self.timeframe_data.get("15min"), "30min": self.timeframe_data.get("30min")}
+        
+        valid_timeframes = 0
+        consensus_score = 0
+        
         for tf, tf_df in timeframes.items():
             if tf_df is None or tf_df.empty:
-                return None
+                continue
             tf_result = self._evaluate_timeframe(tf_df, tf, ts)
             if tf_result is None:
-                return None
+                continue
             results.append(tf_result)
-
+            valid_timeframes += 1
+            
+            # Count consensus
+            if tf_result["supertrend"] == 1 and tf_result["ema_trend"] == 1:  # Bullish
+                consensus_score += 1
+            elif tf_result["supertrend"] == -1 and tf_result["ema_trend"] == -1:  # Bearish
+                consensus_score += 1
+        
+        if valid_timeframes == 0:
+            return None
+        
+        consensus_percentage = (consensus_score / valid_timeframes) * 100
+        
+        if consensus_percentage >= 100:  # Full consensus (3/3)
+            confidence_score += 30
+            confidence_reasons.append("Full multi-timeframe consensus (3/3)")
+        elif consensus_percentage >= 67:  # Strong consensus (2/3)
+            confidence_score += 20
+            confidence_reasons.append("Strong multi-timeframe consensus (2/3)")
+        elif consensus_percentage >= 33:  # Weak consensus (1/3)
+            confidence_score += 10
+            confidence_reasons.append("Weak multi-timeframe consensus (1/3)")
+        
+        # 4. Volume and Volatility (0-15 points)
+        atr = candle.get("atr", 0)
+        if atr > 50:  # High volatility
+            confidence_score += 15
+            confidence_reasons.append(f"High volatility environment (ATR: {atr:.1f})")
+        elif atr > 30:  # Moderate volatility
+            confidence_score += 10
+            confidence_reasons.append(f"Moderate volatility (ATR: {atr:.1f})")
+        elif atr > 15:  # Low volatility
+            confidence_score += 5
+            confidence_reasons.append(f"Low volatility (ATR: {atr:.1f})")
+        
+        # 5. Price Action Quality (0-10 points)
+        price_range = candle["high"] - candle["low"]
+        body_size = abs(candle["close"] - candle["open"])
+        body_ratio = body_size / price_range if price_range > 0 else 0
+        
+        if body_ratio >= 0.7:  # Strong directional candle
+            confidence_score += 10
+            confidence_reasons.append(f"Strong directional candle ({body_ratio:.2f})")
+        elif body_ratio >= 0.5:  # Good directional candle
+            confidence_score += 5
+            confidence_reasons.append(f"Good directional candle ({body_ratio:.2f})")
+        
+        # Determine confidence level
+        if confidence_score >= 80:
+            confidence_level = "Very High"
+        elif confidence_score >= 60:
+            confidence_level = "High"
+        elif confidence_score >= 40:
+            confidence_level = "Medium"
+        elif confidence_score >= 20:
+            confidence_level = "Low"
+        else:
+            confidence_level = "Very Low"
+        
+        # Enhanced signal generation based on confidence
         bullish_votes = sum(1 for r in results if r["supertrend"] == 1 and r["ema_trend"] == 1)
         bearish_votes = sum(1 for r in results if r["supertrend"] == -1 and r["ema_trend"] == -1)
 
-        if bullish_votes >= 2:
-            signal = "BUY CALL"
-            confidence = bullish_votes / 3.0
-        elif bearish_votes >= 2:
-            signal = "BUY PUT"
-            confidence = bearish_votes / 3.0
+        # Dynamic consensus requirements based on confidence
+        if confidence_score >= 70:
+            required_votes = 2  # High confidence allows 2/3 consensus
         else:
-            return None
+            required_votes = 3  # Low confidence requires unanimous 3/3 consensus
 
+        if bullish_votes >= required_votes:
+            signal = "BUY CALL"
+            confidence = confidence_level
+        elif bearish_votes >= required_votes:
+            signal = "BUY PUT"
+            confidence = confidence_level
+        else:
+            return {
+                "signal": "NO TRADE",
+                "confidence": confidence_level,
+                "ema_value": 0.0,
+                "supertrend_value": 0.0,
+                "supertrend_direction": "WEAK",
+                "supertrend_upperband": 0.0,
+                "supertrend_lowerband": 0.0,
+                "candle": candle.to_dict(),
+                "outcome": "No Trade",
+                "pnl": 0.0,
+                "targets_hit": 0,
+                "stoploss_count": 0,
+                "failure_reason": f"Insufficient consensus: {max(bullish_votes, bearish_votes)}/{len(results)} votes (need {required_votes})",
+                "exit_time": None
+            }
+        
+        # Enhanced filtering: Only trade with Medium+ confidence (score >= 40)
+        if confidence_score < 40:
+            return {
+                "signal": "NO TRADE",
+                "confidence": "Very Low",
+                "ema_value": 0.0,
+                "supertrend_value": 0.0,
+                "supertrend_direction": "LOW_CONFIDENCE",
+                "supertrend_upperband": 0.0,
+                "supertrend_lowerband": 0.0,
+                "candle": candle.to_dict(),
+                "outcome": "No Trade",
+                "pnl": 0.0,
+                "targets_hit": 0,
+                "stoploss_count": 0,
+                "failure_reason": f"Low confidence score: {confidence_score} < 40",
+                "exit_time": None
+            }
+        
         base = results[0]
+        
+        # Dynamic risk management based on confidence
+        atr = base["candle"].get("atr", 0)
+        entry_price = base["candle"]["close"]
+        
+        if confidence_score >= 80:  # Very high confidence
+            stop_loss_multiplier = 0.6  # Tighter stop loss
+            target_multipliers = [1.5, 2.5, 3.5]  # Aggressive targets
+        elif confidence_score >= 60:  # High confidence
+            stop_loss_multiplier = 0.7
+            target_multipliers = [1.3, 2.0, 3.0]
+        elif confidence_score >= 40:  # Medium confidence
+            stop_loss_multiplier = 0.8
+            target_multipliers = [1.2, 1.8, 2.2]
+        else:  # Should not reach here due to filtering, but safety
+            stop_loss_multiplier = 1.0
+            target_multipliers = [1.0, 1.5, 2.0]
+        
         # Default outcome values
         outcome = "Pending"
         pnl = 0.0
@@ -183,14 +344,14 @@ class SupertrendEma(Strategy):
         stoploss_count = 0
         failure_reason = ""
         exit_time = None
+        
         # If future_data is provided, calculate performance
         if future_data is not None and not future_data.empty:
-            entry_price = base["candle"]["close"]
-            atr = base["candle"].get("atr", 0)
-            stop_loss = round(atr * 1.0, 2) if atr > 0 else 0
-            target = round(atr * 1.5, 2) if atr > 0 else 0
-            target2 = round(atr * 2.0, 2) if atr > 0 else 0
-            target3 = round(atr * 2.5, 2) if atr > 0 else 0
+            stop_loss = round(atr * stop_loss_multiplier, 2) if atr > 0 else 0
+            target = round(atr * target_multipliers[0], 2) if atr > 0 else 0
+            target2 = round(atr * target_multipliers[1], 2) if atr > 0 else 0
+            target3 = round(atr * target_multipliers[2], 2) if atr > 0 else 0
+            
             perf = self.calculate_performance(signal, entry_price, stop_loss, target, target2, target3, future_data)
             outcome = perf["outcome"]
             pnl = perf["pnl"]
@@ -198,10 +359,16 @@ class SupertrendEma(Strategy):
             stoploss_count = perf["stoploss_count"]
             failure_reason = perf["failure_reason"]
             exit_time = perf["exit_time"]
+        
         exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
+        
+        # Combine confidence reasons
+        detailed_reasons = "; ".join(confidence_reasons) if confidence_reasons else "Standard analysis"
+        
         return {
             "signal": signal,
-            "confidence": round(confidence, 2),
+            "confidence": confidence_level,
+            "confidence_score": confidence_score,
             "ema_value": round(base["ema"], 2),
             "supertrend_value": round(base["st_data"]["value"], 2),
             "supertrend_direction": base["st_data"]["direction"],
@@ -213,6 +380,7 @@ class SupertrendEma(Strategy):
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
+            "confidence_reasons": detailed_reasons,
             "exit_time": exit_time_str
         }
 

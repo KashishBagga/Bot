@@ -123,39 +123,134 @@ class EmaCrossover(Strategy):
         outcome = "Pending"
         failure_reason = ""
         
+        # Calculate confidence score based on multiple market conditions instead of time filter
+        confidence_score = 0
+        confidence_reasons = []
+        
+        # 1. EMA Crossover Strength (0-35 points)
+        crossover_strength = abs(candle.get('crossover_strength', 0))
+        if crossover_strength >= 2.0:  # Very strong crossover
+            confidence_score += 35
+            confidence_reasons.append(f"Very strong EMA crossover ({crossover_strength:.2f}%)")
+        elif crossover_strength >= 1.5:  # Strong crossover
+            confidence_score += 30
+            confidence_reasons.append(f"Strong EMA crossover ({crossover_strength:.2f}%)")
+        elif crossover_strength >= 1.0:  # Good crossover
+            confidence_score += 25
+            confidence_reasons.append(f"Good EMA crossover ({crossover_strength:.2f}%)")
+        elif crossover_strength >= 0.5:  # Moderate crossover
+            confidence_score += 15
+            confidence_reasons.append(f"Moderate EMA crossover ({crossover_strength:.2f}%)")
+        elif crossover_strength >= 0.2:  # Weak crossover
+            confidence_score += 8
+            confidence_reasons.append(f"Weak EMA crossover ({crossover_strength:.2f}%)")
+        
+        # 2. Price Position Relative to EMAs (0-20 points)
+        price_distance = ((candle['close'] - candle['ema_fast']) / candle['ema_fast']) * 100 if candle['ema_fast'] != 0 else 0
+        ema_alignment = candle['ema_fast'] > candle['ema_slow']
+        
+        if ema_alignment and price_distance > 0.5:  # Price well above fast EMA
+            confidence_score += 20
+            confidence_reasons.append(f"Price well above fast EMA ({price_distance:.2f}%)")
+        elif ema_alignment and price_distance > 0.2:  # Price above fast EMA
+            confidence_score += 15
+            confidence_reasons.append(f"Price above fast EMA ({price_distance:.2f}%)")
+        elif not ema_alignment and price_distance < -0.5:  # Price well below fast EMA
+            confidence_score += 20
+            confidence_reasons.append(f"Price well below fast EMA ({price_distance:.2f}%)")
+        elif not ema_alignment and price_distance < -0.2:  # Price below fast EMA
+            confidence_score += 15
+            confidence_reasons.append(f"Price below fast EMA ({price_distance:.2f}%)")
+        
+        # 3. Momentum Confirmation (0-20 points)
+        ema_change = candle.get('ema_fast_change', 0)
+        
+        if abs(ema_change) > 1.0:  # Strong momentum
+            confidence_score += 20
+            direction = "bullish" if ema_change > 0 else "bearish"
+            confidence_reasons.append(f"Strong {direction} momentum ({ema_change:.2f}%)")
+        elif abs(ema_change) > 0.5:  # Good momentum
+            confidence_score += 15
+            direction = "bullish" if ema_change > 0 else "bearish"
+            confidence_reasons.append(f"Good {direction} momentum ({ema_change:.2f}%)")
+        elif abs(ema_change) > 0.2:  # Mild momentum
+            confidence_score += 10
+            direction = "bullish" if ema_change > 0 else "bearish"
+            confidence_reasons.append(f"Mild {direction} momentum")
+        
+        # 4. RSI Confirmation (0-15 points) - if available
+        rsi = candle.get('rsi', 50)
+        if 30 <= rsi <= 70:  # RSI in good range (not extreme)
+            confidence_score += 15
+            confidence_reasons.append(f"RSI in optimal range ({rsi:.1f})")
+        elif 25 <= rsi <= 75:  # RSI in acceptable range
+            confidence_score += 10
+            confidence_reasons.append(f"RSI in acceptable range ({rsi:.1f})")
+        elif rsi < 20 or rsi > 80:  # Extreme RSI levels
+            confidence_score += 8
+            confidence_reasons.append(f"Extreme RSI level ({rsi:.1f}) - potential reversal")
+        
+        # 5. Volume Analysis (0-10 points) - if available
+        if 'volume' in candle and candle['volume'] > 0:
+            # Simple volume check - above average gets points
+            confidence_score += 5
+            confidence_reasons.append("Volume confirmation available")
+        
+        # Determine confidence level
+        if confidence_score >= 80:
+            confidence = "Very High"
+        elif confidence_score >= 60:
+            confidence = "High"
+        elif confidence_score >= 40:
+            confidence = "Medium"
+        elif confidence_score >= 20:
+            confidence = "Low"
+        else:
+            confidence = "Very Low"
+        
         # Determine momentum
         momentum = None
-        if candle['ema_fast_change'] > 0.5:
+        if ema_change > 0.5:
             momentum = "Strong bullish"
-        elif candle['ema_fast_change'] > 0.2:
+        elif ema_change > 0.2:
             momentum = "Bullish"
-        elif candle['ema_fast_change'] < -0.5:
+        elif ema_change < -0.5:
             momentum = "Strong bearish"
-        elif candle['ema_fast_change'] < -0.2:
+        elif ema_change < -0.2:
             momentum = "Bearish"
         
-        # Calculate ATR-based stop loss and targets
+        # Calculate ATR-based stop loss and targets (reduced for better risk management)
         atr = candle['atr'] if 'atr' in candle else abs(candle['ema_fast'] - candle['ema_slow']) * 2
-        stop_loss = int(round(atr))
-        target1 = int(round(1.5 * atr))
-        target2 = int(round(2.0 * atr))
-        target3 = int(round(2.5 * atr))
+        stop_loss = int(round(0.7 * atr))  # Tighter stop loss
+        target1 = int(round(1.0 * atr))    # Reduced targets for higher win rate
+        target2 = int(round(1.5 * atr))
+        target3 = int(round(2.0 * atr))
+        
+        # Stronger signal validation: Require significant crossover strength and momentum
+        crossover_strength_threshold = 0.8  # Increased threshold
         
         # Check for bullish signal (fast EMA above slow EMA)
-        if candle['ema_fast'] > candle['ema_slow'] and candle['close'] > candle['ema_fast']:
+        if (candle['ema_fast'] > candle['ema_slow'] and 
+            candle['close'] > candle['ema_fast'] and
+            candle['crossover_strength'] > crossover_strength_threshold):
             signal = "BUY CALL"
-            confidence = "High" if candle['crossover_strength'] > 0.5 else "Medium"
-            price_reason = f"EMA{self.fast_ema} crossed above EMA{self.slow_ema} (Strength: {candle['crossover_strength']:.2f}%)"
+            price_reason = f"Strong EMA{self.fast_ema} crossover above EMA{self.slow_ema} (Strength: {candle['crossover_strength']:.2f}%)"
             if momentum:
                 price_reason += f", {momentum} momentum"
         
         # Check for bearish signal (fast EMA below slow EMA)
-        elif candle['ema_fast'] < candle['ema_slow'] and candle['close'] < candle['ema_fast']:
+        elif (candle['ema_fast'] < candle['ema_slow'] and 
+              candle['close'] < candle['ema_fast'] and
+              abs(candle['crossover_strength']) > crossover_strength_threshold):
             signal = "BUY PUT"
-            confidence = "High" if abs(candle['crossover_strength']) > 0.5 else "Medium"
-            price_reason = f"EMA{self.fast_ema} crossed below EMA{self.slow_ema} (Strength: {candle['crossover_strength']:.2f}%)"
+            price_reason = f"Strong EMA{self.fast_ema} crossover below EMA{self.slow_ema} (Strength: {candle['crossover_strength']:.2f}%)"
             if momentum:
                 price_reason += f", {momentum} momentum"
+        
+        # Additional filter: Only trade with Medium+ confidence
+        if signal != "NO TRADE" and confidence == "Low":
+            signal = "NO TRADE"
+            price_reason += " (Filtered: Low confidence)"
         
         # If we have a trade signal and future data, calculate performance
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:

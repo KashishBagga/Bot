@@ -359,48 +359,203 @@ class SupertrendMacdRsiEma(Strategy):
 
         candle = data.iloc[-1]
         signal = "NO TRADE"
-        confidence = "Low"
         rsi_reason = macd_reason = price_reason = ""
         option_type = outcome = failure_reason = exit_time = option_symbol = None
         option_expiry = option_strike = option_entry_price = 0
         pnl = 0.0
         targets_hit = stoploss_count = 0
 
+        # Calculate comprehensive confidence score based on all indicators
+        confidence_score = 0
+        confidence_reasons = []
+        
+        # 1. RSI Analysis (0-25 points)
+        rsi = candle['rsi']
+        if rsi <= 25:  # Extreme oversold
+            confidence_score += 25
+            confidence_reasons.append(f"Extreme RSI oversold ({rsi:.1f})")
+        elif rsi <= 35:  # Strong oversold
+            confidence_score += 20
+            confidence_reasons.append(f"Strong RSI oversold ({rsi:.1f})")
+        elif rsi >= 75:  # Extreme overbought
+            confidence_score += 25
+            confidence_reasons.append(f"Extreme RSI overbought ({rsi:.1f})")
+        elif rsi >= 65:  # Strong overbought
+            confidence_score += 20
+            confidence_reasons.append(f"Strong RSI overbought ({rsi:.1f})")
+        elif 45 <= rsi <= 55:  # Neutral zone
+            confidence_score += 10
+            confidence_reasons.append(f"RSI in neutral zone ({rsi:.1f})")
+        
+        # 2. MACD Analysis (0-25 points)
+        macd = candle['macd']
+        macd_signal = candle['macd_signal']
+        macd_histogram = candle['macd_histogram']
+        
+        macd_strength = abs(macd - macd_signal)
+        macd_direction = "bullish" if macd > macd_signal else "bearish"
+        
+        if macd_strength > 5 and macd_histogram > 2:  # Strong bullish MACD
+            confidence_score += 25
+            confidence_reasons.append(f"Strong bullish MACD crossover ({macd:.2f} > {macd_signal:.2f})")
+        elif macd_strength > 5 and macd_histogram < -2:  # Strong bearish MACD
+            confidence_score += 25
+            confidence_reasons.append(f"Strong bearish MACD crossover ({macd:.2f} < {macd_signal:.2f})")
+        elif macd_strength > 2:  # Good MACD divergence
+            confidence_score += 15
+            confidence_reasons.append(f"Good MACD {macd_direction} signal")
+        elif macd_strength > 1:  # Mild MACD signal
+            confidence_score += 8
+            confidence_reasons.append(f"Mild MACD {macd_direction} signal")
+        
+        # 3. SuperTrend Analysis (0-20 points)
+        supertrend = candle['supertrend']
+        supertrend_direction = candle['supertrend_direction']
+        price_to_st_distance = abs(candle['close'] - supertrend) / candle['close'] * 100
+        
+        if supertrend_direction > 0 and price_to_st_distance > 1.0:  # Strong bullish SuperTrend
+            confidence_score += 20
+            confidence_reasons.append(f"Strong bullish SuperTrend (price {price_to_st_distance:.2f}% above)")
+        elif supertrend_direction < 0 and price_to_st_distance > 1.0:  # Strong bearish SuperTrend
+            confidence_score += 20
+            confidence_reasons.append(f"Strong bearish SuperTrend (price {price_to_st_distance:.2f}% below)")
+        elif supertrend_direction > 0 and price_to_st_distance > 0.5:  # Good bullish SuperTrend
+            confidence_score += 15
+            confidence_reasons.append(f"Good bullish SuperTrend")
+        elif supertrend_direction < 0 and price_to_st_distance > 0.5:  # Good bearish SuperTrend
+            confidence_score += 15
+            confidence_reasons.append(f"Good bearish SuperTrend")
+        elif supertrend_direction != 0:  # Basic SuperTrend signal
+            confidence_score += 8
+            direction = "bullish" if supertrend_direction > 0 else "bearish"
+            confidence_reasons.append(f"Basic {direction} SuperTrend signal")
+        
+        # 4. EMA Analysis (0-15 points)
+        ema = candle['ema']
+        price_to_ema_distance = (candle['close'] - ema) / ema * 100 if ema != 0 else 0
+        
+        if abs(price_to_ema_distance) > 2.0:  # Strong price-EMA separation
+            confidence_score += 15
+            direction = "above" if price_to_ema_distance > 0 else "below"
+            confidence_reasons.append(f"Price strongly {direction} EMA ({price_to_ema_distance:.2f}%)")
+        elif abs(price_to_ema_distance) > 1.0:  # Good price-EMA separation
+            confidence_score += 10
+            direction = "above" if price_to_ema_distance > 0 else "below"
+            confidence_reasons.append(f"Price {direction} EMA ({price_to_ema_distance:.2f}%)")
+        elif abs(price_to_ema_distance) > 0.5:  # Mild separation
+            confidence_score += 5
+            direction = "above" if price_to_ema_distance > 0 else "below"
+            confidence_reasons.append(f"Price slightly {direction} EMA")
+        
+        # 5. Volume and Volatility Analysis (0-15 points)
         atr = candle['atr']
-        stop_loss = math.ceil(atr)
-        target = math.ceil(1.5 * atr)
-        target2 = math.ceil(2.0 * atr)
-        target3 = math.ceil(2.5 * atr)
+        body_size = abs(candle['close'] - candle['open'])
+        price_range = candle['high'] - candle['low']
+        body_ratio = body_size / price_range if price_range > 0 else 0
+        
+        if atr > 60 and body_ratio > 0.7:  # High volatility with strong candle
+            confidence_score += 15
+            confidence_reasons.append(f"High volatility with strong directional candle (ATR: {atr:.1f}, Body: {body_ratio:.2f})")
+        elif atr > 40 and body_ratio > 0.5:  # Good volatility with decent candle
+            confidence_score += 10
+            confidence_reasons.append(f"Good volatility environment (ATR: {atr:.1f})")
+        elif atr > 25:  # Decent volatility
+            confidence_score += 5
+            confidence_reasons.append(f"Decent volatility (ATR: {atr:.1f})")
+        
+        # Determine confidence level
+        if confidence_score >= 85:
+            confidence = "Very High"
+        elif confidence_score >= 65:
+            confidence = "High"
+        elif confidence_score >= 45:
+            confidence = "Medium"
+        elif confidence_score >= 25:
+            confidence = "Low"
+        else:
+            confidence = "Very Low"
 
+        # Dynamic risk management based on confidence and market conditions
+        if confidence_score >= 85:  # Very high confidence
+            stop_loss_multiplier = 0.5  # Very tight stop loss
+            target_multipliers = [1.2, 2.0, 3.0]  # Aggressive targets
+        elif confidence_score >= 65:  # High confidence
+            stop_loss_multiplier = 0.6
+            target_multipliers = [1.0, 1.5, 2.2]
+        elif confidence_score >= 45:  # Medium confidence
+            stop_loss_multiplier = 0.7
+            target_multipliers = [0.8, 1.2, 1.8]
+        else:  # Low confidence
+            stop_loss_multiplier = 0.8
+            target_multipliers = [0.6, 1.0, 1.5]
+
+        stop_loss = math.ceil(stop_loss_multiplier * atr)
+        target = math.ceil(target_multipliers[0] * atr)
+        target2 = math.ceil(target_multipliers[1] * atr)
+        target3 = math.ceil(target_multipliers[2] * atr)
+
+        # Enhanced signal criteria based on multi-indicator alignment
         is_buy_call = (
-            candle['rsi'] > 55 and
-            candle['macd'] > candle['macd_signal'] and
-            candle['close'] > candle['ema'] * 1.005 and
-            candle['supertrend_direction'] > 0
+            rsi >= 45 and rsi <= 65 and  # RSI in optimal range or oversold
+            macd > macd_signal and
+            macd > -5 and  # MACD not extremely negative
+            candle['close'] > candle['ema'] * 1.002 and     # Price above EMA with buffer
+            supertrend_direction > 0 and
+            candle['close'] > candle['supertrend'] * 1.001  # Price above SuperTrend with buffer
+        ) or (
+            rsi <= 35 and  # Oversold conditions for reversal
+            macd > macd_signal and
+            candle['close'] > candle['ema'] and
+            supertrend_direction > 0
         )
 
         is_buy_put = (
-            candle['rsi'] < 45 and
-            candle['macd'] < candle['macd_signal'] and
-            candle['close'] < candle['ema'] * 0.995 and
-            candle['supertrend_direction'] < 0
+            rsi >= 35 and rsi <= 55 and  # RSI in optimal range or overbought
+            macd < macd_signal and
+            macd < 5 and  # MACD not extremely positive
+            candle['close'] < candle['ema'] * 0.998 and     # Price below EMA with buffer
+            supertrend_direction < 0 and
+            candle['close'] < candle['supertrend'] * 0.999  # Price below SuperTrend with buffer
+        ) or (
+            rsi >= 65 and  # Overbought conditions for reversal
+            macd < macd_signal and
+            candle['close'] < candle['ema'] and
+            supertrend_direction < 0
         )
 
         if is_buy_call:
             signal = "BUY CALL"
-            confidence = "High" if candle['rsi'] > 70 else "Medium"
-            rsi_reason = f"RSI {candle['rsi']:.2f} > 55"
+            rsi_reason = f"RSI {candle['rsi']:.2f} in bullish zone"
             macd_reason = f"MACD {candle['macd']:.2f} > Signal {candle['macd_signal']:.2f}"
-            price_reason = f"Price {candle['close']:.2f} > EMA {candle['ema']:.2f}, Supertrend bullish"
+            price_reason = f"Price {candle['close']:.2f} >> EMA {candle['ema']:.2f} and > SuperTrend {candle['supertrend']:.2f}"
             option_type = "CE"
 
         elif is_buy_put:
             signal = "BUY PUT"
-            confidence = "High" if candle['rsi'] < 30 else "Medium"
-            rsi_reason = f"RSI {candle['rsi']:.2f} < 45"
+            rsi_reason = f"RSI {candle['rsi']:.2f} in bearish zone"
             macd_reason = f"MACD {candle['macd']:.2f} < Signal {candle['macd_signal']:.2f}"
-            price_reason = f"Price {candle['close']:.2f} < EMA {candle['ema']:.2f}, Supertrend bearish"
+            price_reason = f"Price {candle['close']:.2f} << EMA {candle['ema']:.2f} and < SuperTrend {candle['supertrend']:.2f}"
             option_type = "PE"
+
+        # Enhanced filtering: Only trade with Medium+ confidence (score >= 45)
+        if signal != "NO TRADE" and confidence_score < 45:
+            signal = "NO TRADE"
+            confidence = "Low"
+            rsi_reason += f" (Filtered: Confidence score {confidence_score} < 45)"
+
+        # Additional filter for very high confidence trades
+        if signal != "NO TRADE" and confidence_score >= 65:
+            # Check for indicator alignment
+            indicators_aligned = (
+                (signal == "BUY CALL" and rsi <= 60 and macd > 0 and supertrend_direction > 0) or
+                (signal == "BUY PUT" and rsi >= 40 and macd < 0 and supertrend_direction < 0)
+            )
+            if not indicators_aligned:
+                confidence_score -= 20  # Reduce confidence for misaligned indicators
+                if confidence_score < 45:
+                    signal = "NO TRADE"
+                    confidence = "Low"
+                    rsi_reason += " (Indicator misalignment detected)"
 
         # Fallback: If option data is missing, simulate on underlying
         if signal.startswith("BUY") and future_data is not None and not future_data.empty:
@@ -453,7 +608,7 @@ class SupertrendMacdRsiEma(Strategy):
             "macd": candle['macd'],
             "macd_signal": candle['macd_signal'],
             "ema_20": candle['ema'],
-            "atr": atr,
+            "atr": candle['atr'],
             "supertrend": candle['supertrend'],
             "supertrend_direction": candle['supertrend_direction'],
             "stop_loss": stop_loss,

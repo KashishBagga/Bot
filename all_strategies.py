@@ -311,7 +311,15 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
                         if isinstance(row.name, pd.Timestamp):
                             time_str = row.name.strftime('%Y-%m-%d %H:%M:%S')
                         else:
-                            time_str = str(row.name)
+                            # If row.name is not a timestamp, use the time column if available
+                            if 'time' in df_with_indicators.columns:
+                                candle_time = df_with_indicators.iloc[i]['time']
+                                if pd.notna(candle_time):
+                                    time_str = pd.to_datetime(candle_time).strftime('%Y-%m-%d %H:%M:%S')
+                                else:
+                                    time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                            else:
+                                time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         
                         signal_info = {
                             'time': time_str,
@@ -333,7 +341,15 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
                     if isinstance(row.name, pd.Timestamp):
                         time_str = row.name.strftime('%Y-%m-%d %H:%M:%S')
                     else:
-                        time_str = str(row.name)
+                        # If row.name is not a timestamp, use the time column if available
+                        if 'time' in df_with_indicators.columns:
+                            candle_time = df_with_indicators.iloc[i]['time']
+                            if pd.notna(candle_time):
+                                time_str = pd.to_datetime(candle_time).strftime('%Y-%m-%d %H:%M:%S')
+                            else:
+                                time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        else:
+                            time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     
                     signal_info = {
                         'time': time_str,

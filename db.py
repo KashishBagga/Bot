@@ -388,9 +388,6 @@ def log_strategy_sql(strategy_name, signal_data):
     if 'failure_reason' not in signal_data or not signal_data['failure_reason']:
         signal_data['failure_reason'] = ""
 
-    # Debug print for outcome
-    # print(f"[DB DEBUG] Logging outcome: {signal_data.get('outcome')}")
-    
     # Connect to the database
     conn = sqlite3.connect("trading_signals.db")
     cursor = conn.cursor()
@@ -467,7 +464,6 @@ def log_strategy_sql(strategy_name, signal_data):
             VALUES ({placeholders})
         """, tuple(filtered_data[col] for col in columns))
         conn.commit()
-        # print(f"✅ Strategy {strategy_name} logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
     except Exception as e:
         print(f"❌ Error inserting data into {strategy_name}: {e}")
     finally:

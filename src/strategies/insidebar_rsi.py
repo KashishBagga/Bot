@@ -22,7 +22,10 @@ class InsidebarRsi(Strategy):
             'rsi_overbought': 60,
             'rsi_extreme_overbought': 70,
             'rsi_oversold': 40,
-            'rsi_extreme_oversold': 30
+            'rsi_extreme_oversold': 30,
+            'volatility_threshold': 1.5,  # ATR multiplier for volatility check
+            'momentum_threshold': 0.5,    # Price momentum threshold
+            'volume_factor': 1.2          # Volume confirmation factor
         }
         
         # Use provided params or defaults
@@ -65,7 +68,127 @@ class InsidebarRsi(Strategy):
         # Apply the function to create an RSI level column
         data['rsi_level'] = data['rsi'].apply(get_rsi_level)
         
+        # Advanced confidence indicators
+        data['price_range'] = data['high'] - data['low']
+        data['body_size'] = abs(data['close'] - data['open'])
+        data['body_ratio'] = data['body_size'] / data['price_range'].replace(0, float('nan'))
+        
+        # Volume analysis
+        data['avg_volume_5'] = data['volume'].rolling(5).mean()
+        data['volume_ratio'] = data['volume'] / data['avg_volume_5'].replace(0, float('nan'))
+        
+        # Price momentum
+        data['price_momentum'] = data['close'].pct_change(3) * 100
+        
+        # Volatility measure
+        data['volatility_ratio'] = data['atr'] / data['close'] * 100
+        
         return data
+    
+    def calculate_confidence_score(self, candle: pd.Series) -> tuple:
+        """Calculate confidence score based on multiple market conditions.
+        
+        Returns:
+            tuple: (confidence_level, confidence_score, detailed_reasons)
+        """
+        confidence_score = 0
+        reasons = []
+        
+        # 1. RSI Strength (0-30 points)
+        rsi = candle['rsi']
+        if rsi <= 20:  # Extreme oversold
+            confidence_score += 30
+            reasons.append(f"Extreme RSI oversold ({rsi:.1f})")
+        elif rsi <= 30:  # Strong oversold
+            confidence_score += 25
+            reasons.append(f"Strong RSI oversold ({rsi:.1f})")
+        elif rsi <= 40:  # Mild oversold
+            confidence_score += 15
+            reasons.append(f"Mild RSI oversold ({rsi:.1f})")
+        elif rsi >= 80:  # Extreme overbought
+            confidence_score += 30
+            reasons.append(f"Extreme RSI overbought ({rsi:.1f})")
+        elif rsi >= 70:  # Strong overbought
+            confidence_score += 25
+            reasons.append(f"Strong RSI overbought ({rsi:.1f})")
+        elif rsi >= 60:  # Mild overbought
+            confidence_score += 15
+            reasons.append(f"Mild RSI overbought ({rsi:.1f})")
+        
+        # 2. Inside Bar Quality (0-20 points)
+        if candle['is_inside']:
+            prev_range = candle['prev_high'] - candle['prev_low']
+            current_range = candle['high'] - candle['low']
+            compression_ratio = current_range / prev_range if prev_range > 0 else 0
+            
+            if compression_ratio <= 0.5:  # High compression
+                confidence_score += 20
+                reasons.append(f"High compression inside bar ({compression_ratio:.2f})")
+            elif compression_ratio <= 0.7:  # Good compression
+                confidence_score += 15
+                reasons.append(f"Good compression inside bar ({compression_ratio:.2f})")
+            else:  # Low compression
+                confidence_score += 10
+                reasons.append(f"Low compression inside bar ({compression_ratio:.2f})")
+        
+        # 3. Volume Confirmation (0-15 points)
+        volume_ratio = candle.get('volume_ratio', 1)
+        if volume_ratio >= 2.0:  # High volume
+            confidence_score += 15
+            reasons.append(f"High volume confirmation ({volume_ratio:.1f}x)")
+        elif volume_ratio >= 1.5:  # Above average volume
+            confidence_score += 10
+            reasons.append(f"Above average volume ({volume_ratio:.1f}x)")
+        elif volume_ratio >= 1.2:  # Decent volume
+            confidence_score += 5
+            reasons.append(f"Decent volume ({volume_ratio:.1f}x)")
+        
+        # 4. Market Volatility (0-15 points)
+        volatility = candle.get('volatility_ratio', 1)
+        atr = candle.get('atr', 50)
+        if volatility >= 2.0 and atr > 30:  # High volatility, good range
+            confidence_score += 15
+            reasons.append(f"High volatility environment ({volatility:.1f}%)")
+        elif volatility >= 1.5 and atr > 20:  # Moderate volatility
+            confidence_score += 10
+            reasons.append(f"Moderate volatility ({volatility:.1f}%)")
+        elif atr > 15:  # Decent range
+            confidence_score += 5
+            reasons.append(f"Decent price range (ATR: {atr:.1f})")
+        
+        # 5. Price Momentum Alignment (0-10 points)
+        momentum = candle.get('price_momentum', 0)
+        if abs(momentum) >= 1.0:  # Strong momentum
+            confidence_score += 10
+            direction = "bullish" if momentum > 0 else "bearish"
+            reasons.append(f"Strong {direction} momentum ({momentum:.1f}%)")
+        elif abs(momentum) >= 0.5:  # Moderate momentum
+            confidence_score += 5
+            direction = "bullish" if momentum > 0 else "bearish"
+            reasons.append(f"Moderate {direction} momentum ({momentum:.1f}%)")
+        
+        # 6. Candle Quality (0-10 points)
+        body_ratio = candle.get('body_ratio', 0.5)
+        if body_ratio >= 0.7:  # Strong directional candle
+            confidence_score += 10
+            reasons.append(f"Strong directional candle ({body_ratio:.2f})")
+        elif body_ratio >= 0.5:  # Decent body
+            confidence_score += 5
+            reasons.append(f"Decent candle body ({body_ratio:.2f})")
+        
+        # Determine confidence level
+        if confidence_score >= 70:
+            confidence_level = "Very High"
+        elif confidence_score >= 50:
+            confidence_level = "High"
+        elif confidence_score >= 30:
+            confidence_level = "Medium"
+        elif confidence_score >= 15:
+            confidence_level = "Low"
+        else:
+            confidence_level = "Very Low"
+        
+        return confidence_level, confidence_score, reasons
     
     def safe_signal_time(self, val):
         return val if isinstance(val, (pd.Timestamp, datetime)) else datetime.now()
@@ -96,7 +219,6 @@ class InsidebarRsi(Strategy):
         
         # Set default values
         signal = "NO TRADE"
-        confidence = "Low"
         trade_type = "Intraday"
         rsi_reason = price_reason = ""
         
@@ -108,28 +230,103 @@ class InsidebarRsi(Strategy):
         failure_reason = ""
         exit_time = None
         
-        # Check if we have an inside bar
-        is_inside = candle['is_inside']
+        # Check if we have an inside bar - mandatory requirement
+        if not candle['is_inside']:
+            return {
+                "signal": "NO TRADE",
+                "price": candle['close'],
+                "rsi": candle['rsi'],
+                "rsi_level": candle['rsi_level'],
+                "ema_20": candle['ema'] if 'ema' in candle else 0,
+                "atr": candle['atr'],
+                "confidence": "Very Low",
+                "confidence_score": 0,
+                "rsi_reason": "No inside bar pattern detected",
+                "price_reason": "Inside bar formation required for signal",
+                "trade_type": trade_type,
+                "stop_loss": 0,
+                "target": 0,
+                "target2": 0,
+                "target3": 0,
+                "outcome": "No Trade",
+                "pnl": 0,
+                "targets_hit": 0,
+                "stoploss_count": 0,
+                "failure_reason": "",
+                "exit_time": None
+            }
+        
+        # Calculate confidence score based on market conditions
+        confidence_level, confidence_score, confidence_reasons = self.calculate_confidence_score(candle)
+        
+        # FIXED LOGIC: Correct RSI interpretation with enhanced confidence
+        # When RSI is oversold (< 40), expect price to go UP -> BUY CALL
+        # When RSI is overbought (> 60), expect price to go DOWN -> BUY PUT
         rsi_level = candle['rsi_level']
         
-        # Implement strategy logic
-        if is_inside and candle['rsi'] > self.params['rsi_overbought']:
+        if candle['rsi'] < self.params['rsi_oversold']:
             signal = "BUY CALL"
-            confidence = "High" if candle['rsi'] > self.params['rsi_extreme_overbought'] else "Medium"
-            rsi_reason = f"RSI {candle['rsi']:.2f} > {self.params['rsi_overbought']} ({rsi_level})"
-            price_reason = "Inside bar pattern"
-        elif is_inside and candle['rsi'] < self.params['rsi_oversold']:
+            rsi_reason = f"RSI {candle['rsi']:.2f} < {self.params['rsi_oversold']} (Oversold - expect bounce up)"
+            price_reason = "Inside bar pattern + RSI oversold reversal"
+        elif candle['rsi'] > self.params['rsi_overbought']:
             signal = "BUY PUT"
-            confidence = "High" if candle['rsi'] < self.params['rsi_extreme_oversold'] else "Medium"
-            rsi_reason = f"RSI {candle['rsi']:.2f} < {self.params['rsi_oversold']} ({rsi_level})"
-            price_reason = "Inside bar pattern"
+            rsi_reason = f"RSI {candle['rsi']:.2f} > {self.params['rsi_overbought']} (Overbought - expect pullback down)"
+            price_reason = "Inside bar pattern + RSI overbought reversal"
         
-        # Calculate stops and targets based on ATR
+        # Enhanced filtering: Only trade with Medium+ confidence (score >= 30)
+        if signal != "NO TRADE" and confidence_score < 30:
+            signal = "NO TRADE"
+            rsi_reason += f" (Filtered: Confidence score {confidence_score} < 30)"
+            confidence_level = "Very Low"
+        
+        # Additional quality checks for high confidence trades
+        if signal != "NO TRADE" and confidence_score >= 50:
+            # Check for divergence or momentum alignment
+            momentum = candle.get('price_momentum', 0)
+            if signal == "BUY CALL" and momentum < -1.0:  # Bearish momentum conflicts with bullish signal
+                confidence_score -= 15
+                confidence_level = "Medium" if confidence_score >= 30 else "Low"
+                rsi_reason += " (Momentum divergence detected)"
+            elif signal == "BUY PUT" and momentum > 1.0:  # Bullish momentum conflicts with bearish signal
+                confidence_score -= 15
+                confidence_level = "Medium" if confidence_score >= 30 else "Low"
+                rsi_reason += " (Momentum divergence detected)"
+        
+        # Dynamic risk management based on confidence and market conditions
         atr = candle['atr']
-        stop_loss = int(round(atr))
-        target1 = int(round(1.5 * atr))
-        target2 = int(round(2.0 * atr))
-        target3 = int(round(2.5 * atr))
+        volatility_ratio = candle.get('volatility_ratio', 1)
+        
+        # Adjust stop loss based on confidence and volatility
+        if confidence_score >= 70:  # Very high confidence
+            stop_loss_multiplier = 0.6  # Tighter stop
+        elif confidence_score >= 50:  # High confidence
+            stop_loss_multiplier = 0.7
+        elif confidence_score >= 30:  # Medium confidence
+            stop_loss_multiplier = 0.8
+        else:  # Low confidence
+            stop_loss_multiplier = 1.0
+        
+        # Adjust for volatility
+        if volatility_ratio >= 2.0:  # High volatility
+            stop_loss_multiplier *= 1.2
+        elif volatility_ratio <= 1.0:  # Low volatility
+            stop_loss_multiplier *= 0.9
+        
+        stop_loss = int(round(stop_loss_multiplier * atr))
+        
+        # Dynamic targets based on confidence
+        if confidence_score >= 70:
+            target1 = int(round(1.5 * atr))  # Aggressive targets for high confidence
+            target2 = int(round(2.5 * atr))
+            target3 = int(round(3.5 * atr))
+        elif confidence_score >= 50:
+            target1 = int(round(1.2 * atr))  # Moderate targets
+            target2 = int(round(2.0 * atr))
+            target3 = int(round(3.0 * atr))
+        else:
+            target1 = int(round(1.0 * atr))  # Conservative targets
+            target2 = int(round(1.5 * atr))
+            target3 = int(round(2.0 * atr))
         
         # Calculate performance if we have a signal and future data
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:
@@ -271,10 +468,12 @@ class InsidebarRsi(Strategy):
                                 exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
                             break
         
-        # In all places where exit_time is set, use self.safe_signal_time
         # Defensive IST conversion for exit_time in signal_data
         exit_time_val = exit_time
         exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
+        
+        # Combine all confidence reasons
+        detailed_reasons = "; ".join(confidence_reasons) if confidence_reasons else "Standard analysis"
         
         # Return the signal data
         signal_data = {
@@ -284,9 +483,10 @@ class InsidebarRsi(Strategy):
             "rsi_level": rsi_level,
             "ema_20": candle['ema'] if 'ema' in candle else 0,
             "atr": candle['atr'],
-            "confidence": confidence,
+            "confidence": confidence_level,
+            "confidence_score": confidence_score,
             "rsi_reason": rsi_reason,
-            "price_reason": price_reason,
+            "price_reason": f"{price_reason} | {detailed_reasons}",
             "trade_type": trade_type,
             "stop_loss": stop_loss,
             "target": target1,
