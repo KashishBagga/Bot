@@ -242,7 +242,7 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
             pass  # no-op if not saving to DB
     
     strategy_results = {}
-    print(f"\n====== Running strategy: {strategy_name} ======")
+    # print(f"\n====== Running strategy: {strategy_name} ======")
 
     # Get the strategy class
     strategy_class = get_strategy_class(strategy_name)
@@ -375,7 +375,7 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
             traceback.print_exc()
             strategy_results[index_name] = {"error": str(e)}
 
-    print(f"====== Completed: {strategy_name} ======\n")
+    # print(f"====== Completed: {strategy_name} ======\n")
     return strategy_results
 
 def _call_strategy_analyze(strategy, strategy_name, row, i, df_with_indicators, future_data, index_name):
