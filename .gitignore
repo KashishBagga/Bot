@@ -33,6 +33,11 @@ logs/
 *.db
 *.sqlite3
 
+# Data files
+data/
+*.parquet
+cache/backtest_results/
+
 # Credentials
 *.json
 !requirements.json
