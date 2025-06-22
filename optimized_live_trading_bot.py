@@ -82,9 +82,9 @@ class OptimizedLiveTradingBot:
         try:
             conn = sqlite3.connect(self.db_path)
             
-            # Create live_signals table if it doesn't exist
+            # Create live_signals_realtime table if it doesn't exist
             conn.execute('''
-                CREATE TABLE IF NOT EXISTS live_signals (
+                CREATE TABLE IF NOT EXISTS live_signals_realtime (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT NOT NULL,
                     strategy TEXT NOT NULL,
@@ -99,7 +99,27 @@ class OptimizedLiveTradingBot:
                     target3 REAL,
                     reasoning TEXT,
                     status TEXT DEFAULT 'ACTIVE',
+                    cycle_number INTEGER,
+                    analysis_time_ms REAL,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Create rejected_signals table if it doesn't exist
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS rejected_signals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    signal TEXT NOT NULL,
+                    rejection_reason TEXT,
+                    confidence TEXT,
+                    confidence_score INTEGER,
+                    price REAL,
+                    stop_loss REAL,
+                    target REAL,
+                    reasoning TEXT
                 )
             ''')
             
@@ -109,6 +129,25 @@ class OptimizedLiveTradingBot:
             
         except Exception as e:
             self.logger.error(f"❌ Database setup error: {e}")
+    
+    def get_connection_status(self) -> Dict[str, Any]:
+        """Get the current connection status for real-time data"""
+        try:
+            # For this optimized bot, we're using simulated data
+            # In a real implementation, this would check Fyers API connectivity
+            return {
+                'real_time_data': True,  # We can generate real-time-like data
+                'data_source': 'Simulated Market Data',
+                'message': 'Connected (using optimized simulated data)',
+                'status': 'CONNECTED'
+            }
+        except Exception as e:
+            return {
+                'real_time_data': False,
+                'data_source': 'None',
+                'message': f'Connection failed: {e}',
+                'status': 'DISCONNECTED'
+            }
     
     def is_market_open(self) -> bool:
         """Check if market is currently open"""
@@ -293,6 +332,7 @@ class OptimizedLiveTradingBot:
         self.logger.info("🔄 Starting trading cycle...")
         
         all_signals = []
+        rejected_signals = []
         
         # Analyze all symbols with all strategies
         for symbol in self.symbols:
@@ -301,22 +341,38 @@ class OptimizedLiveTradingBot:
                 for strategy_name in self.strategies.keys():
                     result = self.analyze_with_strategy(strategy_name, symbol, data)
                     
-                    # Filter signals based on confidence
-                    if (result['signal'] not in ['NO TRADE', 'ERROR'] and 
-                        result.get('confidence_score', 0) >= self.risk_params['min_confidence_score']):
-                        all_signals.append(result)
-                        self.logger.info(
-                            f"🎯 {result['strategy']} - {result['symbol']}: "
-                            f"{result['signal']} (Confidence: {result.get('confidence_score', 'N/A')})"
-                        )
+                    # Check if signal is valid but doesn't meet confidence threshold
+                    if result['signal'] not in ['NO TRADE', 'ERROR']:
+                        confidence_score = result.get('confidence_score', 0)
+                        
+                        if confidence_score >= self.risk_params['min_confidence_score']:
+                            all_signals.append(result)
+                            self.logger.info(
+                                f"🎯 {result['strategy']} - {result['symbol']}: "
+                                f"{result['signal']} (Confidence: {confidence_score})"
+                            )
+                        else:
+                            # Signal generated but rejected due to low confidence
+                            result['rejection_reason'] = f"Low confidence score: {confidence_score} < {self.risk_params['min_confidence_score']}"
+                            rejected_signals.append(result)
+                            self.logger.info(
+                                f"🚫 {result['strategy']} - {result['symbol']}: "
+                                f"{result['signal']} REJECTED (Confidence: {confidence_score})"
+                            )
         
         # Process and store high-quality signals
         if all_signals:
             self.process_signals(all_signals)
             self.daily_stats['signals_generated'] += len(all_signals)
             self.daily_stats['high_confidence_signals'] += len(all_signals)
-        else:
-            self.logger.info("📊 No high-confidence signals generated this cycle")
+        
+        # Store rejected signals for analysis
+        if rejected_signals:
+            self.store_rejected_signals(rejected_signals)
+            self.logger.info(f"📊 {len(rejected_signals)} signals rejected due to low confidence")
+        
+        if not all_signals and not rejected_signals:
+            self.logger.info("📊 No signals generated this cycle")
         
         # Risk management check
         self.check_risk_limits()
@@ -338,9 +394,9 @@ class OptimizedLiveTradingBot:
                 elif not isinstance(timestamp, str):
                     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
-                # Store signal in live_signals table
+                # Store signal in live_signals_realtime table
                 conn.execute('''
-                    INSERT INTO live_signals (
+                    INSERT INTO live_signals_realtime (
                         timestamp, strategy, symbol, signal, confidence, 
                         confidence_score, price, stop_loss, target, target2, target3, reasoning
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -398,7 +454,7 @@ class OptimizedLiveTradingBot:
             query = '''
                 SELECT COUNT(*) as signals, 
                        AVG(confidence_score) as avg_confidence
-                FROM live_signals
+                FROM live_signals_realtime
                 WHERE date(created_at) = ?
             '''
             result = conn.execute(query, (today,)).fetchone()
@@ -517,6 +573,48 @@ class OptimizedLiveTradingBot:
             json.dump(final_stats, f, indent=2)
         
         self.logger.info("📊 Optimized session statistics saved")
+    
+    def store_rejected_signals(self, rejected_signals: List[Dict[str, Any]]):
+        """Store rejected signals for analysis and improvement"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            
+            for signal in rejected_signals:
+                # Ensure proper timestamp format
+                timestamp = signal.get('timestamp')
+                if isinstance(timestamp, str) and 'T' in timestamp:
+                    # ISO format - convert to standard datetime string
+                    timestamp = pd.to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                elif not isinstance(timestamp, str):
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                # Store signal in rejected_signals table
+                conn.execute('''
+                    INSERT INTO rejected_signals (
+                        timestamp, strategy, symbol, signal, rejection_reason,
+                        confidence, confidence_score, price, stop_loss, target, reasoning
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    timestamp,
+                    signal['strategy'],
+                    signal['symbol'],
+                    signal['signal'],
+                    signal.get('rejection_reason', 'Unknown rejection reason'),
+                    signal.get('confidence', 'Unknown'),
+                    signal.get('confidence_score', 0),
+                    signal.get('price', 0),
+                    signal.get('stop_loss', 0),
+                    signal.get('target', 0),
+                    signal.get('price_reason', '') + ' | ' + str(signal.get('confidence_reasons', ''))
+                ))
+            
+            conn.commit()
+            conn.close()
+            
+            self.logger.info(f"💾 Stored {len(rejected_signals)} rejected signals for analysis")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error storing rejected signals: {e}")
 
 
 def main():

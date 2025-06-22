@@ -40,7 +40,7 @@ def get_recent_signals(hours=24):
         
         query = '''
             SELECT timestamp, strategy, symbol, signal, confidence_score, price, reasoning
-            FROM live_signals 
+            FROM live_signals_realtime 
             WHERE timestamp >= ?
             ORDER BY timestamp DESC
             LIMIT 20
@@ -69,7 +69,7 @@ def get_signal_stats():
                 COUNT(CASE WHEN confidence_score >= 70 THEN 1 END) as high_confidence,
                 COUNT(CASE WHEN signal = 'BUY' THEN 1 END) as buy_signals,
                 COUNT(CASE WHEN signal = 'SELL' THEN 1 END) as sell_signals
-            FROM live_signals 
+            FROM live_signals_realtime 
             WHERE date(timestamp) = ?
         '''
         
@@ -78,7 +78,7 @@ def get_signal_stats():
         # Strategy breakdown
         strategy_query = '''
             SELECT strategy, COUNT(*) as count, AVG(confidence_score) as avg_conf
-            FROM live_signals 
+            FROM live_signals_realtime 
             WHERE date(timestamp) = ?
             GROUP BY strategy
             ORDER BY count DESC
