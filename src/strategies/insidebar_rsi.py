@@ -12,11 +12,12 @@ from datetime import datetime, timedelta
 class InsidebarRsi(Strategy):
     """Trading strategy implementation for Inside Bar with RSI confirmation."""
     
-    def __init__(self, params: Dict[str, Any] = None):
+    def __init__(self, params: Dict[str, Any] = None, timeframe_data: Dict[str, pd.DataFrame] = None):
         """Initialize the strategy.
         
         Args:
             params: Strategy parameters
+            timeframe_data: Dictionary of timeframes with their respective data
         """
         default_params = {
             'rsi_overbought': 60,
@@ -37,6 +38,7 @@ class InsidebarRsi(Strategy):
             params = default_params
             
         super().__init__("insidebar_rsi", params)
+        self.timeframe_data = timeframe_data or {}
     
     def add_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """Add strategy-specific indicators to the data.

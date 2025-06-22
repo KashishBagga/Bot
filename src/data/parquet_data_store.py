@@ -281,71 +281,6 @@ class ParquetDataStore:
         
         return df
     
-    def _resample_to_timeframe(self, df: pd.DataFrame, timeframe: str) -> pd.DataFrame:
-        """Resample dataframe to a different timeframe."""
-        if df.empty:
-            return df
-        
-        pandas_freq = self.TIMEFRAMES[timeframe]
-        
-        # OHLCV aggregation
-        agg_dict = {
-            'open': 'first',
-            'high': 'max',
-            'low': 'min',
-            'close': 'last',
-            'volume': 'sum'
-        }
-        
-        # Add indicator columns to aggregation
-        indicator_cols = [col for col in df.columns if col not in ['open', 'high', 'low', 'close', 'volume']]
-        for col in indicator_cols:
-            agg_dict[col] = 'last'  # Use last value for indicators
-        
-        resampled = df.resample(pandas_freq).agg(agg_dict)
-        resampled = resampled.dropna()  # Remove rows with NaN values
-        
-        return resampled
-    
-    def _store_all_timeframes(self, symbol: str, name: str, base_df: pd.DataFrame, base_resolution: str):
-        """Generate and store data for all timeframes."""
-        base_timeframe = f"{base_resolution}min"
-        
-        # Store base timeframe
-        if base_timeframe in self.TIMEFRAMES:
-            self._store_timeframe_data(symbol, base_timeframe, base_df)
-            print(f"  💾 Stored {base_timeframe}: {len(base_df)} candles")
-        
-        # Generate and store higher timeframes
-        for timeframe in self.TIMEFRAMES:
-            if timeframe == base_timeframe:
-                continue  # Already stored
-            
-            # Only generate higher timeframes
-            base_minutes = int(base_resolution)
-            target_minutes = self._timeframe_to_minutes(timeframe)
-            
-            if target_minutes <= base_minutes:
-                continue  # Can't generate lower timeframes
-            
-            try:
-                resampled_df = self._resample_to_timeframe(base_df, timeframe)
-                if not resampled_df.empty:
-                    self._store_timeframe_data(symbol, timeframe, resampled_df)
-                    print(f"  💾 Stored {timeframe}: {len(resampled_df)} candles")
-                else:
-                    print(f"  ⚠️ No data for {timeframe} after resampling")
-            except Exception as e:
-                print(f"  ❌ Failed to generate {timeframe}: {e}")
-    
-    def _timeframe_to_minutes(self, timeframe: str) -> int:
-        """Convert timeframe to minutes for comparison."""
-        mapping = {
-            '1min': 1, '3min': 3, '5min': 5, '15min': 15, '30min': 30,
-            '1hour': 60, '4hour': 240, '1day': 1440
-        }
-        return mapping.get(timeframe, 0)
-    
     def _store_timeframe_data(self, symbol: str, timeframe: str, df: pd.DataFrame):
         """Store dataframe for a specific timeframe."""
         file_path = self._get_timeframe_file(symbol, timeframe)
@@ -378,13 +313,20 @@ class ParquetDataStore:
             # Read parquet file
             df = pd.read_parquet(file_path)
             
-            # Set time as index
-            df['time'] = pd.to_datetime(df['time'])
-            df.set_index('time', inplace=True)
+            # Ensure time column is datetime and set as index
+            if 'time' in df.columns:
+                df['time'] = pd.to_datetime(df['time'])
+                df.set_index('time', inplace=True)
+            elif df.index.name != 'time':
+                # If index is not named 'time', assume it's the time index
+                df.index = pd.to_datetime(df.index)
+                df.index.name = 'time'
             
             # Filter by days_back if specified
-            if days_back is not None:
-                cutoff_date = datetime.now() - timedelta(days=days_back)
+            if days_back is not None and len(df) > 0:
+                # Use the last available date as reference, not today's date
+                last_date = df.index.max()
+                cutoff_date = last_date - timedelta(days=days_back)
                 df = df[df.index >= cutoff_date]
             
             return df
@@ -445,7 +387,10 @@ class ParquetDataStore:
             timeframe = file_path.stem
             if timeframe in self.TIMEFRAMES:
                 timeframes.append(timeframe)
-        return sorted(timeframes, key=lambda x: self._timeframe_to_minutes(x))
+        
+        # Sort by timeframe order (1min, 3min, 5min, etc.)
+        timeframe_order = ['1min', '3min', '5min', '15min', '30min', '1hour', '4hour', '1day']
+        return sorted(timeframes, key=lambda x: timeframe_order.index(x) if x in timeframe_order else 999)
     
     def _has_complete_data(self, symbol: str, start_date: str, end_date: str) -> bool:
         """Check if we already have complete data for the symbol and date range."""
