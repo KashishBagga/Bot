@@ -361,8 +361,8 @@ class EmaCrossover(Strategy):
                 
                 # Iterate through future candles chronologically
                 for idx, future_candle in future_data.iterrows():
-                    # Get timestamp in the correct format
-                    current_time = self.safe_signal_time(future_candle.get('time', None))
+                    # Get timestamp from the index (which should be a DatetimeIndex)
+                    current_time = self.safe_signal_time(idx)
                     
                     # Check stop loss first (exit on low price)
                     if future_candle['low'] <= stop_loss_price:
@@ -393,8 +393,8 @@ class EmaCrossover(Strategy):
                 
                 # Iterate through future candles chronologically
                 for idx, future_candle in future_data.iterrows():
-                    # Get timestamp in the correct format
-                    current_time = self.safe_signal_time(future_candle.get('time', None))
+                    # Get timestamp from the index (which should be a DatetimeIndex)
+                    current_time = self.safe_signal_time(idx)
                     
                     # Check stop loss first (exit on high price)
                     if future_candle['high'] >= stop_loss_price:
@@ -446,7 +446,7 @@ class EmaCrossover(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = self.safe_signal_time(candle.get('time', None))
+                current_time = self.safe_signal_time(idx)
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['low'] <= (entry_price - stop_loss):
                     outcome = "Loss"
@@ -498,7 +498,7 @@ class EmaCrossover(Strategy):
             trailing_sl = None
             target1_hit = target2_hit = target3_hit = False
             for idx, candle in future_data.iterrows():
-                current_time = self.safe_signal_time(candle.get('time', None))
+                current_time = self.safe_signal_time(idx)
                 # Check if stop loss was hit before target1
                 if not target1_hit and candle['high'] >= (entry_price + stop_loss):
                     outcome = "Loss"
@@ -717,4 +717,4 @@ def run_strategy(candle, index_name, future_data=None, crossover_strength=None, 
         data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
         if pd.api.types.is_datetime64_any_dtype(data['time']):
             data = data.set_index('time')
-    return strategy.analyze(data, index_name, future_data)
+    return strategy.analyze_single_timeframe(data, future_data)
