@@ -144,27 +144,8 @@ def run_strategy(strategy_name: str, dataframes: Dict[str, pd.DataFrame],
                     params = list(analyze_signature.parameters.keys())
                     
                     # Handle different strategy signatures
-                    if strategy_name in ["ema_crossover", "supertrend_macd_rsi_ema"]:
-                        # These strategies need the full dataframe to calculate indicators properly
-                        # Call with the full dataframe instead of individual candles
-                        if hasattr(strategy_instance, 'analyze_single_timeframe'):
-                            result = strategy_instance.analyze_single_timeframe(df, multi_tf_data)
-                        else:
-                            # Fallback to regular analyze method with full dataframe
-                            result = strategy_instance.analyze(df.iloc[-1], len(df)-1, df, multi_tf_data)
-                        if result and result.get('signal') not in ['NO TRADE', None]:
-                            signal_type = result.get('signal', 'NO TRADE')
-                            results[symbol] = {
-                                'signals': {signal_type: 1},
-                                'total_signals': 1,
-                                'raw_signals': [result] if not save_to_db else None
-                            }
-                        else:
-                            results[symbol] = {
-                                'signals': {'NO TRADE': 1},
-                                'total_signals': 0,
-                                'raw_signals': []
-                            }
+                    if False and strategy_name in ["ema_crossover", "supertrend_macd_rsi_ema"]:
+                        pass  # Let the generic parameter-based branches handle these strategies
                     elif len(params) >= 3 and 'candle' in params and 'index' in params and 'df' in params:
                         # Method expects (candle, index, df, future_data) - iterate through candles
                         signals = []
@@ -262,8 +243,26 @@ def run_strategy_backtest(strategy_name: str, symbol: str, dataframe: pd.DataFra
         module_path = f"src.strategies.{strategy_name}"
         strategy_module = importlib.import_module(module_path)
         
-        # Check different strategy patterns
-        if hasattr(strategy_module, 'run_strategy'):
+        # For strategies that expose both a class and a legacy run_strategy wrapper
+        # (e.g., ema_crossover, supertrend_macd_rsi_ema), prefer the class-based
+        # approach so we can pass the full DataFrame context for indicator look-back.
+        if strategy_name in ["ema_crossover", "supertrend_macd_rsi_ema"]:
+            class_name = ''.join(word.capitalize() for word in strategy_name.split('_'))
+            strategy_class = getattr(strategy_module, class_name)
+            strategy_instance = strategy_class(timeframe_data=multi_timeframe_data or {})
+
+            # Iterate through candles, skip first 20 for indicator warm-up
+            signals = []
+            for i in range(len(dataframe)):
+                if i < 20:
+                    continue
+                candle = dataframe.iloc[i]
+                result = strategy_instance.analyze(candle, i, dataframe, multi_timeframe_data)
+                if result and result.get('signal') not in ['NO TRADE', None]:
+                    signals.append(result)
+            return signals
+            
+        elif hasattr(strategy_module, 'run_strategy'):
             # Pattern 1: run_strategy function (like ema_crossover)
             signals = []
             for i in range(len(dataframe)):
@@ -298,19 +297,10 @@ def run_strategy_backtest(strategy_name: str, symbol: str, dataframe: pd.DataFra
             analyze_signature = inspect.signature(strategy_instance.analyze)
             params = list(analyze_signature.parameters.keys())
             
-            if strategy_name == "ema_crossover":
-                # This strategy needs the full dataframe to calculate EMAs properly
-                # Call with the full dataframe instead of individual candles
-                result = strategy_instance.analyze_single_timeframe(dataframe, multi_timeframe_data)
-                if result and result.get('signal') not in ['NO TRADE', None]:
-                    return [result]
-                return []
-            elif strategy_name == "supertrend_macd_rsi_ema":
-                # This strategy also needs the full dataframe for proper indicator calculation
-                result = strategy_instance.analyze_single_timeframe(dataframe, multi_timeframe_data)
-                if result and result.get('signal') not in ['NO TRADE', None]:
-                    return [result]
-                return []
+            if False and strategy_name == "ema_crossover":
+                pass  # Let generic branches below handle
+            elif False and strategy_name == "supertrend_macd_rsi_ema":
+                pass
             elif len(params) >= 3 and 'data' in params and 'index_name' in params:
                 # Method expects (data, index_name, future_data) - pass full dataframe
                 result = strategy_instance.analyze(dataframe, symbol, multi_timeframe_data)
