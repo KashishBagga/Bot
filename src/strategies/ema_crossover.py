@@ -47,7 +47,11 @@ class EmaCrossover(Strategy):
         data['ema_21'] = data['ema_slow']
         
         # Calculate crossover strength (percentage difference between EMAs)
-        data['crossover_strength'] = 100 * (data['ema_fast'] - data['ema_slow']) / data['ema_slow']
+        # Avoid division by zero
+        data['crossover_strength'] = data.apply(
+            lambda row: 100 * (row['ema_fast'] - row['ema_slow']) / row['ema_slow'] 
+            if row['ema_slow'] != 0 else 0, axis=1
+        )
         
         # Determine momentum based on the slope of the fast EMA
         data['ema_fast_change'] = data['ema_fast'].pct_change(5) * 100  # 5-period percent change
@@ -227,7 +231,7 @@ class EmaCrossover(Strategy):
         target3 = int(round(2.0 * atr))
         
         # Stronger signal validation: Require significant crossover strength and momentum
-        crossover_strength_threshold = 0.8  # Increased threshold
+        crossover_strength_threshold = 0.02  # Adjusted based on actual data distribution
         
         # Check for bullish signal (fast EMA above slow EMA)
         if (candle['ema_fast'] > candle['ema_slow'] and 
@@ -247,10 +251,10 @@ class EmaCrossover(Strategy):
             if momentum:
                 price_reason += f", {momentum} momentum"
         
-        # Additional filter: Only trade with Medium+ confidence
-        if signal != "NO TRADE" and confidence == "Low":
+        # Additional filter: Only trade with Low+ confidence (filter out Very Low)
+        if signal != "NO TRADE" and confidence == "Very Low":
             signal = "NO TRADE"
-            price_reason += " (Filtered: Low confidence)"
+            price_reason += " (Filtered: Very Low confidence)"
         
         # If we have a trade signal and future data, calculate performance
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:

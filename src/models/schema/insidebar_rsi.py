@@ -26,7 +26,7 @@ insidebar_rsi_fields = [
     "pnl",
     "targets_hit",
     "stoploss_count",
-    "failure_reason"
+    "failure_reason",
     "exit_time"
 ]
 

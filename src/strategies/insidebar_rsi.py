@@ -214,7 +214,7 @@ class InsidebarRsi(Strategy):
         """
         # Calculate indicators if they haven't been calculated yet
         if 'is_inside' not in data.columns:
-            data = self.calculate_indicators(data)
+            data = self.add_indicators(data)
         
         # Get the latest candle
         candle = data.iloc[-1]
@@ -512,6 +512,6 @@ class InsidebarRsi(Strategy):
             else:
                 db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
             db_signal_data["index_name"] = index_name
-            db.log_strategy('insidebar_rsi', db_signal_data)
+            db.log_strategy_trade('insidebar_rsi', db_signal_data)
         
         return signal_data
