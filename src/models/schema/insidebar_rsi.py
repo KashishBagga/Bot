@@ -30,11 +30,9 @@ insidebar_rsi_fields = [
     "exit_time"
 ]
 
-def setup_insidebar_rsi_table():
+def setup_insidebar_rsi_table(db_instance):
     """Set up the insidebar_rsi strategy table."""
-    conn = sqlite3.connect("trading_signals.db")
-    cursor = conn.cursor()
-    cursor.execute("""
+    query = """
         CREATE TABLE IF NOT EXISTS insidebar_rsi (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             signal_time TEXT,
@@ -59,7 +57,6 @@ def setup_insidebar_rsi_table():
             failure_reason TEXT,
             exit_time TEXT
         )
-    """)
-    conn.commit()
-    conn.close()
+    """
+    db_instance.execute_query(query)
 

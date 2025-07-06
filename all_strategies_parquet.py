@@ -146,7 +146,8 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
                         # Call strategy analyze method
                         if strategy_name == 'insidebar_rsi':
                             # Special handling for insidebar_rsi which expects different parameters
-                            result = strategy_instance.analyze(df_with_indicators.iloc[i:i+1], index_name, future_data.iloc[i:] if not future_data.empty else None)
+                            future_data_slice = future_data.iloc[i:] if not future_data.empty else None
+                            result = strategy_instance.analyze(df_with_indicators.iloc[i:i+1], index_name, future_data_slice)
                         elif hasattr(strategy_instance, 'analyze'):
                             result = strategy_instance.analyze(row, i, df_with_indicators, future_data)
                         else:
