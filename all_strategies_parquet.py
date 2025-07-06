@@ -19,6 +19,7 @@ import os
 sys.path.append(str(Path(__file__).parent / "src"))
 
 from src.data.parquet_data_store import ParquetDataStore
+from src.models.backtesting_summary import BacktestingSummary
 from dotenv import load_dotenv
 
 # Import strategy modules
@@ -246,7 +247,7 @@ def save_strategy_results_to_db(strategy_name, symbol, results):
     except Exception as e:
         print(f"⚠️ Error saving to database: {e}")
 
-def print_summary(results, duration):
+def print_summary(results, duration, days_back=None, timeframe=None, symbols_tested=None, strategies_tested=None):
     """Print comprehensive summary of backtest results"""
     print(f"\n{'='*80}")
     print(f"📊 PARQUET BACKTESTING SUMMARY")
@@ -257,6 +258,7 @@ def print_summary(results, duration):
     total_signals = 0
     total_profit_loss = 0.0
     successful_strategies = 0
+    strategy_results_data = []
     
     for strategy_name, strategy_results in results.items():
         if 'error' in strategy_results:
@@ -287,6 +289,16 @@ def print_summary(results, duration):
                     print(f"  📈 {symbol}: {symbol_signals} signals, "
                           f"₹{symbol_profit:.2f} P&L, "
                           f"{symbol_win_rate:.1f}% win rate ({symbol_trades} trades)")
+                
+                # Store data for database logging
+                strategy_results_data.append({
+                    'strategy_name': strategy_name,
+                    'symbol': symbol,
+                    'signals_count': symbol_signals,
+                    'pnl': symbol_profit,
+                    'win_rate': symbol_win_rate,
+                    'total_trades': symbol_trades
+                })
         
         if strategy_trades > 0:
             strategy_win_rate = sum(
@@ -302,9 +314,35 @@ def print_summary(results, duration):
     print(f"\n🎉 OVERALL RESULTS:")
     print(f"  ✅ Successful strategies: {successful_strategies}/{len(results)}")
     print(f"  📈 Total signals generated: {total_signals:,}")
-    print(f"  �� Total P&L: ₹{total_profit_loss:.2f}")
+    print(f"   Total P&L: ₹{total_profit_loss:.2f}")
     print(f"  ⚡ Performance: {total_signals/duration:.0f} signals/second")
     print(f"{'='*80}")
+    
+    # Log to backtesting summary database
+    if days_back and timeframe and symbols_tested and strategies_tested:
+        try:
+            summary = BacktestingSummary()
+            backtest_data = {
+                'run_timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'period_days': days_back,
+                'timeframe': timeframe,
+                'symbols': symbols_tested,
+                'strategies': strategies_tested,
+                'total_signals': total_signals,
+                'total_pnl': total_profit_loss,
+                'duration_seconds': duration,
+                'performance_rate': total_signals/duration if duration > 0 else 0,
+                'strategy_results': strategy_results_data
+            }
+            
+            run_id = summary.log_backtest_run(backtest_data)
+            print(f"📊 Backtest results logged to database (Run ID: {run_id})")
+        except Exception as e:
+            print(f"⚠️ Failed to log backtest results: {e}")
+    
+    print(f"\n🎉 Parquet backtesting completed successfully!")
+    print(f"📊 All data sourced from local parquet files (no API calls)")
+    print(f"🚀 Ready for production backtesting with 20-year data!")
 
 def run_all_strategies_parquet(days_back=30, timeframe="15min", save_to_db=True, 
                               symbols=None, strategies=None, parallel=True):
@@ -445,7 +483,7 @@ def run_all_strategies_parquet(days_back=30, timeframe="15min", save_to_db=True,
                 results[name] = {"error": str(e)}
     
     duration = time.time() - start_time
-    print_summary(results, duration)
+    print_summary(results, duration, days_back, timeframe, symbols_to_test, strategies_to_test)
     
     return True
 
