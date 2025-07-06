@@ -74,6 +74,15 @@ class Indicators:
     @staticmethod
     def supertrend(data: pd.DataFrame, period: int = 10, multiplier: float = 3.0) -> Dict[str, pd.Series]:
         """Calculate SuperTrend indicator using vectorized operations."""
+        if len(data) < period + 1:
+            # Not enough data for calculation
+            return {
+                'supertrend': pd.Series(0.0, index=data.index).apply(safe_float),
+                'direction': pd.Series(0, index=data.index),
+                'upper': pd.Series(0.0, index=data.index).apply(safe_float),
+                'lower': pd.Series(0.0, index=data.index).apply(safe_float)
+            }
+        
         atr = Indicators.atr(data, period)
         hl2 = (data['high'] + data['low']) / 2
         basic_upper = hl2 + (multiplier * atr)
@@ -81,25 +90,36 @@ class Indicators:
 
         final_upper = basic_upper.copy()
         final_lower = basic_lower.copy()
-        supertrend = pd.Series(index=data.index, data=False)
+        supertrend = pd.Series(index=data.index, data=0.0)  # Initialize with 0.0 instead of False
         direction = pd.Series(1, index=data.index)  # 1 for uptrend, -1 for downtrend
 
+        # Initialize first value
+        supertrend.iloc[0] = basic_upper.iloc[0]
+        
         for i in range(1, len(data)):
+            # Bounds check to prevent index errors
+            if i >= len(data) or i-1 < 0:
+                continue
+                
             final_upper.iloc[i] = min(basic_upper.iloc[i], final_upper.iloc[i-1]) if data['close'].iloc[i-1] <= final_upper.iloc[i-1] else basic_upper.iloc[i]
             final_lower.iloc[i] = max(basic_lower.iloc[i], final_lower.iloc[i-1]) if data['close'].iloc[i-1] >= final_lower.iloc[i-1] else basic_lower.iloc[i]
 
-            if final_upper.iloc[i-1] == supertrend.iloc[i-1] and data['close'].iloc[i] <= final_upper.iloc[i]:
+            if supertrend.iloc[i-1] == final_upper.iloc[i-1] and data['close'].iloc[i] <= final_upper.iloc[i]:
                 supertrend.iloc[i] = final_upper.iloc[i]
                 direction.iloc[i] = -1
-            elif final_upper.iloc[i-1] == supertrend.iloc[i-1] and data['close'].iloc[i] > final_upper.iloc[i]:
+            elif supertrend.iloc[i-1] == final_upper.iloc[i-1] and data['close'].iloc[i] > final_upper.iloc[i]:
                 supertrend.iloc[i] = final_lower.iloc[i]
                 direction.iloc[i] = 1
-            elif final_lower.iloc[i-1] == supertrend.iloc[i-1] and data['close'].iloc[i] >= final_lower.iloc[i]:
+            elif supertrend.iloc[i-1] == final_lower.iloc[i-1] and data['close'].iloc[i] >= final_lower.iloc[i]:
                 supertrend.iloc[i] = final_lower.iloc[i]
                 direction.iloc[i] = 1
-            elif final_lower.iloc[i-1] == supertrend.iloc[i-1] and data['close'].iloc[i] < final_lower.iloc[i]:
+            elif supertrend.iloc[i-1] == final_lower.iloc[i-1] and data['close'].iloc[i] < final_lower.iloc[i]:
                 supertrend.iloc[i] = final_upper.iloc[i]
                 direction.iloc[i] = -1
+            else:
+                # Default case - maintain previous values
+                supertrend.iloc[i] = supertrend.iloc[i-1]
+                direction.iloc[i] = direction.iloc[i-1]
 
         return {
             'supertrend': supertrend.apply(safe_float),
