@@ -28,6 +28,7 @@ var/
 # Logs
 *.log
 logs/
+startup_debug.log
 
 # Database
 *.db
@@ -57,6 +58,17 @@ cache/backtest_results/
 ehthumbs.db
 Thumbs.db
 
+# API logs
 analysis-test-458117-64b56a994c55.json
 fyersApi.log
 fyersRequests.log
+
+# Session data
+session_stats_*.json
+*_session_stats.json
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
