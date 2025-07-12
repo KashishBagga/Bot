@@ -266,7 +266,8 @@ class SupertrendMacdRsiEma(Strategy):
             }
             
             for tf, tf_df in timeframes.items():
-                if tf_df is None or tf_df.empty:
+                # Ensure we have a proper DataFrame before using it
+                if tf_df is None or not isinstance(tf_df, pd.DataFrame) or tf_df.empty:
                     # If any timeframe is missing, fall back to single timeframe
                     break
                 tf_result = self._evaluate_timeframe(tf_df, tf, ts)
@@ -636,8 +637,13 @@ class SupertrendMacdRsiEma(Strategy):
 
     def _evaluate_timeframe(self, df: pd.DataFrame, timeframe: str, ts: datetime) -> Optional[Dict[str, Any]]:
         """Evaluate a specific timeframe for signal confirmation."""
+        # Validate that df is a proper DataFrame first
+        if df is None or not isinstance(df, pd.DataFrame):
+            return None
+        
         df = df[df.index <= ts].copy()
-        if df.empty or len(df) < 20:  # Need at least 20 candles for indicators
+        # Now check if the DataFrame is empty or has insufficient rows
+        if df.empty or len(df) < 20:
             return None
 
         # Add indicators to this timeframe data

@@ -21,6 +21,7 @@ sys.path.append(str(Path(__file__).parent / "src"))
 from src.data.parquet_data_store import ParquetDataStore
 from src.models.backtesting_summary import BacktestingSummary
 from dotenv import load_dotenv
+import src.warning_filters  # noqa: F401
 
 # Import strategy modules
 def get_available_strategies():
@@ -129,66 +130,222 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
                 # Add strategy-specific indicators
                 df_with_indicators = strategy_instance.add_indicators(df_with_indicators)
                 
-                # Prepare future data (for lookahead prevention)
-                future_data = df_with_indicators.shift(-1)
-                
+                # Initialize results for this symbol
                 symbol_results = {
-                    'signals': {'BUY': 0, 'SELL': 0, 'NO TRADE': 0},
+                    'signals': {'BUY CALL': 0, 'BUY PUT': 0, 'BUY': 0, 'SELL': 0, 'NO TRADE': 0},
                     'total_profit_loss': 0.0,
                     'trades': [],
                     'win_rate': 0.0,
                     'total_trades': 0,
-                    'winning_trades': 0
+                    'winning_trades': 0,
+                    'total_signals': 0
                 }
                 
-                # Process each row
-                for i, (timestamp, row) in enumerate(df_with_indicators.iterrows()):
-                    try:
-                        # Call strategy analyze method
-                        if strategy_name == 'insidebar_rsi':
-                            # Special handling for insidebar_rsi which expects different parameters
-                            future_data_slice = future_data.iloc[i:] if not future_data.empty else None
-                            result = strategy_instance.analyze(df_with_indicators.iloc[i:i+1], index_name, future_data_slice)
-                        elif hasattr(strategy_instance, 'analyze'):
-                            result = strategy_instance.analyze(row, i, df_with_indicators, future_data)
-                        else:
-                            # Fallback for strategies with different signatures
-                            result = strategy_instance.analyze(df_with_indicators, index_name, future_data)
-                        
-                        if result and isinstance(result, dict):
-                            signal = result.get('signal', 'NO TRADE')
-                            symbol_results['signals'][signal] = symbol_results['signals'].get(signal, 0) + 1
+                # Strategy-specific execution logic
+                if strategy_name == 'insidebar_rsi':
+                    # InsidebarRsi expects: analyze(data, index_name, future_data)
+                    # We need to pass the full dataframe for each analysis
+                    for i in range(50, len(df_with_indicators)):  # Skip first 50 for indicator warmup
+                        try:
+                            # Get data up to current point
+                            current_data = df_with_indicators.iloc[:i+1]
                             
-                            # Track profit/loss if available
-                            if 'profit_loss' in result:
-                                symbol_results['total_profit_loss'] += result['profit_loss']
-                            elif 'pnl' in result:
-                                symbol_results['total_profit_loss'] += result['pnl']
+                            # Get future data for performance calculation
+                            future_data = df_with_indicators.iloc[i+1:i+51] if i+1 < len(df_with_indicators) else None
                             
-                            # Track trades
-                            if signal in ['BUY', 'SELL', 'BUY CALL', 'BUY PUT']:
-                                pnl = result.get('profit_loss', result.get('pnl', 0))
-                                trade_info = {
-                                    'timestamp': timestamp,
-                                    'signal': signal,
-                                    'price': row['close'],
-                                    'profit_loss': pnl
-                                }
-                                symbol_results['trades'].append(trade_info)
+                            # Call strategy analyze method
+                            result = strategy_instance.analyze(current_data, index_name, future_data)
+                            
+                            if result and isinstance(result, dict):
+                                signal = result.get('signal', 'NO TRADE')
+                                symbol_results['signals'][signal] = symbol_results['signals'].get(signal, 0) + 1
                                 
-                                if pnl > 0:
-                                    symbol_results['winning_trades'] += 1
-                                symbol_results['total_trades'] += 1
+                                # Track all signals (including NO TRADE for analysis)
+                                symbol_results['total_signals'] += 1
+                                
+                                # Track actual trades (non-NO TRADE signals)
+                                if signal not in ['NO TRADE', 'None', None]:
+                                    pnl = result.get('pnl', 0.0)
+                                    symbol_results['total_profit_loss'] += pnl
+                                    
+                                    trade_info = {
+                                        'timestamp': df_with_indicators.index[i],
+                                        'signal': signal,
+                                        'price': result.get('price', 0),
+                                        'profit_loss': pnl,
+                                        'confidence': result.get('confidence', 'Unknown'),
+                                        'outcome': result.get('outcome', 'Pending')
+                                    }
+                                    symbol_results['trades'].append(trade_info)
+                                    
+                                    if pnl > 0:
+                                        symbol_results['winning_trades'] += 1
+                                    symbol_results['total_trades'] += 1
+                                    
+                        except Exception as e:
+                            print(f"⚠️ Error processing row {i} for {strategy_name} on {index_name}: {e}")
+                            continue
+                
+                elif strategy_name in ['ema_crossover', 'supertrend_ema', 'supertrend_macd_rsi_ema']:
+                    # These strategies expect: analyze(candle, index, df, future_data)
+                    for i in range(50, len(df_with_indicators)):  # Skip first 50 for indicator warmup
+                        try:
+                            candle = df_with_indicators.iloc[i]
+                            
+                            # Get future data for performance calculation
+                            future_data = df_with_indicators.iloc[i+1:i+51] if i+1 < len(df_with_indicators) else None
+                            
+                            # Call strategy analyze method
+                            result = strategy_instance.analyze(candle, i, df_with_indicators, future_data)
+                            
+                            if result and isinstance(result, dict):
+                                signal = result.get('signal', 'NO TRADE')
+                                symbol_results['signals'][signal] = symbol_results['signals'].get(signal, 0) + 1
+                                
+                                # Track all signals (including NO TRADE for analysis)
+                                symbol_results['total_signals'] += 1
+                                
+                                # Track actual trades (non-NO TRADE signals)
+                                if signal not in ['NO TRADE', 'None', None]:
+                                    pnl = result.get('pnl', 0.0)
+                                    symbol_results['total_profit_loss'] += pnl
+                                    
+                                    trade_info = {
+                                        'timestamp': df_with_indicators.index[i],
+                                        'signal': signal,
+                                        'price': result.get('price', 0),
+                                        'profit_loss': pnl,
+                                        'confidence': result.get('confidence', 'Unknown'),
+                                        'outcome': result.get('outcome', 'Pending')
+                                    }
+                                    symbol_results['trades'].append(trade_info)
+                                    
+                                    if pnl > 0:
+                                        symbol_results['winning_trades'] += 1
+                                    symbol_results['total_trades'] += 1
+                                    
+                        except Exception as e:
+                            print(f"⚠️ Error processing row {i} for {strategy_name} on {index_name}: {e}")
+                            continue
+                
+                else:
+                    # Generic strategy execution - try to determine method signature
+                    import inspect
+                    analyze_signature = inspect.signature(strategy_instance.analyze)
+                    params = list(analyze_signature.parameters.keys())
                     
-                    except Exception as e:
-                        print(f"⚠️ Error processing row {i} for {strategy_name} on {index_name}: {e}")
-                        continue
+                    if 'data' in params and 'index_name' in params:
+                        # Strategy expects full dataframe like insidebar_rsi
+                        for i in range(50, len(df_with_indicators)):
+                            try:
+                                current_data = df_with_indicators.iloc[:i+1]
+                                future_data = df_with_indicators.iloc[i+1:i+51] if i+1 < len(df_with_indicators) else None
+                                
+                                result = strategy_instance.analyze(current_data, index_name, future_data)
+                                
+                                if result and isinstance(result, dict):
+                                    signal = result.get('signal', 'NO TRADE')
+                                    symbol_results['signals'][signal] = symbol_results['signals'].get(signal, 0) + 1
+                                    symbol_results['total_signals'] += 1
+                                    
+                                    if signal not in ['NO TRADE', 'None', None]:
+                                        pnl = result.get('pnl', 0.0)
+                                        symbol_results['total_profit_loss'] += pnl
+                                        
+                                        trade_info = {
+                                            'timestamp': df_with_indicators.index[i],
+                                            'signal': signal,
+                                            'price': result.get('price', 0),
+                                            'profit_loss': pnl,
+                                            'confidence': result.get('confidence', 'Unknown'),
+                                            'outcome': result.get('outcome', 'Pending')
+                                        }
+                                        symbol_results['trades'].append(trade_info)
+                                        
+                                        if pnl > 0:
+                                            symbol_results['winning_trades'] += 1
+                                        symbol_results['total_trades'] += 1
+                                        
+                            except Exception as e:
+                                print(f"⚠️ Error processing row {i} for {strategy_name} on {index_name}: {e}")
+                                continue
+                    
+                    elif 'candle' in params and 'index' in params:
+                        # Strategy expects candle-by-candle analysis
+                        for i in range(50, len(df_with_indicators)):
+                            try:
+                                candle = df_with_indicators.iloc[i]
+                                future_data = df_with_indicators.iloc[i+1:i+51] if i+1 < len(df_with_indicators) else None
+                                
+                                result = strategy_instance.analyze(candle, i, df_with_indicators, future_data)
+                                
+                                if result and isinstance(result, dict):
+                                    signal = result.get('signal', 'NO TRADE')
+                                    symbol_results['signals'][signal] = symbol_results['signals'].get(signal, 0) + 1
+                                    symbol_results['total_signals'] += 1
+                                    
+                                    if signal not in ['NO TRADE', 'None', None]:
+                                        pnl = result.get('pnl', 0.0)
+                                        symbol_results['total_profit_loss'] += pnl
+                                        
+                                        trade_info = {
+                                            'timestamp': df_with_indicators.index[i],
+                                            'signal': signal,
+                                            'price': result.get('price', 0),
+                                            'profit_loss': pnl,
+                                            'confidence': result.get('confidence', 'Unknown'),
+                                            'outcome': result.get('outcome', 'Pending')
+                                        }
+                                        symbol_results['trades'].append(trade_info)
+                                        
+                                        if pnl > 0:
+                                            symbol_results['winning_trades'] += 1
+                                        symbol_results['total_trades'] += 1
+                                        
+                            except Exception as e:
+                                print(f"⚠️ Error processing row {i} for {strategy_name} on {index_name}: {e}")
+                                continue
+                    
+                    else:
+                        # Fallback - try single analysis on full dataframe
+                        try:
+                            result = strategy_instance.analyze(df_with_indicators, index_name, None)
+                            
+                            if result and isinstance(result, dict):
+                                signal = result.get('signal', 'NO TRADE')
+                                symbol_results['signals'][signal] = symbol_results['signals'].get(signal, 0) + 1
+                                symbol_results['total_signals'] += 1
+                                
+                                if signal not in ['NO TRADE', 'None', None]:
+                                    pnl = result.get('pnl', 0.0)
+                                    symbol_results['total_profit_loss'] += pnl
+                                    
+                                    trade_info = {
+                                        'timestamp': df_with_indicators.index[-1],
+                                        'signal': signal,
+                                        'price': result.get('price', 0),
+                                        'profit_loss': pnl,
+                                        'confidence': result.get('confidence', 'Unknown'),
+                                        'outcome': result.get('outcome', 'Pending')
+                                    }
+                                    symbol_results['trades'].append(trade_info)
+                                    
+                                    if pnl > 0:
+                                        symbol_results['winning_trades'] += 1
+                                    symbol_results['total_trades'] += 1
+                                    
+                        except Exception as e:
+                            print(f"⚠️ Error in fallback analysis for {strategy_name} on {index_name}: {e}")
                 
                 # Calculate win rate
                 if symbol_results['total_trades'] > 0:
                     symbol_results['win_rate'] = (symbol_results['winning_trades'] / symbol_results['total_trades']) * 100
                 
                 results[index_name] = symbol_results
+                
+                # Print progress for this symbol
+                total_signals = sum(count for signal, count in symbol_results['signals'].items() if signal != 'NO TRADE')
+                print(f"  📊 {index_name}: {total_signals} signals from {symbol_results['total_signals']} analyses")
                 
                 # Save to database if requested
                 if save_to_db:
@@ -270,25 +427,39 @@ def print_summary(results, duration, days_back=None, timeframe=None, symbols_tes
         strategy_profit = 0.0
         strategy_trades = 0
         strategy_win_rate = 0.0
+        total_analyses = 0
         
         print(f"\n🎯 {strategy_name.upper()}:")
         
         for symbol, stats in strategy_results.items():
             if isinstance(stats, dict) and 'signals' in stats:
                 signals_dict = stats.get('signals', {})
-                symbol_signals = sum(count for signal, count in signals_dict.items() if signal != 'NO TRADE')
+                
+                # Count only actual trading signals (exclude NO TRADE)
+                symbol_signals = sum(count for signal, count in signals_dict.items() if signal not in ['NO TRADE', 'None', None])
+                
+                # Get other stats
                 symbol_profit = stats.get('total_profit_loss', 0.0)
                 symbol_trades = stats.get('total_trades', 0)
                 symbol_win_rate = stats.get('win_rate', 0.0)
+                symbol_analyses = stats.get('total_signals', 0)
                 
                 strategy_signals += symbol_signals
                 strategy_profit += symbol_profit
                 strategy_trades += symbol_trades
+                total_analyses += symbol_analyses
                 
+                # Print detailed breakdown for each symbol
+                no_trade_count = signals_dict.get('NO TRADE', 0)
+                buy_call_count = signals_dict.get('BUY CALL', 0)
+                buy_put_count = signals_dict.get('BUY PUT', 0)
+                buy_count = signals_dict.get('BUY', 0)
+                sell_count = signals_dict.get('SELL', 0)
+                
+                print(f"  📈 {symbol}: {symbol_signals} signals from {symbol_analyses} analyses")
+                print(f"      🔍 Breakdown: BUY CALL({buy_call_count}), BUY PUT({buy_put_count}), BUY({buy_count}), SELL({sell_count}), NO TRADE({no_trade_count})")
                 if symbol_signals > 0:
-                    print(f"  📈 {symbol}: {symbol_signals} signals, "
-                          f"₹{symbol_profit:.2f} P&L, "
-                          f"{symbol_win_rate:.1f}% win rate ({symbol_trades} trades)")
+                    print(f"      💰 P&L: ₹{symbol_profit:.2f}, Win Rate: {symbol_win_rate:.1f}% ({symbol_trades} trades)")
                 
                 # Store data for database logging
                 strategy_results_data.append({
@@ -297,7 +468,8 @@ def print_summary(results, duration, days_back=None, timeframe=None, symbols_tes
                     'signals_count': symbol_signals,
                     'pnl': symbol_profit,
                     'win_rate': symbol_win_rate,
-                    'total_trades': symbol_trades
+                    'total_trades': symbol_trades,
+                    'total_analyses': symbol_analyses
                 })
         
         if strategy_trades > 0:
@@ -309,13 +481,24 @@ def print_summary(results, duration, days_back=None, timeframe=None, symbols_tes
         total_signals += strategy_signals
         total_profit_loss += strategy_profit
         
-        print(f"  📊 Total: {strategy_signals} signals, ₹{strategy_profit:.2f} P&L, {strategy_win_rate:.1f}% win rate")
+        print(f"  📊 Strategy Total: {strategy_signals} signals from {total_analyses} analyses, ₹{strategy_profit:.2f} P&L, {strategy_win_rate:.1f}% win rate")
     
     print(f"\n🎉 OVERALL RESULTS:")
     print(f"  ✅ Successful strategies: {successful_strategies}/{len(results)}")
     print(f"  📈 Total signals generated: {total_signals:,}")
-    print(f"   Total P&L: ₹{total_profit_loss:.2f}")
+    print(f"  💰 Total P&L: ₹{total_profit_loss:.2f}")
     print(f"  ⚡ Performance: {total_signals/duration:.0f} signals/second")
+    
+    # Additional debugging info
+    if total_signals == 0:
+        print(f"\n⚠️  DEBUG INFO:")
+        print(f"  🔍 No signals generated - this indicates a problem with:")
+        print(f"      • Strategy logic conditions may be too restrictive")
+        print(f"      • Indicator calculations may be incorrect")
+        print(f"      • Data quality issues (missing indicators, wrong timeframes)")
+        print(f"      • Strategy parameter mismatches")
+        print(f"  💡 Recommendation: Check individual strategy outputs and reduce signal thresholds")
+    
     print(f"{'='*80}")
     
     # Log to backtesting summary database
@@ -340,9 +523,12 @@ def print_summary(results, duration, days_back=None, timeframe=None, symbols_tes
         except Exception as e:
             print(f"⚠️ Failed to log backtest results: {e}")
     
-    print(f"\n🎉 Parquet backtesting completed successfully!")
+    print(f"\n🎉 Parquet backtesting completed!")
     print(f"📊 All data sourced from local parquet files (no API calls)")
-    print(f"🚀 Ready for production backtesting with 20-year data!")
+    if total_signals > 0:
+        print(f"🚀 Signal generation working correctly!")
+    else:
+        print(f"⚠️ Signal generation needs investigation - check strategy logic")
 
 def run_all_strategies_parquet(days_back=30, timeframe="15min", save_to_db=True, 
                               symbols=None, strategies=None, parallel=True):

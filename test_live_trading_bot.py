@@ -125,7 +125,7 @@ def test_market_data_generation():
         bot = LiveTradingBot()
         
         # Test market data generation (this will be simulated data)
-        symbols = ['BANKNIFTY', 'NIFTY50']
+        symbols = ['NSE_NIFTYBANK_INDEX', 'NSE_NIFTY50_INDEX']  # Updated to match data directory names
         for symbol in symbols:
             data = bot.get_market_data(symbol)
             
@@ -154,7 +154,7 @@ def test_signal_processing():
         test_signal = {
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'strategy': 'test_strategy',
-            'symbol': 'BANKNIFTY',
+            'symbol': 'NSE_NIFTYBANK_INDEX',
             'signal': 'BUY CALL',
             'confidence_score': 75,
             'price': 45000.0,

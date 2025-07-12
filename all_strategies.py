@@ -72,7 +72,47 @@ def run_strategy(strategy_name: str, dataframes: Dict[str, pd.DataFrame],
                 multi_tf_data = multi_timeframe_dataframes.get(symbol, {})
                 
                 # Check different strategy patterns
-                if hasattr(strategy_module, 'run_strategy'):
+                # Prioritize class-based approach for these strategies
+                if strategy_name in ["ema_crossover", "supertrend_macd_rsi_ema", "supertrend_ema"]:
+                    # Get strategy class - convert snake_case to CamelCase
+                    class_name = ''.join(word.capitalize() for word in strategy_name.split('_'))
+                    strategy_class = getattr(strategy_module, class_name)
+                    strategy_instance = strategy_class(timeframe_data=multi_tf_data)
+                    
+                    # These strategies expect (candle, index, df, future_data) - iterate through candles
+                    signals = []
+                    for i in range(len(df)):
+                        if i < 50:  # Skip first 50 candles for indicators to stabilize
+                            continue
+                        candle = df.iloc[i]
+                        # Get future data for performance calculation
+                        future_data = df.iloc[i+1:i+51] if i+1 < len(df) else None
+                        
+                        result = strategy_instance.analyze(candle, i, df, future_data)
+                        
+                        if result and result.get('signal') not in ['NO TRADE', None]:
+                            signals.append(result)
+                    
+                    # Process results
+                    if signals:
+                        signal_counts = {}
+                        for signal in signals:
+                            signal_type = signal.get('signal', 'NO TRADE')
+                            signal_counts[signal_type] = signal_counts.get(signal_type, 0) + 1
+                        
+                        results[symbol] = {
+                            'signals': signal_counts,
+                            'total_signals': len(signals),
+                            'raw_signals': signals if not save_to_db else None
+                        }
+                    else:
+                        results[symbol] = {
+                            'signals': {'NO TRADE': 1},
+                            'total_signals': 0,
+                            'raw_signals': []
+                        }
+                        
+                elif hasattr(strategy_module, 'run_strategy'):
                     # Pattern 1: run_strategy function (like ema_crossover)
                     signals = []
                     for i in range(len(df)):
@@ -144,17 +184,18 @@ def run_strategy(strategy_name: str, dataframes: Dict[str, pd.DataFrame],
                     params = list(analyze_signature.parameters.keys())
                     
                     # Handle different strategy signatures
-                    if False and strategy_name in ["ema_crossover", "supertrend_macd_rsi_ema"]:
-                        pass  # Let the generic parameter-based branches handle these strategies
-                    elif len(params) >= 3 and 'candle' in params and 'index' in params and 'df' in params:
-                        # Method expects (candle, index, df, future_data) - iterate through candles
+                    if strategy_name in ["ema_crossover", "supertrend_macd_rsi_ema", "supertrend_ema"]:
+                        # These strategies expect (candle, index, df, future_data) - iterate through candles
                         signals = []
                         for i in range(len(df)):
-                            if i < 20:  # Skip first 20 candles for indicators to stabilize
+                            if i < 50:  # Skip first 50 candles for indicators to stabilize
                                 continue
                             candle = df.iloc[i]
-                            # Pass the candle, its index in the dataframe, and the full dataframe
-                            result = strategy_instance.analyze(candle, i, df, multi_tf_data)
+                            # Get future data for performance calculation
+                            future_data = df.iloc[i+1:i+51] if i+1 < len(df) else None
+                            
+                            result = strategy_instance.analyze(candle, i, df, future_data)
+                            
                             if result and result.get('signal') not in ['NO TRADE', None]:
                                 signals.append(result)
                         
@@ -176,15 +217,33 @@ def run_strategy(strategy_name: str, dataframes: Dict[str, pd.DataFrame],
                                 'total_signals': 0,
                                 'raw_signals': []
                             }
-                    elif len(params) >= 3 and 'data' in params and 'index_name' in params:
-                        # Method expects (data, index_name, future_data) - pass full dataframe
-                        result = strategy_instance.analyze(df, symbol, multi_tf_data)
-                        if result and result.get('signal') not in ['NO TRADE', None]:
-                            signal_type = result.get('signal', 'NO TRADE')
+                    
+                    elif len(params) >= 3 and 'candle' in params and 'index' in params and 'df' in params:
+                        # Method expects (candle, index, df, future_data) - iterate through candles
+                        signals = []
+                        for i in range(len(df)):
+                            if i < 20:  # Skip first 20 candles for indicators to stabilize
+                                continue
+                            candle = df.iloc[i]
+                            # Get future data for performance calculation
+                            future_data = df.iloc[i+1:i+51] if i+1 < len(df) else None
+                            
+                            result = strategy_instance.analyze(candle, i, df, future_data)
+                            
+                            if result and result.get('signal') not in ['NO TRADE', None]:
+                                signals.append(result)
+                        
+                        # Process results
+                        if signals:
+                            signal_counts = {}
+                            for signal in signals:
+                                signal_type = signal.get('signal', 'NO TRADE')
+                                signal_counts[signal_type] = signal_counts.get(signal_type, 0) + 1
+                            
                             results[symbol] = {
-                                'signals': {signal_type: 1},
-                                'total_signals': 1,
-                                'raw_signals': [result] if not save_to_db else None
+                                'signals': signal_counts,
+                                'total_signals': len(signals),
+                                'raw_signals': signals if not save_to_db else None
                             }
                         else:
                             results[symbol] = {
@@ -192,6 +251,44 @@ def run_strategy(strategy_name: str, dataframes: Dict[str, pd.DataFrame],
                                 'total_signals': 0,
                                 'raw_signals': []
                             }
+                    
+                    elif len(params) >= 3 and 'data' in params and 'index_name' in params:
+                        # Method expects (data, index_name, future_data) - pass progressive data slices
+                        signals = []
+                        for i in range(len(df)):
+                            if i < 50:  # Skip first 50 candles for indicators to stabilize
+                                continue
+                            
+                            # Get data up to current point (progressive analysis)
+                            current_data = df.iloc[:i+1]
+                            
+                            # Get future data for performance calculation (next 50 candles)
+                            future_data = df.iloc[i+1:i+51] if i+1 < len(df) else None
+                            
+                            result = strategy_instance.analyze(current_data, symbol, future_data)
+                            
+                            if result and result.get('signal') not in ['NO TRADE', None]:
+                                signals.append(result)
+                        
+                        # Process results
+                        if signals:
+                            signal_counts = {}
+                            for signal in signals:
+                                signal_type = signal.get('signal', 'NO TRADE')
+                                signal_counts[signal_type] = signal_counts.get(signal_type, 0) + 1
+                            
+                            results[symbol] = {
+                                'signals': signal_counts,
+                                'total_signals': len(signals),
+                                'raw_signals': signals if not save_to_db else None
+                            }
+                        else:
+                            results[symbol] = {
+                                'signals': {'NO TRADE': 1},
+                                'total_signals': 0,
+                                'raw_signals': []
+                            }
+                    
                     else:
                         # Method expects (data, symbol) - analyze full dataframe
                         result = strategy_instance.analyze(df, symbol)

@@ -19,6 +19,7 @@ sys.path.append(str(Path(__file__).parent / "src"))
 from src.data.parquet_data_store import ParquetDataStore
 from all_strategies import get_available_strategies, run_strategy
 from dotenv import load_dotenv
+import src.warning_filters  # noqa: F401
 
 def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min", 
                         save_to_db: bool = True, symbols: List[str] = None,

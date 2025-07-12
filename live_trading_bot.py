@@ -28,7 +28,9 @@ from src.strategies.supertrend_ema import SupertrendEma
 from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
 from src.models.backtesting_summary import BacktestingSummary
 from src.data.parquet_data_store import ParquetDataStore
+from src.models.unified_database import UnifiedDatabase
 from dotenv import load_dotenv
+import src.warning_filters  # noqa: F401
 
 class LiveTradingBot:
     """Production Live Trading Bot with backtesting consistency"""
@@ -74,8 +76,11 @@ class LiveTradingBot:
         # Data store for historical data
         self.data_store = ParquetDataStore()
         
+        # Initialize unified database
+        self.unified_db = UnifiedDatabase(db_path)
+        
         self.setup_logging()
-        self.setup_database()
+        self.setup_legacy_database()  # Keep legacy tables for compatibility
         
     def setup_logging(self):
         """Setup comprehensive logging"""
@@ -95,15 +100,15 @@ class LiveTradingBot:
         )
         self.logger = logging.getLogger('LiveTradingBot')
         
-    def setup_database(self):
-        """Setup database tables for live trading"""
+    def setup_legacy_database(self):
+        """Setup legacy database tables for backward compatibility"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # Create live_signals table (consistent with backtesting)
+            # Keep legacy live_signals table for compatibility
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS live_signals (
+                CREATE TABLE IF NOT EXISTS live_signals_realtime (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT NOT NULL,
                     strategy TEXT NOT NULL,
@@ -118,7 +123,26 @@ class LiveTradingBot:
                     target3 REAL,
                     reasoning TEXT,
                     status TEXT DEFAULT 'ACTIVE',
+                    analysis_time_ms REAL,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Keep legacy rejected_signals table for compatibility  
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS rejected_signals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    signal TEXT NOT NULL,
+                    rejection_reason TEXT,
+                    confidence TEXT,
+                    confidence_score INTEGER,
+                    price REAL,
+                    stop_loss REAL,
+                    target REAL,
+                    reasoning TEXT
                 )
             ''')
             
@@ -164,7 +188,7 @@ class LiveTradingBot:
             
             conn.commit()
             conn.close()
-            self.logger.info("✅ Database setup completed")
+            self.logger.info("✅ Legacy database compatibility maintained")
             
         except Exception as e:
             self.logger.error(f"❌ Database setup error: {e}")
@@ -265,6 +289,8 @@ class LiveTradingBot:
     
     def analyze_with_strategy(self, strategy_name: str, symbol: str, data: pd.DataFrame) -> Dict[str, Any]:
         """Analyze market data with strategy - SAME AS BACKTESTING"""
+        analysis_start = time.time()
+        
         try:
             strategy = self.strategies[strategy_name]
             
@@ -282,10 +308,13 @@ class LiveTradingBot:
                 candle = data.iloc[-1]
                 result = strategy.analyze(candle, len(data)-1, data, None)
             
+            analysis_time = (time.time() - analysis_start) * 1000  # Convert to milliseconds
+            
             if result and isinstance(result, dict):
                 result['strategy'] = strategy_name
                 result['symbol'] = symbol
                 result['timestamp'] = datetime.now().isoformat()
+                result['analysis_time_ms'] = analysis_time
                 
                 # Add confidence score if not present
                 if 'confidence_score' not in result:
@@ -300,16 +329,19 @@ class LiveTradingBot:
                     'signal': 'NO TRADE',
                     'strategy': strategy_name,
                     'symbol': symbol,
-                    'reason': 'No signal generated'
+                    'reason': 'No signal generated',
+                    'analysis_time_ms': analysis_time
                 }
             
         except Exception as e:
+            analysis_time = (time.time() - analysis_start) * 1000
             self.logger.error(f"❌ Error analyzing {strategy_name} for {symbol}: {e}")
             return {
                 'signal': 'ERROR',
                 'reason': str(e),
                 'strategy': strategy_name,
-                'symbol': symbol
+                'symbol': symbol,
+                'analysis_time_ms': analysis_time
             }
     
     def execute_trading_cycle(self):
@@ -325,74 +357,118 @@ class LiveTradingBot:
         self.logger.info("🔄 Starting trading cycle...")
         
         all_signals = []
+        rejected_signals = []
+        total_analyses = 0
+        no_trade_count = 0
+        low_confidence_count = 0
+        error_count = 0
         
         # Analyze all symbols with all strategies
         for symbol in self.symbols:
             data = self.get_market_data(symbol)
             if data is not None:
+                self.logger.info(f"📊 Analyzing {symbol} with {len(data)} candles (latest close: ₹{data.iloc[-1]['close']:.2f})")
+                
                 for strategy_name in self.strategies.keys():
                     result = self.analyze_with_strategy(strategy_name, symbol, data)
+                    total_analyses += 1
                     
-                    if result['signal'] not in ['NO TRADE', 'ERROR']:
-                        confidence_score = result.get('confidence_score', 0)
-                        
+                    # Extract common fields
+                    confidence_score = result.get('confidence_score', 0)
+                    signal_type = result.get('signal', 'UNKNOWN')
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    # Add common fields to result
+                    result.update({
+                        'timestamp': timestamp,
+                        'signal_time': timestamp,
+                        'price': data.iloc[-1]['close'] if len(data) > 0 else 0
+                    })
+                    
+                    if signal_type == 'NO TRADE':
+                        no_trade_count += 1
+                        rejected_signals.append({
+                            **result,
+                            'rejection_reason': 'No trade signal generated',
+                            'signal': 'NO TRADE'
+                        })
+                        self.logger.debug(
+                            f"📋 {strategy_name} - {symbol}: NO TRADE "
+                            f"(Reason: {result.get('reason', 'Unknown')})"
+                        )
+                    elif signal_type == 'ERROR':
+                        error_count += 1
+                        rejected_signals.append({
+                            **result,
+                            'rejection_reason': f"Strategy error: {result.get('reason', 'Unknown')}",
+                            'signal': 'ERROR'
+                        })
+                        self.logger.warning(
+                            f"⚠️ {strategy_name} - {symbol}: ERROR "
+                            f"(Reason: {result.get('reason', 'Unknown')})"
+                        )
+                    else:
+                        # Valid signal generated
                         if confidence_score >= self.risk_params['min_confidence_score']:
                             all_signals.append(result)
                             self.logger.info(
-                                f"🎯 {result['strategy']} - {result['symbol']}: "
-                                f"{result['signal']} (Confidence: {confidence_score})"
+                                f"🎯 {strategy_name} - {symbol}: "
+                                f"{signal_type} (Confidence: {confidence_score})"
+                            )
+                        else:
+                            low_confidence_count += 1
+                            rejected_signals.append({
+                                **result,
+                                'rejection_reason': f"Low confidence: {confidence_score} < {self.risk_params['min_confidence_score']}",
+                                'signal': signal_type
+                            })
+                            self.logger.info(
+                                f"🔻 {strategy_name} - {symbol}: "
+                                f"{signal_type} (Confidence: {confidence_score} < {self.risk_params['min_confidence_score']} threshold)"
                             )
         
-        # Process and store signals
+        # Log cycle summary
+        self.logger.info(
+            f"📈 Cycle Summary: {total_analyses} analyses | "
+            f"{len(all_signals)} valid signals | "
+            f"{no_trade_count} no-trade | "
+            f"{low_confidence_count} low-confidence | "
+            f"{error_count} errors"
+        )
+        
+        # Store rejected signals using unified database
+        if rejected_signals:
+            self.store_rejected_signals_unified(rejected_signals)
+        
+        # Process and store valid signals using unified database
         if all_signals:
-            self.process_signals(all_signals)
+            self.process_signals_unified(all_signals)
             self.daily_stats['signals_generated'] += len(all_signals)
+        else:
+            self.logger.info("💭 No qualifying signals generated this cycle")
         
         # Risk management check
         self.check_risk_limits()
     
-    def process_signals(self, signals: List[Dict[str, Any]]):
-        """Process and store trading signals"""
+    def process_signals_unified(self, signals: List[Dict[str, Any]]):
+        """Process and store trading signals using unified database"""
         try:
-            conn = sqlite3.connect(self.db_path)
-            
             for signal in signals:
-                timestamp = signal.get('timestamp', datetime.now().isoformat())
-                if isinstance(timestamp, str) and 'T' in timestamp:
-                    timestamp = pd.to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                # Log to unified database
+                signal_id = self.unified_db.log_live_signal(
+                    strategy=signal['strategy'],
+                    symbol=signal['symbol'],
+                    signal_data=signal
+                )
                 
-                # Store signal in live_signals table
-                cursor = conn.cursor()
-                cursor.execute('''
-                    INSERT INTO live_signals (
-                        timestamp, strategy, symbol, signal, confidence, 
-                        confidence_score, price, stop_loss, target, target2, target3, reasoning
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    timestamp,
-                    signal['strategy'],
-                    signal['symbol'],
-                    signal['signal'],
-                    signal.get('confidence', 'Unknown'),
-                    signal.get('confidence_score', 0),
-                    signal.get('price', 0),
-                    signal.get('stop_loss', 0),
-                    signal.get('target', 0),
-                    signal.get('target2', 0),
-                    signal.get('target3', 0),
-                    signal.get('reasoning', '')
-                ))
-                
-                signal_id = cursor.lastrowid
+                # Also log to legacy table for compatibility
+                self.store_signal_legacy(signal)
                 
                 # In production, this would execute the actual trade
                 # For now, we'll simulate the trade execution
                 self.simulate_trade_execution(signal_id, signal)
             
-            conn.commit()
-            conn.close()
-            
-            self.logger.info(f"💾 Processed {len(signals)} signals")
+            self.logger.info(f"💾 Processed {len(signals)} signals with unified database")
             
         except Exception as e:
             self.logger.error(f"❌ Error processing signals: {e}")
@@ -652,6 +728,95 @@ class LiveTradingBot:
             json.dump(final_stats, f, indent=2)
         
         self.logger.info("📊 Session statistics saved")
+
+    def store_rejected_signals_unified(self, rejected_signals: List[Dict[str, Any]]):
+        """Store rejected signals using unified database"""
+        try:
+            for signal in rejected_signals:
+                # Log to unified database
+                self.unified_db.log_rejected_signal(
+                    strategy=signal.get('strategy', 'Unknown'),
+                    symbol=signal.get('symbol', 'Unknown'),
+                    rejection_data=signal,
+                    source='LIVE'
+                )
+            
+            # Also store in legacy table for compatibility
+            self.store_rejected_signals_legacy(rejected_signals)
+            
+            self.logger.info(f"📋 Stored {len(rejected_signals)} rejected signals with unified database")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error storing rejected signals: {e}")
+    
+    def store_signal_legacy(self, signal: Dict[str, Any]):
+        """Store signal in legacy live_signals_realtime table for compatibility"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            timestamp = signal.get('timestamp', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            if isinstance(timestamp, str) and 'T' in timestamp:
+                timestamp = pd.to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+            
+            cursor.execute('''
+                INSERT INTO live_signals_realtime (
+                    timestamp, strategy, symbol, signal, confidence, 
+                    confidence_score, price, stop_loss, target, target2, target3, reasoning, analysis_time_ms
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                timestamp,
+                signal['strategy'],
+                signal['symbol'],
+                signal['signal'],
+                signal.get('confidence', 'Unknown'),
+                signal.get('confidence_score', 0),
+                signal.get('price', 0),
+                signal.get('stop_loss', 0),
+                signal.get('target', 0),
+                signal.get('target2', 0),
+                signal.get('target3', 0),
+                signal.get('reasoning', ''),
+                signal.get('analysis_time_ms', 0)
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error storing legacy signal: {e}")
+    
+    def store_rejected_signals_legacy(self, rejected_signals: List[Dict[str, Any]]):
+        """Store rejected signals in legacy rejected_signals table for compatibility"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            for signal in rejected_signals:
+                cursor.execute('''
+                    INSERT INTO rejected_signals (
+                        timestamp, strategy, symbol, signal, rejection_reason,
+                        confidence, confidence_score, price, stop_loss, target, reasoning
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    signal.get('timestamp', datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                    signal.get('strategy', 'Unknown'),
+                    signal.get('symbol', 'Unknown'),
+                    signal.get('signal', 'UNKNOWN'),
+                    signal.get('rejection_reason', 'Unknown'),
+                    signal.get('confidence', 'Unknown'),
+                    signal.get('confidence_score', 0),
+                    signal.get('price', 0),
+                    signal.get('stop_loss', 0),
+                    signal.get('target', 0),
+                    signal.get('reasoning', signal.get('reason', ''))
+                ))
+            
+            conn.commit()
+            conn.close()
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error storing legacy rejected signals: {e}")
 
 
 def main():
