@@ -165,7 +165,7 @@ class Database:
         
         try:
             self.execute_query(query, params)
-            print(f"✅ Trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
+            # print(f"✅ Trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
             return True
         except Exception as e:
             print(f"❌ Failed to insert signal: {e}")
@@ -223,7 +223,7 @@ class Database:
         )
         
         self.execute_query(query, params)
-        print(f"✅ Backtesting trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
+        # print(f"✅ Backtesting trade logged in SQLite: {signal_data.get('signal')} at {signal_data.get('price')}")
     
     def log_strategy_trade(self, strategy_name, signal_data):
         """Log a trade for a specific strategy."""
@@ -272,7 +272,7 @@ class Database:
         params = [signal_data.get(field, None) for field in fields_list]
         
         self.execute_query(query, params)
-        print(f"✅ Strategy trade logged in SQLite: {strategy_name} - {signal_data.get('signal')} at {signal_data.get('price')}")
+        # print(f"✅ Strategy trade logged in SQLite: {strategy_name} - {signal_data.get('signal')} at {signal_data.get('price')}")
 
 # Create a database instance for direct imports
 db = Database() 

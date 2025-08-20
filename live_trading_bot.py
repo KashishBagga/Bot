@@ -31,6 +31,7 @@ from src.data.parquet_data_store import ParquetDataStore
 from src.models.unified_database import UnifiedDatabase
 from dotenv import load_dotenv
 import src.warning_filters  # noqa: F401
+from src.models.enhanced_rejected_signals import log_rejected_signal_with_pnl
 
 class LiveTradingBot:
     """Production Live Trading Bot with backtesting consistency"""
@@ -417,6 +418,37 @@ class LiveTradingBot:
                             )
                         else:
                             low_confidence_count += 1
+                            # Enhanced rejected signal with P&L calculation
+                            enhanced_rejected_data = {
+                                **result,
+                                'rejection_reason': f"Low confidence: {confidence_score} < {self.risk_params['min_confidence_score']}",
+                                'signal': signal_type,
+                                'signal_attempted': signal_type,
+                                'timestamp': timestamp,
+                                'strategy': strategy_name,
+                                'symbol': symbol,
+                                'price': data.iloc[-1]['close'] if len(data) > 0 else 0,
+                                'confidence': result.get('confidence', 'Low'),
+                                'confidence_score': confidence_score,
+                                'rsi': result.get('rsi', 0),
+                                'macd': result.get('macd', 0),
+                                'macd_signal': result.get('macd_signal', 0),
+                                'ema_20': result.get('ema_20', 0),
+                                'atr': result.get('atr', 0),
+                                'stop_loss': result.get('stop_loss', 0),
+                                'target': result.get('target', 0),
+                                'target2': result.get('target2', 0),
+                                'target3': result.get('target3', 0),
+                                'reasoning': result.get('reasoning', result.get('reason', '')),
+                                'trade_type': 'Intraday'
+                            }
+                            
+                            # Get future data for P&L calculation
+                            future_data = self.get_market_data(symbol, periods=50)
+                            
+                            # Log with enhanced P&L calculation
+                            log_rejected_signal_with_pnl(enhanced_rejected_data, future_data)
+                            
                             rejected_signals.append({
                                 **result,
                                 'rejection_reason': f"Low confidence: {confidence_score} < {self.risk_params['min_confidence_score']}",
