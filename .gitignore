@@ -72,3 +72,6 @@ session_stats_*.json
 *.temp
 temp/
 tmp/
+
+# Analysis outputs
+rejected_signals*.csv

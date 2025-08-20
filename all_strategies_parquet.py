@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
 import os
+import pandas as pd # Added pandas import for pd.concat
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent / "src"))
@@ -76,6 +77,15 @@ def add_technical_indicators(df):
             df['bb_lower'] = sma_20 - (std_20 * 2)
             df['bb_middle'] = sma_20
         
+        # ATR (if not already present)
+        if 'atr' not in df.columns:
+            prev_close = df['close'].shift(1)
+            tr1 = df['high'] - df['low']
+            tr2 = (df['high'] - prev_close).abs()
+            tr3 = (df['low'] - prev_close).abs()
+            true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+            df['atr'] = true_range.rolling(window=14, min_periods=1).mean()
+        
         # Additional indicators for comprehensive analysis
         # SMA calculations
         df['sma_10'] = df['close'].rolling(window=10).mean()
@@ -87,7 +97,7 @@ def add_technical_indicators(df):
         df['volume_ratio'] = df['volume'] / df['volume_sma']
         
         # Price position indicators
-        df['price_position'] = (df['close'] - df['low']) / (df['high'] - df['low'])
+        df['price_position'] = (df['close'] - df['low']) / (df['high'] - df['low']).replace(0, pd.NA)
         df['candle_size'] = (df['high'] - df['low']) / df['close']
         
     except Exception as e:
@@ -344,8 +354,8 @@ def run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_
                 results[index_name] = symbol_results
                 
                 # Print progress for this symbol
-                total_signals = sum(count for signal, count in symbol_results['signals'].items() if signal != 'NO TRADE')
-                print(f"  📊 {index_name}: {total_signals} signals from {symbol_results['total_signals']} analyses")
+                # total_signals = sum(count for signal, count in symbol_results['signals'].items() if signal != 'NO TRADE')
+                # print(f"  📊 {index_name}: {total_signals} signals from {symbol_results['total_signals']} analyses")
                 
                 # Save to database if requested
                 if save_to_db:
@@ -456,7 +466,7 @@ def print_summary(results, duration, days_back=None, timeframe=None, symbols_tes
                 buy_count = signals_dict.get('BUY', 0)
                 sell_count = signals_dict.get('SELL', 0)
                 
-                print(f"  📈 {symbol}: {symbol_signals} signals from {symbol_analyses} analyses")
+                # print(f"  📈 {symbol}: {symbol_signals} signals from {symbol_analyses} analyses")
                 print(f"      🔍 Breakdown: BUY CALL({buy_call_count}), BUY PUT({buy_put_count}), BUY({buy_count}), SELL({sell_count}), NO TRADE({no_trade_count})")
                 if symbol_signals > 0:
                     print(f"      💰 P&L: ₹{symbol_profit:.2f}, Win Rate: {symbol_win_rate:.1f}% ({symbol_trades} trades)")
@@ -481,7 +491,7 @@ def print_summary(results, duration, days_back=None, timeframe=None, symbols_tes
         total_signals += strategy_signals
         total_profit_loss += strategy_profit
         
-        print(f"  📊 Strategy Total: {strategy_signals} signals from {total_analyses} analyses, ₹{strategy_profit:.2f} P&L, {strategy_win_rate:.1f}% win rate")
+        # print(f"  📊 Strategy Total: {strategy_signals} signals from {total_analyses} analyses, ₹{strategy_profit:.2f} P&L, {strategy_win_rate:.1f}% win rate")
     
     print(f"\n🎉 OVERALL RESULTS:")
     print(f"  ✅ Successful strategies: {successful_strategies}/{len(results)}")

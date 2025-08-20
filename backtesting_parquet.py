@@ -12,607 +12,349 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 import os
+import pandas as pd
+import sqlite3
+from datetime import datetime, timedelta
+from pathlib import Path
+import warnings
+import src.warning_filters
+import subprocess
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent / "src"))
 
 from src.data.parquet_data_store import ParquetDataStore
-from all_strategies import get_available_strategies, run_strategy
-from dotenv import load_dotenv
-import src.warning_filters  # noqa: F401
+from all_strategies_parquet import run_strategy
+from src.models.enhanced_rejected_signals import log_rejected_signal_backtest
+from all_strategies_parquet import add_technical_indicators
 
-def run_parquet_backtest(days_back: int = 30, timeframe: str = "5min", 
-                        save_to_db: bool = True, symbols: List[str] = None,
-                        strategies: List[str] = None, parallel: bool = True, no_cache: bool = False):
-    """Run backtest using parquet data store.
+def setup_database():
+    """Setup database with required tables"""
+    conn = sqlite3.connect('trading_signals.db')
+    cursor = conn.cursor()
     
-    Args:
-        days_back: Number of days to backtest
-        timeframe: Timeframe to use for backtesting
-        save_to_db: Whether to save results to database
-        symbols: Specific symbols to test
-        strategies: Specific strategies to test
-        parallel: Whether to run strategies in parallel
-        no_cache: Whether to disable result caching
-    """
-    load_dotenv()
+    # Create trading_signals table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS trading_signals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            strategy TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            signal TEXT NOT NULL,
+            confidence TEXT,
+            confidence_score INTEGER,
+            price REAL,
+            stop_loss REAL,
+            target REAL,
+            target2 REAL,
+            target3 REAL,
+            reasoning TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     
-    # Initialize data store
+    # Create rejected_signals table (legacy)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS rejected_signals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            strategy TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            signal TEXT NOT NULL,
+            rejection_reason TEXT NOT NULL,
+            confidence TEXT,
+            confidence_score INTEGER,
+            price REAL,
+            stop_loss REAL,
+            target REAL,
+            reasoning TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+def ensure_recent_data(symbols: list, timeframe: str, max_staleness_days: int = 1):
+    """Ensure parquet data is fresh for given symbols and timeframe. Optionally runs sync."""
     data_store = ParquetDataStore()
-    
-    # Get available symbols
-    available_symbols = data_store.get_available_symbols()
-    if not available_symbols:
-        print("❌ No data found in parquet store. Run setup_parquet_data.py first.")
-        return False
-    
-    # Clean up duplicate symbols (prioritize NSE: format over simple names)
-    cleaned_symbols = []
-    nse_symbols = [s for s in available_symbols if s.startswith('NSE:')]
-    simple_symbols = [s for s in available_symbols if not s.startswith('NSE:')]
-    
-    # Add NSE symbols first
-    cleaned_symbols.extend(nse_symbols)
-    
-    # Add simple symbols only if no NSE equivalent exists
-    for simple in simple_symbols:
-        # Check if there's already an NSE equivalent
-        nse_equivalent = None
-        if simple == 'NIFTY50':
-            nse_equivalent = 'NSE:NIFTY50-INDEX'
-        elif simple == 'NIFTYBANK' or simple == 'BANKNIFTY':
-            nse_equivalent = 'NSE:NIFTYBANK-INDEX'
-        
-        if nse_equivalent not in nse_symbols:
-            cleaned_symbols.append(simple)
-    
-    symbols_to_test = cleaned_symbols
-    
-    # Process user-specified symbols if provided
-    if symbols:
-        symbol_list = []
-        for symbol in symbols:
-            if symbol.upper() == 'NIFTY50':
-                # Prefer NSE format if available, fallback to simple
-                if 'NSE:NIFTY50-INDEX' in cleaned_symbols:
-                    symbol_list.append('NSE:NIFTY50-INDEX')
-                elif 'NIFTY50' in cleaned_symbols:
-                    symbol_list.append('NIFTY50')
-            elif symbol.upper() == 'BANKNIFTY':
-                # Prefer NSE format if available, fallback to simple
-                if 'NSE:NIFTYBANK-INDEX' in cleaned_symbols:
-                    symbol_list.append('NSE:NIFTYBANK-INDEX')
-                elif 'BANKNIFTY' in cleaned_symbols:
-                    symbol_list.append('BANKNIFTY')
-            else:
-                symbol_list.append(f'NSE:{symbol.upper()}-EQ')
-        
-        # Filter to available symbols
-        symbols_to_test = [s for s in symbol_list if s in cleaned_symbols]
-        if not symbols_to_test:
-            print(f"❌ None of the specified symbols found in data store.")
-            print(f"Available symbols: {cleaned_symbols}")
-            return False
-    else:
-        symbols_to_test = cleaned_symbols
-    
-    # Get available strategies
-    all_strategies = get_available_strategies()
-    if strategies:
-        strategies_to_test = [s for s in strategies if s in all_strategies]
-        if not strategies_to_test:
-            print(f"❌ None of the specified strategies found.")
-            print(f"Available strategies: {all_strategies}")
-            return False
-    else:
-        strategies_to_test = all_strategies
-    
-    # Validate timeframe
-    sample_symbol = symbols_to_test[0]
-    available_timeframes = data_store.get_available_timeframes(sample_symbol)
-    if timeframe not in available_timeframes:
-        print(f"❌ Timeframe '{timeframe}' not available.")
-        print(f"Available timeframes: {available_timeframes}")
-        return False
-    
-    execution_mode = "Parallel" if parallel else "Sequential"
-    print(f"🚀 Running Parquet-Based Backtest ({execution_mode}):")
-    print(f"  📅 Period: Last {days_back} days")
-    print(f"  ⏰ Timeframe: {timeframe}")
-    print(f"  💿 Save to DB: {save_to_db}")
-    print(f"  📈 Symbols: {len(symbols_to_test)} ({', '.join([s.split(':')[1].replace('-INDEX', '').replace('-EQ', '') if ':' in s else s for s in symbols_to_test])})")
-    print(f"  🧠 Strategies: {len(strategies_to_test)} ({', '.join(strategies_to_test)})")
-    print(f"  ⚡ Execution: {execution_mode}")
-    
-    # Check cache for identical configuration
-    cache_enabled = enable_smart_caching() and not no_cache
-    cache_key = get_cache_key(days_back, timeframe, symbols_to_test, strategies_to_test, save_to_db)
-    
-    if cache_enabled:
-        cached_results = load_cached_results(cache_key)
-        if cached_results is not None:
-            print("\n🎉 Cache hit! Skipping computation...")
-            
-            # Print summary from cache
-            print(f"\n📊 Backtest Summary (from cache):")
-            print(f"📦 Strategies tested: {len(cached_results)}")
-            
-            total_signals = 0
-            for strategy_name, strategy_results in cached_results.items():
-                if 'error' in strategy_results:
-                    print(f"  ❌ {strategy_name}: ERROR")
-                    continue
-                    
-                strategy_signals = 0
-                for index_name, stats in strategy_results.items():
-                    if isinstance(stats, dict) and 'signals' in stats:
-                        signals_dict = stats.get('signals', {})
-                        for signal_type, count in signals_dict.items():
-                            if signal_type != 'NO TRADE':
-                                strategy_signals += count
-                
-                total_signals += strategy_signals
-                print(f"  📈 {strategy_name}: {strategy_signals} signals")
-            
-            print(f"\n🎉 Total signals generated: {total_signals}")
-            print(f"⚡ Performance: INSTANT (cached)")
-            return True
-    
-    start_time = time.time()
-    
-    # Load data for all symbols
-    print(f"\n📊 Loading {timeframe} data...")
-    dataframes = {}
-    multi_timeframe_dataframes = {}
-    
-    for symbol in symbols_to_test:
-        # Load primary timeframe data
-        df = data_store.load_data(symbol, timeframe, days_back)
+    stale = []
+    for symbol in symbols:
+        df = data_store.load_data(symbol, timeframe, days_back=None)
         if df.empty:
-            print(f"⚠️ No data for {symbol} at {timeframe}")
+            stale.append(symbol)
             continue
-        
-        # Create display name
-        if 'NIFTY50' in symbol:
-            display_name = 'NIFTY50'
-        elif 'NIFTYBANK' in symbol:
-            display_name = 'BANKNIFTY'
-        else:
-            display_name = symbol.split(':')[1].replace('-EQ', '') if ':' in symbol else symbol
-        
-        # Check if we already have this display name (avoid duplicates)
-        if display_name in dataframes:
-            print(f"⚠️ Skipping duplicate symbol: {symbol} (already loaded as {display_name})")
-            continue
-        
-        dataframes[display_name] = df
-        
-        # Load multi-timeframe data (for strategies that need it)
-        all_timeframes = data_store.get_available_timeframes(symbol)
-        multi_tf_data = {}
-        for tf in all_timeframes:
-            tf_df = data_store.load_data(symbol, tf, days_back)
-            if not tf_df.empty:
-                multi_tf_data[tf] = tf_df
-        
-        multi_timeframe_dataframes[display_name] = multi_tf_data
-        
-        print(f"  ✅ {display_name}: {len(df)} candles ({timeframe})")
-    
-    if not dataframes:
-        print("❌ No data loaded")
-        return False
-    
-    data_load_time = time.time() - start_time
-    print(f"📈 Data loaded in {data_load_time:.2f} seconds")
-    
-    # Preprocess common indicators
-    processed_dataframes = preprocess_common_indicators(dataframes)
-    
-    # Run strategies
-    print(f"\n🎯 Running {len(strategies_to_test)} strategies ({execution_mode})...")
-    results = optimize_strategy_execution(strategies_to_test, processed_dataframes, multi_timeframe_dataframes, save_to_db, parallel)
-    
-    # Print summary
-    total_time = time.time() - start_time
-    print(f"\n📊 Backtest Summary:")
-    print(f"⏱️ Total time: {total_time:.2f} seconds")
-    print(f"  📊 Data loading: {data_load_time:.2f}s")
-    print(f"  🧠 Strategy execution: {total_time - data_load_time:.2f}s")
-    print(f"📦 Strategies tested: {len(results)}")
-    
+        last_ts = df.index.max()
+        if (datetime.now() - last_ts).days > max_staleness_days:
+            stale.append(symbol)
+    if not stale:
+        return
+    print(f"⚠️ Stale/missing data detected for {timeframe}: {stale}")
+    if os.environ.get('ALLOW_SYNC', '0') == '1':
+        print("🔄 Running sync_parquet_data.py to fetch missing data...")
+        try:
+            cmd = [
+                sys.executable, 'sync_parquet_data.py',
+                '--symbols', ','.join(stale),
+                '--timeframes', timeframe
+            ]
+            subprocess.run(cmd, check=False)
+        except Exception as e:
+            print(f"❌ Sync failed to run: {e}")
+
+def run_backtest_with_enhanced_logging(strategy_name, symbol, timeframe, days):
+    """Run backtest with enhanced rejected signals logging"""
+    print(f"\n🔄 Running backtest: {strategy_name} on {symbol} ({timeframe}, {days} days)")
+
+    # Generate unique backtest run ID
+    backtest_run_id = f"backtest_{strategy_name}_{symbol}_{timeframe}_{days}d_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    backtest_parameters = {
+        "strategy": strategy_name,
+        "symbol": symbol,
+        "timeframe": timeframe,
+        "days": days,
+        "run_timestamp": datetime.now().isoformat()
+    }
+
+    # Load data
+    data_store = ParquetDataStore()
+    data = data_store.load_data(symbol, timeframe, days_back=days)
+
+    if data.empty:
+        print(f"❌ No data available for {symbol}")
+        return 0, 0
+
+    print(f"📊 Loaded {len(data)} candles for {symbol}")
+
+    # Precompute indicators once
+    df_with_indicators = add_technical_indicators(data.copy())
+
+    # Import and instantiate strategy once
+    strategy_module = __import__(f"src.strategies.{strategy_name}", fromlist=[strategy_name])
+    class_name = ''.join(word.capitalize() for word in strategy_name.split('_'))
+    strategy_class = getattr(strategy_module, class_name)
+    strategy_instance = strategy_class(timeframe_data={})
+    # Allow strategy to add its indicators, if needed
+    df_with_indicators = strategy_instance.add_indicators(df_with_indicators)
+
+    # Initialize counters
     total_signals = 0
-    for strategy_name, strategy_results in results.items():
-        if 'error' in strategy_results:
-            print(f"  ❌ {strategy_name}: ERROR")
+    rejected_signals = 0
+
+    # Iterate efficiently per candle
+    for i in range(50, len(df_with_indicators)):
+        candle = df_with_indicators.iloc[i]
+        current_time = candle.name if hasattr(candle, 'name') else datetime.now()
+        future_data = df_with_indicators.iloc[i+1:i+51] if i+1 < len(df_with_indicators) else None
+
+        try:
+            # Call analyze with the correct signature per strategy
+            if strategy_name == 'insidebar_rsi':
+                current_slice = df_with_indicators.iloc[:i+1]
+                result = strategy_instance.analyze(current_slice, symbol, future_data)
+            else:
+                result = strategy_instance.analyze(candle, i, df_with_indicators, future_data)
+
+            if not result or not isinstance(result, dict):
+                continue
+
+            signal_type = result.get('signal', 'NO TRADE')
+            confidence_score = result.get('confidence_score', 0)
+            total_signals += 1
+
+            if total_signals % 50 == 0:
+                print(f"  📊 {symbol}: {total_signals} signals processed...")
+
+            # Build enhanced signal payload
+            enhanced_signal_data = {
+                'timestamp': current_time.isoformat() if hasattr(current_time, 'isoformat') else str(current_time),
+                'strategy': strategy_name,
+                'symbol': symbol,
+                'signal_attempted': signal_type,
+                'price': candle.get('close', 0),
+                'confidence': result.get('confidence', 'Unknown'),
+                'confidence_score': confidence_score,
+                'rsi': candle.get('rsi', 0),
+                'macd': candle.get('macd', 0),
+                'macd_signal': candle.get('macd_signal', 0),
+                'macd_histogram': candle.get('macd_histogram', 0),
+                'ema_9': candle.get('ema_9', 0),
+                'ema_21': candle.get('ema_21', 0),
+                'ema_20': candle.get('ema_20', candle.get('ema', 0)),
+                'ema_50': candle.get('ema_50', 0),
+                'atr': candle.get('atr', 0),
+                'supertrend': candle.get('supertrend', 0),
+                'supertrend_direction': candle.get('supertrend_direction', 0),
+                'bb_upper': candle.get('bb_upper', 0),
+                'bb_lower': candle.get('bb_lower', 0),
+                'bb_middle': candle.get('bb_middle', 0),
+                'volume': candle.get('volume', 0),
+                'stop_loss': result.get('stop_loss', 0),
+                'target': result.get('target', 0),
+                'target2': result.get('target2', 0),
+                'target3': result.get('target3', 0),
+                'trade_type': 'Intraday',
+                'reasoning': result.get('reasoning', result.get('reason', '')),
+                'outcome': result.get('outcome', 'Pending'),
+                'pnl': result.get('pnl', 0.0),
+                'targets_hit': result.get('targets_hit', 0),
+                'stoploss_count': result.get('stoploss_count', 0),
+                'failure_reason': result.get('failure_reason', ''),
+                'exit_time': result.get('exit_time', ''),
+                'market_condition': 'Unknown'
+            }
+
+            # Rejection policy
+            if signal_type == 'NO TRADE' or (confidence_score and confidence_score > 0 and confidence_score < 60):
+                enhanced_signal_data['rejection_reason'] = (
+                    "No trade signal generated" if signal_type == 'NO TRADE' else f"Low confidence: {confidence_score} < 60 threshold"
+                )
+                log_rejected_signal_backtest(enhanced_signal_data, future_data, backtest_run_id, backtest_parameters)
+                rejected_signals += 1
+            else:
+                # Valid signal - log to trading_signals table
+                conn = sqlite3.connect('trading_signals.db')
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO trading_signals (timestamp, strategy, symbol, signal, confidence, confidence_score, price, stop_loss, target, target2, target3, reasoning)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    enhanced_signal_data['timestamp'],
+                    strategy_name,
+                    symbol,
+                    signal_type,
+                    enhanced_signal_data['confidence'],
+                    confidence_score,
+                    enhanced_signal_data['price'],
+                    enhanced_signal_data['stop_loss'],
+                    enhanced_signal_data['target'],
+                    enhanced_signal_data['target2'],
+                    enhanced_signal_data['target3'],
+                    enhanced_signal_data['reasoning']
+                ))
+                conn.commit()
+                conn.close()
+
+        except Exception as e:
+            print(f"❌ Error processing candle {i}: {e}")
             continue
-            
-        strategy_signals = 0
-        for index_name, stats in strategy_results.items():
-            if isinstance(stats, dict) and 'signals' in stats:
-                # Count all signals except 'NO TRADE'
-                signals_dict = stats.get('signals', {})
-                for signal_type, count in signals_dict.items():
-                    if signal_type != 'NO TRADE':
-                        strategy_signals += count
-        
-        total_signals += strategy_signals
-        print(f"  📈 {strategy_name}: {strategy_signals} signals")
-    
-    print(f"\n🎉 Total signals generated: {total_signals}")
-    
-    # Performance stats
-    total_candles = sum(len(df) for df in dataframes.values())
-    candles_per_second = total_candles / total_time if total_time > 0 else 0
-    speedup = f" (⚡ {total_time / (data_load_time + total_time - data_load_time):.1f}x faster)" if parallel else ""
-    print(f"⚡ Performance: {total_candles:,} candles processed at {candles_per_second:,.0f} candles/second{speedup}")
-    
-    # Save results to cache for future use
-    if cache_enabled:
-        save_to_cache(cache_key, results)
-    
-    return True
 
-def show_data_info():
-    """Display parquet data store information."""
-    data_store = ParquetDataStore()
-    info = data_store.get_storage_info()
-    
-    print("📊 Parquet Data Store Information:")
-    print(f"📁 Storage directory: {info['storage_directory']}")
-    print(f"📊 Total symbols: {info['total_symbols']}")
-    print(f"💾 Total storage: {info['total_size_mb']} MB")
-    
-    if info['symbols']:
-        print("\n📈 Available Data:")
-        for symbol_info in info['symbols']:
-            print(f"\n  • {symbol_info['name']} ({symbol_info['symbol']})")
-            print(f"    📅 Period: {symbol_info['date_range']}")
-            print(f"    📊 Base candles: {symbol_info['base_candles_count']:,}")
-            print(f"    🎯 Timeframes: {len(symbol_info['timeframes'])}")
-            print(f"      {', '.join(symbol_info['timeframes'])}")
-            print(f"    💾 Size: {symbol_info['size_mb']} MB")
-    else:
-        print("\n❌ No data found. Run setup_parquet_data.py to initialize.")
-
-def show_timeframe_comparison():
-    """Show data comparison across timeframes for a symbol."""
-    data_store = ParquetDataStore()
-    available_symbols = data_store.get_available_symbols()
-    
-    if not available_symbols:
-        print("❌ No data available")
-        return
-    
-    # Use first available symbol for demonstration
-    symbol = available_symbols[0]
-    timeframes = data_store.get_available_timeframes(symbol)
-    
-    if not timeframes:
-        print(f"❌ No timeframes available for {symbol}")
-        return
-    
-    print(f"📊 Timeframe Comparison for {symbol}:")
-    print(f"{'Timeframe':<10} {'Candles':<15} {'Date Range':<25} {'Size'}")
-    print("-" * 70)
-    
-    for tf in timeframes:
-        df = data_store.load_data(symbol, tf, days_back=None)  # Load all data
-        if not df.empty:
-            candle_count = len(df)
-            start_date = df.index[0].strftime('%Y-%m-%d')
-            end_date = df.index[-1].strftime('%Y-%m-%d')
-            date_range = f"{start_date} to {end_date}"
-            
-            # Estimate size
-            file_path = data_store._get_timeframe_file(symbol, tf)
-            size_mb = file_path.stat().st_size / (1024 * 1024) if file_path.exists() else 0
-            
-            print(f"{tf:<10} {candle_count:<15,} {date_range:<25} {size_mb:.2f} MB")
-
-def benchmark_loading():
-    """Benchmark data loading performance."""
-    data_store = ParquetDataStore()
-    available_symbols = data_store.get_available_symbols()
-    
-    if not available_symbols:
-        print("❌ No data available for benchmarking")
-        return
-    
-    symbol = available_symbols[0]
-    timeframes = data_store.get_available_timeframes(symbol)
-    
-    print(f"⚡ Benchmarking data loading for {symbol}:")
-    print(f"{'Timeframe':<10} {'Load Time':<12} {'Candles':<12} {'Speed'}")
-    print("-" * 50)
-    
-    for tf in timeframes:
-        start_time = time.time()
-        df = data_store.load_data(symbol, tf, days_back=30)  # Last 30 days
-        load_time = time.time() - start_time
-        
-        if not df.empty:
-            candles = len(df)
-            speed = candles / load_time if load_time > 0 else 0
-            print(f"{tf:<10} {load_time:<12.4f}s {candles:<12,} {speed:,.0f}/s")
-
-def preprocess_common_indicators(dataframes):
-    """Pre-calculate common indicators used by multiple strategies to avoid redundant calculations."""
-    processed_dataframes = {}
-    
-    print("📊 Pre-calculating common indicators...")
-    for symbol, df in dataframes.items():
-        # Create a copy to avoid modifying original
-        processed_df = df.copy()
-        
-        # Common indicators used across strategies
-        from ta.trend import EMAIndicator, SMAIndicator
-        from ta.momentum import RSIIndicator
-        from ta.volatility import AverageTrueRange, BollingerBands
-        from ta.trend import MACD
-        
-        # EMAs (most commonly used)
-        processed_df['ema_9'] = EMAIndicator(processed_df['close'], window=9).ema_indicator()
-        processed_df['ema_20'] = EMAIndicator(processed_df['close'], window=20).ema_indicator()
-        processed_df['ema_21'] = EMAIndicator(processed_df['close'], window=21).ema_indicator()
-        processed_df['ema_50'] = EMAIndicator(processed_df['close'], window=50).ema_indicator()
-        
-        # RSI (very common)
-        processed_df['rsi'] = RSIIndicator(processed_df['close'], window=14).rsi()
-        
-        # ATR (used by many strategies)
-        processed_df['atr'] = AverageTrueRange(processed_df['high'], processed_df['low'], processed_df['close'], window=14).average_true_range()
-        
-        # MACD (common momentum indicator)
-        macd = MACD(processed_df['close'])
-        processed_df['macd'] = macd.macd()
-        processed_df['macd_signal'] = macd.macd_signal()
-        processed_df['macd_diff'] = macd.macd_diff()
-        
-        # Bollinger Bands (used by several strategies)
-        bb = BollingerBands(processed_df['close'], window=20)
-        processed_df['bb_upper'] = bb.bollinger_hband()
-        processed_df['bb_lower'] = bb.bollinger_lband()
-        processed_df['bb_middle'] = bb.bollinger_mavg()
-        
-        # Volume indicators
-        if 'volume' in processed_df.columns:
-            processed_df['volume_sma'] = SMAIndicator(processed_df['volume'], window=20).sma_indicator()
-        
-        processed_dataframes[symbol] = processed_df
-    
-    return processed_dataframes
-
-def optimize_strategy_execution(strategies_to_test, processed_dataframes, multi_timeframe_dataframes, save_to_db, parallel):
-    """Optimized strategy execution with result caching and vectorized operations."""
-    results = {}
-    
-    # Strategy result cache to avoid recomputing identical operations
-    strategy_cache = {}
-    
-    # Group strategies by similarity to optimize execution order
-    similar_strategies = {
-        'trend_following': ['supertrend_ema', 'ema_crossover'],
-        'mean_reversion': ['insidebar_bollinger', 'insidebar_rsi'],
-        'breakout': ['breakout_rsi', 'donchian_breakout', 'range_breakout_volatility'],
-        'complex': ['supertrend_macd_rsi_ema']
-    }
-    
-    # Flatten and maintain order
-    ordered_strategies = []
-    for group in similar_strategies.values():
-        for strategy in group:
-            if strategy in strategies_to_test:
-                ordered_strategies.append(strategy)
-    
-    # Add any remaining strategies
-    for strategy in strategies_to_test:
-        if strategy not in ordered_strategies:
-            ordered_strategies.append(strategy)
-    
-    if parallel and len(ordered_strategies) > 1:
-        return run_parallel_optimized(ordered_strategies, processed_dataframes, multi_timeframe_dataframes, save_to_db)
-    else:
-        return run_sequential_optimized(ordered_strategies, processed_dataframes, multi_timeframe_dataframes, save_to_db)
-
-def run_parallel_optimized(strategies_to_test, dataframes, multi_timeframe_dataframes, save_to_db):
-    """Optimized parallel execution with intelligent worker allocation."""
-    results = {}
-    print_lock = threading.Lock()
-    
-    def run_strategy_wrapper(strategy_name):
-        try:
-            with print_lock:
-                print(f"  🔄 Running {strategy_name}...")
-            result = run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_db)
-            with print_lock:
-                print(f"  ✅ {strategy_name} completed")
-            return strategy_name, result
-        except Exception as e:
-            with print_lock:
-                print(f"  ❌ {strategy_name} failed: {e}")
-            return strategy_name, {"error": str(e)}
-    
-    # Optimize worker count based on strategy count and available resources
-    cpu_cores = os.cpu_count()
-    
-    # For small strategy counts, use fewer workers to reduce overhead
-    if len(strategies_to_test) <= 2:
-        max_workers = min(len(strategies_to_test), 2)
-    elif len(strategies_to_test) <= 4:
-        max_workers = min(len(strategies_to_test), 3)
-    else:
-        # For larger strategy counts, use more workers but leave some cores free
-        max_workers = min(len(strategies_to_test), max(4, cpu_cores - 1))
-    
-    print(f"  🔧 Using {max_workers} parallel workers (CPU cores: {cpu_cores})")
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_strategy = {executor.submit(run_strategy_wrapper, strategy): strategy 
-                            for strategy in strategies_to_test}
-        
-        for future in concurrent.futures.as_completed(future_to_strategy):
-            strategy_name, result = future.result()
-            results[strategy_name] = result
-    
-    return results
-
-def run_sequential_optimized(strategies_to_test, dataframes, multi_timeframe_dataframes, save_to_db):
-    """Optimized sequential execution with shared computations."""
-    results = {}
-    
-    for strategy_name in strategies_to_test:
-        try:
-            print(f"  🔄 Running {strategy_name}...")
-            result = run_strategy(strategy_name, dataframes, multi_timeframe_dataframes, save_to_db)
-            results[strategy_name] = result
-            print(f"  ✅ {strategy_name} completed")
-        except Exception as e:
-            print(f"  ❌ {strategy_name} failed: {e}")
-            results[strategy_name] = {"error": str(e)}
-    
-    return results
-
-def add_vectorized_processing():
-    """Add support for vectorized strategy processing."""
-    pass
-
-def add_result_caching(timeframe, days_back):
-    """Add intelligent result caching based on timeframe and period."""
-    import hashlib
-    cache_key = f"{timeframe}_{days_back}"
-    cache_dir = Path("cache/backtest_results")
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    return cache_dir / f"{cache_key}.pkl"
-
-def add_progressive_backtesting():
-    """Add support for progressive backtesting (start small, scale up)."""
-    pass
-
-def enable_smart_caching(cache_results=True):
-    """Enable smart result caching for faster repeated backtests."""
-    if not cache_results:
-        return False
-    
-    cache_dir = Path("cache/backtest_results")
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    return True
-
-def get_cache_key(days_back, timeframe, symbols, strategies, save_to_db):
-    """Generate cache key for backtest configuration."""
-    import hashlib
-    
-    # Create deterministic hash of configuration
-    config_str = f"{days_back}_{timeframe}_{sorted(symbols)}_{sorted(strategies)}_{save_to_db}"
-    return hashlib.md5(config_str.encode()).hexdigest()
-
-def load_cached_results(cache_key):
-    """Load cached backtest results if available."""
-    import pickle
-    
-    cache_file = Path("cache/backtest_results") / f"{cache_key}.pkl"
-    if cache_file.exists():
-        try:
-            with open(cache_file, 'rb') as f:
-                cached_data = pickle.load(f)
-            
-            # Check if cache is recent (within last hour for demo)
-            import time
-            if time.time() - cached_data['timestamp'] < 3600:  # 1 hour
-                print("🚀 Using cached results (performance boost!)")
-                return cached_data['results']
-        except Exception as e:
-            print(f"⚠️ Cache read error: {e}")
-    
-    return None
-
-def save_to_cache(cache_key, results):
-    """Save backtest results to cache."""
-    import pickle
-    import time
-    
-    cache_file = Path("cache/backtest_results") / f"{cache_key}.pkl"
-    cached_data = {
-        'results': results,
-        'timestamp': time.time()
-    }
-    
-    try:
-        with open(cache_file, 'wb') as f:
-            pickle.dump(cached_data, f)
-        print("💾 Results cached for future use")
-    except Exception as e:
-        print(f"⚠️ Cache save error: {e}")
+    print(f"✅ Backtest completed: {total_signals} total signals, {rejected_signals} rejected")
+    return total_signals, rejected_signals
 
 def main():
-    parser = argparse.ArgumentParser(description='Run parquet-based backtesting')
-    parser.add_argument('--days', type=int, default=30, help='Number of days to backtest (default: 30)')
-    parser.add_argument('--timeframe', type=str, default='5min', help='Timeframe to use (default: 5min)')
-    parser.add_argument('--no-save', action='store_true', help="Don't save results to database")
-    parser.add_argument('--symbols', type=str, help='Symbols to test, comma separated (e.g., NIFTY50,BANKNIFTY)')
-    parser.add_argument('--strategies', type=str, help='Strategies to test, comma separated')
-    parser.add_argument('--data-info', action='store_true', help='Show data store information')
-    parser.add_argument('--timeframe-comparison', action='store_true', help='Show timeframe comparison')
-    parser.add_argument('--benchmark', action='store_true', help='Benchmark data loading performance')
-    parser.add_argument('--sequential', action='store_true', help='Run strategies sequentially instead of parallel')
-    parser.add_argument('--no-cache', action='store_true', help='Disable result caching')
-    parser.add_argument('--clear-cache', action='store_true', help='Clear all cached results')
+    """Main backtesting function"""
+    print("🚀 BACKTESTING WITH ENHANCED REJECTED SIGNALS")
+    print("=" * 60)
     
-    args = parser.parse_args()
+    # Setup database
+    setup_database()
     
-    # Handle cache operations
-    if args.clear_cache:
-        clear_cache()
-        return
+    # Test strategies
+    strategies = [
+        'ema_crossover',
+        'supertrend_macd_rsi_ema',
+        'supertrend_ema',
+        'insidebar_rsi'
+    ]
     
-    # Handle info operations
-    if args.data_info:
-        show_data_info()
-        return
-    
-    if args.timeframe_comparison:
-        show_timeframe_comparison()
-        return
-    
-    if args.benchmark:
-        benchmark_loading()
-        return
-    
-    # Process symbols if provided
-    symbols = None
-    if args.symbols:
-        symbols = [s.strip() for s in args.symbols.split(',')]
-    
-    # Process strategies if provided
-    strategies = None
-    if args.strategies:
-        strategies = [s.strip() for s in args.strategies.split(',')]
-    
-    # Run backtest
-    success = run_parquet_backtest(
-        days_back=args.days,
-        timeframe=args.timeframe,
-        save_to_db=not args.no_save,
-        symbols=symbols,
-        strategies=strategies,
-        parallel=not args.sequential,
-        no_cache=args.no_cache
-    )
-    
-    sys.exit(0 if success else 1)
+    symbols = ['NSE:NIFTYBANK-INDEX', 'NSE:NIFTY50-INDEX']
+    timeframe = '5min'
+    days = 5
 
-def clear_cache():
-    """Clear all cached backtest results."""
-    import shutil
+    # Ensure data fresh
+    ensure_recent_data(symbols, timeframe)
     
-    cache_dir = Path("cache/backtest_results")
-    if cache_dir.exists():
-        try:
-            shutil.rmtree(cache_dir)
-            print("🗑️ Cache cleared successfully!")
-        except Exception as e:
-            print(f"❌ Error clearing cache: {e}")
-    else:
-        print("ℹ️ No cache found to clear.")
+    total_signals_all = 0
+    total_rejected_all = 0
+    
+    for strategy in strategies:
+        print(f"\n🧠 Testing Strategy: {strategy}")
+        print("-" * 40)
+        
+        for symbol in symbols:
+            try:
+                signals, rejected = run_backtest_with_enhanced_logging(strategy, symbol, timeframe, days)
+                total_signals_all += signals
+                total_rejected_all += rejected
+                
+                if signals > 0:
+                    rejection_rate = (rejected / signals) * 100
+                    print(f"  📊 {symbol}: {signals} signals, {rejected} rejected ({rejection_rate:.1f}%)")
+                else:
+                    print(f"  📊 {symbol}: No signals generated")
+                    
+            except Exception as e:
+                print(f"  ❌ Error testing {symbol}: {e}")
+    
+    print(f"\n🎯 OVERALL RESULTS")
+    print("=" * 60)
+    print(f"Total Signals Generated: {total_signals_all}")
+    print(f"Total Signals Rejected: {total_rejected_all}")
+    
+    if total_signals_all > 0:
+        overall_rejection_rate = (total_rejected_all / total_signals_all) * 100
+        print(f"Overall Rejection Rate: {overall_rejection_rate:.1f}%")
+    
+    # Show database status
+    conn = sqlite3.connect('trading_signals.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(*) FROM trading_signals")
+    valid_signals = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM rejected_signals")
+    legacy_rejected = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM rejected_signals_backtest")
+    enhanced_rejected = cursor.fetchone()[0]
+    
+    conn.close()
+    
+    print(f"\n📊 DATABASE STATUS")
+    print("=" * 60)
+    print(f"✅ Valid Signals (trading_signals): {valid_signals}")
+    print(f"📋 Legacy Rejected Signals (rejected_signals): {legacy_rejected}")
+    print(f"🎯 Enhanced Rejected Signals (rejected_signals_backtest): {enhanced_rejected}")
+    
+    print(f"\n🎉 BACKTESTING COMPLETE!")
+    print("✅ All strategies tested with enhanced rejected signals logging")
+    print("✅ P&L calculations available for all rejected signals")
+    print("✅ Separate tables maintained for backtesting vs live trading")
 
 if __name__ == "__main__":
-    main() 
+    parser = argparse.ArgumentParser(description="Parquet backtesting runner")
+    parser.add_argument("--strategy", type=str, default=None, help="Strategy name to run (optional)")
+    parser.add_argument("--symbol", type=str, default=None, help="Symbol to run (optional)")
+    parser.add_argument("--timeframe", type=str, default=None, help="Timeframe (e.g., 5min)")
+    parser.add_argument("--days", type=int, default=None, help="Days back to load")
+    args = parser.parse_args()
+
+    # If args provided, override defaults inside main via simple wrapper
+    if args.strategy or args.symbol or args.timeframe or args.days:
+        def _run_single():
+            print("🚀 BACKTESTING WITH ENHANCED REJECTED SIGNALS")
+            print("=" * 60)
+            setup_database()
+            strategy = args.strategy or 'ema_crossover'
+            symbol = args.symbol or 'NSE:NIFTYBANK-INDEX'
+            timeframe = args.timeframe or '5min'
+            days = args.days or 1
+
+            # Ensure data fresh for the requested run
+            ensure_recent_data([symbol], timeframe)
+            print(f"\n🧠 Testing Strategy: {strategy}")
+            print("-" * 40)
+            try:
+                signals, rejected = run_backtest_with_enhanced_logging(strategy, symbol, timeframe, days)
+                if signals > 0:
+                    rejection_rate = (rejected / signals) * 100
+                    print(f"  📊 {symbol}: {signals} signals, {rejected} rejected ({rejection_rate:.1f}%)")
+                else:
+                    print(f"  📊 {symbol}: No signals generated")
+            except Exception as e:
+                print(f"  ❌ Error testing {symbol}: {e}")
+            print("\n🎉 BACKTESTING COMPLETE!")
+        _run_single()
+    else:
+        main() 
