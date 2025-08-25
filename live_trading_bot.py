@@ -44,13 +44,17 @@ class LiveTradingBot:
         self.symbols = ['NSE_NIFTYBANK_INDEX', 'NSE_NIFTY50_INDEX']  # Updated to match data directory names
         self.timeframe = '5min'  # Primary timeframe for live trading
         
-        # Risk management parameters - OPTIMIZED FOR MULTI-FACTOR CONFIDENCE
+        # Risk management parameters - EMERGENCY LOSS PREVENTION
         self.risk_params = {
-            'min_confidence_score': 60,  # Increased from 50 for better signal quality
-            'max_daily_loss': -1500,     # Reduced from -2000 for better risk control
-            'max_positions_per_strategy': 1,  # Reduced from 2
-            'position_size_multiplier': 0.8,  # Reduced from 1.0 for better risk management
-            'emergency_stop': False
+            'min_confidence_score': 85,  # Increased from 60 for emergency loss prevention
+            'max_daily_loss': -1000,     # Reduced from -1500 for tighter risk control
+            'max_positions_per_strategy': 1,
+            'position_size_multiplier': 0.6,  # Reduced from 0.8 for better risk management
+            'emergency_stop': True,  # Enable emergency stop
+            'disabled_strategies': [  # EMERGENCY: Disable major loss strategies
+                'ema_crossover',
+                'macd_cross_rsi_filter'
+            ]
         }
         
         # OPTIMIZATION: Focus on profitable strategies only
@@ -375,6 +379,11 @@ class LiveTradingBot:
                 self.logger.info(f"📊 Analyzing {symbol} with {len(data)} candles (latest close: ₹{data.iloc[-1]['close']:.2f})")
                 
                 for strategy_name in self.strategies.keys():
+                    # EMERGENCY: Skip disabled strategies
+                    if strategy_name in self.risk_params.get('disabled_strategies', []):
+                        self.logger.warning(f"🚫 Strategy {strategy_name} is DISABLED for emergency loss prevention")
+                        continue
+                        
                     result = self.analyze_with_strategy(strategy_name, symbol, data)
                     total_analyses += 1
                     

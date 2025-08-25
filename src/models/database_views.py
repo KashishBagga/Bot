@@ -152,49 +152,42 @@ class DatabaseViews:
         ORDER BY timestamp DESC
         """)
         
-        # 7. Strategy Comparison View
+        # 8. Strategy Comparison View (FIXED)
         cursor.execute("""
         CREATE VIEW IF NOT EXISTS strategy_comparison AS
         SELECT 
             strategy,
-            COUNT(DISTINCT symbol) as symbols_traded,
-            COUNT(*) as total_trades,
-            ROUND(AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) * 100, 2) as overall_win_rate,
+            symbol,
+            COUNT(*) as total_signals,
+            SUM(CASE WHEN outcome = 'Win' THEN 1 ELSE 0 END) as valid_signals,
+            ROUND(AVG(confidence_score), 1) as avg_confidence,
             ROUND(SUM(pnl), 2) as total_pnl,
             ROUND(AVG(pnl), 2) as avg_pnl,
-            ROUND(AVG(confidence_score), 1) as avg_confidence,
+            ROUND(AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) * 100, 2) as win_rate,
             ROUND(MAX(pnl), 2) as max_profit,
             ROUND(MIN(pnl), 2) as max_loss,
             ROUND(AVG(targets_hit), 1) as avg_targets_hit,
-            ROUND(AVG(stoploss_count), 1) as avg_stoploss_count
+            ROUND(AVG(stoploss_count), 1) as avg_stoploss_count,
+            CASE 
+                WHEN SUM(pnl) > 0 THEN 'PROFITABLE'
+                WHEN SUM(pnl) = 0 THEN 'BREAKEVEN'
+                ELSE 'LOSS'
+            END as performance_status
         FROM trades_backtest 
-        GROUP BY strategy
+        GROUP BY strategy, symbol
         ORDER BY total_pnl DESC
         """)
         
-        # 8. Symbol Performance View
-        cursor.execute("""
-        CREATE VIEW IF NOT EXISTS symbol_performance AS
-        SELECT 
-            symbol,
-            COUNT(DISTINCT strategy) as strategies_used,
-            COUNT(*) as total_trades,
-            ROUND(AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) * 100, 2) as overall_win_rate,
-            ROUND(SUM(pnl), 2) as total_pnl,
-            ROUND(AVG(pnl), 2) as avg_pnl,
-            ROUND(AVG(confidence_score), 1) as avg_confidence,
-            ROUND(MAX(pnl), 2) as max_profit,
-            ROUND(MIN(pnl), 2) as max_loss
-        FROM trades_backtest 
-        GROUP BY symbol
-        ORDER BY total_pnl DESC
-        """)
-        
-        # 9. Market Condition Analysis View
+        # 9. Market Condition Analysis View (FIXED)
         cursor.execute("""
         CREATE VIEW IF NOT EXISTS market_condition_analysis AS
         SELECT 
-            market_condition,
+            CASE 
+                WHEN AVG(confidence_score) >= 75 THEN 'High Confidence'
+                WHEN AVG(confidence_score) >= 60 THEN 'Medium Confidence'
+                WHEN AVG(confidence_score) >= 45 THEN 'Low Confidence'
+                ELSE 'Very Low Confidence'
+            END as market_condition,
             strategy,
             symbol,
             COUNT(*) as trades,
@@ -204,8 +197,83 @@ class DatabaseViews:
             ROUND(AVG(pnl), 2) as avg_pnl,
             ROUND(AVG(confidence_score), 1) as avg_confidence
         FROM trades_backtest 
-        WHERE market_condition IS NOT NULL AND market_condition != 'Unknown'
-        GROUP BY market_condition, strategy, symbol
+        GROUP BY strategy, symbol
+        ORDER BY total_pnl DESC
+        """)
+        
+        # 11. COMPREHENSIVE STRATEGY SUMMARY VIEW (NEW)
+        cursor.execute("""
+        CREATE VIEW IF NOT EXISTS comprehensive_strategy_summary AS
+        SELECT 
+            strategy,
+            symbol,
+            COUNT(*) as total_trades,
+            SUM(CASE WHEN outcome = 'Win' THEN 1 ELSE 0 END) as wins,
+            SUM(CASE WHEN outcome = 'Loss' THEN 1 ELSE 0 END) as losses,
+            ROUND(AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) * 100, 2) as win_rate,
+            ROUND(SUM(pnl), 2) as total_pnl,
+            ROUND(AVG(pnl), 2) as avg_pnl,
+            ROUND(AVG(confidence_score), 1) as avg_confidence,
+            ROUND(MAX(pnl), 2) as max_profit,
+            ROUND(MIN(pnl), 2) as max_loss,
+            ROUND(AVG(targets_hit), 1) as avg_targets_hit,
+            ROUND(AVG(stoploss_count), 1) as avg_stoploss_count,
+            ROUND(COUNT(CASE WHEN stoploss_count > 0 THEN 1 END) * 100.0 / COUNT(*), 2) as stoploss_rate,
+            ROUND(COUNT(CASE WHEN targets_hit > 0 THEN 1 END) * 100.0 / COUNT(*), 2) as target_hit_rate,
+            CASE 
+                WHEN SUM(pnl) > 100 THEN 'HIGHLY PROFITABLE'
+                WHEN SUM(pnl) > 0 THEN 'PROFITABLE'
+                WHEN SUM(pnl) = 0 THEN 'BREAKEVEN'
+                WHEN SUM(pnl) > -1000 THEN 'MINOR LOSS'
+                WHEN SUM(pnl) > -5000 THEN 'MODERATE LOSS'
+                ELSE 'MAJOR LOSS'
+            END as performance_category,
+            CASE 
+                WHEN AVG(confidence_score) >= 80 THEN 'Very High'
+                WHEN AVG(confidence_score) >= 70 THEN 'High'
+                WHEN AVG(confidence_score) >= 60 THEN 'Medium'
+                WHEN AVG(confidence_score) >= 50 THEN 'Low'
+                ELSE 'Very Low'
+            END as confidence_category,
+            MIN(timestamp) as first_trade,
+            MAX(timestamp) as last_trade,
+            ROUND((MAX(timestamp) - MIN(timestamp)) / 86400.0, 1) as days_active
+        FROM trades_backtest 
+        GROUP BY strategy, symbol
+        ORDER BY total_pnl DESC
+        """)
+        
+        # 12. STRATEGY OPTIMIZATION RECOMMENDATIONS VIEW (NEW)
+        cursor.execute("""
+        CREATE VIEW IF NOT EXISTS strategy_optimization_recommendations AS
+        SELECT 
+            strategy,
+            symbol,
+            COUNT(*) as total_trades,
+            ROUND(SUM(pnl), 2) as total_pnl,
+            ROUND(AVG(pnl), 2) as avg_pnl,
+            ROUND(AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) * 100, 2) as win_rate,
+            ROUND(AVG(confidence_score), 1) as avg_confidence,
+            ROUND(AVG(stoploss_count), 1) as avg_stoploss_count,
+            ROUND(AVG(targets_hit), 1) as avg_targets_hit,
+            CASE 
+                WHEN SUM(pnl) > 0 AND AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) > 0.4 THEN 'KEEP_ACTIVE'
+                WHEN SUM(pnl) > 0 AND AVG(CASE WHEN outcome = 'Win' THEN 1.0 ELSE 0.0 END) <= 0.4 THEN 'OPTIMIZE_WIN_RATE'
+                WHEN SUM(pnl) < 0 AND AVG(confidence_score) > 70 THEN 'REDUCE_CONFIDENCE_THRESHOLD'
+                WHEN SUM(pnl) < 0 AND AVG(stoploss_count) > 0.5 THEN 'IMPROVE_RISK_MANAGEMENT'
+                WHEN SUM(pnl) < 0 AND AVG(targets_hit) < 0.3 THEN 'ADJUST_TARGET_LEVELS'
+                WHEN SUM(pnl) < -5000 THEN 'CONSIDER_DISABLE'
+                ELSE 'MONITOR_CLOSELY'
+            END as optimization_action,
+            CASE 
+                WHEN SUM(pnl) > 0 THEN '✅ PROFITABLE'
+                WHEN SUM(pnl) = 0 THEN '⚖️ BREAKEVEN'
+                WHEN SUM(pnl) > -1000 THEN '⚠️ MINOR LOSS'
+                WHEN SUM(pnl) > -5000 THEN '❌ MODERATE LOSS'
+                ELSE '🚫 MAJOR LOSS'
+            END as status
+        FROM trades_backtest 
+        GROUP BY strategy, symbol
         ORDER BY total_pnl DESC
         """)
         
@@ -243,6 +311,8 @@ class DatabaseViews:
         print("  • symbol_performance")
         print("  • market_condition_analysis")
         print("  • risk_analysis")
+        print("  • comprehensive_strategy_summary")
+        print("  • strategy_optimization_recommendations")
     
     def get_view_data(self, view_name: str, limit: int = 10) -> List[Dict]:
         """Get data from a specific view"""
@@ -294,6 +364,10 @@ def main():
     views.print_view_summary("daily_performance", 3)
     views.print_view_summary("confidence_analysis", 3)
     views.print_view_summary("rejection_analysis", 3)
+    views.print_view_summary("strategy_comparison", 3)
+    views.print_view_summary("market_condition_analysis", 3)
+    views.print_view_summary("comprehensive_strategy_summary", 3)
+    views.print_view_summary("strategy_optimization_recommendations", 3)
 
 if __name__ == "__main__":
     main() 

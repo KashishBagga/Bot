@@ -3,7 +3,7 @@ InsidebarRsi strategy.
 Trading strategy implementation.
 """
 import pandas as pd
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from src.core.strategy import Strategy
 from src.core.indicators import indicators
 from src.models.database import db
@@ -201,295 +201,174 @@ class InsidebarRsi(Strategy):
             return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
         return None
     
-    def analyze(self, data: pd.DataFrame, index_name: str = None, future_data = None) -> Dict[str, Any]:
-        """Analyze data and generate trading signals.
-        
-        Args:
-            data: Market data with indicators
-            index_name: Name of the index or symbol being analyzed
-            future_data: Future candles for performance calculation
+    def analyze(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
+        """Analyze data and generate trading signals with enhanced quality filters."""
+        if index < 50 or future_data is None or future_data.empty:
+            return None
             
-        Returns:
-            Dict[str, Any]: Signal data
-        """
-        # Calculate indicators if they haven't been calculated yet
-        if 'is_inside' not in data.columns:
-            data = self.add_indicators(data)
+        # Get indicator values
+        is_inside = candle.get('is_inside', False)
+        rsi = candle.get('rsi', 50)
+        rsi_level = candle.get('rsi_level', 'Neutral')
+        volume_ratio = candle.get('volume_ratio', 1.0)
+        body_ratio = candle.get('body_ratio', 0.5)
+        price_momentum = candle.get('price_momentum', 0)
+        volatility_ratio = candle.get('volatility_ratio', 1.0)
+        ema_21 = candle.get('ema_21', 0)
+        ema_50 = candle.get('ema_50', 0)
+        macd = candle.get('macd', 0)
+        macd_signal = candle.get('macd_signal', 0)
+        atr = candle.get('atr', candle['close'] * 0.01)
+        price = candle['close']
         
-        # Get the latest candle
-        candle = data.iloc[-1]
-        
-        # Set default values
+        # OPTIMIZATION: Enhanced signal quality filters
         signal = "NO TRADE"
-        trade_type = "Intraday"
-        rsi_reason = price_reason = ""
+        confidence_score = 0
         
-        # Performance tracking variables
+        # Check for valid indicator values
+        if not is_inside or ema_21 <= 0 or ema_50 <= 0:
+            return None
+            
+        # OPTIMIZATION: Enhanced inside bar signal conditions
+        if rsi_level in ['Extreme Oversold', 'Oversold']:  # Bullish setup
+            # Additional bullish filters for better win rate
+            if (price > ema_21 and ema_21 > ema_50 and  # Trend alignment
+                macd > macd_signal and                 # MACD bullish
+                volume_ratio > 1.2 and                 # Strong volume
+                body_ratio > 0.4 and                   # Decent body size
+                price_momentum > 0.5):                 # Positive momentum
+                
+                signal = "BUY CALL"
+                # OPTIMIZATION: Better confidence calculation
+                rsi_strength = min(25, (40 - rsi) * 2)  # RSI oversold strength
+                trend_strength = min(20, (price - ema_21) / ema_21 * 100)
+                volume_strength = min(15, (volume_ratio - 1.0) * 10)
+                momentum_strength = min(10, price_momentum)
+                body_strength = min(10, body_ratio * 20)
+                
+                confidence_score = 60 + rsi_strength + trend_strength + volume_strength + momentum_strength + body_strength
+                
+        elif rsi_level in ['Extreme Overbought', 'Overbought']:  # Bearish setup
+            # Additional bearish filters for better win rate
+            if (price < ema_21 and ema_21 < ema_50 and  # Trend alignment
+                macd < macd_signal and                 # MACD bearish
+                volume_ratio > 1.2 and                 # Strong volume
+                body_ratio > 0.4 and                   # Decent body size
+                price_momentum < -0.5):                # Negative momentum
+                
+                signal = "BUY PUT"
+                # OPTIMIZATION: Better confidence calculation
+                rsi_strength = min(25, (rsi - 60) * 2)  # RSI overbought strength
+                trend_strength = min(20, (ema_21 - price) / ema_21 * 100)
+                volume_strength = min(15, (volume_ratio - 1.0) * 10)
+                momentum_strength = min(10, abs(price_momentum))
+                body_strength = min(10, body_ratio * 20)
+                
+                confidence_score = 60 + rsi_strength + trend_strength + volume_strength + momentum_strength + body_strength
+        
+        # OPTIMIZATION: Higher minimum confidence threshold for better quality
+        if confidence_score < 75:  # Increased from implicit lower threshold
+            return None
+            
+        # Determine confidence level
+        if confidence_score >= 90:
+            confidence = "Very High"
+        elif confidence_score >= 80:
+            confidence = "High"
+        elif confidence_score >= 75:
+            confidence = "Medium"
+        else:
+            confidence = "Low"
+        
+        # OPTIMIZATION: Improved risk-reward ratios based on confidence
+        if confidence_score >= 85:
+            stop_loss = int(round(1.0 * atr))  # Tighter stop loss
+            target1 = int(round(2.5 * atr))    # 2.5:1 R:R
+            target2 = int(round(4.0 * atr))    # 4:1 R:R
+            target3 = int(round(5.5 * atr))    # 5.5:1 R:R
+        elif confidence_score >= 80:
+            stop_loss = int(round(1.2 * atr))
+            target1 = int(round(3.0 * atr))    # 2.5:1 R:R
+            target2 = int(round(4.5 * atr))    # 3.75:1 R:R
+            target3 = int(round(6.0 * atr))    # 5:1 R:R
+        else:  # 75-79
+            stop_loss = int(round(1.5 * atr))
+            target1 = int(round(3.5 * atr))    # 2.33:1 R:R
+            target2 = int(round(5.0 * atr))    # 3.33:1 R:R
+            target3 = int(round(6.5 * atr))    # 4.33:1 R:R
+        
+        # OPTIMIZATION: Position sizing based on confidence
+        position_multiplier = 0.7 if confidence_score >= 80 else 0.5
+        
+        # Calculate performance if we have future data
         outcome = "Pending"
         pnl = 0.0
         targets_hit = 0
         stoploss_count = 0
         failure_reason = ""
-        exit_time = None
         
-        # Check if we have an inside bar - mandatory requirement
-        if not candle['is_inside']:
-            return {
-                "signal": "NO TRADE",
-                "price": candle['close'],
-                "rsi": candle['rsi'],
-                "rsi_level": candle['rsi_level'],
-                "ema_20": candle['ema'] if 'ema' in candle else 0,
-                "atr": candle['atr'],
-                "confidence": "Very Low",
-                "confidence_score": 0,
-                "rsi_reason": "No inside bar pattern detected",
-                "price_reason": "Inside bar formation required for signal",
-                "trade_type": trade_type,
-                "stop_loss": 0,
-                "target": 0,
-                "target2": 0,
-                "target3": 0,
-                "outcome": "No Trade",
-                "pnl": 0,
-                "targets_hit": 0,
-                "stoploss_count": 0,
-                "failure_reason": "",
-                "exit_time": None
-            }
-        
-        # Calculate confidence score based on market conditions
-        confidence_level, confidence_score, confidence_reasons = self.calculate_confidence_score(candle)
-        
-        # FIXED LOGIC: Correct RSI interpretation with enhanced confidence
-        # When RSI is oversold (< 40), expect price to go UP -> BUY CALL
-        # When RSI is overbought (> 60), expect price to go DOWN -> BUY PUT
-        rsi_level = candle['rsi_level']
-        
-        if candle['rsi'] < self.params['rsi_oversold']:
-            signal = "BUY CALL"
-            rsi_reason = f"RSI {candle['rsi']:.2f} < {self.params['rsi_oversold']} (Oversold - expect bounce up)"
-            price_reason = "Inside bar pattern + RSI oversold reversal"
-        elif candle['rsi'] > self.params['rsi_overbought']:
-            signal = "BUY PUT"
-            rsi_reason = f"RSI {candle['rsi']:.2f} > {self.params['rsi_overbought']} (Overbought - expect pullback down)"
-            price_reason = "Inside bar pattern + RSI overbought reversal"
-        
-        # Enhanced filtering: Only trade with Medium+ confidence (score >= 30)
-        if signal != "NO TRADE" and confidence_score < 30:
-            signal = "NO TRADE"
-            rsi_reason += f" (Filtered: Confidence score {confidence_score} < 30)"
-            confidence_level = "Very Low"
-        
-        # Additional quality checks for high confidence trades
-        if signal != "NO TRADE" and confidence_score >= 50:
-            # Check for divergence or momentum alignment
-            momentum = candle.get('price_momentum', 0)
-            if signal == "BUY CALL" and momentum < -1.0:  # Bearish momentum conflicts with bullish signal
-                confidence_score -= 15
-                confidence_level = "Medium" if confidence_score >= 30 else "Low"
-                rsi_reason += " (Momentum divergence detected)"
-            elif signal == "BUY PUT" and momentum > 1.0:  # Bullish momentum conflicts with bearish signal
-                confidence_score -= 15
-                confidence_level = "Medium" if confidence_score >= 30 else "Low"
-                rsi_reason += " (Momentum divergence detected)"
-        
-        # Dynamic risk management based on confidence and market conditions
-        atr = candle['atr']
-        volatility_ratio = candle.get('volatility_ratio', 1)
-        
-        # Adjust stop loss based on confidence and volatility
-        if confidence_score >= 70:  # Very high confidence
-            stop_loss_multiplier = 0.6  # Tighter stop
-        elif confidence_score >= 50:  # High confidence
-            stop_loss_multiplier = 0.7
-        elif confidence_score >= 30:  # Medium confidence
-            stop_loss_multiplier = 0.8
-        else:  # Low confidence
-            stop_loss_multiplier = 1.0
-        
-        # Adjust for volatility
-        if volatility_ratio >= 2.0:  # High volatility
-            stop_loss_multiplier *= 1.2
-        elif volatility_ratio <= 1.0:  # Low volatility
-            stop_loss_multiplier *= 0.9
-        
-        stop_loss = int(round(stop_loss_multiplier * atr))
-        
-        # Dynamic targets based on confidence
-        if confidence_score >= 70:
-            target1 = int(round(1.5 * atr))  # Aggressive targets for high confidence
-            target2 = int(round(2.5 * atr))
-            target3 = int(round(3.5 * atr))
-        elif confidence_score >= 50:
-            target1 = int(round(1.2 * atr))  # Moderate targets
-            target2 = int(round(2.0 * atr))
-            target3 = int(round(3.0 * atr))
-        else:
-            target1 = int(round(1.0 * atr))  # Conservative targets
-            target2 = int(round(1.5 * atr))
-            target3 = int(round(2.0 * atr))
-        
-        # Calculate performance if we have a signal and future data
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:
-            # Calculate performance metrics with trailing stop logic
+            # Check future prices to see if targets or stop loss were hit
             if signal == "BUY CALL":
-                stop_loss_price = candle['close'] - stop_loss
-                target1_price = candle['close'] + target1
-                target2_price = candle['close'] + target2
-                target3_price = candle['close'] + target3
+                max_future_price = future_data['high'].max()
+                min_future_price = future_data['low'].min()
                 
-                highest_price = candle['close']
-                trailing_sl = None
-                target1_hit = target2_hit = target3_hit = False
-                for i, future_candle in future_data.iterrows():
-                    # Check if stop loss is hit first
-                    if not target1_hit and future_candle['low'] <= stop_loss_price:
-                        outcome = "Loss"
-                        pnl = -stop_loss
-                        stoploss_count = 1
-                        failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                        break
-                    # Check which targets are hit
-                    if not target1_hit and future_candle['high'] >= target1_price:
-                        target1_hit = True
-                        targets_hit = 1
-                        pnl = target1
-                        highest_price = max(highest_price, future_candle['high'])
-                        trailing_sl = highest_price - stop_loss
-                        outcome = "Win"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                        continue
-                    if target1_hit and not target2_hit and future_candle['high'] >= target2_price:
-                        target2_hit = True
-                        targets_hit = 2
-                        pnl += (target2 - target1)
-                        highest_price = max(highest_price, future_candle['high'])
-                        trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    if target2_hit and not target3_hit and future_candle['high'] >= target3_price:
-                        target3_hit = True
-                        targets_hit = 3
-                        pnl += (target3 - target2)
-                        highest_price = max(highest_price, future_candle['high'])
-                        trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    # After target1, always trail SL at highest_price - stop_loss
-                    if target1_hit:
-                        highest_price = max(highest_price, future_candle['high'])
-                        trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                        # If price hits trailing SL, exit
-                        if future_candle['low'] <= trailing_sl:
-                            outcome = "Win"
-                            pnl = trailing_sl - candle['close']
-                            failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
-                            if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                                exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                            elif 'time' in future_data.columns:
-                                exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                            break
+                # Check if stop loss was hit
+                if min_future_price <= (price - stop_loss):
+                    outcome = "Loss"
+                    pnl = -stop_loss * position_multiplier
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {price - stop_loss}"
+                else:
+                    outcome = "Win"
+                    # Check which targets were hit
+                    if max_future_price >= (price + target1):
+                        targets_hit += 1
+                        pnl += target1 * position_multiplier
+                    if max_future_price >= (price + target2):
+                        targets_hit += 1
+                        pnl += (target2 - target1) * position_multiplier
+                    if max_future_price >= (price + target3):
+                        targets_hit += 1
+                        pnl += (target3 - target2) * position_multiplier
+                    
             elif signal == "BUY PUT":
-                stop_loss_price = candle['close'] + stop_loss
-                target1_price = candle['close'] - target1
-                target2_price = candle['close'] - target2
-                target3_price = candle['close'] - target3
+                max_future_price = future_data['high'].max()
+                min_future_price = future_data['low'].min()
                 
-                lowest_price = candle['close']
-                trailing_sl = None
-                target1_hit = target2_hit = target3_hit = False
-                for i, future_candle in future_data.iterrows():
-                    # Check if stop loss is hit first
-                    if not target1_hit and future_candle['high'] >= stop_loss_price:
-                        outcome = "Loss"
-                        pnl = -stop_loss
-                        stoploss_count = 1
-                        failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                        break
-                    # Check which targets are hit
-                    if not target1_hit and future_candle['low'] <= target1_price:
-                        target1_hit = True
-                        targets_hit = 1
-                        pnl = target1
-                        lowest_price = min(lowest_price, future_candle['low'])
-                        trailing_sl = lowest_price + stop_loss
-                        outcome = "Win"
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                        continue
-                    if target1_hit and not target2_hit and future_candle['low'] <= target2_price:
-                        target2_hit = True
-                        targets_hit = 2
-                        pnl += (target2 - target1)
-                        lowest_price = min(lowest_price, future_candle['low'])
-                        trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    if target2_hit and not target3_hit and future_candle['low'] <= target3_price:
-                        target3_hit = True
-                        targets_hit = 3
-                        pnl += (target3 - target2)
-                        lowest_price = min(lowest_price, future_candle['low'])
-                        trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                        if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                            exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                        elif 'time' in future_data.columns:
-                            exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                    # After target1, always trail SL at lowest_price + stop_loss
-                    if target1_hit:
-                        lowest_price = min(lowest_price, future_candle['low'])
-                        trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                        # If price hits trailing SL, exit
-                        if future_candle['high'] >= trailing_sl:
-                            outcome = "Win"
-                            pnl = candle['close'] - trailing_sl
-                            failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
-                            if hasattr(future_candle, 'name') and isinstance(future_candle.name, pd.Timestamp):
-                                exit_time = future_candle.name.strftime("%Y-%m-%d %H:%M:%S")
-                            elif 'time' in future_data.columns:
-                                exit_time = future_candle['time'].strftime("%Y-%m-%d %H:%M:%S")
-                            break
+                # Check if stop loss was hit
+                if max_future_price >= (price + stop_loss):
+                    outcome = "Loss"
+                    pnl = -stop_loss * position_multiplier
+                    stoploss_count = 1
+                    failure_reason = f"Stop loss hit at {price + stop_loss}"
+                else:
+                    outcome = "Win"
+                    # Check which targets were hit
+                    if min_future_price <= (price - target1):
+                        targets_hit += 1
+                        pnl += target1 * position_multiplier
+                    if min_future_price <= (price - target2):
+                        targets_hit += 1
+                        pnl += (target2 - target1) * position_multiplier
+                    if min_future_price <= (price - target3):
+                        targets_hit += 1
+                        pnl += (target3 - target2) * position_multiplier
         
-        # Defensive IST conversion for exit_time in signal_data
-        exit_time_val = exit_time
-        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
+        # Build reasoning string
+        price_reason = f"Inside Bar: {rsi_level} RSI ({rsi:.1f})"
+        price_reason += f", Trend: {'BULLISH' if price > ema_21 else 'BEARISH'}"
+        price_reason += f", EMA21: {ema_21:.1f} vs EMA50: {ema_50:.1f}"
+        price_reason += f", MACD: {macd:.2f} vs {macd_signal:.2f}"
+        price_reason += f", Volume: {volume_ratio:.1f}x"
+        price_reason += f", Body: {body_ratio:.2f}, Momentum: {price_momentum:.1f}%"
+        price_reason += f", Confidence: {confidence_score}"
         
-        # Combine all confidence reasons
-        detailed_reasons = "; ".join(confidence_reasons) if confidence_reasons else "Standard analysis"
-        
-        # Return the signal data
-        signal_data = {
+        return {
             "signal": signal,
-            "price": candle['close'],
-            "rsi": candle['rsi'],
-            "rsi_level": rsi_level,
-            "ema_20": candle['ema'] if 'ema' in candle else 0,
-            "atr": candle['atr'],
-            "confidence": confidence_level,
+            "confidence": confidence,
             "confidence_score": confidence_score,
-            "rsi_reason": rsi_reason,
-            "price_reason": f"{price_reason} | {detailed_reasons}",
-            "trade_type": trade_type,
+            "price": price,
             "stop_loss": stop_loss,
             "target": target1,
             "target2": target2,
@@ -499,19 +378,5 @@ class InsidebarRsi(Strategy):
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time_str
+            "reasoning": price_reason
         }
-        
-        # If index_name is provided, log to database
-        if index_name and signal != "NO TRADE":
-            db_signal_data = signal_data.copy()
-            signal_time = self.safe_signal_time(candle.name)
-            # Only convert to IST if signal_time is a datetime
-            if isinstance(signal_time, (pd.Timestamp, datetime)):
-                db_signal_data["signal_time"] = self.to_ist_str(signal_time)
-            else:
-                db_signal_data["signal_time"] = str(signal_time) if signal_time is not None else None
-            db_signal_data["index_name"] = index_name
-            db.log_strategy_trade('insidebar_rsi', db_signal_data)
-        
-        return signal_data
