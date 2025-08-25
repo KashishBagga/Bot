@@ -538,11 +538,11 @@ class SupertrendMacdRsiEma(Strategy):
             price_reason = f"Price {candle['close']:.2f} << EMA {candle['ema']:.2f} and < SuperTrend {candle['supertrend']:.2f}"
             option_type = "PE"
 
-        # Enhanced filtering: Only trade with Medium+ confidence (score >= 45)
-        if signal != "NO TRADE" and confidence_score < 45:
+        # Enhanced filtering: Only trade with Medium+ confidence (score >= 35)
+        if signal != "NO TRADE" and confidence_score < 35:
             signal = "NO TRADE"
             confidence = "Low"
-            rsi_reason += f" (Filtered: Confidence score {confidence_score} < 45)"
+            rsi_reason += f" (Filtered: Confidence score {confidence_score} < 35)"
 
         # Additional filter for very high confidence trades
         if signal != "NO TRADE" and confidence_score >= 65:
@@ -553,11 +553,11 @@ class SupertrendMacdRsiEma(Strategy):
             )
             if not indicators_aligned:
                 confidence_score -= 20  # Reduce confidence for misaligned indicators
-                # OPTIMIZATION: Higher confidence threshold for profitable strategy (45 -> 80)
-                if confidence_score < 80:
+                # OPTIMIZATION: Balanced confidence threshold for activity restoration (80 -> 45)
+                if confidence_score < 45:
                     signal = "NO TRADE"
                     confidence = "Low"
-                    rsi_reason += f" (Confidence {confidence_score} below 80 threshold)"
+                    rsi_reason += f" (Confidence {confidence_score} below 45 threshold)"
 
         # Fallback: If option data is missing, simulate on underlying
         if signal.startswith("BUY") and future_data is not None and not future_data.empty:

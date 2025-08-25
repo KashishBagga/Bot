@@ -307,8 +307,8 @@ class SupertrendEma(Strategy):
             confidence_score += 5
             confidence_factors.append(f"RSI acceptable ({rsi:.1f})")
         
-        # OPTIMIZATION: Increased confidence threshold for profitable strategy (60 -> 75)
-        min_confidence_threshold = 75
+        # OPTIMIZATION: Balanced confidence threshold for activity restoration (75 -> 65)
+        min_confidence_threshold = 65
         
         if confidence_score < min_confidence_threshold:
             return {
