@@ -98,166 +98,140 @@ class EmaCrossover(Strategy):
         return self.analyze_single_timeframe(df.iloc[index:index+1], future_data)
 
     def analyze_single_timeframe(self, data: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
-        """Single timeframe analysis method."""
-        # Ensure 'time' column exists and is valid, and set as index
-        if 'time' in data.columns:
-            data = data.copy()
-            data.loc[:, 'time'] = pd.to_datetime(data['time'], errors='coerce')
-            data = data.set_index('time')
-        if not isinstance(data.index, pd.DatetimeIndex):
-            raise ValueError("DataFrame index must be a DatetimeIndex")
         
-        # Calculate indicators if they haven't been calculated yet
-        if 'ema_fast' not in data.columns:
-            data = self.add_indicators(data)
+        if len(data) < 51:  # Need at least 51 periods for indicators
+            return {"signal": "NO TRADE", "confidence": "Very Low", "confidence_score": 0, "reasoning": "Insufficient data"}
         
-        # Get the latest candle
         candle = data.iloc[-1]
+        prev_candle = data.iloc[-2]
         
-        # Set default values
-        signal = "NO TRADE"  # Changed from "None" to "NO TRADE" for consistency
-        confidence = "Low"
-        trade_type = "Intraday"
-        rsi_reason = macd_reason = price_reason = ""
+        # Get current values
+        ema_9 = candle['ema_9']
+        ema_21 = candle['ema_21']
+        prev_ema_9 = prev_candle['ema_9']
+        prev_ema_21 = prev_candle['ema_21']
+        rsi = candle['rsi']
+        volume_ratio = candle.get('volume_ratio', 1.0)
+        macd = candle.get('macd', 0)
+        macd_signal = candle.get('macd_signal', 0)
         
-        # Performance tracking variables
+        # Initialize variables
+        signal = "NO TRADE"
+        confidence = "Very Low"
+        confidence_score = 0
+        outcome = "Pending"
         pnl = 0.0
         targets_hit = 0
         stoploss_count = 0
-        outcome = "Pending"
         failure_reason = ""
+        exit_time = None
         
-        # Calculate confidence score based on multiple market conditions instead of time filter
-        confidence_score = 0
-        confidence_reasons = []
+        # OPTIMIZATION: Enhanced filters for profitability
+        # 1. Volume filter - only trade on above-average volume
+        if volume_ratio < 1.5:
+            return {
+                "signal": "NO TRADE",
+                "confidence": "Very Low", 
+                "confidence_score": 0,
+                "reasoning": f"Low volume (ratio: {volume_ratio:.2f} < 1.5)"
+            }
         
-        # 1. EMA Crossover Strength (0-35 points)
-        crossover_strength = abs(candle.get('crossover_strength', 0))
-        if crossover_strength >= 2.0:  # Very strong crossover
-            confidence_score += 35
-            confidence_reasons.append(f"Very strong EMA crossover ({crossover_strength:.2f}%)")
-        elif crossover_strength >= 1.5:  # Strong crossover
-            confidence_score += 30
-            confidence_reasons.append(f"Strong EMA crossover ({crossover_strength:.2f}%)")
-        elif crossover_strength >= 1.0:  # Good crossover
-            confidence_score += 25
-            confidence_reasons.append(f"Good EMA crossover ({crossover_strength:.2f}%)")
-        elif crossover_strength >= 0.5:  # Moderate crossover
+        # 2. MACD alignment filter
+        macd_aligned_buy = macd > macd_signal and macd > 0
+        macd_aligned_sell = macd < macd_signal and macd < 0
+        
+        # EMA crossover detection
+        buy_signal = (ema_9 > ema_21 and prev_ema_9 <= prev_ema_21)
+        sell_signal = (ema_9 < ema_21 and prev_ema_9 >= prev_ema_21)
+        
+        # Enhanced entry criteria with MACD confirmation
+        if buy_signal and macd_aligned_buy and rsi < 70:
+            signal = "BUY CALL"
+            base_confidence = 50
+        elif sell_signal and macd_aligned_sell and rsi > 30:
+            signal = "BUY PUT"
+            base_confidence = 50
+        else:
+            return {"signal": "NO TRADE", "confidence": "Very Low", "confidence_score": 0, "reasoning": "No valid crossover or MACD not aligned"}
+        
+        # Enhanced confidence scoring (target: 85+ for execution)
+        confidence_score = base_confidence
+        
+        # Volume confirmation boost
+        if volume_ratio > 2.0:
             confidence_score += 15
-            confidence_reasons.append(f"Moderate EMA crossover ({crossover_strength:.2f}%)")
-        elif crossover_strength >= 0.2:  # Weak crossover
-            confidence_score += 8
-            confidence_reasons.append(f"Weak EMA crossover ({crossover_strength:.2f}%)")
-        
-        # 2. Price Position Relative to EMAs (0-20 points)
-        price_distance = ((candle['close'] - candle['ema_fast']) / candle['ema_fast']) * 100 if candle['ema_fast'] != 0 else 0
-        ema_alignment = candle['ema_fast'] > candle['ema_slow']
-        
-        if ema_alignment and price_distance > 0.5:  # Price well above fast EMA
-            confidence_score += 20
-            confidence_reasons.append(f"Price well above fast EMA ({price_distance:.2f}%)")
-        elif ema_alignment and price_distance > 0.2:  # Price above fast EMA
-            confidence_score += 15
-            confidence_reasons.append(f"Price above fast EMA ({price_distance:.2f}%)")
-        elif not ema_alignment and price_distance < -0.5:  # Price well below fast EMA
-            confidence_score += 20
-            confidence_reasons.append(f"Price well below fast EMA ({price_distance:.2f}%)")
-        elif not ema_alignment and price_distance < -0.2:  # Price below fast EMA
-            confidence_score += 15
-            confidence_reasons.append(f"Price below fast EMA ({price_distance:.2f}%)")
-        
-        # 3. Momentum Confirmation (0-20 points)
-        ema_change = candle.get('ema_fast_change', 0)
-        
-        if abs(ema_change) > 1.0:  # Strong momentum
-            confidence_score += 20
-            direction = "bullish" if ema_change > 0 else "bearish"
-            confidence_reasons.append(f"Strong {direction} momentum ({ema_change:.2f}%)")
-        elif abs(ema_change) > 0.5:  # Good momentum
-            confidence_score += 15
-            direction = "bullish" if ema_change > 0 else "bearish"
-            confidence_reasons.append(f"Good {direction} momentum ({ema_change:.2f}%)")
-        elif abs(ema_change) > 0.2:  # Mild momentum
+        elif volume_ratio > 1.8:
             confidence_score += 10
-            direction = "bullish" if ema_change > 0 else "bearish"
-            confidence_reasons.append(f"Mild {direction} momentum")
-        
-        # 4. RSI Confirmation (0-15 points) - if available
-        rsi = candle.get('rsi', 50)
-        if 30 <= rsi <= 70:  # RSI in good range (not extreme)
-            confidence_score += 15
-            confidence_reasons.append(f"RSI in optimal range ({rsi:.1f})")
-        elif 25 <= rsi <= 75:  # RSI in acceptable range
-            confidence_score += 10
-            confidence_reasons.append(f"RSI in acceptable range ({rsi:.1f})")
-        elif rsi < 20 or rsi > 80:  # Extreme RSI levels
-            confidence_score += 8
-            confidence_reasons.append(f"Extreme RSI level ({rsi:.1f}) - potential reversal")
-        
-        # 5. Volume Analysis (0-10 points) - if available
-        if 'volume' in candle and candle['volume'] > 0:
-            # Simple volume check - above average gets points
+        elif volume_ratio > 1.5:
             confidence_score += 5
-            confidence_reasons.append("Volume confirmation available")
+            
+        # MACD strength boost
+        macd_strength = abs(macd - macd_signal)
+        if macd_strength > 5:
+            confidence_score += 15
+        elif macd_strength > 2:
+            confidence_score += 10
+        elif macd_strength > 1:
+            confidence_score += 5
+            
+        # RSI position boost
+        if signal == "BUY CALL" and 45 <= rsi <= 65:
+            confidence_score += 10
+        elif signal == "BUY PUT" and 35 <= rsi <= 55:
+            confidence_score += 10
+            
+        # Trend strength boost
+        ema_separation = abs(ema_9 - ema_21) / ema_21
+        if ema_separation > 0.01:
+            confidence_score += 10
+        elif ema_separation > 0.005:
+            confidence_score += 5
+            
+        # OPTIMIZATION: Higher confidence threshold (60 -> 85)
+        if confidence_score < 85:
+            return {
+                "signal": "NO TRADE",
+                "confidence": "Low",
+                "confidence_score": confidence_score,
+                "reasoning": f"Confidence {confidence_score} below 85 threshold"
+            }
         
         # Determine confidence level
-        if confidence_score >= 80:
+        if confidence_score >= 90:
             confidence = "Very High"
-        elif confidence_score >= 60:
+        elif confidence_score >= 85:
             confidence = "High"
-        elif confidence_score >= 40:
+        elif confidence_score >= 70:
             confidence = "Medium"
-        elif confidence_score >= 20:
+        elif confidence_score >= 50:
             confidence = "Low"
         else:
             confidence = "Very Low"
         
-        # Determine momentum
-        momentum = None
-        if ema_change > 0.5:
-            momentum = "Strong bullish"
-        elif ema_change > 0.2:
-            momentum = "Bullish"
-        elif ema_change < -0.5:
-            momentum = "Strong bearish"
-        elif ema_change < -0.2:
-            momentum = "Bearish"
+        # Calculate stop loss and targets with improved R:R
+        atr = candle.get('atr', candle['close'] * 0.01)
         
-        # Calculate ATR-based stop loss and targets (reduced for better risk management)
-        atr = candle['atr'] if 'atr' in candle else abs(candle['ema_fast'] - candle['ema_slow']) * 2
-        stop_loss = int(round(0.7 * atr))  # Tighter stop loss
-        target1 = int(round(1.0 * atr))    # Reduced targets for higher win rate
-        target2 = int(round(1.5 * atr))
-        target3 = int(round(2.0 * atr))
+        # OPTIMIZATION: Improved risk-reward ratios
+        if confidence_score >= 95:
+            stop_loss = int(round(1.5 * atr))
+            target1 = int(round(4.0 * atr))  # 2.7:1 R:R
+            target2 = int(round(6.0 * atr))  # 4:1 R:R
+            target3 = int(round(8.0 * atr))  # 5.3:1 R:R
+        elif confidence_score >= 90:
+            stop_loss = int(round(2.0 * atr))
+            target1 = int(round(4.5 * atr))  # 2.25:1 R:R
+            target2 = int(round(6.5 * atr))  # 3.25:1 R:R
+            target3 = int(round(8.5 * atr))  # 4.25:1 R:R
+        else:  # 85-89
+            stop_loss = int(round(2.5 * atr))
+            target1 = int(round(5.0 * atr))  # 2:1 R:R
+            target2 = int(round(7.0 * atr))  # 2.8:1 R:R
+            target3 = int(round(9.0 * atr))  # 3.6:1 R:R
         
-        # Stronger signal validation: Require significant crossover strength and momentum
-        crossover_strength_threshold = 0.005  # Reduced from 0.02 to 0.005 (0.5% instead of 2%)
+        # OPTIMIZATION: Reduced position size for testing (0.3x)
+        position_multiplier = 0.3
         
-        # Check for bullish signal (fast EMA above slow EMA)
-        if (candle['ema_fast'] > candle['ema_slow'] and 
-            candle['close'] > candle['ema_fast'] and
-            candle['crossover_strength'] > crossover_strength_threshold):
-            signal = "BUY CALL"
-            price_reason = f"Strong EMA{self.fast_ema} crossover above EMA{self.slow_ema} (Strength: {candle['crossover_strength']:.3f}%)"
-            if momentum:
-                price_reason += f", {momentum} momentum"
-        
-        # Check for bearish signal (fast EMA below slow EMA)
-        elif (candle['ema_fast'] < candle['ema_slow'] and 
-              candle['close'] < candle['ema_fast'] and
-              abs(candle['crossover_strength']) > crossover_strength_threshold):
-            signal = "BUY PUT"
-            price_reason = f"Strong EMA{self.fast_ema} crossover below EMA{self.slow_ema} (Strength: {candle['crossover_strength']:.3f}%)"
-            if momentum:
-                price_reason += f", {momentum} momentum"
-        
-        # Additional filter: Only trade with Low+ confidence (filter out Very Low)
-        # Temporarily disabled to allow all signals through for debugging
-        # if signal != "NO TRADE" and confidence == "Very Low":
-        #     signal = "NO TRADE"
-        #     price_reason += " (Filtered: Very Low confidence)"
-        
-        # If we have a trade signal and future data, calculate performance
+        # Calculate performance if we have future data
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:
             price = candle['close']
             
@@ -270,7 +244,7 @@ class EmaCrossover(Strategy):
                 # Check if stop loss was hit
                 if min_future_price <= (price - stop_loss):
                     outcome = "Loss"
-                    pnl = -stop_loss
+                    pnl = -stop_loss * position_multiplier
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {price - stop_loss}"
                 else:
@@ -278,13 +252,13 @@ class EmaCrossover(Strategy):
                     # Check which targets were hit
                     if max_future_price >= (price + target1):
                         targets_hit += 1
-                        pnl += target1
+                        pnl += target1 * position_multiplier
                     if max_future_price >= (price + target2):
                         targets_hit += 1
-                        pnl += (target2 - target1)
+                        pnl += (target2 - target1) * position_multiplier
                     if max_future_price >= (price + target3):
                         targets_hit += 1
-                        pnl += (target3 - target2)
+                        pnl += (target3 - target2) * position_multiplier
                     
             elif signal == "BUY PUT":
                 # For buy puts, check if price went down to targets or up to stop loss
@@ -294,7 +268,7 @@ class EmaCrossover(Strategy):
                 # Check if stop loss was hit
                 if max_future_price >= (price + stop_loss):
                     outcome = "Loss"
-                    pnl = -stop_loss
+                    pnl = -stop_loss * position_multiplier
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {price + stop_loss}"
                 else:
@@ -302,128 +276,39 @@ class EmaCrossover(Strategy):
                     # Check which targets were hit
                     if min_future_price <= (price - target1):
                         targets_hit += 1
-                        pnl += target1
+                        pnl += target1 * position_multiplier
                     if min_future_price <= (price - target2):
                         targets_hit += 1
-                        pnl += (target2 - target1)
+                        pnl += (target2 - target1) * position_multiplier
                     if min_future_price <= (price - target3):
                         targets_hit += 1
-                        pnl += (target3 - target2)
+                        pnl += (target3 - target2) * position_multiplier
         
-        # --- Outcome logic fix ---
-        # If a trade was simulated and outcome is set, keep it as 'Win' or 'Loss'
-        # Otherwise, set outcome to 'No Trade' or 'Data Missing' as appropriate
-        if signal == "NO TRADE":
-            outcome = "No Trade"
-        elif (signal.startswith("BUY") and (future_data is None or future_data.empty)):
-            outcome = "Data Missing"
-        elif outcome not in ["Win", "Loss"]:
-            outcome = "No Trade"
+        # Build reasoning string
+        price_reason = f"EMA crossover: {ema_9:.1f} {'>' if signal == 'BUY CALL' else '<'} {ema_21:.1f}"
+        price_reason += f", Volume: {volume_ratio:.1f}x"
+        price_reason += f", MACD: {macd:.2f} vs {macd_signal:.2f}"
+        price_reason += f", RSI: {rsi:.1f}"
+        price_reason += f", Confidence: {confidence_score}"
         
-        # Create the signal data dictionary
-        signal_data = {
+        return {
             "signal": signal,
+            "confidence": confidence,
+            "confidence_score": confidence_score,
             "price": candle['close'],
-            "rsi": candle.get('rsi', 0),
-            "macd": candle.get('macd', 0),
-            "macd_signal": candle.get('macd_signal', 0),
-            "ema_20": candle.get('ema', 0),
-            "ema_fast": candle['ema_fast'],
-            "ema_slow": candle['ema_slow'],
-            "ema_9": candle['ema_9'],  # For backward compatibility
-            "ema_21": candle['ema_21'],  # For backward compatibility
-            "atr": atr,
             "stop_loss": stop_loss,
             "target": target1,
             "target2": target2,
             "target3": target3,
-            "confidence": confidence,
-            "rsi_reason": rsi_reason,
-            "macd_reason": macd_reason,
-            "price_reason": price_reason,
-            "trade_type": trade_type,
-            "crossover_strength": candle['crossover_strength'],
-            "momentum": momentum,
+            "reasoning": price_reason,
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": None  # Initialize exit_time as None
+            "exit_time": exit_time,
+            "position_multiplier": position_multiplier
         }
-        
-        # If future data is available, try to determine exit time
-        if future_data is not None and not future_data.empty and signal != "NO TRADE":
-            exit_time = None
-            
-            # For BUY CALL scenario
-            if signal == "BUY CALL":
-                price = candle['close']
-                stop_loss_price = price - stop_loss
-                target1_price = price + target1
-                target2_price = price + target2
-                target3_price = price + target3
-                
-                # Iterate through future candles chronologically
-                for idx, future_candle in future_data.iterrows():
-                    # Get timestamp from the index (which should be a DatetimeIndex)
-                    current_time = self.safe_signal_time(idx)
-                    
-                    # Check stop loss first (exit on low price)
-                    if future_candle['low'] <= stop_loss_price:
-                        exit_time = current_time
-                        break
-                    
-                    # Check targets (exit on the highest target reached)
-                    highest_target_reached = 0
-                    if future_candle['high'] >= target3_price:
-                        highest_target_reached = 3
-                    elif future_candle['high'] >= target2_price:
-                        highest_target_reached = 2
-                    elif future_candle['high'] >= target1_price:
-                        highest_target_reached = 1
-                    
-                    if highest_target_reached > 0:
-                        exit_time = current_time
-                        if highest_target_reached == 3:  # If highest target reached, we're done
-                            break
-            
-            # For BUY PUT scenario
-            elif signal == "BUY PUT":
-                price = candle['close']
-                stop_loss_price = price + stop_loss
-                target1_price = price - target1
-                target2_price = price - target2
-                target3_price = price - target3
-                
-                # Iterate through future candles chronologically
-                for idx, future_candle in future_data.iterrows():
-                    # Get timestamp from the index (which should be a DatetimeIndex)
-                    current_time = self.safe_signal_time(idx)
-                    
-                    # Check stop loss first (exit on high price)
-                    if future_candle['high'] >= stop_loss_price:
-                        exit_time = current_time
-                        break
-                    
-                    # Check targets (exit on the lowest target reached)
-                    lowest_target_reached = 0
-                    if future_candle['low'] <= target3_price:
-                        lowest_target_reached = 3
-                    elif future_candle['low'] <= target2_price:
-                        lowest_target_reached = 2
-                    elif future_candle['low'] <= target1_price:
-                        lowest_target_reached = 1
-                    
-                    if lowest_target_reached > 0:
-                        exit_time = current_time
-                        if lowest_target_reached == 3:  # If lowest target reached, we're done
-                            break
-            
-            # Update the signal data with the exit time
-            signal_data["exit_time"] = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
-        
-        return signal_data
         
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,

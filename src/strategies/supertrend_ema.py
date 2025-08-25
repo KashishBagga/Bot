@@ -253,17 +253,80 @@ class SupertrendEma(Strategy):
             confidence_score += 5
             confidence_reasons.append(f"Good directional candle ({body_ratio:.2f})")
         
+        # Enhanced confidence scoring for profitability optimization
+        confidence_score = 50
+        confidence_factors = []
+        
+        # SuperTrend direction strength (0-20 points)
+        if supertrend_direction == 1:  # Bullish
+            confidence_score += 15
+            confidence_factors.append("SuperTrend bullish")
+        elif supertrend_direction == -1:  # Bearish
+            confidence_score += 15
+            confidence_factors.append("SuperTrend bearish")
+        
+        # Price vs SuperTrend distance (0-15 points)
+        supertrend_value = candle.get('supertrend', 0)
+        st_distance = abs(candle['close'] - supertrend_value) / candle['close']
+        if st_distance > 0.02:  # >2% from SuperTrend
+            confidence_score += 15
+            confidence_factors.append(f"Strong price separation from ST ({st_distance:.1%})")
+        elif st_distance > 0.01:  # >1% from SuperTrend
+            confidence_score += 10
+            confidence_factors.append(f"Good price separation from ST ({st_distance:.1%})")
+        elif st_distance > 0.005:  # >0.5% from SuperTrend
+            confidence_score += 5
+            confidence_factors.append(f"Moderate price separation from ST ({st_distance:.1%})")
+        
+        # EMA alignment (0-15 points)
+        ema_21 = candle.get('ema_21', 0)
+        if ema_21 > 0:
+            ema_alignment = (candle['close'] > ema_21) if supertrend_direction == 1 else (candle['close'] < ema_21)
+            if ema_alignment:
+                confidence_score += 15
+                confidence_factors.append("EMA alignment confirmed")
+        
+        # Volume confirmation (0-10 points)
+        volume_ratio = candle.get('volume_ratio', 1.0)
+        if volume_ratio > 1.5:
+            confidence_score += 10
+            confidence_factors.append(f"Above average volume ({volume_ratio:.1f}x)")
+        elif volume_ratio > 1.2:
+            confidence_score += 5
+            confidence_factors.append(f"Good volume ({volume_ratio:.1f}x)")
+        
+        # RSI confirmation (0-10 points)
+        rsi = candle.get('rsi', 50)
+        if supertrend_direction == 1 and 40 <= rsi <= 65:  # Bullish with good RSI
+            confidence_score += 10
+            confidence_factors.append(f"RSI optimal for bullish ({rsi:.1f})")
+        elif supertrend_direction == -1 and 35 <= rsi <= 60:  # Bearish with good RSI
+            confidence_score += 10
+            confidence_factors.append(f"RSI optimal for bearish ({rsi:.1f})")
+        elif 30 <= rsi <= 70:  # Acceptable RSI range
+            confidence_score += 5
+            confidence_factors.append(f"RSI acceptable ({rsi:.1f})")
+        
+        # OPTIMIZATION: Increased confidence threshold for profitable strategy (60 -> 75)
+        min_confidence_threshold = 75
+        
+        if confidence_score < min_confidence_threshold:
+            return {
+                "signal": "NO TRADE",
+                "confidence": "Low",
+                "confidence_score": confidence_score,
+                "reasoning": f"Confidence {confidence_score} below {min_confidence_threshold} threshold. Factors: {', '.join(confidence_factors)}"
+            }
+        
         # Determine confidence level
-        if confidence_score >= 80:
-            confidence_level = "Very High"
-        elif confidence_score >= 60:
-            confidence_level = "High"
-        elif confidence_score >= 40:
-            confidence_level = "Medium"
-        elif confidence_score >= 20:
-            confidence_level = "Low"
+        if confidence_score >= 90:
+            confidence = "Very High"
+        elif confidence_score >= 80:
+            confidence = "High"
+        elif confidence_score >= 70:
+            confidence = "Medium"
         else:
-            confidence_level = "Very Low"
+            confidence = "Low"
         
         # Enhanced signal generation based on confidence
         bullish_votes = sum(1 for r in results if r["supertrend"] == 1 and r["ema_trend"] == 1)
@@ -277,14 +340,12 @@ class SupertrendEma(Strategy):
 
         if bullish_votes >= required_votes:
             signal = "BUY CALL"
-            confidence = confidence_level
         elif bearish_votes >= required_votes:
             signal = "BUY PUT"
-            confidence = confidence_level
         else:
             return {
                 "signal": "NO TRADE",
-                "confidence": confidence_level,
+                "confidence": confidence,
                 "ema_value": 0.0,
                 "supertrend_value": 0.0,
                 "supertrend_direction": "WEAK",
@@ -367,7 +428,7 @@ class SupertrendEma(Strategy):
         
         return {
             "signal": signal,
-            "confidence": confidence_level,
+            "confidence": confidence,
             "confidence_score": confidence_score,
             "ema_value": round(base["ema"], 2),
             "supertrend_value": round(base["st_data"]["value"], 2),

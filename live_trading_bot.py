@@ -31,7 +31,7 @@ from src.data.parquet_data_store import ParquetDataStore
 from src.models.unified_database import UnifiedDatabase
 from dotenv import load_dotenv
 import src.warning_filters  # noqa: F401
-from src.models.enhanced_rejected_signals import log_rejected_signal_with_pnl
+from src.models.enhanced_rejected_signals import log_rejected_signal_live
 
 class LiveTradingBot:
     """Production Live Trading Bot with backtesting consistency"""
@@ -44,10 +44,23 @@ class LiveTradingBot:
         self.symbols = ['NSE_NIFTYBANK_INDEX', 'NSE_NIFTY50_INDEX']  # Updated to match data directory names
         self.timeframe = '5min'  # Primary timeframe for live trading
         
-        # Initialize strategies exactly as in backtesting
+        # Risk management parameters - OPTIMIZED FOR PROFITABILITY
+        self.risk_params = {
+            'min_confidence_score': 75,  # Increased from 60 to 75
+            'max_daily_loss': -2000,     # Reduced from -5000 for better risk control
+            'max_positions_per_strategy': 1,  # Reduced from 2
+            'position_size_multiplier': 1.0,
+            'emergency_stop': False
+        }
+        
+        # OPTIMIZATION: Focus on profitable strategies only
+        self.profitable_strategies = {
+            'supertrend_ema': {'symbols': ['NSE:NIFTY50-INDEX'], 'active': True},
+            'supertrend_macd_rsi_ema': {'symbols': ['NSE:NIFTYBANK-INDEX'], 'active': True}
+        }
+        
+        # Initialize only profitable strategies
         self.strategies = {
-            'insidebar_rsi': InsidebarRsi(),
-            'ema_crossover': EmaCrossover(),
             'supertrend_ema': SupertrendEma(),
             'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
         }
@@ -63,15 +76,6 @@ class LiveTradingBot:
             'start_time': None,
             'end_time': None,
             'market_sessions': 0
-        }
-        
-        # Risk management parameters
-        self.risk_params = {
-            'min_confidence_score': 60,
-            'max_daily_loss': -5000,
-            'max_positions_per_strategy': 2,
-            'position_size_multiplier': 1.0,
-            'emergency_stop': False
         }
         
         # Data store for historical data
@@ -447,7 +451,7 @@ class LiveTradingBot:
                             future_data = self.get_market_data(symbol, periods=50)
                             
                             # Log with enhanced P&L calculation
-                            log_rejected_signal_with_pnl(enhanced_rejected_data, future_data)
+                            log_rejected_signal_live(enhanced_rejected_data, future_data)
                             
                             rejected_signals.append({
                                 **result,

@@ -5,6 +5,9 @@ import pandas as pd
 class RsiMeanReversionBb:
 	def __init__(self, timeframe_data=None):
 		self.timeframe_data = timeframe_data or {}
+		self.daily_trades = {}
+		self.cooldown_until_index = None
+		self.stopout_streak = 0
 
 	def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
 		# Ensure Bollinger present
@@ -22,10 +25,35 @@ class RsiMeanReversionBb:
 			tr3 = (df['low'] - prev_close).abs()
 			true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 			df['atr'] = true_range.rolling(window=14, min_periods=1).mean()
+		# ATR percentile
+		if 'atr_pct' not in df.columns and 'atr' in df.columns:
+			atr = df['atr']
+			rolling = atr.rolling(window=200, min_periods=50)
+			df['atr_pct'] = rolling.rank(pct=True)
 		return df
+
+	def _session_ok(self, ts) -> bool:
+		h, m = ts.hour, ts.minute
+		if (h == 9 and m < 30) or (h == 15 and m >= 15):
+			return False
+		return True
+
+	def _daily_cap_ok(self, ts) -> bool:
+		day = ts.date()
+		return self.daily_trades.get(day, 0) < 5
+
+	def _inc_daily(self, ts):
+		day = ts.date()
+		self.daily_trades[day] = self.daily_trades.get(day, 0) + 1
 
 	def analyze(self, candle, index, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None):
 		if index < 50 or future_data is None or future_data.empty:
+			return None
+		
+		ts = df.index[index]
+		if not self._session_ok(ts) or not self._daily_cap_ok(ts):
+			return None
+		if self.cooldown_until_index is not None and index < self.cooldown_until_index:
 			return None
 		
 		price = float(candle['close'])
@@ -33,19 +61,35 @@ class RsiMeanReversionBb:
 		bb_lower = float(candle.get('bb_lower', 0))
 		bb_upper = float(candle.get('bb_upper', 0))
 		atr = float(candle.get('atr', 0))
+		atr_pct = float(candle.get('atr_pct', 0.5))
+		ema21 = float(candle.get('ema_21', 0))
+		ema50 = float(candle.get('ema_50', 0))
+		vol_ratio = float(candle.get('volume_ratio', 1))
 		if atr <= 0 or bb_lower == 0 or bb_upper == 0:
 			return None
 		
-		# Mean reversion: RSI <= 30 near/below lower band -> long; RSI >= 70 near/above upper band -> short
-		long_setup = (rsi <= 30) and (price <= bb_lower)
-		short_setup = (rsi >= 70) and (price >= bb_upper)
+		# Volatility and volume windows (relaxed)
+		if atr_pct < 0.1 or atr_pct > 0.9 or vol_ratio != vol_ratio or vol_ratio < 0.6:
+			return None
+		
+		# Flat regime via EMA proximity (relaxed tolerance)
+		tol = 0.005  # 0.5%
+		flat_regime = abs(ema21 - ema50) / max(1e-6, abs(ema50)) <= tol
+		if not flat_regime:
+			return None
+		
+		# Mean reversion triggers with band proximity tolerance
+		near_lower = price <= bb_lower * 1.002
+		near_upper = price >= bb_upper * 0.998
+		long_setup = (rsi <= 35) and near_lower
+		short_setup = (rsi >= 65) and near_upper
 		if not (long_setup or short_setup):
 			return None
 		
-		conf = 60 + min(10, abs(50 - rsi) / 5)
+		conf = 60 + min(10, abs(50 - rsi) / 4)
 		bias = 'BUY' if long_setup else 'SELL'
-		stop_loss = 1.5 * atr
-		target = 1.5 * atr
+		stop_loss = 1.0 * atr
+		target = 1.2 * atr
 		slippage = price * 0.0003
 		
 		entry = price
@@ -53,19 +97,41 @@ class RsiMeanReversionBb:
 		outcome = 'Pending'
 		targets_hit = 0
 		stoploss_count = 0
+		breakeven_activated = False
+		trail_active = False
+		trail_stop = None
 		for _, frow in future_data.iterrows():
 			fhigh = float(frow['high'])
 			flow = float(frow['low'])
+			# BE at 1R; trail 1.0 ATR thereafter
+			if not breakeven_activated:
+				if bias == 'BUY' and fhigh >= entry + stop_loss:
+					breakeven_activated = True
+					trail_active = True
+					trail_stop = entry
+				elif bias == 'SELL' and flow <= entry - stop_loss:
+					breakeven_activated = True
+					trail_active = True
+					trail_stop = entry
 			if bias == 'BUY':
 				if fhigh >= entry + target:
 					pnl = max(0.0, target - slippage)
 					outcome = 'Win'
 					targets_hit = 1
 					break
+				if trail_active:
+					trail_stop = max(trail_stop, fhigh - 1.0*atr)
 				if flow <= entry - stop_loss:
 					pnl = -max(0.0, stop_loss + slippage)
 					outcome = 'Loss'
 					stoploss_count = 1
+					self.stopout_streak += 1
+					if self.stopout_streak >= 2:
+						self.cooldown_until_index = index + 20
+					break
+				if trail_active and flow <= trail_stop:
+					pnl = max(0.0, trail_stop - entry - slippage)
+					outcome = 'Win'
 					break
 			else:
 				if flow <= entry - target:
@@ -73,11 +139,25 @@ class RsiMeanReversionBb:
 					outcome = 'Win'
 					targets_hit = 1
 					break
+				if trail_active:
+					trail_stop = min(trail_stop, flow + 1.0*atr)
 				if fhigh >= entry + stop_loss:
 					pnl = -max(0.0, stop_loss + slippage)
 					outcome = 'Loss'
 					stoploss_count = 1
+					self.stopout_streak += 1
+					if self.stopout_streak >= 2:
+						self.cooldown_until_index = index + 20
 					break
+				if trail_active and fhigh >= trail_stop:
+					pnl = max(0.0, entry - trail_stop - slippage)
+					outcome = 'Win'
+					break
+		
+		# Bookkeeping
+		self._inc_daily(ts)
+		if outcome == 'Win':
+			self.stopout_streak = 0
 		
 		return {
 			'signal': bias,
@@ -90,5 +170,5 @@ class RsiMeanReversionBb:
 			'pnl': pnl,
 			'targets_hit': targets_hit,
 			'stoploss_count': stoploss_count,
-			'reasoning': 'RSI mean reversion with Bollinger Bands'
+			'reasoning': 'RSI mean reversion in flat regime; BB bands; TP1->BE->trail'
 		} 

@@ -72,7 +72,7 @@ def setup_database():
         )
     ''')
 
-    # Create trades_backtest table to store valid trade outcomes
+    # Create trades_backtest table for valid trades
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS trades_backtest (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,17 +83,11 @@ def setup_database():
             price REAL,
             stop_loss REAL,
             target REAL,
-            target2 REAL,
-            target3 REAL,
-            reasoning TEXT,
-            confidence TEXT,
-            confidence_score INTEGER,
-            outcome TEXT,
             pnl REAL,
+            outcome TEXT,
             targets_hit INTEGER,
             stoploss_count INTEGER,
-            exit_time TEXT,
-            market_condition TEXT,
+            confidence_score INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -105,7 +99,7 @@ def ensure_recent_data(symbols: list, timeframe: str, max_staleness_days: int = 
     """Ensure parquet data is fresh for given symbols and timeframe. Optionally runs sync."""
     data_store = ParquetDataStore()
     stale = []
-        for symbol in symbols:
+    for symbol in symbols:
         df = data_store.load_data(symbol, timeframe, days_back=None)
         if df.empty:
             stale.append(symbol)
@@ -238,7 +232,7 @@ def run_backtest_with_enhanced_logging(strategy_name, symbol, timeframe, days):
                 log_rejected_signal_backtest(enhanced_signal_data, future_data, backtest_run_id, backtest_parameters)
                 rejected_signals += 1
             else:
-                # Valid signal - log to trading_signals table
+                # Valid signal - log to trading_signals and trades_backtest
                 conn = sqlite3.connect('trading_signals.db')
                 cursor = conn.cursor()
                 cursor.execute('''
@@ -258,40 +252,23 @@ def run_backtest_with_enhanced_logging(strategy_name, symbol, timeframe, days):
                     enhanced_signal_data['target3'],
                     enhanced_signal_data['reasoning']
                 ))
-
-                # Also log to trades_backtest with real performance data if present
-                try:
-                    trade_payload = {
-                        'timestamp': enhanced_signal_data['timestamp'],
-                        'strategy': strategy_name,
-                        'symbol': symbol,
-                        'signal': signal_type,
-                        'price': enhanced_signal_data['price'],
-                        'stop_loss': enhanced_signal_data.get('stop_loss', 0),
-                        'target': enhanced_signal_data.get('target', 0),
-                        'target2': enhanced_signal_data.get('target2', 0),
-                        'target3': enhanced_signal_data.get('target3', 0),
-                        'reasoning': enhanced_signal_data.get('reasoning', ''),
-                        'confidence': enhanced_signal_data.get('confidence', 'Unknown'),
-                        'confidence_score': enhanced_signal_data.get('confidence_score', 0),
-                        'outcome': enhanced_signal_data.get('outcome', 'Pending'),
-                        'pnl': enhanced_signal_data.get('pnl', 0.0),
-                        'targets_hit': enhanced_signal_data.get('targets_hit', 0),
-                        'stoploss_count': enhanced_signal_data.get('stoploss_count', 0),
-                        'exit_time': enhanced_signal_data.get('exit_time', ''),
-                        'market_condition': enhanced_signal_data.get('market_condition', 'Unknown')
-                    }
-                    cursor.execute('''
-                        INSERT INTO trades_backtest (
-                            timestamp, strategy, symbol, signal, price, stop_loss, target, target2, target3, reasoning,
-                            confidence, confidence_score, outcome, pnl, targets_hit, stoploss_count, exit_time, market_condition
-                        ) VALUES (
-                            :timestamp, :strategy, :symbol, :signal, :price, :stop_loss, :target, :target2, :target3, :reasoning,
-                            :confidence, :confidence_score, :outcome, :pnl, :targets_hit, :stoploss_count, :exit_time, :market_condition
-                        )
-                    ''', trade_payload)
-                except Exception as _:
-                    pass
+                cursor.execute('''
+                    INSERT INTO trades_backtest (timestamp, strategy, symbol, signal, price, stop_loss, target, pnl, outcome, targets_hit, stoploss_count, confidence_score)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    enhanced_signal_data['timestamp'],
+                    strategy_name,
+                    symbol,
+                    signal_type,
+                    float(enhanced_signal_data['price'] or 0.0),
+                    float(enhanced_signal_data['stop_loss'] or 0.0),
+                    float(enhanced_signal_data['target'] or 0.0),
+                    float(enhanced_signal_data.get('pnl', 0.0) or 0.0),
+                    enhanced_signal_data.get('outcome', 'Pending'),
+                    int(enhanced_signal_data.get('targets_hit', 0) or 0),
+                    int(enhanced_signal_data.get('stoploss_count', 0) or 0),
+                    int(confidence_score or 0)
+                ))
                 conn.commit()
                 conn.close()
 
@@ -321,12 +298,6 @@ def main():
     symbols = ['NSE:NIFTYBANK-INDEX', 'NSE:NIFTY50-INDEX']
     timeframe = '5min'
     days = 5
-    # Allow environment overrides for full multi-strategy runs
-    timeframe = os.environ.get('TIMEFRAME', timeframe)
-    try:
-        days = int(os.environ.get('DAYS', days))
-    except Exception:
-        pass
 
     # Ensure data fresh
     ensure_recent_data(symbols, timeframe)
@@ -349,10 +320,8 @@ def main():
                     print(f"  📊 {symbol}: {signals} signals, {rejected} rejected ({rejection_rate:.1f}%)")
                 else:
                     print(f"  📊 {symbol}: No signals generated")
-                    
-        except Exception as e:
-                print(f"  ❌ Error testing {symbol}: {e}")
-    
+            except Exception as e:
+                print(f"  ❌ Error testing {symbol}: {e}")    
     print(f"\n🎯 OVERALL RESULTS")
     print("=" * 60)
     print(f"Total Signals Generated: {total_signals_all}")
@@ -418,9 +387,9 @@ if __name__ == "__main__":
                     print(f"  📊 {symbol}: {signals} signals, {rejected} rejected ({rejection_rate:.1f}%)")
                 else:
                     print(f"  📊 {symbol}: No signals generated")
-        except Exception as e:
+            except Exception as e:
                 print(f"  ❌ Error testing {symbol}: {e}")
             print("\n🎉 BACKTESTING COMPLETE!")
         _run_single()
     else:
-    main() 
+        main() 

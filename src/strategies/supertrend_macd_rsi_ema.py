@@ -553,10 +553,11 @@ class SupertrendMacdRsiEma(Strategy):
             )
             if not indicators_aligned:
                 confidence_score -= 20  # Reduce confidence for misaligned indicators
-                if confidence_score < 45:
+                # OPTIMIZATION: Higher confidence threshold for profitable strategy (45 -> 80)
+                if confidence_score < 80:
                     signal = "NO TRADE"
                     confidence = "Low"
-                    rsi_reason += " (Indicator misalignment detected)"
+                    rsi_reason += f" (Confidence {confidence_score} below 80 threshold)"
 
         # Fallback: If option data is missing, simulate on underlying
         if signal.startswith("BUY") and future_data is not None and not future_data.empty:
