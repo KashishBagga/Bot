@@ -44,9 +44,9 @@ class LiveTradingBot:
         self.symbols = ['NSE_NIFTYBANK_INDEX', 'NSE_NIFTY50_INDEX']  # Updated to match data directory names
         self.timeframe = '5min'  # Primary timeframe for live trading
         
-        # Risk management parameters - BALANCED FOR ACTIVITY RESTORATION
+        # Risk management parameters - OPTIMIZED FOR MULTI-FACTOR CONFIDENCE
         self.risk_params = {
-            'min_confidence_score': 65,  # Reduced from 75 to 65 to restore trading activity
+            'min_confidence_score': 50,  # Optimized for multi-factor confidence system
             'max_daily_loss': -2000,     # Reduced from -5000 for better risk control
             'max_positions_per_strategy': 1,  # Reduced from 2
             'position_size_multiplier': 1.0,

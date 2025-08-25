@@ -68,8 +68,8 @@ class RsiMeanReversionBb:
 		if atr <= 0 or bb_lower == 0 or bb_upper == 0:
 			return None
 		
-		# Volatility and volume windows (relaxed)
-		if atr_pct < 0.1 or atr_pct > 0.9 or vol_ratio != vol_ratio or vol_ratio < 0.6:
+		# OPTIMIZATION: Enhanced volatility and volume filters for better win rate
+		if atr_pct < 0.2 or atr_pct > 0.8 or vol_ratio != vol_ratio or vol_ratio < 0.8:
 			return None
 		
 		# Flat regime via EMA proximity (relaxed tolerance)
@@ -78,18 +78,26 @@ class RsiMeanReversionBb:
 		if not flat_regime:
 			return None
 		
-		# Mean reversion triggers with band proximity tolerance
-		near_lower = price <= bb_lower * 1.002
-		near_upper = price >= bb_upper * 0.998
-		long_setup = (rsi <= 35) and near_lower
-		short_setup = (rsi >= 65) and near_upper
+		# OPTIMIZATION: Enhanced mean reversion triggers for better win rate
+		near_lower = price <= bb_lower * 1.005  # Slightly more tolerance
+		near_upper = price >= bb_upper * 0.995  # Slightly more tolerance
+		long_setup = (rsi <= 30) and near_lower  # More extreme RSI for better reversal
+		short_setup = (rsi >= 70) and near_upper  # More extreme RSI for better reversal
 		if not (long_setup or short_setup):
 			return None
 		
-		conf = 60 + min(10, abs(50 - rsi) / 4)
+		# Multi-Factor Confidence Integration for RSI Mean Reversion
+		from src.core.multi_factor_confidence import MultiFactorConfidence
+		
+		mfc = MultiFactorConfidence()
+		signal_type = "BUY" if long_setup else "SELL"
+		confidence_result = mfc.calculate_confidence(candle, signal_type, self.timeframe_data)
+		
+		conf = confidence_result['total_score']
 		bias = 'BUY' if long_setup else 'SELL'
-		stop_loss = 1.0 * atr
-		target = 1.2 * atr
+		# OPTIMIZATION: Improved risk-reward ratio for better profitability
+		stop_loss = 0.8 * atr  # Tighter stop loss
+		target = 1.5 * atr     # Higher target for better R:R ratio
 		slippage = price * 0.0003
 		
 		entry = price

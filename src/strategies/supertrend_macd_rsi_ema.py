@@ -538,11 +538,22 @@ class SupertrendMacdRsiEma(Strategy):
             price_reason = f"Price {candle['close']:.2f} << EMA {candle['ema']:.2f} and < SuperTrend {candle['supertrend']:.2f}"
             option_type = "PE"
 
-        # Enhanced filtering: Only trade with Medium+ confidence (score >= 35)
-        if signal != "NO TRADE" and confidence_score < 35:
+        # Multi-Factor Confidence Integration
+        from src.core.multi_factor_confidence import MultiFactorConfidence
+        
+        # Calculate multi-factor confidence
+        mfc = MultiFactorConfidence()
+        signal_type = "BUY" if signal == "BUY CALL" else "SELL"
+        confidence_result = mfc.calculate_confidence(candle, signal_type, self.timeframe_data)
+        
+        # Use multi-factor confidence score
+        confidence_score = confidence_result['total_score']
+        
+        # Enhanced filtering: Only trade with Medium+ confidence (score >= 40)
+        if signal != "NO TRADE" and confidence_score < 40:
             signal = "NO TRADE"
             confidence = "Low"
-            rsi_reason += f" (Filtered: Confidence score {confidence_score} < 35)"
+            rsi_reason += f" (Filtered: Multi-factor confidence {confidence_score} < 40)"
 
         # Additional filter for very high confidence trades
         if signal != "NO TRADE" and confidence_score >= 65:
@@ -553,11 +564,11 @@ class SupertrendMacdRsiEma(Strategy):
             )
             if not indicators_aligned:
                 confidence_score -= 20  # Reduce confidence for misaligned indicators
-                # OPTIMIZATION: Balanced confidence threshold for activity restoration (80 -> 45)
-                if confidence_score < 45:
+                # OPTIMIZATION: Multi-factor confidence threshold for optimal win rate
+                if confidence_score < 50:
                     signal = "NO TRADE"
                     confidence = "Low"
-                    rsi_reason += f" (Confidence {confidence_score} below 45 threshold)"
+                    rsi_reason += f" (Multi-factor confidence {confidence_score} below 50 threshold)"
 
         # Fallback: If option data is missing, simulate on underlying
         if signal.startswith("BUY") and future_data is not None and not future_data.empty:

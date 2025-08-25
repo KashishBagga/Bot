@@ -253,62 +253,30 @@ class SupertrendEma(Strategy):
             confidence_score += 5
             confidence_reasons.append(f"Good directional candle ({body_ratio:.2f})")
         
-        # Enhanced confidence scoring for profitability optimization
-        confidence_score = 50
+        # Multi-Factor Confidence Scoring System
+        from src.core.multi_factor_confidence import MultiFactorConfidence
+        
+        mfc = MultiFactorConfidence()
+        confidence_result = mfc.calculate_confidence(candle, "BUY" if supertrend_direction > 0 else "SELL", self.timeframe_data)
+        
+        confidence_score = confidence_result['total_score']
         confidence_factors = []
         
-        # SuperTrend direction strength (0-20 points)
-        if supertrend_direction == 1:  # Bullish
-            confidence_score += 15
-            confidence_factors.append("SuperTrend bullish")
-        elif supertrend_direction == -1:  # Bearish
-            confidence_score += 15
-            confidence_factors.append("SuperTrend bearish")
+        # Add factor details to reasoning
+        for factor, score in confidence_result['factors'].items():
+            if score > 0:
+                confidence_factors.append(f"{factor}: {score}")
         
-        # Price vs SuperTrend distance (0-15 points)
-        supertrend_value = candle.get('supertrend', 0)
-        st_distance = abs(candle['close'] - supertrend_value) / candle['close']
-        if st_distance > 0.02:  # >2% from SuperTrend
-            confidence_score += 15
-            confidence_factors.append(f"Strong price separation from ST ({st_distance:.1%})")
-        elif st_distance > 0.01:  # >1% from SuperTrend
-            confidence_score += 10
-            confidence_factors.append(f"Good price separation from ST ({st_distance:.1%})")
-        elif st_distance > 0.005:  # >0.5% from SuperTrend
-            confidence_score += 5
-            confidence_factors.append(f"Moderate price separation from ST ({st_distance:.1%})")
+        # Add detailed reasoning from multi-factor system
+        for factor, reasons in confidence_result['reasons'].items():
+            if reasons:
+                confidence_factors.extend(reasons)
         
-        # EMA alignment (0-15 points)
-        ema_21 = candle.get('ema_21', 0)
-        if ema_21 > 0:
-            ema_alignment = (candle['close'] > ema_21) if supertrend_direction == 1 else (candle['close'] < ema_21)
-            if ema_alignment:
-                confidence_score += 15
-                confidence_factors.append("EMA alignment confirmed")
+        # Multi-factor confidence already calculated above
+        # confidence_score and confidence_factors are now set by MultiFactorConfidence system
         
-        # Volume confirmation (0-10 points)
-        volume_ratio = candle.get('volume_ratio', 1.0)
-        if volume_ratio > 1.5:
-            confidence_score += 10
-            confidence_factors.append(f"Above average volume ({volume_ratio:.1f}x)")
-        elif volume_ratio > 1.2:
-            confidence_score += 5
-            confidence_factors.append(f"Good volume ({volume_ratio:.1f}x)")
-        
-        # RSI confirmation (0-10 points)
-        rsi = candle.get('rsi', 50)
-        if supertrend_direction == 1 and 40 <= rsi <= 65:  # Bullish with good RSI
-            confidence_score += 10
-            confidence_factors.append(f"RSI optimal for bullish ({rsi:.1f})")
-        elif supertrend_direction == -1 and 35 <= rsi <= 60:  # Bearish with good RSI
-            confidence_score += 10
-            confidence_factors.append(f"RSI optimal for bearish ({rsi:.1f})")
-        elif 30 <= rsi <= 70:  # Acceptable RSI range
-            confidence_score += 5
-            confidence_factors.append(f"RSI acceptable ({rsi:.1f})")
-        
-        # OPTIMIZATION: Balanced confidence threshold for activity restoration (75 -> 65)
-        min_confidence_threshold = 65
+        # OPTIMIZATION: Multi-factor confidence threshold for optimal win rate
+        min_confidence_threshold = 50  # Reduced threshold to enable trading activity
         
         if confidence_score < min_confidence_threshold:
             return {

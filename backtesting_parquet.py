@@ -321,7 +321,8 @@ def main():
                 else:
                     print(f"  📊 {symbol}: No signals generated")
             except Exception as e:
-                print(f"  ❌ Error testing {symbol}: {e}")    
+                print(f"  ❌ Error testing {symbol}: {e}")
+    
     print(f"\n🎯 OVERALL RESULTS")
     print("=" * 60)
     print(f"Total Signals Generated: {total_signals_all}")
@@ -364,7 +365,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeframe", type=str, default=None, help="Timeframe (e.g., 5min)")
     parser.add_argument("--days", type=int, default=None, help="Days back to load")
     args = parser.parse_args()
-
+    
     # If args provided, override defaults inside main via simple wrapper
     if args.strategy or args.symbol or args.timeframe or args.days:
         def _run_single():
