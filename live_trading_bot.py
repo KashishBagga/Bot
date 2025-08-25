@@ -46,10 +46,10 @@ class LiveTradingBot:
         
         # Risk management parameters - OPTIMIZED FOR MULTI-FACTOR CONFIDENCE
         self.risk_params = {
-            'min_confidence_score': 50,  # Optimized for multi-factor confidence system
-            'max_daily_loss': -2000,     # Reduced from -5000 for better risk control
+            'min_confidence_score': 60,  # Increased from 50 for better signal quality
+            'max_daily_loss': -1500,     # Reduced from -2000 for better risk control
             'max_positions_per_strategy': 1,  # Reduced from 2
-            'position_size_multiplier': 1.0,
+            'position_size_multiplier': 0.8,  # Reduced from 1.0 for better risk management
             'emergency_stop': False
         }
         

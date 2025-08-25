@@ -98,104 +98,57 @@ class EmaCrossover(Strategy):
         return self.analyze_single_timeframe(df.iloc[index:index+1], future_data)
 
     def analyze_single_timeframe(self, data: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        """Analyze single timeframe data for EMA crossover signals."""
+        if data.empty:
+            return None
+            
+        candle = data.iloc[0]
         
-        if len(data) < 51:  # Need at least 51 periods for indicators
-            return {"signal": "NO TRADE", "confidence": "Very Low", "confidence_score": 0, "reasoning": "Insufficient data"}
-        
-        candle = data.iloc[-1]
-        prev_candle = data.iloc[-2]
-        
-        # Get current values
-        ema_9 = candle['ema_9']
-        ema_21 = candle['ema_21']
-        prev_ema_9 = prev_candle['ema_9']
-        prev_ema_21 = prev_candle['ema_21']
-        rsi = candle['rsi']
-        volume_ratio = candle.get('volume_ratio', 1.0)
+        # Get indicator values
+        ema_9 = candle.get('ema_fast', candle.get('ema_9', 0))
+        ema_21 = candle.get('ema_slow', candle.get('ema_21', 0))
+        rsi = candle.get('rsi', 50)
         macd = candle.get('macd', 0)
         macd_signal = candle.get('macd_signal', 0)
+        volume_ratio = candle.get('volume_ratio', 1.0)
+        atr = candle.get('atr', candle['close'] * 0.01)
         
-        # Initialize variables
+        # OPTIMIZATION: Enhanced signal generation with better filters
         signal = "NO TRADE"
-        confidence = "Very Low"
         confidence_score = 0
-        outcome = "Pending"
-        pnl = 0.0
-        targets_hit = 0
-        stoploss_count = 0
-        failure_reason = ""
-        exit_time = None
         
-        # OPTIMIZATION: Enhanced filters for profitability
-        # 1. Volume filter - only trade on above-average volume
-        if volume_ratio < 1.5:
-            return {
-                "signal": "NO TRADE",
-                "confidence": "Very Low", 
-                "confidence_score": 0,
-                "reasoning": f"Low volume (ratio: {volume_ratio:.2f} < 1.5)"
-            }
-        
-        # 2. MACD alignment filter
-        macd_aligned_buy = macd > macd_signal and macd > 0
-        macd_aligned_sell = macd < macd_signal and macd < 0
-        
-        # EMA crossover detection
-        buy_signal = (ema_9 > ema_21 and prev_ema_9 <= prev_ema_21)
-        sell_signal = (ema_9 < ema_21 and prev_ema_9 >= prev_ema_21)
-        
-        # Enhanced entry criteria with MACD confirmation
-        if buy_signal and macd_aligned_buy and rsi < 70:
-            signal = "BUY CALL"
-            base_confidence = 50
-        elif sell_signal and macd_aligned_sell and rsi > 30:
-            signal = "BUY PUT"
-            base_confidence = 50
-        else:
-            return {"signal": "NO TRADE", "confidence": "Very Low", "confidence_score": 0, "reasoning": "No valid crossover or MACD not aligned"}
-        
-        # Enhanced confidence scoring (target: 85+ for execution)
-        confidence_score = base_confidence
-        
-        # Volume confirmation boost
-        if volume_ratio > 2.0:
-            confidence_score += 15
-        elif volume_ratio > 1.8:
-            confidence_score += 10
-        elif volume_ratio > 1.5:
-            confidence_score += 5
+        # Check for valid EMA values
+        if ema_9 <= 0 or ema_21 <= 0:
+            return None
             
-        # MACD strength boost
-        macd_strength = abs(macd - macd_signal)
-        if macd_strength > 5:
-            confidence_score += 15
-        elif macd_strength > 2:
-            confidence_score += 10
-        elif macd_strength > 1:
-            confidence_score += 5
-            
-        # RSI position boost
-        if signal == "BUY CALL" and 45 <= rsi <= 65:
-            confidence_score += 10
-        elif signal == "BUY PUT" and 35 <= rsi <= 55:
-            confidence_score += 10
-            
-        # Trend strength boost
-        ema_separation = abs(ema_9 - ema_21) / ema_21
-        if ema_separation > 0.01:
-            confidence_score += 10
-        elif ema_separation > 0.005:
-            confidence_score += 5
-            
-        # OPTIMIZATION: Higher confidence threshold (60 -> 85)
-        if confidence_score < 85:
-            return {
-                "signal": "NO TRADE",
-                "confidence": "Low",
-                "confidence_score": confidence_score,
-                "reasoning": f"Confidence {confidence_score} below 85 threshold"
-            }
+        # Calculate EMA crossover strength
+        crossover_strength = abs(ema_9 - ema_21) / ema_21 * 100
         
+        # OPTIMIZATION: Improved signal conditions
+        if ema_9 > ema_21 and crossover_strength > 0.1:  # Bullish crossover
+            # Additional bullish filters
+            if (rsi > 40 and rsi < 80 and  # RSI not overbought
+                macd > macd_signal and     # MACD bullish
+                volume_ratio > 0.8):       # Decent volume
+                
+                signal = "BUY CALL"
+                # OPTIMIZATION: Better confidence calculation
+                confidence_score = 60 + min(20, crossover_strength * 10) + min(10, (rsi - 40) / 2)
+                
+        elif ema_9 < ema_21 and crossover_strength > 0.1:  # Bearish crossover
+            # Additional bearish filters
+            if (rsi < 60 and rsi > 20 and  # RSI not oversold
+                macd < macd_signal and     # MACD bearish
+                volume_ratio > 0.8):       # Decent volume
+                
+                signal = "BUY PUT"
+                # OPTIMIZATION: Better confidence calculation
+                confidence_score = 60 + min(20, crossover_strength * 10) + min(10, (60 - rsi) / 2)
+        
+        # OPTIMIZATION: Minimum confidence threshold
+        if confidence_score < 50:
+            return None
+            
         # Determine confidence level
         if confidence_score >= 90:
             confidence = "Very High"
@@ -208,30 +161,33 @@ class EmaCrossover(Strategy):
         else:
             confidence = "Very Low"
         
-        # Calculate stop loss and targets with improved R:R
-        atr = candle.get('atr', candle['close'] * 0.01)
-        
-        # OPTIMIZATION: Improved risk-reward ratios
-        if confidence_score >= 95:
+        # OPTIMIZATION: Improved risk-reward ratios based on confidence
+        if confidence_score >= 80:
             stop_loss = int(round(1.5 * atr))
-            target1 = int(round(4.0 * atr))  # 2.7:1 R:R
-            target2 = int(round(6.0 * atr))  # 4:1 R:R
-            target3 = int(round(8.0 * atr))  # 5.3:1 R:R
-        elif confidence_score >= 90:
+            target1 = int(round(3.0 * atr))  # 2:1 R:R
+            target2 = int(round(4.5 * atr))  # 3:1 R:R
+            target3 = int(round(6.0 * atr))  # 4:1 R:R
+        elif confidence_score >= 70:
             stop_loss = int(round(2.0 * atr))
-            target1 = int(round(4.5 * atr))  # 2.25:1 R:R
-            target2 = int(round(6.5 * atr))  # 3.25:1 R:R
-            target3 = int(round(8.5 * atr))  # 4.25:1 R:R
-        else:  # 85-89
+            target1 = int(round(3.5 * atr))  # 1.75:1 R:R
+            target2 = int(round(5.0 * atr))  # 2.5:1 R:R
+            target3 = int(round(6.5 * atr))  # 3.25:1 R:R
+        else:  # 50-69
             stop_loss = int(round(2.5 * atr))
-            target1 = int(round(5.0 * atr))  # 2:1 R:R
-            target2 = int(round(7.0 * atr))  # 2.8:1 R:R
-            target3 = int(round(9.0 * atr))  # 3.6:1 R:R
+            target1 = int(round(4.0 * atr))  # 1.6:1 R:R
+            target2 = int(round(5.5 * atr))  # 2.2:1 R:R
+            target3 = int(round(7.0 * atr))  # 2.8:1 R:R
         
-        # OPTIMIZATION: Reduced position size for testing (0.3x)
-        position_multiplier = 0.3
+        # OPTIMIZATION: Reduced position size for better risk management
+        position_multiplier = 0.5 if confidence_score >= 80 else 0.3
         
         # Calculate performance if we have future data
+        outcome = "Pending"
+        pnl = 0.0
+        targets_hit = 0
+        stoploss_count = 0
+        failure_reason = ""
+        
         if signal != "NO TRADE" and future_data is not None and not future_data.empty:
             price = candle['close']
             
@@ -286,6 +242,7 @@ class EmaCrossover(Strategy):
         
         # Build reasoning string
         price_reason = f"EMA crossover: {ema_9:.1f} {'>' if signal == 'BUY CALL' else '<'} {ema_21:.1f}"
+        price_reason += f", Strength: {crossover_strength:.2f}%"
         price_reason += f", Volume: {volume_ratio:.1f}x"
         price_reason += f", MACD: {macd:.2f} vs {macd_signal:.2f}"
         price_reason += f", RSI: {rsi:.1f}"
@@ -300,14 +257,12 @@ class EmaCrossover(Strategy):
             "target": target1,
             "target2": target2,
             "target3": target3,
-            "reasoning": price_reason,
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time,
-            "position_multiplier": position_multiplier
+            "reasoning": price_reason
         }
         
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 

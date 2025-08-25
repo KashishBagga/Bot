@@ -222,5 +222,40 @@ class FyersClient:
             logger.error(f"Error getting order status: {e}")
             return None
 
+    def get_historical_data(self, symbol, resolution, date_format=1, range_from=None, range_to=None, cont_flag=1):
+        """Get historical data for a symbol.
+        
+        Args:
+            symbol: Trading symbol (e.g., "NSE:NIFTY50-INDEX")
+            resolution: Timeframe (1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 120, 180, 240, 1D)
+            date_format: Date format (1 for timestamp)
+            range_from: Start date (YYYY-MM-DD)
+            range_to: End date (YYYY-MM-DD)
+            cont_flag: Continuous flag
+            
+        Returns:
+            dict: Historical data
+        """
+        if not self.fyers:
+            logger.error("Fyers client not initialized")
+            return None
+        
+        data = {
+            "symbol": symbol,
+            "resolution": resolution,
+            "date_format": date_format,
+            "range_from": range_from,
+            "range_to": range_to,
+            "cont_flag": cont_flag
+        }
+        
+        try:
+            response = self.fyers.history(data)
+            logger.info(f"Historical data fetched for {symbol}")
+            return response
+        except Exception as e:
+            logger.error(f"Error fetching historical data for {symbol}: {e}")
+            return None
+
 # Create an instance for direct imports
 fyers_client = FyersClient() 

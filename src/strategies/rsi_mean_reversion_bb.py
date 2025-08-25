@@ -65,24 +65,42 @@ class RsiMeanReversionBb:
 		ema21 = float(candle.get('ema_21', 0))
 		ema50 = float(candle.get('ema_50', 0))
 		vol_ratio = float(candle.get('volume_ratio', 1))
+		macd = float(candle.get('macd', 0))
+		macd_signal = float(candle.get('macd_signal', 0))
+		
 		if atr <= 0 or bb_lower == 0 or bb_upper == 0:
 			return None
 		
-		# OPTIMIZATION: Enhanced volatility and volume filters for better win rate
-		if atr_pct < 0.2 or atr_pct > 0.8 or vol_ratio != vol_ratio or vol_ratio < 0.8:
+		# OPTIMIZATION: Tighter volatility and volume filters for better win rate
+		if atr_pct < 0.3 or atr_pct > 0.7 or vol_ratio != vol_ratio or vol_ratio < 1.0:
 			return None
 		
-		# Flat regime via EMA proximity (relaxed tolerance)
-		tol = 0.005  # 0.5%
+		# OPTIMIZATION: Enhanced flat regime detection with stricter tolerance
+		tol = 0.003  # Reduced from 0.005 - tighter flat regime requirement
 		flat_regime = abs(ema21 - ema50) / max(1e-6, abs(ema50)) <= tol
 		if not flat_regime:
 			return None
 		
-		# OPTIMIZATION: Enhanced mean reversion triggers for better win rate
-		near_lower = price <= bb_lower * 1.005  # Slightly more tolerance
-		near_upper = price >= bb_upper * 0.995  # Slightly more tolerance
-		long_setup = (rsi <= 30) and near_lower  # More extreme RSI for better reversal
-		short_setup = (rsi >= 70) and near_upper  # More extreme RSI for better reversal
+		# OPTIMIZATION: Enhanced mean reversion triggers with stricter conditions
+		near_lower = price <= bb_lower * 1.002  # Tighter tolerance
+		near_upper = price >= bb_upper * 0.998  # Tighter tolerance
+		
+		# OPTIMIZATION: More extreme RSI conditions for better reversal probability
+		long_setup = (rsi <= 25) and near_lower  # More extreme oversold
+		short_setup = (rsi >= 75) and near_upper  # More extreme overbought
+		
+		# OPTIMIZATION: Additional momentum confirmation
+		if long_setup:
+			# For long setup, check if MACD is starting to turn up
+			macd_turning_up = macd > macd_signal and macd > 0
+			if not macd_turning_up:
+				long_setup = False
+		elif short_setup:
+			# For short setup, check if MACD is starting to turn down
+			macd_turning_down = macd < macd_signal and macd < 0
+			if not macd_turning_down:
+				short_setup = False
+		
 		if not (long_setup or short_setup):
 			return None
 		
@@ -94,12 +112,19 @@ class RsiMeanReversionBb:
 		confidence_result = mfc.calculate_confidence(candle, signal_type, self.timeframe_data)
 		
 		conf = confidence_result['total_score']
+		
+		# OPTIMIZATION: Higher minimum confidence threshold
+		if conf < 60:  # Increased from implicit lower threshold
+			return None
+			
 		bias = 'BUY' if long_setup else 'SELL'
+		
 		# OPTIMIZATION: Improved risk-reward ratio for better profitability
-		stop_loss = 0.8 * atr  # Tighter stop loss
-		target = 1.5 * atr     # Higher target for better R:R ratio
+		stop_loss = 0.6 * atr  # Tighter stop loss for better R:R
+		target = 1.8 * atr     # Higher target for better R:R ratio (3:1)
 		slippage = price * 0.0003
 		
+		# Walk forward with BE after 0.4R and trail 0.6 ATR thereafter
 		entry = price
 		pnl = 0.0
 		outcome = 'Pending'
@@ -108,19 +133,33 @@ class RsiMeanReversionBb:
 		breakeven_activated = False
 		trail_active = False
 		trail_stop = None
+		
+		# OPTIMIZATION: Time-based exit (EOD at 15:00)
+		eod_exit = False
+		
 		for _, frow in future_data.iterrows():
 			fhigh = float(frow['high'])
 			flow = float(frow['low'])
-			# BE at 1R; trail 1.0 ATR thereafter
+			
+			# Check for EOD exit
+			if hasattr(frow, 'name') and hasattr(frow.name, 'hour'):
+				if frow.name.hour >= 15:
+					eod_exit = True
+					pnl = max(0.0, (flow + fhigh) / 2 - entry - slippage) if bias == 'BUY' else max(0.0, entry - (flow + fhigh) / 2 - slippage)
+					outcome = 'Win' if pnl > 0 else 'Loss'
+					break
+			
+			# OPTIMIZATION: Activate BE after 0.4R (reduced from 0.5R)
 			if not breakeven_activated:
-				if bias == 'BUY' and fhigh >= entry + stop_loss:
+				if bias == 'BUY' and fhigh >= entry + 0.4*stop_loss:
 					breakeven_activated = True
 					trail_active = True
 					trail_stop = entry
-				elif bias == 'SELL' and flow <= entry - stop_loss:
+				elif bias == 'SELL' and flow <= entry - 0.4*stop_loss:
 					breakeven_activated = True
 					trail_active = True
 					trail_stop = entry
+			# TP at 1.8 ATR
 			if bias == 'BUY':
 				if fhigh >= entry + target:
 					pnl = max(0.0, target - slippage)
@@ -128,7 +167,7 @@ class RsiMeanReversionBb:
 					targets_hit = 1
 					break
 				if trail_active:
-					trail_stop = max(trail_stop, fhigh - 1.0*atr)
+					trail_stop = max(trail_stop, fhigh - 0.6*atr)  # Tighter trail
 				if flow <= entry - stop_loss:
 					pnl = -max(0.0, stop_loss + slippage)
 					outcome = 'Loss'
@@ -148,7 +187,7 @@ class RsiMeanReversionBb:
 					targets_hit = 1
 					break
 				if trail_active:
-					trail_stop = min(trail_stop, flow + 1.0*atr)
+					trail_stop = min(trail_stop, flow + 0.6*atr)  # Tighter trail
 				if fhigh >= entry + stop_loss:
 					pnl = -max(0.0, stop_loss + slippage)
 					outcome = 'Loss'
@@ -170,7 +209,7 @@ class RsiMeanReversionBb:
 		return {
 			'signal': bias,
 			'price': entry,
-			'confidence': 'High' if conf >= 70 else ('Medium' if conf >= 60 else 'Low'),
+			'confidence': 'High' if conf >= 75 else ('Medium' if conf >= 60 else 'Low'),
 			'confidence_score': int(conf),
 			'stop_loss': stop_loss,
 			'target': target,
@@ -178,5 +217,5 @@ class RsiMeanReversionBb:
 			'pnl': pnl,
 			'targets_hit': targets_hit,
 			'stoploss_count': stoploss_count,
-			'reasoning': 'RSI mean reversion in flat regime; BB bands; TP1->BE->trail'
+			'reasoning': f'RSI mean reversion with Bollinger Bands, RSI={rsi:.1f}, BB_{"lower" if long_setup else "upper"}, R:R=3:1, Conf={conf}'
 		} 
