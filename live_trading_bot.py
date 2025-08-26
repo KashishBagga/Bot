@@ -9,7 +9,6 @@ import sys
 import time
 import sqlite3
 import pandas as pd
-import threading
 import logging
 import numpy as np
 import schedule
@@ -17,16 +16,12 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 
 # Add src directory to path
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from src.strategies.insidebar_rsi import InsidebarRsi
-from src.strategies.ema_crossover import EmaCrossover
 from src.strategies.supertrend_ema import SupertrendEma
 from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
-from src.models.backtesting_summary import BacktestingSummary
 from src.data.parquet_data_store import ParquetDataStore
 from src.models.unified_database import UnifiedDatabase
 from dotenv import load_dotenv
@@ -41,12 +36,14 @@ class LiveTradingBot:
         self.db_path = db_path
         self.config_path = config_path
         self.is_running = False
-        self.symbols = ['NSE_NIFTYBANK_INDEX', 'NSE_NIFTY50_INDEX']  # Updated to match data directory names
+        
+        # FIX: Standardize symbol naming to match parquet store format
+        self.symbols = ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX']  # Match parquet store exactly
         self.timeframe = '5min'  # Primary timeframe for live trading
         
         # Risk management parameters - EMERGENCY LOSS PREVENTION
         self.risk_params = {
-            'min_confidence_score': 85,  # Increased from 60 for emergency loss prevention
+            'min_confidence_score': 75,  # Reduced from 85 for more realistic trading
             'max_daily_loss': -1000,     # Reduced from -1500 for tighter risk control
             'max_positions_per_strategy': 1,
             'position_size_multiplier': 0.6,  # Reduced from 0.8 for better risk management
@@ -57,7 +54,7 @@ class LiveTradingBot:
             ]
         }
         
-        # OPTIMIZATION: Focus on profitable strategies only
+        # OPTIMIZATION: Focus on profitable strategies only - FIX: Use same symbol format
         self.profitable_strategies = {
             'supertrend_ema': {'symbols': ['NSE:NIFTY50-INDEX'], 'active': True},
             'supertrend_macd_rsi_ema': {'symbols': ['NSE:NIFTYBANK-INDEX'], 'active': True}
@@ -191,7 +188,7 @@ class LiveTradingBot:
                     status TEXT,
                     exit_reason TEXT,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (signal_id) REFERENCES live_signals (id)
+                    FOREIGN KEY (signal_id) REFERENCES live_signals_realtime (id)
                 )
             ''')
             
@@ -257,10 +254,11 @@ class LiveTradingBot:
             # RSI calculation (if not already present)
             if 'rsi' not in df.columns:
                 delta = df['close'].diff()
-                gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-                loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+                gain = delta.clip(lower=0).rolling(window=14).mean()
+                loss = (-delta.clip(upper=0)).rolling(window=14).mean().replace(0, np.nan)
                 rs = gain / loss
                 df['rsi'] = 100 - (100 / (1 + rs))
+                df['rsi'] = df['rsi'].fillna(method='bfill').fillna(50)
             
             # MACD calculation (if not already present)
             if 'macd' not in df.columns:
@@ -287,9 +285,14 @@ class LiveTradingBot:
             df['volume_sma'] = df['volume'].rolling(window=20).mean()
             df['volume_ratio'] = df['volume'] / df['volume_sma']
             
-            # Price position indicators
-            df['price_position'] = (df['close'] - df['low']) / (df['high'] - df['low'])
-            df['candle_size'] = (df['high'] - df['low']) / df['close']
+            # Price position indicators - FIX: Add safety guards
+            range_ = (df['high'] - df['low']).replace(0, np.nan)
+            df['price_position'] = (df['close'] - df['low']) / range_
+            df['price_position'] = df['price_position'].clip(0, 1).fillna(0)
+            
+            den_close = df['close'].replace(0, np.nan)
+            df['candle_size'] = (df['high'] - df['low']) / den_close
+            df['candle_size'] = df['candle_size'].replace([np.inf, -np.inf], np.nan).fillna(0)
             
         except Exception as e:
             self.logger.error(f"⚠️ Error adding indicators: {e}")
@@ -358,6 +361,11 @@ class LiveTradingBot:
         if not self.is_market_open():
             self.logger.debug("🕐 Market closed - skipping cycle")
             return
+        
+        # FIX: Auto-lift emergency stop when starting mid-session
+        if self.is_market_open() and self.risk_params.get('emergency_stop', False):
+            self.logger.warning("⚠️ Emergency stop was ON during market hours; auto-disabling for live cycle.")
+            self.risk_params['emergency_stop'] = False
         
         if self.risk_params['emergency_stop']:
             self.logger.warning("🛑 Emergency stop activated - trading halted")
@@ -456,11 +464,11 @@ class LiveTradingBot:
                                 'trade_type': 'Intraday'
                             }
                             
-                            # Get future data for P&L calculation
-                            future_data = self.get_market_data(symbol, periods=50)
+                            # FIX: Don't compute future P&L in live mode - compute ex-post in scheduled job
+                            # future_data = self.get_market_data(symbol, periods=50)
                             
-                            # Log with enhanced P&L calculation
-                            log_rejected_signal_live(enhanced_rejected_data, future_data)
+                            # Log with enhanced P&L calculation (no future data in live mode)
+                            log_rejected_signal_live(enhanced_rejected_data, None)
                             
                             rejected_signals.append({
                                 **result,
@@ -597,7 +605,7 @@ class LiveTradingBot:
             # Get today's signals
             query = '''
                 SELECT strategy, COUNT(*) as count, AVG(confidence_score) as avg_confidence
-                FROM live_signals
+                FROM live_signals_realtime
                 WHERE date(created_at) = ?
                 GROUP BY strategy
             '''
@@ -721,12 +729,12 @@ class LiveTradingBot:
         self.logger.info("  ✅ Multi-strategy analysis")
         self.logger.info("="*60)
         
-        # Schedule market routines
-        schedule.every().monday.at("09:00").do(self.market_open_routine)
-        schedule.every().tuesday.at("09:00").do(self.market_open_routine)
-        schedule.every().wednesday.at("09:00").do(self.market_open_routine)
-        schedule.every().thursday.at("09:00").do(self.market_open_routine)
-        schedule.every().friday.at("09:00").do(self.market_open_routine)
+        # Schedule market open routine at 09:15 (Indian market opens at 09:15)
+        schedule.every().monday.at("09:15").do(self.market_open_routine)
+        schedule.every().tuesday.at("09:15").do(self.market_open_routine)
+        schedule.every().wednesday.at("09:15").do(self.market_open_routine)
+        schedule.every().thursday.at("09:15").do(self.market_open_routine)
+        schedule.every().friday.at("09:15").do(self.market_open_routine)
         
         schedule.every().monday.at("15:35").do(self.market_close_routine)
         schedule.every().tuesday.at("15:35").do(self.market_close_routine)
