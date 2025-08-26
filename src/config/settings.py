@@ -13,6 +13,23 @@ load_dotenv()
 # Timezone configuration
 TIMEZONE = pytz.timezone("Asia/Kolkata")
 
+# Trading symbols and timeframes
+SYMBOLS = [
+    "NSE:NIFTY50-INDEX",
+    "NSE:NIFTYBANK-INDEX"
+]
+
+TIMEFRAMES = [
+    "1min",
+    "3min", 
+    "5min",
+    "15min",
+    "30min",
+    "60min",
+    "240min",
+    "1D"
+]
+
 # Fyers API configuration
 FYERS_REDIRECT_URI = os.getenv("FYERS_REDIRECT_URI")
 FYERS_CLIENT_ID = os.getenv("FYERS_CLIENT_ID")
