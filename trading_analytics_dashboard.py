@@ -258,7 +258,8 @@ class TradingAnalyticsDashboard:
                 print(f"{outcome_icon} {row['strategy']} ({row['symbol']}): {row['signal']} @ ₹{row['price']:.2f}")
                 print(f"   Outcome: {row['outcome']} | P&L: ₹{row['pnl']:.2f} | Confidence: {row['confidence_score']}")
                 reasoning = row.get('reasoning', 'No reasoning provided')
-                print(f"   Reasoning: {reasoning[:100]}...")
+                if reasoning and reasoning != 'No reasoning provided':
+                    print(f"   Reasoning: {reasoning[:100]}...")
                 print()
         else:
             print("❌ No recent trades found")

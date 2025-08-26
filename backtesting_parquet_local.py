@@ -42,20 +42,25 @@ class LocalBacktestingEngine:
         logger.info(f"📊 Available strategies: {list(self.strategies.keys())}")
     
     def load_strategies(self):
-        """Load all available strategies"""
+        """Load all available trading strategies"""
         strategies = {}
         
-        # Import strategy modules
         try:
             from src.strategies.supertrend_ema import SupertrendEma
             from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
-            from src.strategies.insidebar_rsi import InsidebarRSI
+            from src.strategies.insidebar_rsi import InsidebarRsi
             from src.strategies.hybrid_momentum_trend import HybridMomentumTrend
+            from src.strategies.rsi_mean_reversion_bb import RsiMeanReversionBb
+            from src.strategies.ema_crossover import EmaCrossover
+            from src.strategies.macd_cross_rsi_filter import MacdCrossRsiFilter
             
             strategies['supertrend_ema'] = SupertrendEma()
             strategies['supertrend_macd_rsi_ema'] = SupertrendMacdRsiEma()
-            strategies['insidebar_rsi'] = InsidebarRSI()
+            strategies['insidebar_rsi'] = InsidebarRsi()
             strategies['hybrid_momentum_trend'] = HybridMomentumTrend()
+            strategies['rsi_mean_reversion_bb'] = RsiMeanReversionBb()
+            strategies['ema_crossover'] = EmaCrossover()
+            strategies['macd_cross_rsi_filter'] = MacdCrossRsiFilter()
             
         except ImportError as e:
             logger.error(f"❌ Error importing strategies: {e}")
