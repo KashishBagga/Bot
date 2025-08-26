@@ -63,3 +63,12 @@ class Supertrend:
         self.prev_supertrend = supertrend
         self.prev_direction = direction
         return supertrend, direction
+
+# Global instances for different timeframes
+_supertrend_instances = {}
+
+def get_supertrend_instance(key: str, period: int = 10, multiplier: float = 3.0):
+    """Get or create a Supertrend instance for the given key"""
+    if key not in _supertrend_instances:
+        _supertrend_instances[key] = Supertrend(period=period, multiplier=multiplier)
+    return _supertrend_instances[key]

@@ -1,46 +1,59 @@
 import pandas as pd
 from typing import Dict, Any, Optional
+from datetime import datetime, timedelta
 from src.core.strategy import Strategy
 from src.core.indicators import indicators
-from src.models.database import db
-from src.services.option_utils import get_nearest_expiry, construct_option_symbol, fetch_option_ohlcv
+from src.models.unified_database import UnifiedDatabase
 import math
-from datetime import datetime
-import pytz
 
 class SupertrendMacdRsiEma(Strategy):
-    def __init__(self, params: Dict[str, Any] = None, timeframe_data: Optional[Dict[str, pd.DataFrame]] = None):
-        super().__init__("supertrend_macd_rsi_ema", params)
-        self.params.setdefault('supertrend_period', 10)
-        self.params.setdefault('supertrend_multiplier', 3.0)
-        self.timeframe_data = timeframe_data or {}
+    """
+    Multi-timeframe Supertrend + MACD + RSI + EMA strategy with signal confirmation.
+    """
 
-    def add_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
-        # Add Supertrend indicator
-        period = self.params['supertrend_period']
-        multiplier = self.params['supertrend_multiplier']
-        supertrend_data = indicators.supertrend(data, period=period, multiplier=multiplier)
-        data['supertrend'] = supertrend_data['supertrend']
-        data['supertrend_direction'] = supertrend_data['direction']
+    # Minimum candles required for analysis
+    min_candles = 60
+
+    def __init__(self, params: Dict[str, Any] = None):
+        params = params or {}
+        self.supertrend_period = params.get("supertrend_period", 10)
+        self.supertrend_multiplier = params.get("supertrend_multiplier", 3.0)
+        self.rsi_period = params.get("rsi_period", 14)
+        self.ema_period = params.get("ema_period", 20)
+        self.macd_fast = params.get("macd_fast", 12)
+        self.macd_slow = params.get("macd_slow", 26)
+        self.macd_signal = params.get("macd_signal", 9)
+        self.min_confidence_threshold = params.get("min_confidence_threshold", 50)
+        super().__init__("supertrend_macd_rsi_ema", params)
+
+    def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add strategy-specific indicators."""
+        df = df.copy()
+        
+        # Add SuperTrend indicator
+        period = self.supertrend_period
+        multiplier = self.supertrend_multiplier
+        supertrend_data = indicators.supertrend(df, period=period, multiplier=multiplier)
+        df['supertrend'] = supertrend_data['supertrend']
+        df['supertrend_direction'] = supertrend_data['direction']
         
         # Add MACD indicator
-        macd_data = indicators.macd(data)
-        data['macd'] = macd_data['macd']
-        data['macd_signal'] = macd_data['signal']
-        data['macd_histogram'] = macd_data['histogram']
+        macd_data = indicators.macd(df, fast_period=self.macd_fast, slow_period=self.macd_slow, signal_period=self.macd_signal)
+        df['macd'] = macd_data['macd']
+        df['macd_signal'] = macd_data['signal']
+        df['macd_histogram'] = macd_data['histogram']
         
         # Add RSI indicator
-        data['rsi'] = indicators.rsi(data)
+        df['rsi'] = indicators.rsi(df, period=self.rsi_period)
         
         # Add EMA indicator
-        data['ema'] = indicators.ema(data, period=20)
+        df['ema'] = indicators.ema(df, period=self.ema_period)
         
         # Add body ratio calculations
-        data['body'] = abs(data['close'] - data['open'])
-        data['full_range'] = data['high'] - data['low']
-        data['body_ratio'] = data['body'] / data['full_range'].replace(0, float('nan'))
+        df['body_ratio'] = abs(df['close'] - df['open']) / (df['high'] - df['low'])
+        df['body_ratio'] = df['body_ratio'].fillna(0)
         
-        return data
+        return df
 
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,
@@ -241,459 +254,129 @@ class SupertrendMacdRsiEma(Strategy):
             pass
         return None
 
-    def analyze(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
-        """Multi-timeframe analysis method."""
-        # Ensure DataFrame has DatetimeIndex
-        if not isinstance(df.index, pd.DatetimeIndex):
-            if 'time' in df.columns:
-                df['time'] = pd.to_datetime(df['time'])
-                df = df.set_index('time')
-            else:
-                raise ValueError("DataFrame must have a datetime index or 'time' column")
+    def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """Analyze data and generate trading signals using closed candles."""
+        if not self.validate_data(data):
+            return {'signal': 'NO TRADE', 'reason': 'insufficient data'}
 
-        if index >= len(df):
-            return None
-
-        ts = df.index[index]
-        
-        # If we have timeframe data, use multi-timeframe analysis
-        if self.timeframe_data:
-            results = []
-            timeframes = {
-                "3min": df, 
-                "15min": self.timeframe_data.get("15min"), 
-                "30min": self.timeframe_data.get("30min")
-            }
-            
-            for tf, tf_df in timeframes.items():
-                # Ensure we have a proper DataFrame before using it
-                if tf_df is None or not isinstance(tf_df, pd.DataFrame) or tf_df.empty:
-                    # If any timeframe is missing, fall back to single timeframe
-                    break
-                tf_result = self._evaluate_timeframe(tf_df, tf, ts)
-                if tf_result is None:
-                    break
-                results.append(tf_result)
-            
-            # If we have all timeframe results, use multi-timeframe logic
-            if len(results) == 3:
-                bullish_votes = sum(1 for r in results if r["signal_direction"] == 1)
-                bearish_votes = sum(1 for r in results if r["signal_direction"] == -1)
-                
-                if bullish_votes >= 2:
-                    signal = "BUY CALL"
-                    confidence = "High" if bullish_votes == 3 else "Medium"
-                elif bearish_votes >= 2:
-                    signal = "BUY PUT"
-                    confidence = "High" if bearish_votes == 3 else "Medium"
-                else:
-                    return None  # No clear signal across timeframes
-                
-                # Use base timeframe (3min) candle for calculations
-                base_candle = results[0]["candle"]
-                
-                # Calculate performance if future data is available
-                outcome = "Pending"
-                pnl = 0.0
-                targets_hit = 0
-                stoploss_count = 0
-                failure_reason = ""
-                exit_time = ""
-                
-                if future_data is not None and not future_data.empty:
-                    atr = base_candle['atr']
-                    stop_loss = math.ceil(atr)
-                    target = math.ceil(1.5 * atr)
-                    target2 = math.ceil(2.0 * atr)
-                    target3 = math.ceil(2.5 * atr)
-                    
-                    result = self.calculate_performance(
-                        signal, base_candle['close'], stop_loss, target, target2, target3, future_data
-                    )
-                    outcome = result['outcome']
-                    pnl = result['pnl']
-                    targets_hit = result['targets_hit']
-                    stoploss_count = result['stoploss_count']
-                    failure_reason = result['failure_reason']
-                    exit_time = self.to_ist_str(result['exit_time']) or ""
-                
-                return {
-                    "signal": signal,
-                    "price": base_candle['close'],
-                    "rsi": base_candle['rsi'],
-                    "macd": base_candle['macd'],
-                    "macd_signal": base_candle['macd_signal'],
-                    "ema_20": base_candle['ema'],
-                    "atr": base_candle['atr'],
-                    "supertrend": base_candle['supertrend'],
-                    "supertrend_direction": base_candle['supertrend_direction'],
-                    "stop_loss": math.ceil(base_candle['atr']),
-                    "target": math.ceil(1.5 * base_candle['atr']),
-                    "target2": math.ceil(2.0 * base_candle['atr']),
-                    "target3": math.ceil(2.5 * base_candle['atr']),
-                    "confidence": confidence,
-                    "rsi_reason": f"RSI {base_candle['rsi']:.2f}",
-                    "macd_reason": f"MACD {base_candle['macd']:.2f} vs Signal {base_candle['macd_signal']:.2f}",
-                    "price_reason": f"Multi-timeframe confirmation ({bullish_votes if signal == 'BUY CALL' else bearish_votes}/3 timeframes)",
-                    "trade_type": "Intraday",
-                    "option_chain_confirmation": "Yes" if confidence == "High" else "No",
-                    "outcome": outcome,
-                    "pnl": pnl,
-                    "targets_hit": targets_hit,
-                    "stoploss_count": stoploss_count,
-                    "failure_reason": failure_reason,
-                    "exit_time": exit_time,
-                    "option_symbol": "",
-                    "option_expiry": "",
-                    "option_strike": 0,
-                    "option_type": "",
-                    "option_entry_price": 0.0
-                }
-        
-        # Fall back to single timeframe analysis if multi-timeframe data not available
-        return self.analyze_single_timeframe(df.iloc[index:index+1], future_data)
-
-    def analyze_single_timeframe(self, data: pd.DataFrame, future_data=None) -> Dict[str, Any]:
-        """Original single timeframe analysis method."""
-        if 'supertrend' not in data.columns:
-            data = self.add_indicators(data)
-
-        candle = data.iloc[-1]
-        signal = "NO TRADE"
-        rsi_reason = macd_reason = price_reason = ""
-        option_type = outcome = failure_reason = exit_time = option_symbol = None
-        option_expiry = option_strike = option_entry_price = 0
-        pnl = 0.0
-        targets_hit = stoploss_count = 0
-
-        # Calculate comprehensive confidence score based on all indicators
-        confidence_score = 0
-        confidence_reasons = []
-        
-        # 1. RSI Analysis (0-25 points)
-        rsi = candle['rsi']
-        if rsi <= 25:  # Extreme oversold
-            confidence_score += 25
-            confidence_reasons.append(f"Extreme RSI oversold ({rsi:.1f})")
-        elif rsi <= 35:  # Strong oversold
-            confidence_score += 20
-            confidence_reasons.append(f"Strong RSI oversold ({rsi:.1f})")
-        elif rsi >= 75:  # Extreme overbought
-            confidence_score += 25
-            confidence_reasons.append(f"Extreme RSI overbought ({rsi:.1f})")
-        elif rsi >= 65:  # Strong overbought
-            confidence_score += 20
-            confidence_reasons.append(f"Strong RSI overbought ({rsi:.1f})")
-        elif 45 <= rsi <= 55:  # Neutral zone
-            confidence_score += 10
-            confidence_reasons.append(f"RSI in neutral zone ({rsi:.1f})")
-        
-        # 2. MACD Analysis (0-25 points)
-        macd = candle['macd']
-        macd_signal = candle['macd_signal']
-        macd_histogram = candle['macd_histogram']
-        
-        macd_strength = abs(macd - macd_signal)
-        macd_direction = "bullish" if macd > macd_signal else "bearish"
-        
-        if macd_strength > 5 and macd_histogram > 2:  # Strong bullish MACD
-            confidence_score += 25
-            confidence_reasons.append(f"Strong bullish MACD crossover ({macd:.2f} > {macd_signal:.2f})")
-        elif macd_strength > 5 and macd_histogram < -2:  # Strong bearish MACD
-            confidence_score += 25
-            confidence_reasons.append(f"Strong bearish MACD crossover ({macd:.2f} < {macd_signal:.2f})")
-        elif macd_strength > 2:  # Good MACD divergence
-            confidence_score += 15
-            confidence_reasons.append(f"Good MACD {macd_direction} signal")
-        elif macd_strength > 1:  # Mild MACD signal
-            confidence_score += 8
-            confidence_reasons.append(f"Mild MACD {macd_direction} signal")
-        
-        # 3. SuperTrend Analysis (0-20 points)
-        supertrend = candle['supertrend']
-        supertrend_direction = candle['supertrend_direction']
-        price_to_st_distance = abs(candle['close'] - supertrend) / candle['close'] * 100
-        
-        if supertrend_direction > 0 and price_to_st_distance > 1.0:  # Strong bullish SuperTrend
-            confidence_score += 20
-            confidence_reasons.append(f"Strong bullish SuperTrend (price {price_to_st_distance:.2f}% above)")
-        elif supertrend_direction < 0 and price_to_st_distance > 1.0:  # Strong bearish SuperTrend
-            confidence_score += 20
-            confidence_reasons.append(f"Strong bearish SuperTrend (price {price_to_st_distance:.2f}% below)")
-        elif supertrend_direction > 0 and price_to_st_distance > 0.5:  # Good bullish SuperTrend
-            confidence_score += 15
-            confidence_reasons.append(f"Good bullish SuperTrend")
-        elif supertrend_direction < 0 and price_to_st_distance > 0.5:  # Good bearish SuperTrend
-            confidence_score += 15
-            confidence_reasons.append(f"Good bearish SuperTrend")
-        elif supertrend_direction != 0:  # Basic SuperTrend signal
-            confidence_score += 8
-            direction = "bullish" if supertrend_direction > 0 else "bearish"
-            confidence_reasons.append(f"Basic {direction} SuperTrend signal")
-        
-        # 4. EMA Analysis (0-15 points)
-        ema = candle['ema']
-        price_to_ema_distance = (candle['close'] - ema) / ema * 100 if ema != 0 else 0
-        
-        if abs(price_to_ema_distance) > 2.0:  # Strong price-EMA separation
-            confidence_score += 15
-            direction = "above" if price_to_ema_distance > 0 else "below"
-            confidence_reasons.append(f"Price strongly {direction} EMA ({price_to_ema_distance:.2f}%)")
-        elif abs(price_to_ema_distance) > 1.0:  # Good price-EMA separation
-            confidence_score += 10
-            direction = "above" if price_to_ema_distance > 0 else "below"
-            confidence_reasons.append(f"Price {direction} EMA ({price_to_ema_distance:.2f}%)")
-        elif abs(price_to_ema_distance) > 0.5:  # Mild separation
-            confidence_score += 5
-            direction = "above" if price_to_ema_distance > 0 else "below"
-            confidence_reasons.append(f"Price slightly {direction} EMA")
-        
-        # 5. Volume and Volatility Analysis (0-15 points)
-        atr = candle['atr']
-        body_size = abs(candle['close'] - candle['open'])
-        price_range = candle['high'] - candle['low']
-        body_ratio = body_size / price_range if price_range > 0 else 0
-        
-        if atr > 60 and body_ratio > 0.7:  # High volatility with strong candle
-            confidence_score += 15
-            confidence_reasons.append(f"High volatility with strong directional candle (ATR: {atr:.1f}, Body: {body_ratio:.2f})")
-        elif atr > 40 and body_ratio > 0.5:  # Good volatility with decent candle
-            confidence_score += 10
-            confidence_reasons.append(f"Good volatility environment (ATR: {atr:.1f})")
-        elif atr > 25:  # Decent volatility
-            confidence_score += 5
-            confidence_reasons.append(f"Decent volatility (ATR: {atr:.1f})")
-        
-        # Determine confidence level
-        if confidence_score >= 85:
-            confidence = "Very High"
-        elif confidence_score >= 65:
-            confidence = "High"
-        elif confidence_score >= 45:
-            confidence = "Medium"
-        elif confidence_score >= 25:
-            confidence = "Low"
-        else:
-            confidence = "Very Low"
-
-        # Dynamic risk management based on confidence and market conditions
-        if confidence_score >= 85:  # Very high confidence
-            stop_loss_multiplier = 0.5  # Very tight stop loss
-            target_multipliers = [1.2, 2.0, 3.0]  # Aggressive targets
-        elif confidence_score >= 65:  # High confidence
-            stop_loss_multiplier = 0.6
-            target_multipliers = [1.0, 1.5, 2.2]
-        elif confidence_score >= 45:  # Medium confidence
-            stop_loss_multiplier = 0.7
-            target_multipliers = [0.8, 1.2, 1.8]
-        else:  # Low confidence
-            stop_loss_multiplier = 0.8
-            target_multipliers = [0.6, 1.0, 1.5]
-
-        stop_loss = math.ceil(stop_loss_multiplier * atr)
-        target = math.ceil(target_multipliers[0] * atr)
-        target2 = math.ceil(target_multipliers[1] * atr)
-        target3 = math.ceil(target_multipliers[2] * atr)
-
-        # Enhanced signal criteria based on multi-indicator alignment
-        is_buy_call = (
-            rsi >= 45 and rsi <= 65 and  # RSI in optimal range or oversold
-            macd > macd_signal and
-            macd > -5 and  # MACD not extremely negative
-            candle['close'] > candle['ema'] * 1.002 and     # Price above EMA with buffer
-            supertrend_direction > 0 and
-            candle['close'] > candle['supertrend'] * 1.001  # Price above SuperTrend with buffer
-        ) or (
-            rsi <= 35 and  # Oversold conditions for reversal
-            macd > macd_signal and
-            candle['close'] > candle['ema'] and
-            supertrend_direction > 0
-        )
-
-        is_buy_put = (
-            rsi >= 35 and rsi <= 55 and  # RSI in optimal range or overbought
-            macd < macd_signal and
-            macd < 5 and  # MACD not extremely positive
-            candle['close'] < candle['ema'] * 0.998 and     # Price below EMA with buffer
-            supertrend_direction < 0 and
-            candle['close'] < candle['supertrend'] * 0.999  # Price below SuperTrend with buffer
-        ) or (
-            rsi >= 65 and  # Overbought conditions for reversal
-            macd < macd_signal and
-            candle['close'] < candle['ema'] and
-            supertrend_direction < 0
-        )
-
-        if is_buy_call:
-            signal = "BUY CALL"
-            rsi_reason = f"RSI {candle['rsi']:.2f} in bullish zone"
-            macd_reason = f"MACD {candle['macd']:.2f} > Signal {candle['macd_signal']:.2f}"
-            price_reason = f"Price {candle['close']:.2f} >> EMA {candle['ema']:.2f} and > SuperTrend {candle['supertrend']:.2f}"
-            option_type = "CE"
-
-        elif is_buy_put:
-            signal = "BUY PUT"
-            rsi_reason = f"RSI {candle['rsi']:.2f} in bearish zone"
-            macd_reason = f"MACD {candle['macd']:.2f} < Signal {candle['macd_signal']:.2f}"
-            price_reason = f"Price {candle['close']:.2f} << EMA {candle['ema']:.2f} and < SuperTrend {candle['supertrend']:.2f}"
-            option_type = "PE"
-
-        # Multi-Factor Confidence Integration
-        from src.core.multi_factor_confidence import MultiFactorConfidence
-        
-        # Calculate multi-factor confidence
-        mfc = MultiFactorConfidence()
-        signal_type = "BUY" if signal == "BUY CALL" else "SELL"
-        confidence_result = mfc.calculate_confidence(candle, signal_type, self.timeframe_data)
-        
-        # Use multi-factor confidence score
-        confidence_score = confidence_result['total_score']
-        
-        # Enhanced filtering: Only trade with Medium+ confidence (score >= 40)
-        if signal != "NO TRADE" and confidence_score < 40:
-            signal = "NO TRADE"
-            confidence = "Low"
-            rsi_reason += f" (Filtered: Multi-factor confidence {confidence_score} < 40)"
-
-        # Additional filter for very high confidence trades
-        if signal != "NO TRADE" and confidence_score >= 65:
-            # Check for indicator alignment
-            indicators_aligned = (
-                (signal == "BUY CALL" and rsi <= 60 and macd > 0 and supertrend_direction > 0) or
-                (signal == "BUY PUT" and rsi >= 40 and macd < 0 and supertrend_direction < 0)
-            )
-            if not indicators_aligned:
-                confidence_score -= 20  # Reduce confidence for misaligned indicators
-                # OPTIMIZATION: Multi-factor confidence threshold for optimal win rate
-                if confidence_score < 50:
-                    signal = "NO TRADE"
-                    confidence = "Low"
-                    rsi_reason += f" (Multi-factor confidence {confidence_score} below 50 threshold)"
-
-        # Fallback: If option data is missing, simulate on underlying
-        if signal.startswith("BUY") and future_data is not None and not future_data.empty:
-            option_entry_price = candle['close']
-            result = self.calculate_performance(
-                signal, option_entry_price, stop_loss, target, target2, target3, future_data
-            )
-            outcome = result['outcome']
-            pnl = result['pnl']
-            targets_hit = result['targets_hit']
-            stoploss_count = result['stoploss_count']
-            failure_reason = "Simulated on underlying due to missing option data"
-            exit_time = result['exit_time']
-
-        # --- Outcome logic fix ---
-        # If a trade was simulated and outcome is set by calculate_performance, keep it
-        # Otherwise, set outcome to 'No Trade' or 'Data Missing' as appropriate
-        if signal == "NO TRADE":
-            outcome = "No Trade"
-        elif (signal.startswith("BUY") and (not option_entry_price or future_data is None or future_data.empty)):
-            outcome = "Data Missing"
-        elif outcome not in ["Win", "Loss"]:
-            outcome = "No Trade"
-        # Defensive: ensure no output field is None or blank
-        if option_symbol is None:
-            option_symbol = ""
-        if option_expiry is None:
-            option_expiry = ""
-        if option_type is None:
-            option_type = ""
-        if option_entry_price is None:
-            option_entry_price = 0.0
-        if exit_time is None:
-            exit_time = ""
-        else:
-            # Convert exit_time to IST string format for database compatibility
-            exit_time = self.to_ist_str(exit_time) or ""
-        if failure_reason is None:
-            failure_reason = ""
-        if pnl is None:
-            pnl = 0.0
-        if targets_hit is None:
-            targets_hit = 0
-        if stoploss_count is None:
-            stoploss_count = 0
-        return {
-            "signal": signal,
-            "price": candle['close'],
-            "rsi": candle['rsi'],
-            "macd": candle['macd'],
-            "macd_signal": candle['macd_signal'],
-            "ema_20": candle['ema'],
-            "atr": candle['atr'],
-            "supertrend": candle['supertrend'],
-            "supertrend_direction": candle['supertrend_direction'],
-            "stop_loss": stop_loss,
-            "target": target,
-            "target2": target2,
-            "target3": target3,
-            "confidence": confidence,
-            "rsi_reason": rsi_reason,
-            "macd_reason": macd_reason,
-            "price_reason": price_reason,
-            "trade_type": "Intraday",
-            "option_chain_confirmation": "Yes" if confidence == "High" else "No",
-            "outcome": outcome,
-            "pnl": pnl,
-            "targets_hit": targets_hit,
-            "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason,
-            "exit_time": exit_time,
-            "option_symbol": option_symbol,
-            "option_expiry": str(option_expiry) if option_expiry else "",
-            "option_strike": option_strike,
-            "option_type": option_type,
-            "option_entry_price": option_entry_price
-        }
-
-    def _evaluate_timeframe(self, df: pd.DataFrame, timeframe: str, ts: datetime) -> Optional[Dict[str, Any]]:
-        """Evaluate a specific timeframe for signal confirmation."""
-        # Validate that df is a proper DataFrame first
-        if df is None or not isinstance(df, pd.DataFrame):
-            return None
-        
-        df = df[df.index <= ts].copy()
-        # Now check if the DataFrame is empty or has insufficient rows
-        if df.empty or len(df) < 20:
-            return None
-
-        # Add indicators to this timeframe data
         try:
-            df = self.add_indicators(df)
-        except (IndexError, ValueError):
-            # Not enough data for indicators
-            return None
+            # Use closed candle for analysis
+            candle = self.get_closed_candle(data)
             
-        candle = df.iloc[-1]
-
-        # Check conditions for this timeframe
-        is_buy_call = (
-            candle['rsi'] > 55 and
-            candle['macd'] > candle['macd_signal'] and
-            candle['close'] > candle['ema'] * 1.005 and
-            candle['supertrend_direction'] > 0
-        )
-
-        is_buy_put = (
-            candle['rsi'] < 45 and
-            candle['macd'] < candle['macd_signal'] and
-            candle['close'] < candle['ema'] * 0.995 and
-            candle['supertrend_direction'] < 0
-        )
-
-        signal_direction = 0
-        if is_buy_call:
-            signal_direction = 1
-        elif is_buy_put:
-            signal_direction = -1
-
-        return {
-            "signal_direction": signal_direction,
-            "rsi": candle['rsi'],
-            "macd": candle['macd'],
-            "macd_signal": candle['macd_signal'],
-            "ema": candle['ema'],
-            "supertrend_direction": candle['supertrend_direction'],
-            "candle": candle
-        }
+            # Add indicators
+            df = self.calculate_indicators(data)
+            
+            # Get indicator values from closed candle
+            supertrend_direction = df['supertrend_direction'].iloc[-1]
+            rsi = df['rsi'].iloc[-1]
+            macd = df['macd'].iloc[-1]
+            macd_signal = df['macd_signal'].iloc[-1]
+            macd_histogram = df['macd_histogram'].iloc[-1]
+            ema = df['ema'].iloc[-1]
+            volume_ratio = df['volume_ratio'].iloc[-1]
+            body_ratio = df['body_ratio'].iloc[-1]
+            
+            # Check for NaN values
+            if pd.isna(supertrend_direction) or pd.isna(rsi) or pd.isna(macd) or pd.isna(ema):
+                return {'signal': 'NO TRADE', 'reason': 'indicator data unavailable'}
+            
+            # Calculate confidence score based on multiple factors
+            confidence_score = 0
+            
+            # Trend strength (40% weight)
+            if supertrend_direction == 1:
+                confidence_score += 40
+            elif supertrend_direction == -1:
+                confidence_score += 0
+            else:
+                confidence_score += 20
+            
+            # RSI strength (30% weight)
+            if 30 <= rsi <= 70:
+                confidence_score += 30
+            elif 20 <= rsi <= 80:
+                confidence_score += 20
+            else:
+                confidence_score += 10
+            
+            # MACD strength (30% weight)
+            if macd > macd_signal and macd_histogram > 0:
+                confidence_score += 30
+            elif macd < macd_signal and macd_histogram < 0:
+                confidence_score += 30
+            else:
+                confidence_score += 15
+            
+            # Volume confirmation (bonus)
+            if volume_ratio > 1.0:
+                confidence_score += 10
+            
+            # Body ratio confirmation (bonus)
+            if body_ratio > 0.6:
+                confidence_score += 10
+            
+            # BUY CALL conditions
+            if (supertrend_direction == 1 and  # SuperTrend uptrend
+                rsi > 30 and rsi < 80 and  # RSI in healthy range
+                macd > macd_signal and  # MACD bullish
+                candle['close'] > ema and  # Price above EMA
+                volume_ratio > 0.5):  # Volume confirmation
+                
+                if confidence_score >= self.min_confidence_threshold:
+                    atr = df['atr'].iloc[-1]
+                    stop_loss = 1.5 * atr
+                    target1 = 2.0 * atr
+                    target2 = 3.0 * atr
+                    target3 = 4.0 * atr
+                    
+                    # Dynamic position sizing based on confidence
+                    position_multiplier = 1.0 if confidence_score >= 80 else 0.8
+                    
+                    return {
+                        'signal': 'BUY CALL',
+                        'price': candle['close'],
+                        'confidence_score': confidence_score,
+                        'stop_loss': stop_loss,
+                        'target1': target1,
+                        'target2': target2,
+                        'target3': target3,
+                        'position_multiplier': position_multiplier,
+                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
+                        'reasoning': f"SuperTrend uptrend, RSI {rsi:.1f}, MACD bullish, Price above EMA, Volume {volume_ratio:.2f}"
+                    }
+            
+            # BUY PUT conditions
+            elif (supertrend_direction == -1 and  # SuperTrend downtrend
+                  rsi > 20 and rsi < 70 and  # RSI in healthy range
+                  macd < macd_signal and  # MACD bearish
+                  candle['close'] < ema and  # Price below EMA
+                  volume_ratio > 0.5):  # Volume confirmation
+                
+                if confidence_score >= self.min_confidence_threshold:
+                    atr = df['atr'].iloc[-1]
+                    stop_loss = 1.5 * atr
+                    target1 = 2.0 * atr
+                    target2 = 3.0 * atr
+                    target3 = 4.0 * atr
+                    
+                    # Dynamic position sizing based on confidence
+                    position_multiplier = 1.0 if confidence_score >= 80 else 0.8
+                    
+                    return {
+                        'signal': 'BUY PUT',
+                        'price': candle['close'],
+                        'confidence_score': confidence_score,
+                        'stop_loss': stop_loss,
+                        'target1': target1,
+                        'target2': target2,
+                        'target3': target3,
+                        'position_multiplier': position_multiplier,
+                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
+                        'reasoning': f"SuperTrend downtrend, RSI {rsi:.1f}, MACD bearish, Price below EMA, Volume {volume_ratio:.2f}"
+                    }
+            
+            return {'signal': 'NO TRADE', 'reason': 'no signal conditions met'}
+            
+        except Exception as e:
+            logging.error(f"Error in SupertrendMacdRsiEma analysis: {e}")
+            return {'signal': 'ERROR', 'reason': str(e)}

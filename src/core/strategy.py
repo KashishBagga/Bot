@@ -3,14 +3,20 @@ Base strategy module.
 Provides the foundation for all trading strategies.
 """
 import pandas as pd
+import numpy as np
+from typing import Dict, Any, Optional, List
+from datetime import datetime, timedelta
+import logging
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
-from src.core.indicators import indicators
-from src.models.database import db
+from src.models.unified_database import UnifiedDatabase
+from src.core.indicators import add_technical_indicators
 import sqlite3
 
 class Strategy(ABC):
-    """Base strategy class that all strategies should inherit from."""
+    """Base class for all trading strategies."""
+    
+    # Base minimum candles requirement - override in child strategies
+    min_candles = 50
     
     def __init__(self, name: str, params: Dict[str, Any] = None):
         """Initialize the strategy.
@@ -22,10 +28,60 @@ class Strategy(ABC):
         self.name = name
         self.params = params or {}
         self.signals = []
+        self.db = UnifiedDatabase()
+    
+    def validate_data(self, data: pd.DataFrame) -> bool:
+        """Validate that data meets minimum requirements for analysis.
+        
+        Args:
+            data: Market data DataFrame
+            
+        Returns:
+            bool: True if data is valid for analysis
+        """
+        if len(data) < self.min_candles:
+            logging.warning(f"❌ Insufficient data for {self.name}: {len(data)} < {self.min_candles}")
+            return False
+        
+        # Check for required columns
+        required_cols = {'open', 'high', 'low', 'close', 'volume'}
+        if not required_cols.issubset(data.columns):
+            missing = required_cols - set(data.columns)
+            logging.error(f"❌ Missing required columns for {self.name}: {missing}")
+            return False
+        
+        # Check for NaN in last closed candle
+        if len(data) >= 2:
+            last_closed = data.iloc[-2]
+        else:
+            last_closed = data.iloc[-1]
+            
+        if pd.isna(last_closed['close']):
+            logging.warning(f"❌ Last closed candle has NaN close for {self.name}")
+            return False
+        
+        return True
+    
+    def get_closed_candle(self, data: pd.DataFrame) -> pd.Series:
+        """Get the last closed candle (iloc[-2]) or fallback to current if insufficient data.
+        
+        Args:
+            data: Market data DataFrame
+            
+        Returns:
+            pd.Series: Last closed candle
+        """
+        if len(data) >= 2:
+            return data.iloc[-2]  # Last closed candle
+        else:
+            return data.iloc[-1]  # Fallback for insufficient data
     
     @abstractmethod
     def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
         """Analyze data and generate trading signals.
+        
+        IMPORTANT: This method should use closed candles only (iloc[-2]) for live trading.
+        For backtesting, future_data can be used for P&L calculation.
         
         Args:
             data: Market data DataFrame
@@ -34,6 +90,24 @@ class Strategy(ABC):
             dict: Signal data with analysis results
         """
         pass
+    
+    def analyze_closed(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """Analyze using only closed candles - safe wrapper for live trading.
+        
+        Args:
+            data: Market data DataFrame
+            
+        Returns:
+            dict: Signal data with analysis results
+        """
+        if not self.validate_data(data):
+            return {'signal': 'NO TRADE', 'reason': 'insufficient data'}
+        
+        try:
+            return self.analyze(data)
+        except Exception as e:
+            logging.error(f"❌ Strategy {self.name} error: {e}")
+            return {'signal': 'ERROR', 'reason': str(e)}
     
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """Calculate common indicators needed for the strategy.
@@ -47,25 +121,8 @@ class Strategy(ABC):
         # Make a copy to avoid modifying the original
         df = data.copy()
         
-        # Calculate indicators without caching
-        rsi_period = self.params.get('rsi_period', 14)
-        df['rsi'] = indicators.rsi(df, period=rsi_period)
-        
-        macd_fast = self.params.get('macd_fast', 12)
-        macd_slow = self.params.get('macd_slow', 26)
-        macd_signal_period = self.params.get('macd_signal', 9)
-        macd_data = indicators.macd(df, fast_period=macd_fast, 
-                                   slow_period=macd_slow, 
-                                   signal_period=macd_signal_period)
-        df['macd'] = macd_data['macd']
-        df['macd_signal'] = macd_data['signal']
-        df['macd_histogram'] = macd_data['histogram']
-        
-        ema_period = self.params.get('ema_period', 20)
-        df['ema'] = indicators.ema(df, period=ema_period)
-        
-        atr_period = self.params.get('atr_period', 14)
-        df['atr'] = indicators.atr(df, period=atr_period)
+        # Use the unified indicators function
+        df = add_technical_indicators(df)
         
         # Allow child classes to add their own indicators
         return self.add_indicators(df)
@@ -93,25 +150,15 @@ class Strategy(ABC):
         # Add the signal to the in-memory list
         self.signals.append(signal_data)
         
-        # Ensure symbol is included in signal data, check table schema for correct field name
+        # Use the unified database to log the signal
         try:
-            # First try with the current schema that uses 'symbol'
             signal_data_with_symbol = {
                 'symbol': symbol,
                 **signal_data
             }
-            db.log_strategy_trade(self.name, signal_data_with_symbol)
-        except sqlite3.OperationalError as e:
-            # If we get an error about missing column, try with legacy schema using 'index_name'
-            if "no column named symbol" in str(e):
-                signal_data_with_symbol = {
-                    'index_name': symbol,
-                    **signal_data
-                }
-                db.log_strategy_trade(self.name, signal_data_with_symbol)
-            else:
-                # Re-raise other database errors
-                raise
+            self.db.log_strategy_trade(self.name, signal_data_with_symbol)
+        except Exception as e:
+            logging.error(f"Error logging signal: {e}")
     
     def format_signal(self, signal: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Format a signal for output and logging.

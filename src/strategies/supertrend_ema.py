@@ -10,6 +10,9 @@ class SupertrendEma(Strategy):
     Multi-timeframe Supertrend + EMA strategy with signal confirmation across 3min, 15min, and 30min charts.
     """
 
+    # Minimum candles required for analysis
+    min_candles = 60
+
     def __init__(self, params: Dict[str, Any] = None, timeframe_data: Optional[Dict[str, pd.DataFrame]] = None):
         params = params or {}
         self.ema_period = params.get("ema_period", 20)
@@ -39,7 +42,8 @@ class SupertrendEma(Strategy):
             return None
 
         try:
-            candle = df.iloc[-1]
+            # Use closed candle for analysis
+            candle = self.get_closed_candle(df)
             st_instance = self._get_supertrend_instance(timeframe)
             st_data = st_instance.update(candle)
 
@@ -98,16 +102,19 @@ class SupertrendEma(Strategy):
                 if targets_hit == 0 and candle['high'] >= (entry_price + target):
                     targets_hit = 1
                     pnl = target
-                    outcome = "Win"
-                    exit_time = current_time
-                if targets_hit == 1 and candle['high'] >= (entry_price + target2):
-                    targets_hit = 2
-                    pnl += (target2 - target)
-                if targets_hit == 2 and candle['high'] >= (entry_price + target3):
-                    targets_hit = 3
-                    pnl += (target3 - target2)
-                    exit_time = current_time
-                    break
+                    if candle['high'] >= (entry_price + target2):
+                        targets_hit = 2
+                        pnl = target2
+                        if candle['high'] >= (entry_price + target3):
+                            targets_hit = 3
+                            pnl = target3
+                            outcome = "Win"
+                            exit_time = current_time
+                            break
+                    if targets_hit == 1:
+                        outcome = "Win"
+                        exit_time = current_time
+                        break
         elif signal == "BUY PUT":
             for idx, candle in future_data.iterrows():
                 current_time = self.safe_signal_time(candle.get('time', None))
@@ -121,198 +128,142 @@ class SupertrendEma(Strategy):
                 if targets_hit == 0 and candle['low'] <= (entry_price - target):
                     targets_hit = 1
                     pnl = target
-                    outcome = "Win"
-                    exit_time = current_time
-                if targets_hit == 1 and candle['low'] <= (entry_price - target2):
-                    targets_hit = 2
-                    pnl += (target2 - target)
-                if targets_hit == 2 and candle['low'] <= (entry_price - target3):
-                    targets_hit = 3
-                    pnl += (target3 - target2)
-                    exit_time = current_time
-                    break
-        # Defensive IST conversion for exit_time
-        exit_time_str = self.to_ist_str(exit_time) or (str(exit_time) if exit_time is not None else None)
+                    if candle['low'] <= (entry_price - target2):
+                        targets_hit = 2
+                        pnl = target2
+                        if candle['low'] <= (entry_price - target3):
+                            targets_hit = 3
+                            pnl = target3
+                            outcome = "Win"
+                            exit_time = current_time
+                            break
+                    if targets_hit == 1:
+                        outcome = "Win"
+                        exit_time = current_time
+                        break
         return {
             "outcome": outcome,
             "pnl": pnl,
             "targets_hit": targets_hit,
             "stoploss_count": stoploss_count,
             "failure_reason": failure_reason,
-            "exit_time": exit_time_str
+            "exit_time": exit_time
         }
 
-    def analyze(self, candle: pd.Series, index: int, df: pd.DataFrame, future_data: Optional[pd.DataFrame] = None) -> Optional[Dict[str, Any]]:
-        """Analyze data and generate trading signals with enhanced quality filters."""
-        if index < 50 or future_data is None or future_data.empty:
-            return None
+    def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """Analyze data and generate trading signals using closed candles."""
+        if not self.validate_data(data):
+            return {'signal': 'NO TRADE', 'reason': 'insufficient data'}
+
+        try:
+            # Use closed candle for analysis
+            candle = self.get_closed_candle(data)
             
-        # Get indicator values
-        supertrend = candle.get('supertrend', 0)
-        supertrend_direction = candle.get('supertrend_direction', 0)
-        ema_21 = candle.get('ema_21', 0)
-        ema_50 = candle.get('ema_50', 0)
-        rsi = candle.get('rsi', 50)
-        macd = candle.get('macd', 0)
-        macd_signal = candle.get('macd_signal', 0)
-        volume_ratio = candle.get('volume_ratio', 1.0)
-        atr = candle.get('atr', candle['close'] * 0.01)
-        price = candle['close']
-        
-        # OPTIMIZATION: Enhanced signal quality filters
-        signal = "NO TRADE"
-        confidence_score = 0
-        
-        # Check for valid indicator values
-        if supertrend <= 0 or ema_21 <= 0 or ema_50 <= 0:
-            return None
+            # Add indicators
+            df = self.calculate_indicators(data)
             
-        # OPTIMIZATION: Enhanced SuperTrend signal conditions
-        if supertrend_direction > 0 and price > supertrend:  # Bullish SuperTrend
-            # Additional bullish filters for better win rate
-            if (price > ema_21 and ema_21 > ema_50 and  # Trend alignment
-                rsi > 45 and rsi < 75 and              # RSI not overbought
-                macd > macd_signal and                 # MACD bullish
-                volume_ratio > 1.0):                   # Above average volume
-                
-                signal = "BUY CALL"
-                # OPTIMIZATION: Better confidence calculation
-                trend_strength = min(20, (price - ema_21) / ema_21 * 100)
-                rsi_strength = min(15, (rsi - 45) / 2)
-                macd_strength = min(15, (macd - macd_signal) * 10)
-                volume_strength = min(10, (volume_ratio - 1.0) * 10)
-                
-                confidence_score = 60 + trend_strength + rsi_strength + macd_strength + volume_strength
-                
-        elif supertrend_direction < 0 and price < supertrend:  # Bearish SuperTrend
-            # Additional bearish filters for better win rate
-            if (price < ema_21 and ema_21 < ema_50 and  # Trend alignment
-                rsi < 55 and rsi > 25 and              # RSI not oversold
-                macd < macd_signal and                 # MACD bearish
-                volume_ratio > 1.0):                   # Above average volume
-                
-                signal = "BUY PUT"
-                # OPTIMIZATION: Better confidence calculation
-                trend_strength = min(20, (ema_21 - price) / ema_21 * 100)
-                rsi_strength = min(15, (55 - rsi) / 2)
-                macd_strength = min(15, (macd_signal - macd) * 10)
-                volume_strength = min(10, (volume_ratio - 1.0) * 10)
-                
-                confidence_score = 60 + trend_strength + rsi_strength + macd_strength + volume_strength
-        
-        # OPTIMIZATION: Higher minimum confidence threshold for better quality
-        if confidence_score < 70:  # Increased from 50
-            return None
+            # Get SuperTrend data
+            st_instance = self._get_supertrend_instance("5min")
+            st_data = st_instance.update(candle)
             
-        # Determine confidence level
-        if confidence_score >= 90:
-            confidence = "Very High"
-        elif confidence_score >= 80:
-            confidence = "High"
-        elif confidence_score >= 70:
-            confidence = "Medium"
-        else:
-            confidence = "Low"
-        
-        # OPTIMIZATION: Improved risk-reward ratios based on confidence
-        if confidence_score >= 85:
-            stop_loss = int(round(1.2 * atr))  # Tighter stop loss
-            target1 = int(round(2.4 * atr))    # 2:1 R:R
-            target2 = int(round(3.6 * atr))    # 3:1 R:R
-            target3 = int(round(4.8 * atr))    # 4:1 R:R
-        elif confidence_score >= 75:
-            stop_loss = int(round(1.5 * atr))
-            target1 = int(round(3.0 * atr))    # 2:1 R:R
-            target2 = int(round(4.5 * atr))    # 3:1 R:R
-            target3 = int(round(6.0 * atr))    # 4:1 R:R
-        else:  # 70-74
-            stop_loss = int(round(1.8 * atr))
-            target1 = int(round(3.6 * atr))    # 2:1 R:R
-            target2 = int(round(5.4 * atr))    # 3:1 R:R
-            target3 = int(round(7.2 * atr))    # 4:1 R:R
-        
-        # OPTIMIZATION: Position sizing based on confidence
-        position_multiplier = 0.8 if confidence_score >= 80 else 0.6
-        
-        # Calculate performance if we have future data
-        outcome = "Pending"
-        pnl = 0.0
-        targets_hit = 0
-        stoploss_count = 0
-        failure_reason = ""
-        
-        if signal != "NO TRADE" and future_data is not None and not future_data.empty:
-            # Check future prices to see if targets or stop loss were hit
-            if signal == "BUY CALL":
-                max_future_price = future_data['high'].max()
-                min_future_price = future_data['low'].min()
+            if st_data is None or st_data[1] is None:
+                return {'signal': 'NO TRADE', 'reason': 'insufficient supertrend data'}
+            
+            supertrend_direction = st_data[1]
+            
+            # Get EMAs
+            ema_9 = df['ema_9'].iloc[-1]
+            ema_21 = df['ema_21'].iloc[-1]
+            rsi = df['rsi'].iloc[-1]
+            macd = df['macd'].iloc[-1]
+            macd_signal = df['macd_signal'].iloc[-1]
+            volume_ratio = df['volume_ratio'].iloc[-1]
+            
+            # Check for NaN values
+            if pd.isna(ema_9) or pd.isna(ema_21) or pd.isna(rsi) or pd.isna(macd):
+                return {'signal': 'NO TRADE', 'reason': 'indicator data unavailable'}
+            
+            # BUY CALL conditions
+            if (supertrend_direction == 1 and  # SuperTrend uptrend
+                ema_9 > ema_21 and  # EMA crossover
+                30 < rsi < 80 and  # RSI in healthy range
+                macd > macd_signal and  # MACD bullish
+                volume_ratio > 0.5):  # Volume confirmation
                 
-                # Check if stop loss was hit
-                if min_future_price <= (price - stop_loss):
-                    outcome = "Loss"
-                    pnl = -stop_loss * position_multiplier
-                    stoploss_count = 1
-                    failure_reason = f"Stop loss hit at {price - stop_loss}"
-                else:
-                    outcome = "Win"
-                    # Check which targets were hit
-                    if max_future_price >= (price + target1):
-                        targets_hit += 1
-                        pnl += target1 * position_multiplier
-                    if max_future_price >= (price + target2):
-                        targets_hit += 1
-                        pnl += (target2 - target1) * position_multiplier
-                    if max_future_price >= (price + target3):
-                        targets_hit += 1
-                        pnl += (target3 - target2) * position_multiplier
+                # Calculate confidence score
+                trend_strength = 25 if ema_9 > ema_21 * 1.01 else 15
+                rsi_strength = 20 if 40 < rsi < 70 else 10
+                macd_strength = 15 if macd > macd_signal * 1.1 else 8
+                volume_strength = 10 if volume_ratio > 1.0 else 5
+                
+                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength
+                
+                if confidence_score >= 70:  # High confidence threshold
+                    atr = df['atr'].iloc[-1]
+                    stop_loss = 1.5 * atr
+                    target1 = 2.0 * atr
+                    target2 = 3.0 * atr
+                    target3 = 4.0 * atr
                     
-            elif signal == "BUY PUT":
-                max_future_price = future_data['high'].max()
-                min_future_price = future_data['low'].min()
+                    # Dynamic position sizing based on confidence
+                    position_multiplier = 1.0 if confidence_score >= 80 else 0.8
+                    
+                    return {
+                        'signal': 'BUY CALL',
+                        'price': candle['close'],
+                        'confidence_score': confidence_score,
+                        'stop_loss': stop_loss,
+                        'target1': target1,
+                        'target2': target2,
+                        'target3': target3,
+                        'position_multiplier': position_multiplier,
+                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
+                        'reasoning': f"SuperTrend uptrend, EMA crossover, RSI {rsi:.1f}, MACD bullish, Volume {volume_ratio:.2f}"
+                    }
+            
+            # BUY PUT conditions
+            elif (supertrend_direction == -1 and  # SuperTrend downtrend
+                  ema_9 < ema_21 and  # EMA crossover
+                  20 < rsi < 70 and  # RSI in healthy range
+                  macd < macd_signal and  # MACD bearish
+                  volume_ratio > 0.5):  # Volume confirmation
                 
-                # Check if stop loss was hit
-                if max_future_price >= (price + stop_loss):
-                    outcome = "Loss"
-                    pnl = -stop_loss * position_multiplier
-                    stoploss_count = 1
-                    failure_reason = f"Stop loss hit at {price + stop_loss}"
-                else:
-                    outcome = "Win"
-                    # Check which targets were hit
-                    if min_future_price <= (price - target1):
-                        targets_hit += 1
-                        pnl += target1 * position_multiplier
-                    if min_future_price <= (price - target2):
-                        targets_hit += 1
-                        pnl += (target2 - target1) * position_multiplier
-                    if min_future_price <= (price - target3):
-                        targets_hit += 1
-                        pnl += (target3 - target2) * position_multiplier
-        
-        # Build reasoning string
-        price_reason = f"SuperTrend: {supertrend_direction > 0 and 'BULLISH' or 'BEARISH'}"
-        price_reason += f", Price: {price:.1f} vs SuperTrend: {supertrend:.1f}"
-        price_reason += f", EMA21: {ema_21:.1f} vs EMA50: {ema_50:.1f}"
-        price_reason += f", RSI: {rsi:.1f}, MACD: {macd:.2f} vs {macd_signal:.2f}"
-        price_reason += f", Volume: {volume_ratio:.1f}x"
-        price_reason += f", Confidence: {confidence_score}"
-        
-        return {
-            "signal": signal,
-            "confidence": confidence,
-            "confidence_score": confidence_score,
-            "price": price,
-            "stop_loss": stop_loss,
-            "target": target1,
-            "target2": target2,
-            "target3": target3,
-            "outcome": outcome,
-            "pnl": pnl,
-            "targets_hit": targets_hit,
-            "stoploss_count": stoploss_count,
-            "failure_reason": failure_reason,
-            "reasoning": price_reason
-        }
+                # Calculate confidence score
+                trend_strength = 25 if ema_9 < ema_21 * 0.99 else 15
+                rsi_strength = 20 if 30 < rsi < 60 else 10
+                macd_strength = 15 if macd < macd_signal * 0.9 else 8
+                volume_strength = 10 if volume_ratio > 1.0 else 5
+                
+                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength
+                
+                if confidence_score >= 70:  # High confidence threshold
+                    atr = df['atr'].iloc[-1]
+                    stop_loss = 1.5 * atr
+                    target1 = 2.0 * atr
+                    target2 = 3.0 * atr
+                    target3 = 4.0 * atr
+                    
+                    # Dynamic position sizing based on confidence
+                    position_multiplier = 1.0 if confidence_score >= 80 else 0.8
+                    
+                    return {
+                        'signal': 'BUY PUT',
+                        'price': candle['close'],
+                        'confidence_score': confidence_score,
+                        'stop_loss': stop_loss,
+                        'target1': target1,
+                        'target2': target2,
+                        'target3': target3,
+                        'position_multiplier': position_multiplier,
+                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
+                        'reasoning': f"SuperTrend downtrend, EMA crossover, RSI {rsi:.1f}, MACD bearish, Volume {volume_ratio:.2f}"
+                    }
+            
+            return {'signal': 'NO TRADE', 'reason': 'no signal conditions met'}
+            
+        except Exception as e:
+            logging.error(f"Error in SupertrendEma analysis: {e}")
+            return {'signal': 'ERROR', 'reason': str(e)}
 
 # Optional legacy adapter
 def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_ratio=None):

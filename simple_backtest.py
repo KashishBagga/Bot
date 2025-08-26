@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 """
-Simple Backtesting Script
-Works with existing data and strategies
+Simple Backtesting System
+A reliable and working backtesting solution using local parquet data
 """
 
 import os
 import sys
 import pandas as pd
+import numpy as np
 import logging
-from datetime import datetime, timedelta
 import argparse
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
 from pathlib import Path
 
-# Add src to path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
+# Add src directory to path
+sys.path.append(str(Path(__file__).parent / "src"))
 
-from src.models.database import db
-from src.core.indicators import indicators
+from src.data.local_data_loader import LocalDataLoader
+from src.models.unified_database import UnifiedDatabase
+from src.core.indicators import add_technical_indicators
 
 # Configure logging
 logging.basicConfig(
@@ -29,7 +32,7 @@ class SimpleBacktester:
     def __init__(self):
         """Initialize the simple backtester"""
         self.base_dir = Path("historical_data_20yr")
-        self.db = db
+        self.db = UnifiedDatabase()
         
         logger.info("🚀 Simple Backtester Initialized")
         logger.info(f"📁 Data Directory: {self.base_dir}")
@@ -68,16 +71,10 @@ class SimpleBacktester:
     def add_indicators(self, df):
         """Add basic indicators to the data"""
         try:
-            # Basic indicators
-            df['ema_9'] = indicators.ema(df, period=9)
-            df['ema_21'] = indicators.ema(df, period=21)
-            df['rsi'] = indicators.rsi(df, period=14)
-            df['macd'], df['macd_signal'], df['macd_histogram'] = indicators.macd(df)
+            # Use the unified indicators function
+            df = add_technical_indicators(df)
             
-            # ATR
-            df['atr'] = indicators.atr(df, period=14)
-            
-            # Volume
+            # Add additional indicators specific to this backtest
             df['volume_sma'] = df['volume'].rolling(20).mean()
             df['volume_ratio'] = df['volume'] / df['volume_sma']
             

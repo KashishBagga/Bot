@@ -13,6 +13,7 @@ import logging
 import numpy as np
 import schedule
 import json
+import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from pathlib import Path
@@ -40,6 +41,9 @@ class LiveTradingBot:
         # FIX: Standardize symbol naming to match parquet store format
         self.symbols = ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX']  # Match parquet store exactly
         self.timeframe = '5min'  # Primary timeframe for live trading
+        
+        # Live mode toggle - CRITICAL SAFETY FEATURE
+        self.live_mode = os.getenv("LIVE_MODE", "false").lower() == "true"
         
         # Risk management parameters - EMERGENCY LOSS PREVENTION
         self.risk_params = {
@@ -299,62 +303,73 @@ class LiveTradingBot:
         
         return df
     
-    def analyze_with_strategy(self, strategy_name: str, symbol: str, data: pd.DataFrame) -> Dict[str, Any]:
-        """Analyze market data with strategy - SAME AS BACKTESTING"""
-        analysis_start = time.time()
+    def safe_analyze(self, strategy, data: pd.DataFrame, symbol: str) -> Dict[str, Any]:
+        """Safe wrapper for strategy analysis with proper error handling and closed-candle analysis.
         
+        Args:
+            strategy: Strategy instance
+            data: Market data DataFrame
+            symbol: Trading symbol
+            
+        Returns:
+            dict: Analysis result with signal or error information
+        """
         try:
-            strategy = self.strategies[strategy_name]
+            # Validate data requirements
+            if len(data) < strategy.min_candles:
+                return {'signal': 'NO TRADE', 'reason': f'insufficient data: {len(data)} < {strategy.min_candles}'}
             
-            # Add strategy-specific indicators
-            data = strategy.add_indicators(data)
+            # Check for required columns
+            required_cols = {'open', 'high', 'low', 'close', 'volume'}
+            if not required_cols.issubset(data.columns):
+                missing = required_cols - set(data.columns)
+                return {'signal': 'NO TRADE', 'reason': f'missing columns: {missing}'}
             
-            # Call strategy analyze method using the SAME logic as backtesting
-            if strategy_name == 'insidebar_rsi':
-                # Special handling for insidebar_rsi
-                result = strategy.analyze(data, symbol, None)
-            elif hasattr(strategy, 'analyze_single_timeframe'):
-                result = strategy.analyze_single_timeframe(data, None)
-            else:
-                # For strategies that need candle, index, df parameters
-                candle = data.iloc[-1]
-                result = strategy.analyze(candle, len(data)-1, data, None)
-            
-            analysis_time = (time.time() - analysis_start) * 1000  # Convert to milliseconds
-            
-            if result and isinstance(result, dict):
-                result['strategy'] = strategy_name
-                result['symbol'] = symbol
-                result['timestamp'] = datetime.now().isoformat()
-                result['analysis_time_ms'] = analysis_time
-                
-                # Add confidence score if not present
-                if 'confidence_score' not in result:
-                    confidence_map = {
-                        'Very High': 85, 'High': 70, 'Medium': 50, 'Low': 30, 'Very Low': 10
-                    }
-                    result['confidence_score'] = confidence_map.get(result.get('confidence', 'Low'), 30)
-                
-                return result
-            else:
-                return {
-                    'signal': 'NO TRADE',
-                    'strategy': strategy_name,
-                    'symbol': symbol,
-                    'reason': 'No signal generated',
-                    'analysis_time_ms': analysis_time
-                }
+            # Use closed-candle analysis for live trading
+            return strategy.analyze_closed(data)
             
         except Exception as e:
-            analysis_time = (time.time() - analysis_start) * 1000
-            self.logger.error(f"❌ Error analyzing {strategy_name} for {symbol}: {e}")
-            return {
-                'signal': 'ERROR',
-                'reason': str(e),
-                'strategy': strategy_name,
-                'symbol': symbol,
-                'analysis_time_ms': analysis_time
-            }
+            self.logger.error(f"❌ Strategy {strategy.name} error: {e}")
+            return {'signal': 'ERROR', 'reason': str(e)}
+    
+    def analyze_with_strategy(self, strategy_name: str, symbol: str) -> Optional[Dict[str, Any]]:
+        """Analyze market data with a specific strategy using closed candles."""
+        if strategy_name not in self.strategies:
+            self.logger.warning(f"❌ Strategy '{strategy_name}' not found")
+            return None
+        
+        strategy = self.strategies[strategy_name]
+        
+        # Get market data
+        data = self.get_market_data(symbol, periods=100)
+        if data is None or data.empty:
+            self.logger.warning(f"❌ No data available for {symbol}")
+            return None
+        
+        # Validate data sanity
+        required_cols = {'open', 'high', 'low', 'close', 'volume'}
+        if not required_cols.issubset(data.columns):
+            self.logger.error(f"❌ Data missing columns: {required_cols - set(data.columns)}")
+            return None
+        
+        if pd.isna(data.iloc[-1]['close']):
+            self.logger.warning("❌ Last close is NaN")
+            return None
+        
+        # Use safe analysis wrapper
+        result = self.safe_analyze(strategy, data, symbol)
+        
+        if result.get('signal') in ['BUY CALL', 'BUY PUT']:
+            # Add correlation ID for traceability
+            result['correlation_id'] = str(uuid.uuid4())
+            result['symbol'] = symbol
+            result['strategy'] = strategy_name
+            result['timestamp'] = datetime.now()
+            
+            self.logger.info(f"📊 Signal generated: {result['signal']} for {symbol} "
+                           f"(Confidence: {result.get('confidence_score', 0)})")
+        
+        return result
     
     def execute_trading_cycle(self):
         """Execute one complete trading cycle"""
@@ -392,7 +407,7 @@ class LiveTradingBot:
                         self.logger.warning(f"🚫 Strategy {strategy_name} is DISABLED for emergency loss prevention")
                         continue
                         
-                    result = self.analyze_with_strategy(strategy_name, symbol, data)
+                    result = self.analyze_with_strategy(strategy_name, symbol)
                     total_analyses += 1
                     
                     # Extract common fields
@@ -407,7 +422,7 @@ class LiveTradingBot:
                         'price': data.iloc[-1]['close'] if len(data) > 0 else 0
                     })
                     
-                    if signal_type == 'NO TRADE':
+                    if result.get('signal') == 'NO TRADE':
                         no_trade_count += 1
                         rejected_signals.append({
                             **result,
@@ -418,7 +433,7 @@ class LiveTradingBot:
                             f"📋 {strategy_name} - {symbol}: NO TRADE "
                             f"(Reason: {result.get('reason', 'Unknown')})"
                         )
-                    elif signal_type == 'ERROR':
+                    elif result.get('signal') == 'ERROR':
                         error_count += 1
                         rejected_signals.append({
                             **result,
