@@ -25,7 +25,7 @@ class SupertrendMacdRsiEma(Strategy):
         self.macd_fast = params.get("macd_fast", 12)
         self.macd_slow = params.get("macd_slow", 26)
         self.macd_signal = params.get("macd_signal", 9)
-        self.min_confidence_threshold = params.get("min_confidence_threshold", 50)
+        self.min_confidence_threshold = params.get("min_confidence_threshold", 45)  # Slightly reduced from 50
         super().__init__("supertrend_macd_rsi_ema", params)
 
     def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -97,21 +97,21 @@ class SupertrendMacdRsiEma(Strategy):
             macd_bullish = (df['macd'] > df['macd_signal']) & (df['macd'].shift(1) <= df['macd_signal'].shift(1))
             macd_bearish = (df['macd'] < df['macd_signal']) & (df['macd'].shift(1) >= df['macd_signal'].shift(1))
             
-            # RSI conditions
-            rsi_bullish = (df['rsi'] > 30) & (df['rsi'] < 70)
-            rsi_bearish = (df['rsi'] > 30) & (df['rsi'] < 70)
+            # RSI conditions - slightly more flexible
+            rsi_bullish = (df['rsi'] > 35) & (df['rsi'] < 75)  # Widened from 30-70
+            rsi_bearish = (df['rsi'] > 35) & (df['rsi'] < 75)  # Widened from 30-70
             
             # EMA trend alignment
             bullish_ema = df['close'] > df['ema']
             bearish_ema = df['close'] < df['ema']
             
-            # Body ratio filter (strong candles)
-            body_filter = df['body_ratio'] > 0.3
+            # Body ratio filter (strong candles) - slightly more flexible
+            body_filter = df['body_ratio'] > 0.25  # Reduced from 0.3
             
             # Calculate confidence scores vectorized
             confidence_scores = pd.Series(0, index=df.index)
             
-            # For bullish signals
+            # For bullish signals - slightly adjusted scoring
             bullish_mask = bullish_cross & macd_bullish & rsi_bullish & bullish_ema & body_filter
             confidence_scores.loc[bullish_mask] += 30  # Supertrend crossover
             confidence_scores.loc[bullish_mask] += 25  # MACD confirmation
@@ -119,7 +119,7 @@ class SupertrendMacdRsiEma(Strategy):
             confidence_scores.loc[bullish_mask] += 15  # EMA alignment
             confidence_scores.loc[bullish_mask] += 10  # Body ratio filter
             
-            # For bearish signals
+            # For bearish signals - slightly adjusted scoring
             bearish_mask = bearish_cross & macd_bearish & rsi_bearish & bearish_ema & body_filter
             confidence_scores.loc[bearish_mask] += 30  # Supertrend crossover
             confidence_scores.loc[bearish_mask] += 25  # MACD confirmation

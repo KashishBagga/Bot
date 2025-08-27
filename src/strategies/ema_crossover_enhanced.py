@@ -24,10 +24,10 @@ class EmaCrossoverEnhanced(Strategy):
         self.ema_long = params.get("ema_long", 50)
         self.ema_trend = params.get("ema_trend", 200)  # Trend filter
         self.atr_period = params.get("atr_period", 14)
-        self.atr_threshold = params.get("atr_threshold", 0.5)  # Minimum ATR for trend
+        self.atr_threshold = params.get("atr_threshold", 0.3)  # Reduced ATR threshold for more signals
         self.adx_period = params.get("adx_period", 14)
-        self.adx_threshold = params.get("adx_threshold", 20)  # Minimum ADX for trend
-        self.min_confidence_threshold = params.get("min_confidence_threshold", 60)
+        self.adx_threshold = params.get("adx_threshold", 15)  # Reduced ADX threshold for more signals
+        self.min_confidence_threshold = params.get("min_confidence_threshold", 40)  # Reduced confidence threshold
         self.volume_threshold = params.get("volume_threshold", 0.3)  # Volume confirmation
         self.rsi_period = params.get("rsi_period", 14)
         self.ema_slope_period = params.get("ema_slope_period", 5)  # EMA slope for momentum
@@ -128,40 +128,40 @@ class EmaCrossoverEnhanced(Strategy):
         # Apply filters
         atr_filter = df['atr'] > self.atr_threshold
         adx_filter = df['adx'] > self.adx_threshold
-        volume_filter = df['volume_ratio_ma'] > 1.0
+        volume_filter = df['volume_ratio_ma'] > 0.8  # Reduced volume threshold for more signals
         
-        # RSI filters
-        bullish_rsi = df['rsi'] > 45
-        bearish_rsi = df['rsi'] < 55
+        # RSI filters - more flexible
+        bullish_rsi = df['rsi'] > 40  # Reduced from 45
+        bearish_rsi = df['rsi'] < 60  # Increased from 55
         
         # EMA slope momentum
-        bullish_momentum = df['ema_slope'] > 0
-        bearish_momentum = df['ema_slope'] < 0
+        bullish_momentum = df['ema_slope'] > -0.1  # More flexible momentum
+        bearish_momentum = df['ema_slope'] < 0.1   # More flexible momentum
         
-        # Trend alignment
-        bullish_trend = df['close'] > df['ema_trend']
-        bearish_trend = df['close'] < df['ema_trend']
+        # Trend alignment - more flexible
+        bullish_trend = df['close'] > df['ema_trend'] * 0.995  # 0.5% tolerance
+        bearish_trend = df['close'] < df['ema_trend'] * 1.005  # 0.5% tolerance
         
         # Calculate confidence scores vectorized
         confidence_scores = pd.Series(0, index=df.index)
         
-        # For bullish signals
+        # For bullish signals - more flexible scoring
         bullish_mask = buy_mask & atr_filter & adx_filter & bullish_rsi & volume_filter & bullish_momentum
-        confidence_scores.loc[bullish_mask & bullish_trend] += 40  # Strong trend alignment
-        confidence_scores.loc[bullish_mask & (df['close'] > df['ema_long'])] += 25  # Moderate trend alignment
-        confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
-        confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bullish_mask & bullish_trend] += 35  # Strong trend alignment (reduced from 40)
+        confidence_scores.loc[bullish_mask & (df['close'] > df['ema_long'])] += 20  # Moderate trend alignment (reduced from 25)
+        confidence_scores.loc[bullish_mask] += 15  # ATR filter passed (reduced from 20)
+        confidence_scores.loc[bullish_mask] += 15  # ADX filter passed (reduced from 20)
         confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
         confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
         confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
         confidence_scores.loc[bullish_mask] += 5   # EMA slope momentum
         
-        # For bearish signals
+        # For bearish signals - more flexible scoring
         bearish_mask = sell_mask & atr_filter & adx_filter & bearish_rsi & volume_filter & bearish_momentum
-        confidence_scores.loc[bearish_mask & bearish_trend] += 40  # Strong trend alignment
-        confidence_scores.loc[bearish_mask & (df['close'] < df['ema_long'])] += 25  # Moderate trend alignment
-        confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
-        confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bearish_mask & bearish_trend] += 35  # Strong trend alignment (reduced from 40)
+        confidence_scores.loc[bearish_mask & (df['close'] < df['ema_long'])] += 20  # Moderate trend alignment (reduced from 25)
+        confidence_scores.loc[bearish_mask] += 15  # ATR filter passed (reduced from 20)
+        confidence_scores.loc[bearish_mask] += 15  # ADX filter passed (reduced from 20)
         confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
         confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
         confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import logging
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
@@ -21,10 +22,10 @@ class SupertrendEma(Strategy):
         self.supertrend_multiplier = params.get("supertrend_multiplier", 3.0)
         self.timeframe_data = timeframe_data or {}
         self._supertrend_instances = {}
-        self.min_confidence_threshold = params.get("min_confidence_threshold", 60)
+        self.min_confidence_threshold = params.get("min_confidence_threshold", 40)  # Reduced from 60
         self.atr_period = params.get("atr_period", 14)
         self.adx_period = params.get("adx_period", 14)
-        self.adx_threshold = params.get("adx_threshold", 20)
+        self.adx_threshold = params.get("adx_threshold", 15)  # Reduced from 20
         self.volume_threshold = params.get("volume_threshold", 1.2)
         super().__init__("supertrend_ema", params)
 
@@ -230,35 +231,45 @@ class SupertrendEma(Strategy):
             df['close'].shift(1) >= df['supertrend_value'].shift(1)
         )
 
+        # Alternative: Also consider EMA crossovers when Supertrend is not available
+        ema_buy_mask = (df['close'] > df['ema']) & (df['close'].shift(1) <= df['ema'].shift(1))
+        ema_sell_mask = (df['close'] < df['ema']) & (df['close'].shift(1) >= df['ema'].shift(1))
+        
+        # Combine Supertrend and EMA signals
+        buy_mask = buy_mask | ema_buy_mask
+        sell_mask = sell_mask | ema_sell_mask
+
         # Apply filters
         ema_bullish = df['close'] > df['ema']
         ema_bearish = df['close'] < df['ema']
-        atr_filter = df['atr'] > 0.5  # Minimum ATR threshold
+        atr_filter = df['atr'] > 0.3  # Reduced from 0.5 for more signals
         adx_filter = df['adx'] > self.adx_threshold
-        rsi_bullish = df['rsi'] > 45
-        rsi_bearish = df['rsi'] < 55
-        volume_filter = df['volume_ratio'] > 1.0
-        momentum_bullish = df['ema_slope'] > 0
-        momentum_bearish = df['ema_slope'] < 0
+        rsi_bullish = df['rsi'] > 40  # Reduced from 45
+        rsi_bearish = df['rsi'] < 60  # Increased from 55
+        volume_filter = df['volume_ratio'] > 0.8  # Reduced from 1.0
+        momentum_bullish = df['ema_slope'] > -0.1  # More flexible
+        momentum_bearish = df['ema_slope'] < 0.1   # More flexible
         
         # Calculate confidence scores vectorized
         confidence_scores = pd.Series(0, index=df.index)
         
-        # For bullish signals
+        # For bullish signals - more flexible scoring
         bullish_mask = buy_mask & ema_bullish & atr_filter & adx_filter & rsi_bullish & volume_filter & momentum_bullish
-        confidence_scores.loc[bullish_mask] += 40  # Supertrend + EMA alignment
-        confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
-        confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bullish_mask] += 35  # Supertrend + EMA alignment (reduced from 40)
+        confidence_scores.loc[bullish_mask] += 15  # ATR filter passed (reduced from 20)
+        confidence_scores.loc[bullish_mask] += 15  # ADX filter passed (reduced from 20)
         confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
         confidence_scores.loc[bullish_mask & (df['volume_ratio'] > 1.2)] += 10  # Volume spike
+        confidence_scores.loc[bullish_mask & (df['volume_ratio'] > 1.0)] += 5   # Above average volume
         
-        # For bearish signals
+        # For bearish signals - more flexible scoring
         bearish_mask = sell_mask & ema_bearish & atr_filter & adx_filter & rsi_bearish & volume_filter & momentum_bearish
-        confidence_scores.loc[bearish_mask] += 40  # Supertrend + EMA alignment
-        confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
-        confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bearish_mask] += 35  # Supertrend + EMA alignment (reduced from 40)
+        confidence_scores.loc[bearish_mask] += 15  # ATR filter passed (reduced from 20)
+        confidence_scores.loc[bearish_mask] += 15  # ADX filter passed (reduced from 20)
         confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
         confidence_scores.loc[bearish_mask & (df['volume_ratio'] > 1.2)] += 10  # Volume spike
+        confidence_scores.loc[bearish_mask & (df['volume_ratio'] > 1.0)] += 5   # Above average volume
         
         # Apply confidence threshold
         valid_signals = confidence_scores >= self.min_confidence_threshold
