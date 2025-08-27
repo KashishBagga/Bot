@@ -126,8 +126,16 @@ class LivePaperTradingSystem:
         if data_provider == 'fyers':
             try:
                 from src.data.realtime_data_manager import FyersDataProvider
-                self.data_manager = FyersDataProvider()
-                logger.info("✅ Using Fyers live data")
+                from refresh_fyers_token import check_and_refresh_token
+                
+                # Get fresh token
+                access_token = check_and_refresh_token()
+                if access_token:
+                    self.data_manager = FyersDataProvider(app_id="C607KIH6W0-100", access_token=access_token)
+                    logger.info("✅ Using Fyers live data with fresh token")
+                else:
+                    self.data_manager = None
+                    logger.warning("⚠️ Could not get Fyers token, using paper data")
             except Exception as e:
                 logger.warning(f"⚠️ Fyers not available, falling back to paper data: {e}")
                 self.data_manager = None
