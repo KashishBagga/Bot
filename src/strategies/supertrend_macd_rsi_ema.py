@@ -28,6 +28,43 @@ class SupertrendMacdRsiEma(Strategy):
         self.min_confidence_threshold = params.get("min_confidence_threshold", 45)  # Slightly reduced from 50
         super().__init__("supertrend_macd_rsi_ema", params)
 
+    def compute_confidence(self, row: pd.Series) -> float:
+        """
+        Unified confidence scoring helper function.
+        Returns confidence score (0-100) for a given row.
+        """
+        score = 0.0
+        
+        # Supertrend crossover (30 points)
+        if row.get('supertrend_bullish', False):
+            score += 30
+        elif row.get('supertrend_bearish', False):
+            score += 30
+        
+        # MACD confirmation (20 points)
+        if row.get('macd_bullish', False):
+            score += 20
+        elif row.get('macd_bearish', False):
+            score += 20
+        
+        # RSI confirmation (15 points)
+        if row.get('rsi_bullish', False):
+            score += 15
+        elif row.get('rsi_bearish', False):
+            score += 15
+        
+        # EMA alignment (10 points)
+        if row.get('ema_bullish', False):
+            score += 10
+        elif row.get('ema_bearish', False):
+            score += 10
+        
+        # Body ratio filter (5 points)
+        if row.get('body_bullish', False) or row.get('body_bearish', False):
+            score += 5
+        
+        return score
+
     def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Add strategy-specific indicators."""
         df = df.copy()
@@ -101,8 +138,10 @@ class SupertrendMacdRsiEma(Strategy):
             macd_bearish = (df['macd'] < df['macd_signal']) & (df['macd'].shift(1) >= df['macd_signal'].shift(1))
             
             # RSI conditions - properly differentiated
-            rsi_bullish = (df['rsi'] > 35) & (df['rsi'] < 70)  # Oversold bounce to neutral
-            rsi_bearish = (df['rsi'] > 30) & (df['rsi'] < 65)  # Overbought rejection to neutral
+            # RSI bullish if in healthy mid-range (oversold recovery)
+            rsi_bullish = (df['rsi'] > 35) & (df['rsi'] < 70)
+            # RSI bearish if in high-mid range (overbought risk)
+            rsi_bearish = (df['rsi'] > 30) & (df['rsi'] < 65)
             
             # EMA trend alignment
             bullish_ema = df['close'] > df['ema']
@@ -111,24 +150,24 @@ class SupertrendMacdRsiEma(Strategy):
             # Body ratio filter (strong candles) - slightly more flexible
             body_filter = df['body_ratio'] > 0.25  # Reduced from 0.3
             
-            # Calculate confidence scores vectorized
-            confidence_scores = pd.Series(0, index=df.index)
+            # Calculate confidence scores using incremental system (0-100 scale)
+            confidence_scores = pd.Series(0, index=df.index, dtype=float)
             
-            # For bullish signals - slightly adjusted scoring
+            # For bullish signals - incremental scoring
             bullish_mask = bullish_cross & macd_bullish & rsi_bullish & bullish_ema & body_filter
-            confidence_scores.loc[bullish_mask] += 30  # Supertrend crossover
-            confidence_scores.loc[bullish_mask] += 25  # MACD confirmation
-            confidence_scores.loc[bullish_mask] += 20  # RSI confirmation
-            confidence_scores.loc[bullish_mask] += 15  # EMA alignment
-            confidence_scores.loc[bullish_mask] += 10  # Body ratio filter
+            confidence_scores += bullish_mask.astype(int) * 30  # Supertrend crossover
+            confidence_scores += (bullish_mask & macd_bullish).astype(int) * 20  # MACD confirmation
+            confidence_scores += (bullish_mask & rsi_bullish).astype(int) * 15  # RSI confirmation
+            confidence_scores += (bullish_mask & bullish_ema).astype(int) * 10  # EMA alignment
+            confidence_scores += (bullish_mask & body_filter).astype(int) * 5   # Body ratio filter
             
-            # For bearish signals - slightly adjusted scoring
+            # For bearish signals - incremental scoring
             bearish_mask = bearish_cross & macd_bearish & rsi_bearish & bearish_ema & body_filter
-            confidence_scores.loc[bearish_mask] += 30  # Supertrend crossover
-            confidence_scores.loc[bearish_mask] += 25  # MACD confirmation
-            confidence_scores.loc[bearish_mask] += 20  # RSI confirmation
-            confidence_scores.loc[bearish_mask] += 15  # EMA alignment
-            confidence_scores.loc[bearish_mask] += 10  # Body ratio filter
+            confidence_scores += bearish_mask.astype(int) * 30  # Supertrend crossover
+            confidence_scores += (bearish_mask & macd_bearish).astype(int) * 20  # MACD confirmation
+            confidence_scores += (bearish_mask & rsi_bearish).astype(int) * 15  # RSI confirmation
+            confidence_scores += (bearish_mask & bearish_ema).astype(int) * 10  # EMA alignment
+            confidence_scores += (bearish_mask & body_filter).astype(int) * 5   # Body ratio filter
             
             # Apply confidence threshold
             valid_signals = confidence_scores >= self.min_confidence_threshold
@@ -140,20 +179,25 @@ class SupertrendMacdRsiEma(Strategy):
             # Set confidence scores
             signals.loc[valid_signals, 'confidence_score'] = confidence_scores[valid_signals]
             
-            # Calculate stop loss and targets (ATR-based) - use real ATR
-            signals.loc[valid_signals, 'stop_loss'] = 1.5 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target1'] = 2.0 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target2'] = 3.0 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target3'] = 4.0 * df.loc[valid_signals, 'atr']
+            # Calculate stop loss and targets (ATR-based) - use real ATR with fallback
+            atr_values = df.loc[valid_signals, 'atr'].fillna(df.loc[valid_signals, 'close'] * 0.01)
+            signals.loc[valid_signals, 'stop_loss'] = 1.5 * atr_values
+            signals.loc[valid_signals, 'target1'] = 2.0 * atr_values
+            signals.loc[valid_signals, 'target2'] = 3.0 * atr_values
+            signals.loc[valid_signals, 'target3'] = 4.0 * atr_values
             
             # Dynamic position sizing
             high_confidence = confidence_scores >= 80
             signals.loc[valid_signals & high_confidence, 'position_multiplier'] = 1.0
             signals.loc[valid_signals & ~high_confidence, 'position_multiplier'] = 0.8
             
-            # Add reasoning - properly formatted for each row
+            # Add reasoning - properly formatted for each row with detailed information
             signals.loc[valid_signals, 'reasoning'] = df.loc[valid_signals].apply(
-                lambda row: f"Supertrend+MACD+RSI+EMA, RSI {row['rsi']:.1f}, MACD {row['macd']:.3f}",
+                lambda row: (
+                    f"Supertrend+MACD+RSI+EMA | "
+                    f"RSI {row['rsi']:.1f}, MACD {row['macd']:.3f}, "
+                    f"ATR {row['atr']:.2f}, EMA {row['ema']:.2f}"
+                ),
                 axis=1
             )
             
@@ -169,7 +213,7 @@ class SupertrendMacdRsiEma(Strategy):
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,
                              future_data: pd.DataFrame) -> Dict[str, Any]:
-        """Calculate performance metrics for a trade signal.
+        """Calculate performance metrics for a trade signal using NumPy optimization.
         
         Args:
             signal: Trade signal ("BUY CALL" or "BUY PUT")
@@ -183,6 +227,8 @@ class SupertrendMacdRsiEma(Strategy):
         Returns:
             Dict containing outcome, pnl, targets_hit, stoploss_count, failure_reason, exit_time
         """
+        import numpy as np
+        
         outcome = "Pending"
         pnl = 0.0
         targets_hit = 0
@@ -200,125 +246,121 @@ class SupertrendMacdRsiEma(Strategy):
                 "exit_time": None
             }
         
+        # Convert to NumPy arrays for faster processing
+        future_highs = future_data["high"].to_numpy()
+        future_lows = future_data["low"].to_numpy()
+        future_closes = future_data["close"].to_numpy()
+        future_index = future_data.index
+        
         if signal == "BUY CALL":
             stop_loss_price = entry_price - stop_loss
             target1_price = entry_price + target
             target2_price = entry_price + target2
             target3_price = entry_price + target3
             
-            highest_price = entry_price
-            trailing_sl = None
-            target1_hit = target2_hit = target3_hit = False
+            # Find first hits using NumPy operations
+            sl_hit_mask = future_lows <= stop_loss_price
+            t1_hit_mask = future_highs >= target1_price
+            t2_hit_mask = future_highs >= target2_price
+            t3_hit_mask = future_highs >= target3_price
             
-            for i, future_candle in future_data.iterrows():
-                # Check stop loss first
-                if not target1_hit and future_candle['low'] <= stop_loss_price:
+            # Find first occurrence of each event
+            def first_idx(bool_mask):
+                idxs = np.nonzero(bool_mask)[0]
+                return idxs[0] if idxs.size > 0 else np.iinfo(np.int32).max
+            
+            idx_stop = first_idx(sl_hit_mask)
+            idx_t1 = first_idx(t1_hit_mask)
+            idx_t2 = first_idx(t2_hit_mask)
+            idx_t3 = first_idx(t3_hit_mask)
+            
+            # Determine which event happened first
+            first_event_idx = min(idx_stop, idx_t1, idx_t2, idx_t3)
+            
+            if first_event_idx == np.iinfo(np.int32).max:
+                # No events hit - use last close
+                last_close = float(future_closes[-1])
+                pnl = (last_close - entry_price)
+                outcome = "Win" if pnl > 0 else "Loss"
+                exit_time = self.safe_signal_time(future_index[-1])
+            else:
+                # Determine outcome based on first event
+                if idx_stop == first_event_idx:
                     outcome = "Loss"
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    break
-                
-                # Check targets
-                if not target1_hit and future_candle['high'] >= target1_price:
-                    target1_hit = True
-                    targets_hit = 1
-                    pnl = target
-                    highest_price = max(highest_price, future_candle['high'])
-                    trailing_sl = highest_price - stop_loss
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                elif idx_t3 == first_event_idx:
                     outcome = "Win"
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    continue
-                    
-                if target1_hit and not target2_hit and future_candle['high'] >= target2_price:
-                    target2_hit = True
-                    targets_hit = 2
-                    pnl += (target2 - target)
-                    highest_price = max(highest_price, future_candle['high'])
-                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    continue
-                    
-                if target2_hit and not target3_hit and future_candle['high'] >= target3_price:
-                    target3_hit = True
+                    pnl = target3
                     targets_hit = 3
-                    pnl += (target3 - target2)
-                    highest_price = max(highest_price, future_candle['high'])
-                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    continue
-                
-                # Update trailing stop
-                if target1_hit:
-                    highest_price = max(highest_price, future_candle['high'])
-                    trailing_sl = max(trailing_sl, highest_price - stop_loss)
-                    if future_candle['low'] <= trailing_sl:
-                        outcome = "Win"
-                        pnl = trailing_sl - entry_price
-                        failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
-                        exit_time = self.safe_signal_time(future_candle.get('time', i))
-                        break
-                        
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                elif idx_t2 == first_event_idx:
+                    outcome = "Win"
+                    pnl = target2
+                    targets_hit = 2
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                else:  # idx_t1 == first_event_idx
+                    outcome = "Win"
+                    pnl = target
+                    targets_hit = 1
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                    
         elif signal == "BUY PUT":
             stop_loss_price = entry_price + stop_loss
             target1_price = entry_price - target
             target2_price = entry_price - target2
             target3_price = entry_price - target3
             
-            lowest_price = entry_price
-            trailing_sl = None
-            target1_hit = target2_hit = target3_hit = False
+            # Find first hits using NumPy operations
+            sl_hit_mask = future_highs >= stop_loss_price
+            t1_hit_mask = future_lows <= target1_price
+            t2_hit_mask = future_lows <= target2_price
+            t3_hit_mask = future_lows <= target3_price
             
-            for i, future_candle in future_data.iterrows():
-                # Check stop loss first
-                if not target1_hit and future_candle['high'] >= stop_loss_price:
+            # Find first occurrence of each event
+            def first_idx(bool_mask):
+                idxs = np.nonzero(bool_mask)[0]
+                return idxs[0] if idxs.size > 0 else np.iinfo(np.int32).max
+            
+            idx_stop = first_idx(sl_hit_mask)
+            idx_t1 = first_idx(t1_hit_mask)
+            idx_t2 = first_idx(t2_hit_mask)
+            idx_t3 = first_idx(t3_hit_mask)
+            
+            # Determine which event happened first
+            first_event_idx = min(idx_stop, idx_t1, idx_t2, idx_t3)
+            
+            if first_event_idx == np.iinfo(np.int32).max:
+                # No events hit - use last close
+                last_close = float(future_closes[-1])
+                pnl = (entry_price - last_close)
+                outcome = "Win" if pnl > 0 else "Loss"
+                exit_time = self.safe_signal_time(future_index[-1])
+            else:
+                # Determine outcome based on first event
+                if idx_stop == first_event_idx:
                     outcome = "Loss"
                     pnl = -stop_loss
                     stoploss_count = 1
                     failure_reason = f"Stop loss hit at {stop_loss_price:.2f}"
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    break
-                
-                # Check targets
-                if not target1_hit and future_candle['low'] <= target1_price:
-                    target1_hit = True
-                    targets_hit = 1
-                    pnl = target
-                    lowest_price = min(lowest_price, future_candle['low'])
-                    trailing_sl = lowest_price + stop_loss
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                elif idx_t3 == first_event_idx:
                     outcome = "Win"
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    continue
-                    
-                if target1_hit and not target2_hit and future_candle['low'] <= target2_price:
-                    target2_hit = True
-                    targets_hit = 2
-                    pnl += (target2 - target)
-                    lowest_price = min(lowest_price, future_candle['low'])
-                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    continue
-                    
-                if target2_hit and not target3_hit and future_candle['low'] <= target3_price:
-                    target3_hit = True
+                    pnl = target3
                     targets_hit = 3
-                    pnl += (target3 - target2)
-                    lowest_price = min(lowest_price, future_candle['low'])
-                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                    exit_time = self.safe_signal_time(future_candle.get('time', i))
-                    continue
-                
-                # Update trailing stop
-                if target1_hit:
-                    lowest_price = min(lowest_price, future_candle['low'])
-                    trailing_sl = min(trailing_sl, lowest_price + stop_loss)
-                    if future_candle['high'] >= trailing_sl:
-                        outcome = "Win"
-                        pnl = entry_price - trailing_sl
-                        failure_reason = f"Trailing SL hit at {trailing_sl:.2f} after targets"
-                        exit_time = self.safe_signal_time(future_candle.get('time', i))
-                        break
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                elif idx_t2 == first_event_idx:
+                    outcome = "Win"
+                    pnl = target2
+                    targets_hit = 2
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
+                else:  # idx_t1 == first_event_idx
+                    outcome = "Win"
+                    pnl = target
+                    targets_hit = 1
+                    exit_time = self.safe_signal_time(future_index[first_event_idx])
         
         return {
             "outcome": outcome,
