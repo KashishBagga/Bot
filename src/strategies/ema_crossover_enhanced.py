@@ -220,4 +220,123 @@ class EmaCrossoverEnhanced(Strategy):
             
         except Exception as e:
             logging.error(f"Error in EmaCrossoverEnhanced analysis: {e}")
-            return {'signal': 'ERROR', 'reason': str(e)} 
+            return {'signal': 'ERROR', 'reason': str(e)}
+    
+    def analyze_vectorized(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Vectorized analysis of the entire dataframe - much faster than row-by-row processing.
+        Returns a DataFrame with signals for all candles that meet the criteria.
+        """
+        try:
+            # Ensure we have enough data
+            if len(df) < self.min_candles:
+                return pd.DataFrame()
+            
+            # Create a copy to avoid modifying original
+            df = df.copy()
+            
+            # Ensure indicators are present
+            if 'ema_short' not in df.columns:
+                df = self.add_indicators(df)
+            
+            # Initialize signals DataFrame
+            signals = pd.DataFrame(index=df.index)
+            signals['signal'] = 'NO TRADE'
+            signals['price'] = df['close']
+            signals['confidence_score'] = 0
+            signals['stop_loss'] = 0.0
+            signals['target1'] = 0.0
+            signals['target2'] = 0.0
+            signals['target3'] = 0.0
+            signals['position_multiplier'] = 1.0
+            signals['reasoning'] = ''
+            
+            # Detect crossovers vectorized (look-ahead safe with shift)
+            # Bullish crossover: ema_short crosses above ema_long
+            bullish_cross = (df['ema_short'] > df['ema_long']) & (df['ema_short'].shift(1) <= df['ema_long'].shift(1))
+            
+            # Bearish crossover: ema_short crosses below ema_long
+            bearish_cross = (df['ema_short'] < df['ema_long']) & (df['ema_short'].shift(1) >= df['ema_long'].shift(1))
+            
+            # ATR filter
+            atr_filter = df['atr'] > self.atr_threshold
+            
+            # ADX filter
+            adx_filter = df['adx'] > self.adx_threshold
+            
+            # RSI filters
+            bullish_rsi = df['rsi'] > 45
+            bearish_rsi = df['rsi'] < 55
+            
+            # Volume confirmation
+            volume_filter = df['volume_ratio_ma'] > 1.0
+            
+            # EMA slope momentum
+            bullish_momentum = df['ema_slope'] > 0
+            bearish_momentum = df['ema_slope'] < 0
+            
+            # Trend alignment
+            bullish_trend = df['close'] > df['ema_trend']
+            bearish_trend = df['close'] < df['ema_trend']
+            
+            # Calculate confidence scores vectorized
+            confidence_scores = pd.Series(0, index=df.index)
+            
+            # For bullish signals
+            bullish_mask = bullish_cross & atr_filter & adx_filter & bullish_rsi & volume_filter & bullish_momentum
+            confidence_scores.loc[bullish_mask & bullish_trend] += 40  # Strong trend alignment
+            confidence_scores.loc[bullish_mask & (df['close'] > df['ema_long'])] += 25  # Moderate trend alignment
+            confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
+            confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
+            confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
+            confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
+            confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
+            confidence_scores.loc[bullish_mask] += 5   # EMA slope momentum
+            
+            # For bearish signals
+            bearish_mask = bearish_cross & atr_filter & adx_filter & bearish_rsi & volume_filter & bearish_momentum
+            confidence_scores.loc[bearish_mask & bearish_trend] += 40  # Strong trend alignment
+            confidence_scores.loc[bearish_mask & (df['close'] < df['ema_long'])] += 25  # Moderate trend alignment
+            confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
+            confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
+            confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
+            confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
+            confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
+            confidence_scores.loc[bearish_mask] += 5   # EMA slope momentum
+            
+            # Apply confidence threshold
+            valid_signals = confidence_scores >= self.min_confidence_threshold
+            
+            # Generate signals
+            signals.loc[bullish_mask & valid_signals, 'signal'] = 'BUY CALL'
+            signals.loc[bearish_mask & valid_signals, 'signal'] = 'BUY PUT'
+            
+            # Set confidence scores
+            signals.loc[valid_signals, 'confidence_score'] = confidence_scores[valid_signals]
+            
+            # Calculate stop loss and targets (ATR-based)
+            signals.loc[valid_signals, 'stop_loss'] = 1.5 * df.loc[valid_signals, 'atr']
+            signals.loc[valid_signals, 'target1'] = 2.0 * df.loc[valid_signals, 'atr']
+            signals.loc[valid_signals, 'target2'] = 3.0 * df.loc[valid_signals, 'atr']
+            signals.loc[valid_signals, 'target3'] = 4.0 * df.loc[valid_signals, 'atr']
+            
+            # Dynamic position sizing
+            high_confidence = confidence_scores >= 80
+            signals.loc[valid_signals & high_confidence, 'position_multiplier'] = 1.0
+            signals.loc[valid_signals & ~high_confidence, 'position_multiplier'] = 0.8
+            
+            # Add reasoning
+            signals.loc[valid_signals, 'reasoning'] = (
+                f"EMA crossover, ATR {df.loc[valid_signals, 'atr'].round(2)}, "
+                f"ADX {df.loc[valid_signals, 'adx'].round(2)}, "
+                f"RSI {df.loc[valid_signals, 'rsi'].round(1)}"
+            )
+            
+            # Return only valid signals
+            valid_signals_df = signals[signals['signal'] != 'NO TRADE'].copy()
+            
+            return valid_signals_df
+            
+        except Exception as e:
+            logging.error(f"Error in EmaCrossoverEnhanced vectorized analysis: {e}")
+            return pd.DataFrame() 

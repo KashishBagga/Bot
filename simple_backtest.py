@@ -167,54 +167,86 @@ class OptimizedBacktester:
         n = len(df)
         min_candles = 200
 
-        # Prepare an index map and maybe column arrays for vectorized access if strategies need them
-        # NOTE: we still call analyze_row for compatibility. If strategies support analyze_vectorized,
-        # that would be faster and we can call it here once per strategy.
+        # Process strategies with vectorized approach for maximum performance
         def process_strategy(strategy_name, strategy):
             strategy_signals = []
             try:
-                # prefer an analyze_row API (row-wise), fallback to analyze (slice)
-                use_row = hasattr(strategy, 'analyze_row')
-
-                rng = range(min_candles, n)
-                it = tqdm(rng, desc=f"Processing {strategy_name}", leave=False, disable=disable_tqdm)
-
-                for j in it:
-                    try:
-                        if use_row:
-                            # lightweight row access
-                            row = df.iloc[j]  # acceptable given it's a single Series
-                            result = strategy.analyze_row(j, row, df)
-                        else:
-                            # fallback - still slower
-                            result = strategy.analyze(df.iloc[:j+1])
-
-                        if result and result.get('signal') and result.get('signal') != 'NO TRADE':
+                # Prefer vectorized analysis if available (much faster)
+                if hasattr(strategy, 'analyze_vectorized'):
+                    logger.info(f"🚀 Using vectorized analysis for {strategy_name}")
+                    
+                    # Run vectorized analysis on entire dataframe
+                    signals_df = strategy.analyze_vectorized(df)
+                    
+                    if not signals_df.empty:
+                        # Convert DataFrame signals to list format
+                        for idx, row in signals_df.iterrows():
                             signal = {
-                                'timestamp': df.iat[j, df.columns.get_loc('timestamp')],
+                                'timestamp': df.loc[idx, 'timestamp'],
                                 'strategy': strategy_name,
-                                'signal': result['signal'],
-                                'price': result.get('price', df.iat[j, df.columns.get_loc('close')]),
-                                'confidence': result.get('confidence_score', 0),
-                                'reasoning': str(result.get('reasoning', ''))[:100],
-                                'stop_loss': result.get('stop_loss'),
-                                'target1': result.get('target1'),
-                                'target2': result.get('target2'),
-                                'target3': result.get('target3'),
-                                'position_multiplier': result.get('position_multiplier', 1.0)
+                                'signal': row['signal'],
+                                'price': row['price'],
+                                'confidence': row['confidence_score'],
+                                'reasoning': str(row['reasoning'])[:100],
+                                'stop_loss': row['stop_loss'],
+                                'target1': row['target1'],
+                                'target2': row['target2'],
+                                'target3': row['target3'],
+                                'position_multiplier': row['position_multiplier']
                             }
                             strategy_signals.append(signal)
-                    except Exception as e:
-                        # log for debugging, but continue processing
-                        logger.debug(f"⚠️ {strategy_name} row {j} error: {e}")
-                        logger.debug(traceback.format_exc())
-                        continue
+                    
+                    logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals (vectorized)")
+                    return strategy_signals
+                
+                else:
+                    # Fallback to row-wise processing for unoptimized strategies
+                    logger.info(f"⚠️ Using row-wise analysis for {strategy_name} (not vectorized)")
+                    
+                    # prefer an analyze_row API (row-wise), fallback to analyze (slice)
+                    use_row = hasattr(strategy, 'analyze_row')
+
+                    rng = range(min_candles, n)
+                    it = tqdm(rng, desc=f"Processing {strategy_name}", leave=False, disable=disable_tqdm)
+
+                    for j in it:
+                        try:
+                            if use_row:
+                                # lightweight row access
+                                row = df.iloc[j]  # acceptable given it's a single Series
+                                result = strategy.analyze_row(j, row, df)
+                            else:
+                                # fallback - still slower
+                                result = strategy.analyze(df.iloc[:j+1])
+
+                            if result and result.get('signal') and result.get('signal') != 'NO TRADE':
+                                signal = {
+                                    'timestamp': df.iat[j, df.columns.get_loc('timestamp')],
+                                    'strategy': strategy_name,
+                                    'signal': result['signal'],
+                                    'price': result.get('price', df.iat[j, df.columns.get_loc('close')]),
+                                    'confidence': result.get('confidence_score', 0),
+                                    'reasoning': str(result.get('reasoning', ''))[:100],
+                                    'stop_loss': result.get('stop_loss'),
+                                    'target1': result.get('target1'),
+                                    'target2': result.get('target2'),
+                                    'target3': result.get('target3'),
+                                    'position_multiplier': result.get('position_multiplier', 1.0)
+                                }
+                                strategy_signals.append(signal)
+                        except Exception as e:
+                            # log for debugging, but continue processing
+                            logger.debug(f"⚠️ {strategy_name} row {j} error: {e}")
+                            logger.debug(traceback.format_exc())
+                            continue
+                    
+                    logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals (row-wise)")
+                    return strategy_signals
+                    
             except Exception as e:
                 logger.error(f"❌ Fatal error processing strategy {strategy_name}: {e}")
                 logger.error(traceback.format_exc())
-
-            logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals")
-            return strategy_signals
+                return []
 
         # Execute strategies in parallel
         max_workers = min(len(strategies), os.cpu_count() or 4)

@@ -57,6 +57,113 @@ class SupertrendMacdRsiEma(Strategy):
         
         return df
 
+    def analyze_vectorized(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Vectorized analysis of the entire dataframe - much faster than row-by-row processing.
+        Returns a DataFrame with signals for all candles that meet the criteria.
+        """
+        try:
+            # Ensure we have enough data
+            if len(df) < self.min_candles:
+                return pd.DataFrame()
+            
+            # Create a copy to avoid modifying original
+            df = df.copy()
+            
+            # Ensure indicators are present
+            if 'supertrend' not in df.columns:
+                df = self.add_indicators(df)
+            
+            # Initialize signals DataFrame
+            signals = pd.DataFrame(index=df.index)
+            signals['signal'] = 'NO TRADE'
+            signals['price'] = df['close']
+            signals['confidence_score'] = 0
+            signals['stop_loss'] = 0.0
+            signals['target1'] = 0.0
+            signals['target2'] = 0.0
+            signals['target3'] = 0.0
+            signals['position_multiplier'] = 1.0
+            signals['reasoning'] = ''
+            
+            # Detect Supertrend crossovers (look-ahead safe with shift)
+            # Bullish: price crosses above Supertrend
+            bullish_cross = (df['close'] > df['supertrend']) & (df['close'].shift(1) <= df['supertrend'].shift(1))
+            
+            # Bearish: price crosses below Supertrend
+            bearish_cross = (df['close'] < df['supertrend']) & (df['close'].shift(1) >= df['supertrend'].shift(1))
+            
+            # MACD crossovers
+            macd_bullish = (df['macd'] > df['macd_signal']) & (df['macd'].shift(1) <= df['macd_signal'].shift(1))
+            macd_bearish = (df['macd'] < df['macd_signal']) & (df['macd'].shift(1) >= df['macd_signal'].shift(1))
+            
+            # RSI conditions
+            rsi_bullish = (df['rsi'] > 30) & (df['rsi'] < 70)
+            rsi_bearish = (df['rsi'] > 30) & (df['rsi'] < 70)
+            
+            # EMA trend alignment
+            bullish_ema = df['close'] > df['ema']
+            bearish_ema = df['close'] < df['ema']
+            
+            # Body ratio filter (strong candles)
+            body_filter = df['body_ratio'] > 0.3
+            
+            # Calculate confidence scores vectorized
+            confidence_scores = pd.Series(0, index=df.index)
+            
+            # For bullish signals
+            bullish_mask = bullish_cross & macd_bullish & rsi_bullish & bullish_ema & body_filter
+            confidence_scores.loc[bullish_mask] += 30  # Supertrend crossover
+            confidence_scores.loc[bullish_mask] += 25  # MACD confirmation
+            confidence_scores.loc[bullish_mask] += 20  # RSI confirmation
+            confidence_scores.loc[bullish_mask] += 15  # EMA alignment
+            confidence_scores.loc[bullish_mask] += 10  # Body ratio filter
+            
+            # For bearish signals
+            bearish_mask = bearish_cross & macd_bearish & rsi_bearish & bearish_ema & body_filter
+            confidence_scores.loc[bearish_mask] += 30  # Supertrend crossover
+            confidence_scores.loc[bearish_mask] += 25  # MACD confirmation
+            confidence_scores.loc[bearish_mask] += 20  # RSI confirmation
+            confidence_scores.loc[bearish_mask] += 15  # EMA alignment
+            confidence_scores.loc[bearish_mask] += 10  # Body ratio filter
+            
+            # Apply confidence threshold
+            valid_signals = confidence_scores >= self.min_confidence_threshold
+            
+            # Generate signals
+            signals.loc[bullish_mask & valid_signals, 'signal'] = 'BUY CALL'
+            signals.loc[bearish_mask & valid_signals, 'signal'] = 'BUY PUT'
+            
+            # Set confidence scores
+            signals.loc[valid_signals, 'confidence_score'] = confidence_scores[valid_signals]
+            
+            # Calculate stop loss and targets (ATR-based, using 1% as default)
+            atr_default = df['close'] * 0.01  # 1% of close price
+            signals.loc[valid_signals, 'stop_loss'] = 1.5 * atr_default.loc[valid_signals]
+            signals.loc[valid_signals, 'target1'] = 2.0 * atr_default.loc[valid_signals]
+            signals.loc[valid_signals, 'target2'] = 3.0 * atr_default.loc[valid_signals]
+            signals.loc[valid_signals, 'target3'] = 4.0 * atr_default.loc[valid_signals]
+            
+            # Dynamic position sizing
+            high_confidence = confidence_scores >= 80
+            signals.loc[valid_signals & high_confidence, 'position_multiplier'] = 1.0
+            signals.loc[valid_signals & ~high_confidence, 'position_multiplier'] = 0.8
+            
+            # Add reasoning
+            signals.loc[valid_signals, 'reasoning'] = (
+                f"Supertrend+MACD+RSI+EMA, RSI {df.loc[valid_signals, 'rsi'].round(1)}, "
+                f"MACD {df.loc[valid_signals, 'macd'].round(3)}"
+            )
+            
+            # Return only valid signals
+            valid_signals_df = signals[signals['signal'] != 'NO TRADE'].copy()
+            
+            return valid_signals_df
+            
+        except Exception as e:
+            logging.error(f"Error in SupertrendMacdRsiEma vectorized analysis: {e}")
+            return pd.DataFrame()
+
     def calculate_performance(self, signal: str, entry_price: float, stop_loss: float, 
                              target: float, target2: float, target3: float,
                              future_data: pd.DataFrame) -> Dict[str, Any]:
