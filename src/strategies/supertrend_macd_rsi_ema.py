@@ -306,7 +306,7 @@ class SupertrendMacdRsiEma(Strategy):
                     pnl = target
                     targets_hit = 1
                     exit_time = self.safe_signal_time(future_index[first_event_idx])
-                    
+                        
         elif signal == "BUY PUT":
             stop_loss_price = entry_price + stop_loss
             target1_price = entry_price - target

@@ -222,6 +222,69 @@ class FyersClient:
             logger.error(f"Error getting order status: {e}")
             return None
 
+    def get_quotes(self, symbols):
+        """Get live quotes for symbols.
+        
+        Args:
+            symbols: List of symbols (e.g., ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"])
+            
+        Returns:
+            dict: Quotes data
+        """
+        if not self.fyers:
+            logger.error("Fyers client not initialized")
+            return None
+        
+        try:
+            response = self.fyers.quotes({"symbols": symbols})
+            logger.info(f"Quotes fetched for {len(symbols)} symbols")
+            return response
+        except Exception as e:
+            logger.error(f"Error fetching quotes: {e}")
+            return None
+    
+    def get_underlying_price(self, symbol):
+        """Get current underlying price for a symbol.
+        
+        Args:
+            symbol: Trading symbol (e.g., "NSE:NIFTY50-INDEX")
+            
+        Returns:
+            float: Current price or None if error
+        """
+        if not self.fyers:
+            logger.error("Fyers client not initialized")
+            return None
+        
+        try:
+            # Get quotes for the symbol
+            response = self.fyers.quotes({"symbols": symbol})
+            
+            if response and 'code' in response and response['code'] == 200:
+                if 'd' in response and response['d']:
+                    data = response['d']
+                    
+                    # Handle different response formats
+                    if isinstance(data, list) and len(data) > 0:
+                        if 'v' in data[0]:
+                            v_data = data[0]['v']
+                            if 'lp' in v_data:  # Last price
+                                return float(v_data['lp'])
+                            elif 'ltp' in v_data:  # Alternative field name
+                                return float(v_data['ltp'])
+                    elif isinstance(data, dict) and symbol in data:
+                        if 'lp' in data[symbol]:
+                            return float(data[symbol]['lp'])
+                        elif 'ltp' in data[symbol]:
+                            return float(data[symbol]['ltp'])
+            
+            logger.warning(f"Could not extract price from response for {symbol}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error getting underlying price for {symbol}: {e}")
+            return None
+
     def get_historical_data(self, symbol, resolution, date_format=1, range_from=None, range_to=None, cont_flag=1):
         """Get historical data for a symbol.
         
@@ -229,12 +292,12 @@ class FyersClient:
             symbol: Trading symbol (e.g., "NSE:NIFTY50-INDEX")
             resolution: Timeframe (1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 120, 180, 240, 1D)
             date_format: Date format (1 for timestamp)
-            range_from: Start date (YYYY-MM-DD)
-            range_to: End date (YYYY-MM-DD)
+            range_from: Start timestamp
+            range_to: End timestamp
             cont_flag: Continuous flag
             
         Returns:
-            dict: Historical data
+            dict: Historical data with candles
         """
         if not self.fyers:
             logger.error("Fyers client not initialized")
@@ -251,8 +314,18 @@ class FyersClient:
         
         try:
             response = self.fyers.history(data)
-            logger.info(f"Historical data fetched for {symbol}")
-            return response
+            
+            if response and 'code' in response and response['code'] == 200:
+                if 'candles' in response:
+                    logger.info(f"Historical data fetched for {symbol}: {len(response['candles'])} candles")
+                    return response
+                else:
+                    logger.warning(f"No candles in response for {symbol}")
+                    return None
+            else:
+                logger.error(f"Error response for {symbol}: {response}")
+                return None
+                
         except Exception as e:
             logger.error(f"Error fetching historical data for {symbol}: {e}")
             return None
