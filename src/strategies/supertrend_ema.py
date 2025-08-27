@@ -298,11 +298,10 @@ class SupertrendEma(Strategy):
         high_confidence = signals_df['confidence_score'] >= 80
         signals_df['position_multiplier'] = np.where(high_confidence, 1.0, 0.8)
         
-        # Add reasoning
-        signals_df['reasoning'] = (
-            f"Supertrend + EMA, ATR {signals_df['atr'].round(2)}, "
-            f"ADX {signals_df['adx'].round(2)}, "
-            f"RSI {signals_df['rsi'].round(1)}"
+        # Add reasoning - properly formatted for each row
+        signals_df['reasoning'] = signals_df.apply(
+            lambda row: f"Supertrend + EMA, ATR {row['atr']:.2f}, ADX {row['adx']:.2f}, RSI {row['rsi']:.1f}",
+            axis=1
         )
 
         return signals_df[['timestamp', 'signal', 'price', 'confidence_score', 'stop_loss', 'target1', 'target2', 'target3', 'position_multiplier', 'reasoning']]

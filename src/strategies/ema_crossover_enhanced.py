@@ -33,6 +33,71 @@ class EmaCrossoverEnhanced(Strategy):
         self.ema_slope_period = params.get("ema_slope_period", 5)  # EMA slope for momentum
         super().__init__("ema_crossover_enhanced", params)
 
+    def calculate_confidence_score(self, df: pd.DataFrame, mask: pd.Series, signal_type: str = 'bullish') -> pd.Series:
+        """
+        Unified confidence scoring system for EMA crossover strategy.
+        Returns confidence scores for the given mask.
+        """
+        confidence_scores = pd.Series(0, index=df.index)
+        
+        if signal_type == 'bullish':
+            # Trend alignment (35% weight)
+            trend_aligned = df['close'] > df['ema_trend']
+            confidence_scores.loc[mask & trend_aligned] += 35
+            
+            moderate_trend = (df['close'] > df['ema_long']) & ~trend_aligned
+            confidence_scores.loc[mask & moderate_trend] += 20
+            
+            # ATR filter (15% weight)
+            confidence_scores.loc[mask] += 15
+            
+            # ADX filter (15% weight)
+            confidence_scores.loc[mask] += 15
+            
+            # RSI confirmation (10% weight)
+            rsi_confirm = df['rsi'] > 45
+            confidence_scores.loc[mask & rsi_confirm] += 10
+            
+            # Volume confirmation (10% weight)
+            volume_spike = df['volume_ratio_ma'] > 1.2
+            volume_above_avg = df['volume_ratio_ma'] > 1.0
+            confidence_scores.loc[mask & volume_spike] += 10
+            confidence_scores.loc[mask & volume_above_avg & ~volume_spike] += 5
+            
+            # EMA slope momentum (5% weight)
+            momentum_confirm = df['ema_slope'] > 0
+            confidence_scores.loc[mask & momentum_confirm] += 5
+            
+        elif signal_type == 'bearish':
+            # Trend alignment (35% weight)
+            trend_aligned = df['close'] < df['ema_trend']
+            confidence_scores.loc[mask & trend_aligned] += 35
+            
+            moderate_trend = (df['close'] < df['ema_long']) & ~trend_aligned
+            confidence_scores.loc[mask & moderate_trend] += 20
+            
+            # ATR filter (15% weight)
+            confidence_scores.loc[mask] += 15
+            
+            # ADX filter (15% weight)
+            confidence_scores.loc[mask] += 15
+            
+            # RSI confirmation (10% weight)
+            rsi_confirm = df['rsi'] < 55
+            confidence_scores.loc[mask & rsi_confirm] += 10
+            
+            # Volume confirmation (10% weight)
+            volume_spike = df['volume_ratio_ma'] > 1.2
+            volume_above_avg = df['volume_ratio_ma'] > 1.0
+            confidence_scores.loc[mask & volume_spike] += 10
+            confidence_scores.loc[mask & volume_above_avg & ~volume_spike] += 5
+            
+            # EMA slope momentum (5% weight)
+            momentum_confirm = df['ema_slope'] < 0
+            confidence_scores.loc[mask & momentum_confirm] += 5
+        
+        return confidence_scores
+
     def _ensure_emas(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """
         Ensure EMA columns exist. Returns a DataFrame with 'ema_short' & 'ema_long'.
@@ -142,30 +207,18 @@ class EmaCrossoverEnhanced(Strategy):
         bullish_trend = df['close'] > df['ema_trend'] * 0.995  # 0.5% tolerance
         bearish_trend = df['close'] < df['ema_trend'] * 1.005  # 0.5% tolerance
         
-        # Calculate confidence scores vectorized
+        # Calculate confidence scores using unified system
         confidence_scores = pd.Series(0, index=df.index)
         
-        # For bullish signals - more flexible scoring
+        # For bullish signals
         bullish_mask = buy_mask & atr_filter & adx_filter & bullish_rsi & volume_filter & bullish_momentum
-        confidence_scores.loc[bullish_mask & bullish_trend] += 35  # Strong trend alignment (reduced from 40)
-        confidence_scores.loc[bullish_mask & (df['close'] > df['ema_long'])] += 20  # Moderate trend alignment (reduced from 25)
-        confidence_scores.loc[bullish_mask] += 15  # ATR filter passed (reduced from 20)
-        confidence_scores.loc[bullish_mask] += 15  # ADX filter passed (reduced from 20)
-        confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
-        confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
-        confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
-        confidence_scores.loc[bullish_mask] += 5   # EMA slope momentum
+        bullish_confidence = self.calculate_confidence_score(df, bullish_mask, 'bullish')
+        confidence_scores += bullish_confidence
         
-        # For bearish signals - more flexible scoring
+        # For bearish signals
         bearish_mask = sell_mask & atr_filter & adx_filter & bearish_rsi & volume_filter & bearish_momentum
-        confidence_scores.loc[bearish_mask & bearish_trend] += 35  # Strong trend alignment (reduced from 40)
-        confidence_scores.loc[bearish_mask & (df['close'] < df['ema_long'])] += 20  # Moderate trend alignment (reduced from 25)
-        confidence_scores.loc[bearish_mask] += 15  # ATR filter passed (reduced from 20)
-        confidence_scores.loc[bearish_mask] += 15  # ADX filter passed (reduced from 20)
-        confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
-        confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
-        confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
-        confidence_scores.loc[bearish_mask] += 5   # EMA slope momentum
+        bearish_confidence = self.calculate_confidence_score(df, bearish_mask, 'bearish')
+        confidence_scores += bearish_confidence
         
         # Apply confidence threshold
         valid_signals = confidence_scores >= self.min_confidence_threshold
@@ -190,15 +243,14 @@ class EmaCrossoverEnhanced(Strategy):
         signals_df['target2'] = 3.0 * signals_df['atr']
         signals_df['target3'] = 4.0 * signals_df['atr']
         
-        # Dynamic position sizing
+                # Dynamic position sizing
         high_confidence = signals_df['confidence_score'] >= 80
         signals_df['position_multiplier'] = np.where(high_confidence, 1.0, 0.8)
         
-        # Add reasoning
-        signals_df['reasoning'] = (
-            f"EMA crossover, ATR {signals_df['atr'].round(2)}, "
-            f"ADX {signals_df['adx'].round(2)}, "
-            f"RSI {signals_df['rsi'].round(1)}"
+        # Add reasoning - properly formatted for each row
+        signals_df['reasoning'] = signals_df.apply(
+            lambda row: f"EMA crossover, ATR {row['atr']:.2f}, ADX {row['adx']:.2f}, RSI {row['rsi']:.1f}",
+            axis=1
         )
 
         return signals_df[['timestamp', 'signal', 'price', 'confidence_score', 'stop_loss', 'target1', 'target2', 'target3', 'position_multiplier', 'reasoning']]

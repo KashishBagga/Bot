@@ -51,6 +51,9 @@ class SupertrendMacdRsiEma(Strategy):
         # Add EMA indicator
         df['ema'] = indicators.ema(df, period=self.ema_period)
         
+        # Add ATR for realistic stop loss and targets
+        df['atr'] = indicators.atr(df, period=14)
+        
         # Add body ratio calculations
         df['body_ratio'] = abs(df['close'] - df['open']) / (df['high'] - df['low'])
         df['body_ratio'] = df['body_ratio'].fillna(0)
@@ -97,9 +100,9 @@ class SupertrendMacdRsiEma(Strategy):
             macd_bullish = (df['macd'] > df['macd_signal']) & (df['macd'].shift(1) <= df['macd_signal'].shift(1))
             macd_bearish = (df['macd'] < df['macd_signal']) & (df['macd'].shift(1) >= df['macd_signal'].shift(1))
             
-            # RSI conditions - slightly more flexible
-            rsi_bullish = (df['rsi'] > 35) & (df['rsi'] < 75)  # Widened from 30-70
-            rsi_bearish = (df['rsi'] > 35) & (df['rsi'] < 75)  # Widened from 30-70
+            # RSI conditions - properly differentiated
+            rsi_bullish = (df['rsi'] > 35) & (df['rsi'] < 70)  # Oversold bounce to neutral
+            rsi_bearish = (df['rsi'] > 30) & (df['rsi'] < 65)  # Overbought rejection to neutral
             
             # EMA trend alignment
             bullish_ema = df['close'] > df['ema']
@@ -137,22 +140,21 @@ class SupertrendMacdRsiEma(Strategy):
             # Set confidence scores
             signals.loc[valid_signals, 'confidence_score'] = confidence_scores[valid_signals]
             
-            # Calculate stop loss and targets (ATR-based, using 1% as default)
-            atr_default = df['close'] * 0.01  # 1% of close price
-            signals.loc[valid_signals, 'stop_loss'] = 1.5 * atr_default.loc[valid_signals]
-            signals.loc[valid_signals, 'target1'] = 2.0 * atr_default.loc[valid_signals]
-            signals.loc[valid_signals, 'target2'] = 3.0 * atr_default.loc[valid_signals]
-            signals.loc[valid_signals, 'target3'] = 4.0 * atr_default.loc[valid_signals]
+            # Calculate stop loss and targets (ATR-based) - use real ATR
+            signals.loc[valid_signals, 'stop_loss'] = 1.5 * df.loc[valid_signals, 'atr']
+            signals.loc[valid_signals, 'target1'] = 2.0 * df.loc[valid_signals, 'atr']
+            signals.loc[valid_signals, 'target2'] = 3.0 * df.loc[valid_signals, 'atr']
+            signals.loc[valid_signals, 'target3'] = 4.0 * df.loc[valid_signals, 'atr']
             
             # Dynamic position sizing
             high_confidence = confidence_scores >= 80
             signals.loc[valid_signals & high_confidence, 'position_multiplier'] = 1.0
             signals.loc[valid_signals & ~high_confidence, 'position_multiplier'] = 0.8
             
-            # Add reasoning
-            signals.loc[valid_signals, 'reasoning'] = (
-                f"Supertrend+MACD+RSI+EMA, RSI {df.loc[valid_signals, 'rsi'].round(1)}, "
-                f"MACD {df.loc[valid_signals, 'macd'].round(3)}"
+            # Add reasoning - properly formatted for each row
+            signals.loc[valid_signals, 'reasoning'] = df.loc[valid_signals].apply(
+                lambda row: f"Supertrend+MACD+RSI+EMA, RSI {row['rsi']:.1f}, MACD {row['macd']:.3f}",
+                axis=1
             )
             
             # Return only valid signals
