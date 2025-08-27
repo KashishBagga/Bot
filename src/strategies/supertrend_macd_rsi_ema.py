@@ -5,6 +5,8 @@ from src.core.strategy import Strategy
 from src.core.indicators import indicators
 from src.models.unified_database import UnifiedDatabase
 import math
+import logging
+import pytz
 
 class SupertrendMacdRsiEma(Strategy):
     """
@@ -280,103 +282,316 @@ class SupertrendMacdRsiEma(Strategy):
             if pd.isna(supertrend_direction) or pd.isna(rsi) or pd.isna(macd) or pd.isna(ema):
                 return {'signal': 'NO TRADE', 'reason': 'indicator data unavailable'}
             
-            # Calculate confidence score based on multiple factors
+            # ENHANCED FILTERS FOR BEST PERFORMER
+            
+            # 1. Time-based filter (avoid lunch hour 11:30-1:30)
+            current_time = datetime.now().time()
+            lunch_start = datetime.strptime('11:30:00', '%H:%M:%S').time()
+            lunch_end = datetime.strptime('13:30:00', '%H:%M:%S').time()
+            
+            if lunch_start <= current_time <= lunch_end:
+                return {'signal': 'NO TRADE', 'reason': 'avoiding lunch hour (low volume)'}
+            
+            # 2. Volume spike filter
+            if volume_ratio < 1.0:
+                return {'signal': 'NO TRADE', 'reason': f'volume too low: {volume_ratio:.2f} < 1.0'}
+            
+            # 3. Body ratio filter (avoid doji candles)
+            if body_ratio < 0.3:
+                return {'signal': 'NO TRADE', 'reason': f'body ratio too low: {body_ratio:.2f} < 0.3'}
+            
+            # Calculate enhanced confidence score with risk scaling
             confidence_score = 0
+            filter_alignment = 0  # Count of aligned filters
             
             # Trend strength (40% weight)
             if supertrend_direction == 1:
                 confidence_score += 40
+                filter_alignment += 1
             elif supertrend_direction == -1:
-                confidence_score += 0
-            else:
-                confidence_score += 20
+                confidence_score += 40
+                filter_alignment += 1
             
-            # RSI strength (30% weight)
+            # RSI strength (25% weight)
             if 30 <= rsi <= 70:
-                confidence_score += 30
-            elif 20 <= rsi <= 80:
-                confidence_score += 20
-            else:
-                confidence_score += 10
-            
-            # MACD strength (30% weight)
-            if macd > macd_signal and macd_histogram > 0:
-                confidence_score += 30
-            elif macd < macd_signal and macd_histogram < 0:
-                confidence_score += 30
-            else:
+                confidence_score += 25
+                filter_alignment += 1
+            elif 25 <= rsi <= 75:
                 confidence_score += 15
+            else:
+                confidence_score += 5
+            
+            # MACD strength (25% weight)
+            if (macd > macd_signal and macd_histogram > 0) or (macd < macd_signal and macd_histogram < 0):
+                confidence_score += 25
+                filter_alignment += 1
+            elif abs(macd - macd_signal) > 0.1:
+                confidence_score += 15
+            else:
+                confidence_score += 5
+            
+            # Price vs EMA alignment (10% weight)
+            if ((supertrend_direction == 1 and candle['close'] > ema) or 
+                (supertrend_direction == -1 and candle['close'] < ema)):
+                confidence_score += 10
+                filter_alignment += 1
             
             # Volume confirmation (bonus)
-            if volume_ratio > 1.0:
+            if volume_ratio > 1.5:
                 confidence_score += 10
             
-            # Body ratio confirmation (bonus)
-            if body_ratio > 0.6:
-                confidence_score += 10
+            # RISK SCALING BASED ON FILTER ALIGNMENT
+            if filter_alignment >= 4:  # All major filters aligned
+                risk_multiplier = 1.0  # Full position size
+                confidence_threshold = 70
+            elif filter_alignment >= 3:  # Most filters aligned
+                risk_multiplier = 0.8  # 80% position size
+                confidence_threshold = 75
+            else:  # Weak alignment
+                risk_multiplier = 0.5  # 50% position size
+                confidence_threshold = 80
             
-            # BUY CALL conditions
-            if (supertrend_direction == 1 and  # SuperTrend uptrend
-                rsi > 30 and rsi < 80 and  # RSI in healthy range
-                macd > macd_signal and  # MACD bullish
-                candle['close'] > ema and  # Price above EMA
-                volume_ratio > 0.5):  # Volume confirmation
+            # Generate signals based on SuperTrend direction
+            if supertrend_direction == 1 and confidence_score >= confidence_threshold:
+                # BUY CALL signal
+                atr = df['atr'].iloc[-1]
+                stop_loss = 1.5 * atr
+                target1 = 2.0 * atr
+                target2 = 3.0 * atr
+                target3 = 4.0 * atr
                 
-                if confidence_score >= self.min_confidence_threshold:
-                    atr = df['atr'].iloc[-1]
-                    stop_loss = 1.5 * atr
-                    target1 = 2.0 * atr
-                    target2 = 3.0 * atr
-                    target3 = 4.0 * atr
-                    
-                    # Dynamic position sizing based on confidence
-                    position_multiplier = 1.0 if confidence_score >= 80 else 0.8
-                    
-                    return {
-                        'signal': 'BUY CALL',
-                        'price': candle['close'],
-                        'confidence_score': confidence_score,
-                        'stop_loss': stop_loss,
-                        'target1': target1,
-                        'target2': target2,
-                        'target3': target3,
-                        'position_multiplier': position_multiplier,
-                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
-                        'reasoning': f"SuperTrend uptrend, RSI {rsi:.1f}, MACD bullish, Price above EMA, Volume {volume_ratio:.2f}"
-                    }
-            
-            # BUY PUT conditions
-            elif (supertrend_direction == -1 and  # SuperTrend downtrend
-                  rsi > 20 and rsi < 70 and  # RSI in healthy range
-                  macd < macd_signal and  # MACD bearish
-                  candle['close'] < ema and  # Price below EMA
-                  volume_ratio > 0.5):  # Volume confirmation
+                # Dynamic position sizing based on filter alignment
+                position_multiplier = risk_multiplier
                 
-                if confidence_score >= self.min_confidence_threshold:
-                    atr = df['atr'].iloc[-1]
-                    stop_loss = 1.5 * atr
-                    target1 = 2.0 * atr
-                    target2 = 3.0 * atr
-                    target3 = 4.0 * atr
-                    
-                    # Dynamic position sizing based on confidence
-                    position_multiplier = 1.0 if confidence_score >= 80 else 0.8
-                    
-                    return {
-                        'signal': 'BUY PUT',
-                        'price': candle['close'],
-                        'confidence_score': confidence_score,
-                        'stop_loss': stop_loss,
-                        'target1': target1,
-                        'target2': target2,
-                        'target3': target3,
-                        'position_multiplier': position_multiplier,
-                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
-                        'reasoning': f"SuperTrend downtrend, RSI {rsi:.1f}, MACD bearish, Price below EMA, Volume {volume_ratio:.2f}"
-                    }
+                return {
+                    'signal': 'BUY CALL',
+                    'price': candle['close'],
+                    'confidence_score': confidence_score,
+                    'stop_loss': stop_loss,
+                    'target1': target1,
+                    'target2': target2,
+                    'target3': target3,
+                    'position_multiplier': position_multiplier,
+                    'filter_alignment': filter_alignment,
+                    'risk_multiplier': risk_multiplier,
+                    'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
+                    'reasoning': f"SuperTrend uptrend, RSI {rsi:.1f}, MACD bullish, Price above EMA, Volume {volume_ratio:.2f}, Filters: {filter_alignment}/4"
+                }
             
-            return {'signal': 'NO TRADE', 'reason': 'no signal conditions met'}
+            elif supertrend_direction == -1 and confidence_score >= confidence_threshold:
+                # BUY PUT signal
+                atr = df['atr'].iloc[-1]
+                stop_loss = 1.5 * atr
+                target1 = 2.0 * atr
+                target2 = 3.0 * atr
+                target3 = 4.0 * atr
+                
+                # Dynamic position sizing based on filter alignment
+                position_multiplier = risk_multiplier
+                
+                return {
+                    'signal': 'BUY PUT',
+                    'price': candle['close'],
+                    'confidence_score': confidence_score,
+                    'stop_loss': stop_loss,
+                    'target1': target1,
+                    'target2': target2,
+                    'target3': target3,
+                    'position_multiplier': position_multiplier,
+                    'filter_alignment': filter_alignment,
+                    'risk_multiplier': risk_multiplier,
+                    'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
+                    'reasoning': f"SuperTrend downtrend, RSI {rsi:.1f}, MACD bearish, Price below EMA, Volume {volume_ratio:.2f}, Filters: {filter_alignment}/4"
+                }
+            
+            return {'signal': 'NO TRADE', 'reason': f'confidence too low: {confidence_score} < {confidence_threshold}'}
             
         except Exception as e:
             logging.error(f"Error in SupertrendMacdRsiEma analysis: {e}")
             return {'signal': 'ERROR', 'reason': str(e)}
+
+    def analyze_strategy(self, df: pd.DataFrame, candle: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Strategy-specific analysis with pre-calculated indicators and market conditions - OPTIMIZED VERSION"""
+        try:
+            # Get previous candle for SuperTrend calculation
+            prev_candle = None
+            if len(df) > 1:
+                prev_candle = df.iloc[-2].to_dict()
+            
+            # Get SuperTrend data
+            st_instance = self._get_supertrend_instance("5min")
+            st_data = st_instance.update(candle, prev_candle)
+            
+            if st_data is None or st_data[1] is None:
+                return {'signal': 'NO TRADE', 'reason': 'insufficient supertrend data'}
+            
+            supertrend_direction = st_data[1]
+            
+            # Get indicators from pre-calculated data
+            ema_9 = df['ema_9'].iloc[-1]
+            ema_21 = df['ema_21'].iloc[-1]
+            ema_50 = df['ema_50'].iloc[-1] if 'ema_50' in df.columns else ema_21
+            rsi = df['rsi'].iloc[-1]
+            macd = df['macd'].iloc[-1]
+            macd_signal = df['macd_signal'].iloc[-1]
+            volume_ratio = df['volume_ratio'].iloc[-1]
+            atr = df['atr'].iloc[-1]
+            
+            # Check for NaN values
+            if pd.isna(ema_9) or pd.isna(ema_21) or pd.isna(rsi) or pd.isna(macd) or pd.isna(atr):
+                return {'signal': 'NO TRADE', 'reason': 'indicator data unavailable'}
+            
+            # MARKET CONDITION ANALYSIS - CRITICAL FILTER
+            if 'market_tradeable' in df.columns and 'market_condition' in df.columns:
+                market_tradeable = df['market_tradeable'].iloc[-1]
+                market_condition = df['market_condition'].iloc[-1]
+                adx = df['adx'].iloc[-1] if 'adx' in df.columns else 20
+                trend_direction = df['trend_direction'].iloc[-1] if 'trend_direction' in df.columns else 0
+                
+                # DEBUG: Print market condition info for first few signals
+                if len(df) % 100 == 0:  # Print every 100th candle
+                    print(f"DEBUG: Market condition: {market_condition}, Tradeable: {market_tradeable}, ADX: {adx}")
+                
+                # CRITICAL: Check if market is tradeable
+                if not market_tradeable:
+                    return {'signal': 'NO TRADE', 'reason': f"market not tradeable: {df['market_reason'].iloc[-1] if 'market_reason' in df.columns else 'unknown'}"}
+                
+                # CRITICAL: Only trade in trending markets - REJECT RANGING MARKETS
+                if market_condition == 'RANGING':
+                    return {'signal': 'NO TRADE', 'reason': f"market ranging: ADX {adx:.1f} < 25"}
+                
+                # CRITICAL: Only trade in trending markets - REJECT INSUFFICIENT DATA
+                if market_condition == 'INSUFFICIENT_DATA':
+                    return {'signal': 'NO TRADE', 'reason': f"insufficient data for market analysis"}
+            else:
+                # If market condition data is not available, don't trade
+                return {'signal': 'NO TRADE', 'reason': 'market condition data not available'}
+            
+            # ENHANCED FILTERS - MORE RESTRICTIVE
+            if atr < 0.5:  # Higher volatility requirement
+                return {'signal': 'NO TRADE', 'reason': f'ATR too low: {atr:.2f} < 0.5'}
+            
+            if volume_ratio < 1.2:  # Higher volume requirement
+                return {'signal': 'NO TRADE', 'reason': f'volume too low: {volume_ratio:.2f} < 1.2'}
+            
+            # Body ratio filter - stronger candles only
+            body_size = abs(candle['close'] - candle['open'])
+            total_range = candle['high'] - candle['low']
+            body_ratio = body_size / total_range if total_range > 0 else 0
+            
+            if body_ratio < 0.4:  # Stronger candle body requirement
+                return {'signal': 'NO TRADE', 'reason': f'weak candle body: {body_ratio:.2f} < 0.4'}
+            
+            # IMPROVEMENT 1: REDUCE CONDITIONS - Pick only the 3 best signals
+            # Core signals: SuperTrend + EMA + MACD (RSI is optional)
+            core_signals = 0
+            optional_signals = 0
+            
+            # Core signal 1: SuperTrend direction
+            if supertrend_direction > 0:
+                core_signals += 1
+            elif supertrend_direction < 0:
+                core_signals -= 1
+            
+            # Core signal 2: EMA alignment (9 > 21 > 50 for uptrend)
+            if ema_9 > ema_21 > ema_50:
+                core_signals += 1
+            elif ema_9 < ema_21 < ema_50:
+                core_signals -= 1
+            
+            # Core signal 3: MACD alignment
+            if macd > macd_signal:
+                core_signals += 1
+            elif macd < macd_signal:
+                core_signals -= 1
+            
+            # Optional signal: RSI (only if extreme)
+            if rsi < 30:
+                optional_signals += 1
+            elif rsi > 70:
+                optional_signals -= 1
+            
+            # IMPROVEMENT 2: DYNAMIC POSITION SIZING BASED ON SIGNAL STRENGTH
+            if core_signals >= 2:  # Strong bullish alignment
+                position_size = 1.0  # Full position
+                confidence_threshold = 70
+            elif core_signals == 1 and optional_signals >= 0:  # Moderate bullish
+                position_size = 0.7  # 70% position
+                confidence_threshold = 75
+            elif core_signals == 0 and optional_signals >= 1:  # Weak bullish
+                position_size = 0.5  # 50% position
+                confidence_threshold = 80
+            elif core_signals <= -2:  # Strong bearish alignment
+                position_size = 1.0  # Full position
+                confidence_threshold = 70
+            elif core_signals == -1 and optional_signals <= 0:  # Moderate bearish
+                position_size = 0.7  # 70% position
+                confidence_threshold = 75
+            elif core_signals == 0 and optional_signals <= -1:  # Weak bearish
+                position_size = 0.5  # 50% position
+                confidence_threshold = 80
+            else:
+                return {'signal': 'NO TRADE', 'reason': 'insufficient signal alignment'}
+            
+            # Multi-Factor Confidence Integration
+            from src.core.multi_factor_confidence import MultiFactorConfidence
+            mfc = MultiFactorConfidence()
+            signal_type = "BUY" if core_signals > 0 else "SELL"
+            confidence_result = mfc.calculate_confidence(candle, signal_type, self.timeframe_data)
+            confidence_score = confidence_result['total_score']
+            
+            # Market condition bonus
+            market_bonus = 0
+            if market_condition in ['STRONG_UPTREND', 'STRONG_DOWNTREND']:
+                market_bonus = 25
+            elif market_condition in ['WEAK_UPTREND', 'WEAK_DOWNTREND']:
+                market_bonus = 15
+            
+            confidence_score += market_bonus
+            
+            # BUY CALL conditions - OPTIMIZED
+            if (core_signals >= 1 and  # At least one bullish core signal
+                confidence_score >= confidence_threshold):
+                
+                # IMPROVEMENT 3: BETTER RISK MANAGEMENT
+                stop_loss = 2.0 * atr  # ATR-based stop-loss
+                target1 = 3.0 * atr   # First target (1:1.5)
+                target2 = 5.0 * atr   # Second target (1:2.5)
+                
+                return {
+                    'signal': 'BUY CALL',
+                    'price': candle['close'],
+                    'confidence': confidence_score,
+                    'stop_loss': stop_loss,
+                    'target': target1,
+                    'target2': target2,
+                    'position_size': position_size,
+                    'timestamp': candle.get('timestamp', datetime.now()),
+                    'reason': f"Core signals: {core_signals}, Optional: {optional_signals}, Market: {market_condition}, Confidence: {confidence_score:.1f}, Size: {position_size:.1f}"
+                }
+            
+            # BUY PUT conditions - OPTIMIZED
+            elif (core_signals <= -1 and  # At least one bearish core signal
+                  confidence_score >= confidence_threshold):
+                
+                # IMPROVEMENT 3: BETTER RISK MANAGEMENT
+                stop_loss = 2.0 * atr  # ATR-based stop-loss
+                target1 = 3.0 * atr   # First target (1:1.5)
+                target2 = 5.0 * atr   # Second target (1:2.5)
+                
+                return {
+                    'signal': 'BUY PUT',
+                    'price': candle['close'],
+                    'confidence': confidence_score,
+                    'stop_loss': stop_loss,
+                    'target': target1,
+                    'target2': target2,
+                    'position_size': position_size,
+                    'timestamp': candle.get('timestamp', datetime.now()),
+                    'reason': f"Core signals: {core_signals}, Optional: {optional_signals}, Market: {market_condition}, Confidence: {confidence_score:.1f}, Size: {position_size:.1f}"
+                }
+            
+            return {'signal': 'NO TRADE', 'reason': 'no conditions met'}
+            
+        except Exception as e:
+            return {'signal': 'ERROR', 'reason': f'strategy error: {str(e)}'}

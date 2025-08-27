@@ -20,12 +20,31 @@ class SupertrendEma(Strategy):
         self.supertrend_multiplier = params.get("supertrend_multiplier", 3.0)
         self.timeframe_data = timeframe_data or {}
         self._supertrend_instances = {}
+        self.min_confidence_threshold = params.get("min_confidence_threshold", 60)
+        self.atr_period = params.get("atr_period", 14)
+        self.adx_period = params.get("adx_period", 14)
+        self.adx_threshold = params.get("adx_threshold", 20)
+        self.volume_threshold = params.get("volume_threshold", 1.2)
         super().__init__("supertrend_ema", params)
 
     def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         df["ema"] = df["close"].ewm(span=self.ema_period).mean()
         df["price_to_ema_ratio"] = (df["close"] / df["ema"] - 1) * 100
+        
+        # Add enhanced indicators
+        from src.core.indicators import indicators
+        df['atr'] = indicators.atr(df, period=self.atr_period)
+        df['adx'] = indicators.adx(df, period=self.adx_period)
+        df['rsi'] = indicators.rsi(df, period=14)
+        
+        # Add volume analysis
+        df['volume_ma'] = df['volume'].rolling(window=20).mean().fillna(0)
+        df['volume_ratio'] = (df['volume'] / df['volume_ma']).fillna(1)
+        
+        # Add EMA slope for momentum
+        df['ema_slope'] = df['ema'].diff(5).fillna(0)
+        
         return df
 
     def _get_supertrend_instance(self, timeframe: str):
@@ -171,39 +190,49 @@ class SupertrendEma(Strategy):
             
             supertrend_direction = st_data[1]
             
-            # Get EMAs
+            # Get EMAs and other indicators
             ema_9 = df['ema_9'].iloc[-1]
             ema_21 = df['ema_21'].iloc[-1]
             rsi = df['rsi'].iloc[-1]
             macd = df['macd'].iloc[-1]
             macd_signal = df['macd_signal'].iloc[-1]
             volume_ratio = df['volume_ratio'].iloc[-1]
+            atr = df['atr'].iloc[-1]
             
             # Check for NaN values
-            if pd.isna(ema_9) or pd.isna(ema_21) or pd.isna(rsi) or pd.isna(macd):
+            if pd.isna(ema_9) or pd.isna(ema_21) or pd.isna(rsi) or pd.isna(macd) or pd.isna(atr):
                 return {'signal': 'NO TRADE', 'reason': 'indicator data unavailable'}
             
-            # BUY CALL conditions
+            # ENHANCED FILTERS FOR NIFTY50 - VERY RELAXED VERSION FOR TESTING
+            
+            # 1. ATR-based volatility filter - very relaxed
+            if atr < 0.05:  # Very low threshold for testing
+                return {'signal': 'NO TRADE', 'reason': f'ATR too low: {atr:.2f} < 0.05'}
+            
+            # 2. Volume confirmation - very relaxed
+            if volume_ratio < 0.1:  # Very low threshold for testing
+                return {'signal': 'NO TRADE', 'reason': f'volume too low: {volume_ratio:.2f} < 0.1'}
+            
+            # BUY CALL conditions with very relaxed filters
             if (supertrend_direction == 1 and  # SuperTrend uptrend
                 ema_9 > ema_21 and  # EMA crossover
-                30 < rsi < 80 and  # RSI in healthy range
-                macd > macd_signal and  # MACD bullish
-                volume_ratio > 0.5):  # Volume confirmation
+                20 < rsi < 85 and  # Very wide RSI range
+                macd > macd_signal):  # MACD bullish
                 
-                # Calculate confidence score
-                trend_strength = 25 if ema_9 > ema_21 * 1.01 else 15
-                rsi_strength = 20 if 40 < rsi < 70 else 10
-                macd_strength = 15 if macd > macd_signal * 1.1 else 8
-                volume_strength = 10 if volume_ratio > 1.0 else 5
+                # Calculate enhanced confidence score with proper weighting
+                trend_strength = 35 if ema_9 > ema_21 * 1.005 else 25  # EMA alignment
+                rsi_strength = 20 if 40 < rsi < 70 else 10  # RSI confirmation
+                macd_strength = 15 if macd > macd_signal * 1.05 else 8  # MACD momentum
+                volume_strength = 15 if volume_ratio > 1.2 else 8  # Volume confirmation
+                atr_strength = 10 if atr > 0.5 else 5  # Volatility filter
+                adx_strength = 5 if df['adx'].iloc[-1] > self.adx_threshold else 0  # Trend strength
                 
-                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength
+                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength + atr_strength + adx_strength
                 
-                if confidence_score >= 70:  # High confidence threshold
-                    atr = df['atr'].iloc[-1]
-                    stop_loss = 1.5 * atr
-                    target1 = 2.0 * atr
-                    target2 = 3.0 * atr
-                    target3 = 4.0 * atr
+                if confidence_score >= 30:  # Very low threshold for testing
+                    # ENHANCED RISK MANAGEMENT
+                    stop_loss = 1.5 * atr  # ATR-based stop-loss
+                    target1 = 2.0 * atr   # First target
                     
                     # Dynamic position sizing based on confidence
                     position_multiplier = 1.0 if confidence_score >= 80 else 0.8
@@ -214,34 +243,33 @@ class SupertrendEma(Strategy):
                         'confidence_score': confidence_score,
                         'stop_loss': stop_loss,
                         'target1': target1,
-                        'target2': target2,
-                        'target3': target3,
+                        'target2': 3.0 * atr,
+                        'target3': 4.0 * atr,
                         'position_multiplier': position_multiplier,
-                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
-                        'reasoning': f"SuperTrend uptrend, EMA crossover, RSI {rsi:.1f}, MACD bullish, Volume {volume_ratio:.2f}"
+                        'timestamp': candle.get('timestamp', datetime.now()),
+                        'reasoning': f"SuperTrend uptrend, EMA crossover, RSI {rsi:.1f}, MACD bullish, ATR {atr:.2f}, Volume {volume_ratio:.2f}"
                     }
             
-            # BUY PUT conditions
+            # BUY PUT conditions with very relaxed filters
             elif (supertrend_direction == -1 and  # SuperTrend downtrend
                   ema_9 < ema_21 and  # EMA crossover
-                  20 < rsi < 70 and  # RSI in healthy range
-                  macd < macd_signal and  # MACD bearish
-                  volume_ratio > 0.5):  # Volume confirmation
+                  15 < rsi < 80 and  # Very wide RSI range
+                  macd < macd_signal):  # MACD bearish
                 
-                # Calculate confidence score
-                trend_strength = 25 if ema_9 < ema_21 * 0.99 else 15
-                rsi_strength = 20 if 30 < rsi < 60 else 10
-                macd_strength = 15 if macd < macd_signal * 0.9 else 8
-                volume_strength = 10 if volume_ratio > 1.0 else 5
+                # Calculate enhanced confidence score with proper weighting
+                trend_strength = 35 if ema_9 < ema_21 * 0.995 else 25  # EMA alignment
+                rsi_strength = 20 if 30 < rsi < 60 else 10  # RSI confirmation
+                macd_strength = 15 if macd < macd_signal * 0.95 else 8  # MACD momentum
+                volume_strength = 15 if volume_ratio > 1.2 else 8  # Volume confirmation
+                atr_strength = 10 if atr > 0.5 else 5  # Volatility filter
+                adx_strength = 5 if df['adx'].iloc[-1] > self.adx_threshold else 0  # Trend strength
                 
-                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength
+                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength + atr_strength + adx_strength
                 
-                if confidence_score >= 70:  # High confidence threshold
-                    atr = df['atr'].iloc[-1]
-                    stop_loss = 1.5 * atr
-                    target1 = 2.0 * atr
-                    target2 = 3.0 * atr
-                    target3 = 4.0 * atr
+                if confidence_score >= 30:  # Very low threshold for testing
+                    # ENHANCED RISK MANAGEMENT
+                    stop_loss = 1.5 * atr  # ATR-based stop-loss
+                    target1 = 2.0 * atr   # First target
                     
                     # Dynamic position sizing based on confidence
                     position_multiplier = 1.0 if confidence_score >= 80 else 0.8
@@ -252,11 +280,11 @@ class SupertrendEma(Strategy):
                         'confidence_score': confidence_score,
                         'stop_loss': stop_loss,
                         'target1': target1,
-                        'target2': target2,
-                        'target3': target3,
+                        'target2': 3.0 * atr,
+                        'target3': 4.0 * atr,
                         'position_multiplier': position_multiplier,
-                        'timestamp': candle.name if hasattr(candle, 'name') else datetime.now(),
-                        'reasoning': f"SuperTrend downtrend, EMA crossover, RSI {rsi:.1f}, MACD bearish, Volume {volume_ratio:.2f}"
+                        'timestamp': candle.get('timestamp', datetime.now()),
+                        'reasoning': f"SuperTrend downtrend, EMA crossover, RSI {rsi:.1f}, MACD bearish, ATR {atr:.2f}, Volume {volume_ratio:.2f}"
                     }
             
             return {'signal': 'NO TRADE', 'reason': 'no signal conditions met'}
@@ -264,6 +292,168 @@ class SupertrendEma(Strategy):
         except Exception as e:
             logging.error(f"Error in SupertrendEma analysis: {e}")
             return {'signal': 'ERROR', 'reason': str(e)}
+
+    def analyze_strategy(self, df: pd.DataFrame, candle: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Strategy-specific analysis with pre-calculated indicators and market conditions - OPTIMIZED VERSION"""
+        try:
+            # Get previous candle for SuperTrend calculation
+            prev_candle = None
+            if len(df) > 1:
+                prev_candle = df.iloc[-2].to_dict()
+            
+            # Get SuperTrend data
+            st_instance = self._get_supertrend_instance("5min")
+            st_data = st_instance.update(candle, prev_candle)
+            
+            if st_data is None or st_data[1] is None:
+                return {'signal': 'NO TRADE', 'reason': 'insufficient supertrend data'}
+            
+            supertrend_direction = st_data[1]
+            
+            # Get EMAs and other indicators from pre-calculated data
+            ema_9 = df['ema_9'].iloc[-1]
+            ema_21 = df['ema_21'].iloc[-1]
+            ema_50 = df['ema_50'].iloc[-1] if 'ema_50' in df.columns else ema_21
+            rsi = df['rsi'].iloc[-1]
+            macd = df['macd'].iloc[-1]
+            macd_signal = df['macd_signal'].iloc[-1]
+            volume_ratio = df['volume_ratio'].iloc[-1]
+            atr = df['atr'].iloc[-1]
+            
+            # Check for NaN values
+            if pd.isna(ema_9) or pd.isna(ema_21) or pd.isna(rsi) or pd.isna(macd) or pd.isna(atr):
+                return {'signal': 'NO TRADE', 'reason': 'indicator data unavailable'}
+            
+            # MARKET CONDITION ANALYSIS - CRITICAL FILTER
+            if 'market_tradeable' in df.columns and 'market_condition' in df.columns:
+                market_tradeable = df['market_tradeable'].iloc[-1]
+                market_condition = df['market_condition'].iloc[-1]
+                adx = df['adx'].iloc[-1] if 'adx' in df.columns else 20
+                trend_direction = df['trend_direction'].iloc[-1] if 'trend_direction' in df.columns else 0
+                
+                # CRITICAL: Check if market is tradeable
+                if not market_tradeable:
+                    return {'signal': 'NO TRADE', 'reason': f"market not tradeable: {df['market_reason'].iloc[-1] if 'market_reason' in df.columns else 'unknown'}"}
+                
+                # CRITICAL: Only trade in trending markets - REJECT RANGING MARKETS
+                if market_condition == 'RANGING':
+                    return {'signal': 'NO TRADE', 'reason': f"market ranging: ADX {adx:.1f} < 25"}
+                
+                # CRITICAL: Only trade in trending markets - REJECT INSUFFICIENT DATA
+                if market_condition == 'INSUFFICIENT_DATA':
+                    return {'signal': 'NO TRADE', 'reason': f"insufficient data for market analysis"}
+            else:
+                # If market condition data is not available, don't trade
+                return {'signal': 'NO TRADE', 'reason': 'market condition data not available'}
+            
+            # ENHANCED FILTERS - OPTIMIZED FOR BETTER SIGNAL GENERATION
+            if atr < 0.3:  # Moderate volatility requirement
+                return {'signal': 'NO TRADE', 'reason': f'ATR too low: {atr:.2f} < 0.3'}
+            
+            if volume_ratio < 0.8:  # Moderate volume requirement
+                return {'signal': 'NO TRADE', 'reason': f'volume too low: {volume_ratio:.2f} < 0.8'}
+            
+            # IMPROVEMENT 1: EMA SLOPE FILTER - Only trade when EMA slope is strong
+            if len(df) >= 10:
+                ema_9_slope = (ema_9 - df['ema_9'].iloc[-5]) / df['ema_9'].iloc[-5] * 100
+                ema_21_slope = (ema_21 - df['ema_21'].iloc[-5]) / df['ema_21'].iloc[-5] * 100
+            else:
+                ema_9_slope = 0
+                ema_21_slope = 0
+            
+            # IMPROVEMENT 2: VOLUME CONFIRMATION - Require volume spike on crossover
+            volume_confirmed = volume_ratio > 1.0
+            
+            # BUY CALL conditions with IMPROVED FILTERS
+            if (supertrend_direction == 1 and  # SuperTrend uptrend
+                ema_9 > ema_21 and  # EMA crossover
+                ema_9_slope > 0.1 and  # EMA slope is positive (IMPROVEMENT)
+                25 < rsi < 75 and  # Relaxed RSI range
+                macd > macd_signal and  # MACD bullish
+                volume_confirmed and  # Volume confirmation (IMPROVEMENT)
+                market_condition['trend_direction'] == 1):  # Market trend aligns
+                
+                # Calculate enhanced confidence score with market condition bonus
+                trend_strength = 30 if ema_9 > ema_21 * 1.005 else 20
+                rsi_strength = 25 if 40 < rsi < 70 else 15
+                macd_strength = 20 if macd > macd_signal * 1.05 else 10
+                volume_strength = 15 if volume_ratio > 1.2 else 8
+                atr_strength = 10 if atr > 0.5 else 5
+                slope_strength = 10 if ema_9_slope > 0.2 else 5  # EMA slope bonus
+                
+                # Market condition bonus
+                market_bonus = 0
+                if market_condition['condition'] == 'STRONG_UPTREND':
+                    market_bonus = 20
+                elif market_condition['condition'] == 'WEAK_UPTREND':
+                    market_bonus = 10
+                
+                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength + atr_strength + slope_strength + market_bonus
+                
+                if confidence_score >= 50:  # Lower threshold for more signals
+                    # IMPROVEMENT 3: BETTER RISK MANAGEMENT
+                    stop_loss = 1.5 * atr  # ATR-based stop-loss
+                    target1 = 2.5 * atr   # First target (1:1.67)
+                    target2 = 4.0 * atr   # Second target (1:2.67)
+                    
+                    return {
+                        'signal': 'BUY CALL',
+                        'price': candle['close'],
+                        'confidence': confidence_score,
+                        'stop_loss': stop_loss,
+                        'target': target1,
+                        'target2': target2,
+                        'timestamp': candle.get('timestamp', datetime.now()),
+                        'reason': f"SuperTrend uptrend, EMA crossover, Slope: {ema_9_slope:.2f}%, RSI {rsi:.1f}, MACD bullish, Volume: {volume_ratio:.2f}, Market: {market_condition['condition']}"
+                    }
+            
+            # BUY PUT conditions with IMPROVED FILTERS
+            elif (supertrend_direction == -1 and  # SuperTrend downtrend
+                  ema_9 < ema_21 and  # EMA crossover
+                  ema_9_slope < -0.1 and  # EMA slope is negative (IMPROVEMENT)
+                  25 < rsi < 75 and  # Relaxed RSI range
+                  macd < macd_signal and  # MACD bearish
+                  volume_confirmed and  # Volume confirmation (IMPROVEMENT)
+                  market_condition['trend_direction'] == -1):  # Market trend aligns
+                
+                # Calculate enhanced confidence score with market condition bonus
+                trend_strength = 30 if ema_9 < ema_21 * 0.995 else 20
+                rsi_strength = 25 if 30 < rsi < 60 else 15
+                macd_strength = 20 if macd < macd_signal * 0.95 else 10
+                volume_strength = 15 if volume_ratio > 1.2 else 8
+                atr_strength = 10 if atr > 0.5 else 5
+                slope_strength = 10 if ema_9_slope < -0.2 else 5  # EMA slope bonus
+                
+                # Market condition bonus
+                market_bonus = 0
+                if market_condition['condition'] == 'STRONG_DOWNTREND':
+                    market_bonus = 20
+                elif market_condition['condition'] == 'WEAK_DOWNTREND':
+                    market_bonus = 10
+                
+                confidence_score = trend_strength + rsi_strength + macd_strength + volume_strength + atr_strength + slope_strength + market_bonus
+                
+                if confidence_score >= 50:  # Lower threshold for more signals
+                    # IMPROVEMENT 3: BETTER RISK MANAGEMENT
+                    stop_loss = 1.5 * atr  # ATR-based stop-loss
+                    target1 = 2.5 * atr   # First target (1:1.67)
+                    target2 = 4.0 * atr   # Second target (1:2.67)
+                    
+                    return {
+                        'signal': 'BUY PUT',
+                        'price': candle['close'],
+                        'confidence': confidence_score,
+                        'stop_loss': stop_loss,
+                        'target': target1,
+                        'target2': target2,
+                        'timestamp': candle.get('timestamp', datetime.now()),
+                        'reason': f"SuperTrend downtrend, EMA crossover, Slope: {ema_9_slope:.2f}%, RSI {rsi:.1f}, MACD bearish, Volume: {volume_ratio:.2f}, Market: {market_condition['condition']}"
+                    }
+            
+            return {'signal': 'NO TRADE', 'reason': 'no conditions met'}
+            
+        except Exception as e:
+            return {'signal': 'ERROR', 'reason': f'strategy error: {str(e)}'}
 
 # Optional legacy adapter
 def strategy_supertrend_ema(candle, index_name, future_data=None, price_to_ema_ratio=None):

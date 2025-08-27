@@ -23,6 +23,7 @@ sys.path.append(str(Path(__file__).parent / "src"))
 
 from src.strategies.supertrend_ema import SupertrendEma
 from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
+from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
 from src.data.parquet_data_store import ParquetDataStore
 from src.models.unified_database import UnifiedDatabase
 from dotenv import load_dotenv
@@ -61,13 +62,15 @@ class LiveTradingBot:
         # OPTIMIZATION: Focus on profitable strategies only - FIX: Use same symbol format
         self.profitable_strategies = {
             'supertrend_ema': {'symbols': ['NSE:NIFTY50-INDEX'], 'active': True},
-            'supertrend_macd_rsi_ema': {'symbols': ['NSE:NIFTYBANK-INDEX'], 'active': True}
+            'supertrend_macd_rsi_ema': {'symbols': ['NSE:NIFTYBANK-INDEX'], 'active': True},
+            'ema_crossover_enhanced': {'symbols': ['NSE:NIFTY50-INDEX'], 'active': True}
         }
         
-        # Initialize only profitable strategies
+        # Initialize enhanced strategies
         self.strategies = {
             'supertrend_ema': SupertrendEma(),
-            'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
+            'supertrend_macd_rsi_ema': SupertrendMacdRsiEma(),
+            'ema_crossover_enhanced': EmaCrossoverEnhanced()
         }
         
         # Daily tracking

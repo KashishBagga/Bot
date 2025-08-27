@@ -109,6 +109,45 @@ class Strategy(ABC):
             logging.error(f"❌ Strategy {self.name} error: {e}")
             return {'signal': 'ERROR', 'reason': str(e)}
     
+    def analyze_optimized(self, data: pd.DataFrame) -> Optional[Dict[str, Any]]:
+        """Analyze market data with pre-calculated indicators.
+        
+        This is an optimized version that assumes indicators are already calculated.
+        
+        Args:
+            data: Market data DataFrame with pre-calculated indicators
+            
+        Returns:
+            dict or None: Trading signal or None if no signal
+        """
+        # Skip validation since indicators are pre-calculated
+        if len(data) < 10:  # Minimum data requirement
+            return None
+            
+        # Get the latest candle
+        candle = self.get_closed_candle(data)
+        
+        # Use the data as-is since indicators are already calculated
+        df = data
+        
+        # Call the strategy-specific analysis
+        return self.analyze_strategy(df, candle)
+    
+    def analyze_strategy(self, df: pd.DataFrame, candle: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Strategy-specific analysis method.
+        
+        This method should be overridden by child classes to implement their specific logic.
+        
+        Args:
+            df: Market data with indicators
+            candle: Current candle data
+            
+        Returns:
+            dict or None: Trading signal or None if no signal
+        """
+        # Default implementation - should be overridden
+        return None
+    
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """Calculate common indicators needed for the strategy.
         

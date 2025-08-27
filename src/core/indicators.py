@@ -6,8 +6,12 @@ import math
 import pandas as pd
 import ta
 import numpy as np
+import warnings
 from typing import Union, Dict, Any
 import logging
+
+# Suppress FutureWarnings from pandas
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Small epsilon to prevent division by zero
 EPSILON = 1e-10
@@ -15,6 +19,8 @@ EPSILON = 1e-10
 def safe_float(val):
     """Safely convert value to float with rounding and edge case handling."""
     try:
+        if pd.isna(val) or val is None:
+            return 0.0
         f = float(val)
         if math.isnan(f) or math.isinf(f):
             return 0.0
@@ -65,7 +71,7 @@ class Indicators:
         """Calculate Exponential Moving Average (EMA)."""
         try:
             ema_series = ta.trend.EMAIndicator(data[column], window=period).ema_indicator()
-            return ema_series.fillna(method='bfill').fillna(data[column].iloc[0]).apply(safe_float)
+            return ema_series.bfill().fillna(data[column].iloc[0]).apply(safe_float)
         except Exception as e:
             logging.error(f"EMA calculation error: {e}")
             return pd.Series(data[column].iloc[0], index=data.index)
@@ -75,7 +81,7 @@ class Indicators:
         """Calculate Simple Moving Average (SMA)."""
         try:
             sma_series = ta.trend.SMAIndicator(data[column], window=period).sma_indicator()
-            return sma_series.fillna(method='bfill').fillna(data[column].iloc[0]).apply(safe_float)
+            return sma_series.bfill().fillna(data[column].iloc[0]).apply(safe_float)
         except Exception as e:
             logging.error(f"SMA calculation error: {e}")
             return pd.Series(data[column].iloc[0], index=data.index)
@@ -87,7 +93,7 @@ class Indicators:
             atr_series = ta.volatility.AverageTrueRange(
                 data['high'], data['low'], data['close'], window=period
             ).average_true_range()
-            return atr_series.fillna(method='bfill').fillna(EPSILON).apply(safe_float)
+            return atr_series.bfill().fillna(EPSILON).apply(safe_float)
         except Exception as e:
             logging.error(f"ATR calculation error: {e}")
             return pd.Series(EPSILON, index=data.index)
@@ -101,9 +107,9 @@ class Indicators:
                 data[column], window=period, window_dev=std_dev
             )
             return {
-                'upper': indicator.bollinger_hband().fillna(method='bfill').fillna(data[column].iloc[0]).apply(safe_float),
-                'middle': indicator.bollinger_mavg().fillna(method='bfill').fillna(data[column].iloc[0]).apply(safe_float),
-                'lower': indicator.bollinger_lband().fillna(method='bfill').fillna(data[column].iloc[0]).apply(safe_float)
+                            'upper': indicator.bollinger_hband().bfill().fillna(data[column].iloc[0]).apply(safe_float),
+            'middle': indicator.bollinger_mavg().bfill().fillna(data[column].iloc[0]).apply(safe_float),
+            'lower': indicator.bollinger_lband().bfill().fillna(data[column].iloc[0]).apply(safe_float)
             }
         except Exception as e:
             logging.error(f"Bollinger Bands calculation error: {e}")
@@ -183,8 +189,8 @@ class Indicators:
     def donchian_channel(data: pd.DataFrame, period: int = 20) -> Dict[str, pd.Series]:
         """Calculate Donchian Channel."""
         try:
-            upper = data['high'].rolling(window=period).max().fillna(method='bfill').fillna(data['high'].iloc[0]).apply(safe_float)
-            lower = data['low'].rolling(window=period).min().fillna(method='bfill').fillna(data['low'].iloc[0]).apply(safe_float)
+            upper = data['high'].rolling(window=period).max().bfill().fillna(data['high'].iloc[0]).apply(safe_float)
+            lower = data['low'].rolling(window=period).min().bfill().fillna(data['low'].iloc[0]).apply(safe_float)
             middle = ((upper + lower) / 2).apply(safe_float)
             
             return {
@@ -199,6 +205,18 @@ class Indicators:
                 'middle': pd.Series(data['close'].iloc[0], index=data.index),
                 'lower': pd.Series(data['low'].iloc[0], index=data.index)
             }
+
+    @staticmethod
+    def adx(data: pd.DataFrame, period: int = 14) -> pd.Series:
+        """Calculate Average Directional Index (ADX)."""
+        try:
+            adx_series = ta.trend.ADXIndicator(
+                data['high'], data['low'], data['close'], window=period
+            ).adx()
+            return adx_series.bfill().fillna(25).apply(safe_float)
+        except Exception as e:
+            logging.error(f"ADX calculation error: {e}")
+            return pd.Series(25, index=data.index)
 
 # Create a callable interface for easy access to indicators
 indicators = Indicators()
