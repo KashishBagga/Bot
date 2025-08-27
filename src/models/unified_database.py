@@ -271,8 +271,8 @@ class UnifiedDatabase:
                     AVG(confidence_score) as avg_confidence,
                     SUM(pnl) as total_pnl,
                     AVG(pnl) as avg_pnl,
-                    SUM(CASE WHEN outcome = 'WIN' THEN 1 ELSE 0 END) * 100.0 / 
-                        NULLIF(SUM(CASE WHEN outcome IN ('WIN', 'LOSS') THEN 1 ELSE 0 END), 0) as win_rate
+                    SUM(CASE WHEN outcome = 'Win' THEN 1 ELSE 0 END) * 100.0 / 
+                        NULLIF(SUM(CASE WHEN outcome IN ('Win', 'Loss') THEN 1 ELSE 0 END), 0) as win_rate
                 FROM backtesting_signals 
                 WHERE run_id = (SELECT MAX(id) FROM backtesting_runs)
                 GROUP BY strategy, symbol
@@ -748,6 +748,77 @@ class UnifiedDatabase:
             print(f"❌ Error getting rejection analysis: {e}")
             return {}
 
+    def save_trades(self, trades_df, symbol=None, timeframe=None):
+        """Save trades dataframe to database."""
+        try:
+            if trades_df.empty:
+                print("⚠️ No trades to save")
+                return
+            
+            conn = sqlite3.connect(self.db_path)
+            
+            # Extract symbol and timeframe from trades_df if not provided
+            if symbol is None and 'symbol' in trades_df.columns:
+                symbol = trades_df['symbol'].iloc[0]
+            elif symbol is None:
+                symbol = "NSE:NIFTY50-INDEX"  # Default fallback
+                
+            if timeframe is None and 'timeframe' in trades_df.columns:
+                timeframe = trades_df['timeframe'].iloc[0]
+            elif timeframe is None:
+                timeframe = "5min"  # Default fallback
+            
+            # Start a backtesting run
+            run_id = self.start_backtesting_run(
+                run_name=f"Backtest_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                period_days=30,
+                timeframe=timeframe,
+                symbols=[symbol],
+                strategies=["ema_crossover_enhanced", "supertrend_ema", "supertrend_macd_rsi_ema"]
+            )
+            
+            # Convert trades to signals format
+            for _, trade in trades_df.iterrows():
+                signal_data = {
+                    'signal_time': trade['timestamp'],
+                    'signal': trade['signal'],
+                    'price': trade['entry_price'],
+                    'confidence_score': trade['confidence'],
+                    'outcome': trade['outcome'],
+                    'pnl': trade['pnl'],
+                    'reasoning': trade['reasoning'],
+                    'stop_loss': 0,  # Default values
+                    'target': 0,
+                    'target2': 0,
+                    'target3': 0
+                }
+                
+                self.log_backtesting_signal(
+                    run_id=run_id,
+                    strategy=trade['strategy'],
+                    symbol=symbol,
+                    signal_data=signal_data
+                )
+            
+            # Finish the backtesting run
+            summary_data = {
+                'total_signals': len(trades_df),
+                'valid_signals': len(trades_df),
+                'rejected_signals': 0,
+                'total_pnl': trades_df['pnl'].sum(),
+                'win_rate': (trades_df['outcome'] == 'Win').sum() / len(trades_df) * 100,
+                'duration_seconds': 0,
+                'signals_per_second': 0
+            }
+            
+            self.finish_backtesting_run(run_id, summary_data)
+            
+            conn.close()
+            print(f"✅ Saved {len(trades_df)} trades to database")
+            
+        except Exception as e:
+            print(f"❌ Error saving trades to database: {e}")
+    
     def cleanup_old_data(self, days_to_keep: int = 30):
         """Clean up old rejected signals and backtesting data."""
         try:

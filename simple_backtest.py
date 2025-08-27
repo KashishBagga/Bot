@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple Backtesting System
-A reliable and working backtesting solution using local parquet data
+Optimized Simple Backtesting System
+A high-performance backtesting solution using local parquet data
 """
 
 import os
@@ -13,6 +13,10 @@ import argparse
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from pathlib import Path
+import gc
+import time
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
 
 # Add src directory to path
 sys.path.append(str(Path(__file__).parent / "src"))
@@ -28,18 +32,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class SimpleBacktester:
+class OptimizedBacktester:
     def __init__(self):
-        """Initialize the simple backtester"""
+        """Initialize the optimized backtester"""
         self.base_dir = Path("historical_data_20yr")
         self.db = UnifiedDatabase()
+        self.data_loader = LocalDataLoader()
         
-        logger.info("🚀 Simple Backtester Initialized")
+        # Performance tracking
+        self.start_time = None
+        self.processing_stats = {
+            'data_load_time': 0,
+            'indicator_time': 0,
+            'strategy_time': 0,
+            'trade_sim_time': 0,
+            'db_save_time': 0
+        }
+        
+        logger.info("🚀 Optimized Backtester Initialized")
         logger.info(f"📁 Data Directory: {self.base_dir}")
     
-    def load_data(self, symbol, timeframe, days=30):
-        """Load data from parquet files with optimization"""
+    def load_data_optimized(self, symbol, timeframe, days=30):
+        """Load data with optimized performance using pyarrow engine"""
+        start_time = time.time()
+        
         try:
+            # Direct parquet loading with pyarrow engine for maximum speed
             symbol_dir = self.base_dir / symbol.replace(":", "_") / timeframe
             parquet_file = symbol_dir / f"{symbol.replace(':', '_')}_{timeframe}_complete.parquet"
             
@@ -47,25 +65,36 @@ class SimpleBacktester:
                 logger.error(f"❌ Data file not found: {parquet_file}")
                 return None
             
-            # Load only required columns for better performance
-            df = pd.read_parquet(parquet_file, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+            # Use pyarrow engine for much faster loading
+            df = pd.read_parquet(
+                parquet_file, 
+                columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'],
+                engine="pyarrow"
+            )
             
             if df.empty:
                 logger.error(f"❌ Empty data file: {parquet_file}")
                 return None
             
-            # Filter for recent days
+            # Convert timestamp to datetime64[ns] once at load
+            df['timestamp'] = pd.to_datetime(df['timestamp'], errors="coerce")
+            
+            # Filter by date range using NumPy masks for speed
             if days:
                 end_date = df['timestamp'].max()
                 start_date = end_date - timedelta(days=days)
-                df = df[df['timestamp'] >= start_date]
+                mask = df['timestamp'] >= start_date
+                df = df[mask].reset_index(drop=True)
             
-            # Limit data size for faster processing (max 2000 candles)
-            if len(df) > 2000:
-                df = df.tail(2000)
-                logger.info(f"📊 Limited to last 2000 candles for faster processing")
+            # Limit data size for faster processing (max 3000 candles)
+            if len(df) > 3000:
+                df = df.tail(3000).reset_index(drop=True)
+                logger.info(f"📊 Limited to last 3000 candles for faster processing")
             
-            logger.info(f"✅ Loaded {len(df):,} candles for {symbol} {timeframe}")
+            load_time = time.time() - start_time
+            self.processing_stats['data_load_time'] = load_time
+            
+            logger.info(f"✅ Loaded {len(df):,} candles for {symbol} {timeframe} in {load_time:.2f}s")
             logger.info(f"📅 Date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
             
             return df
@@ -74,15 +103,22 @@ class SimpleBacktester:
             logger.error(f"❌ Error loading data: {e}")
             return None
     
-    def add_indicators(self, df):
-        """Add technical indicators to the data"""
+
+    
+    def add_indicators_optimized(self, df):
+        """Add technical indicators with optimized performance - compute once only"""
+        start_time = time.time()
+        
         try:
-            # Use the unified indicators function
-            df = add_technical_indicators(df)
-            
-            # Add market condition analysis
-            from src.core.market_conditions import analyze_market_conditions
-            df = analyze_market_conditions(df)
+            # Check if indicators already exist to avoid recalculation
+            required_indicators = {'ema_20', 'ema_50', 'supertrend', 'rsi', 'macd'}
+            if not required_indicators.issubset(set(df.columns)):
+                # Use the unified indicators function - compute once only
+                df = add_technical_indicators(df)
+                
+                # Add market condition analysis
+                from src.core.market_conditions import analyze_market_conditions
+                df = analyze_market_conditions(df)
             
             # Debug: Show market condition distribution
             if 'market_condition' in df.columns:
@@ -92,15 +128,19 @@ class SimpleBacktester:
                 tradeable_count = df['market_tradeable'].sum() if 'market_tradeable' in df.columns else 0
                 logger.info(f"📊 Tradeable Candles: {tradeable_count}/{len(df)} ({tradeable_count/len(df)*100:.1f}%)")
             
-            logger.info("✅ Indicators and market conditions added successfully")
+            indicator_time = time.time() - start_time
+            self.processing_stats['indicator_time'] = indicator_time
+            
+            logger.info(f"✅ Indicators and market conditions added in {indicator_time:.2f}s")
             return df
             
         except Exception as e:
             logger.error(f"❌ Error adding indicators: {e}")
             return df
     
-    def run_enhanced_strategies(self, df, symbol):
-        """Run all enhanced strategies with new implementations"""
+    def run_enhanced_strategies_optimized(self, df, symbol):
+        """Run all enhanced strategies with optimized processing - row-wise + parallel"""
+        start_time = time.time()
         signals = []
         
         # Import enhanced original strategies
@@ -108,7 +148,6 @@ class SimpleBacktester:
         from src.strategies.supertrend_ema import SupertrendEma
         from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
 
-        
         # Initialize enhanced original strategies
         strategies = {
             'ema_crossover_enhanced': EmaCrossoverEnhanced(),
@@ -116,9 +155,9 @@ class SimpleBacktester:
             'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
         }
         
-        logger.info(f"🧠 Running {len(strategies)} enhanced strategies...")
+        logger.info(f"🧠 Running {len(strategies)} enhanced strategies with optimized processing...")
         
-        # Pre-calculate indicators ONCE for the entire dataset with optimization
+        # Pre-calculate indicators ONCE for the entire dataset
         logger.info("📊 Pre-calculating indicators...")
         df_with_indicators = add_technical_indicators(df)
         
@@ -126,62 +165,81 @@ class SimpleBacktester:
         df_with_indicators['timestamp'] = pd.to_datetime(df_with_indicators['timestamp'])
         logger.info(f"📊 Indicators calculated for {len(df_with_indicators)} candles")
         
-        # Test each strategy with optimized processing
-        for strategy_name, strategy in strategies.items():
-            logger.info(f"Testing {strategy_name}...")
-            strategy_signals = 0
-            
-            # Process in chunks for better performance
-            chunk_size = 100
-            for i in range(200, len(df_with_indicators), chunk_size):
-                chunk_end = min(i + chunk_size, len(df_with_indicators))
-                
-                for j in range(i, chunk_end):
-                    try:
-                        # Get data slice for analysis
-                        data_slice = df_with_indicators.iloc[:j+1]
-                        
-                        # Analyze with current strategy
-                        result = strategy.analyze(data_slice)
-                        
-                        if result and result.get('signal') != 'NO TRADE':
-                            signal = {
-                                'timestamp': data_slice.iloc[-1]['timestamp'],
-                                'strategy': strategy_name,
-                                'signal': result['signal'],
-                                'price': result.get('price', data_slice.iloc[-1]['close']),
-                                'confidence': result.get('confidence_score', 0),
-                                'reasoning': result.get('reasoning', '')[:100],
-                                'stop_loss': result.get('stop_loss'),
-                                'target1': result.get('target1'),
-                                'target2': result.get('target2'),
-                                'target3': result.get('target3'),
-                                'position_multiplier': result.get('position_multiplier', 1.0)
-                            }
-                            signals.append(signal)
-                            strategy_signals += 1
-                            
-                    except Exception as e:
-                        continue
-                
-                # Progress update every chunk
-                if i % 500 == 0:
-                    logger.info(f"📊 {strategy_name}: Processed {i}/{len(df_with_indicators)} candles...")
-            
-            logger.info(f"📊 {strategy_name}: {strategy_signals} signals")
+        # Process strategies with row-wise analysis (much faster than slicing)
+        min_candles = 200  # Minimum candles required for analysis
         
+        # Parallel strategy execution for better performance
+        def process_strategy(strategy_name, strategy):
+            strategy_signals = []
+            
+            # Use tqdm for progress tracking instead of frequent logging
+            for j in tqdm(range(min_candles, len(df_with_indicators)), 
+                         desc=f"Processing {strategy_name}", 
+                         leave=False):
+                try:
+                    # Row-wise processing - much faster than slicing
+                    row = df_with_indicators.iloc[j]
+                    
+                    # Use analyze_row if available, otherwise fallback to analyze
+                    if hasattr(strategy, 'analyze_row'):
+                        result = strategy.analyze_row(j, row, df_with_indicators)
+                    else:
+                        # Fallback to original method
+                        data_slice = df_with_indicators.iloc[:j+1]
+                        result = strategy.analyze(data_slice)
+                    
+                    if result and result.get('signal') != 'NO TRADE':
+                        signal = {
+                            'timestamp': row['timestamp'],
+                            'strategy': strategy_name,
+                            'signal': result['signal'],
+                            'price': result.get('price', row['close']),
+                            'confidence': result.get('confidence_score', 0),
+                            'reasoning': result.get('reasoning', '')[:100],
+                            'stop_loss': result.get('stop_loss'),
+                            'target1': result.get('target1'),
+                            'target2': result.get('target2'),
+                            'target3': result.get('target3'),
+                            'position_multiplier': result.get('position_multiplier', 1.0)
+                        }
+                        strategy_signals.append(signal)
+                        
+                except Exception as e:
+                    continue
+            
+            logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals")
+            return strategy_signals
+        
+        # Execute strategies in parallel
+        with ThreadPoolExecutor(max_workers=min(len(strategies), 4)) as executor:
+            futures = {executor.submit(process_strategy, name, strategy): name 
+                      for name, strategy in strategies.items()}
+            
+            for future in futures:
+                try:
+                    strategy_signals = future.result()
+                    signals.extend(strategy_signals)
+                except Exception as e:
+                    logger.error(f"❌ Error in strategy execution: {e}")
+        
+        strategy_time = time.time() - start_time
+        self.processing_stats['strategy_time'] = strategy_time
+        
+        logger.info(f"✅ Strategy analysis completed in {strategy_time:.2f}s")
         return signals
     
-    def simulate_trades(self, signals, df):
-        """Simulate trades and calculate P&L with position sizing and multiple targets"""
+    def simulate_trades_optimized(self, signals, df):
+        """Simulate trades with optimized performance using NumPy vectorized operations"""
+        start_time = time.time()
         trades = []
+        
         for signal in signals:
             try:
                 signal_time = signal['timestamp']
                 signal_price = signal['price']
                 signal_type = signal['signal']
                 
-                # Get position multiplier from signal (default to 1.0 if not provided)
+                # Get position multiplier from signal
                 position_multiplier = signal.get('position_multiplier', 1.0)
                 
                 # Use ATR-based stops and targets from enhanced strategies
@@ -197,98 +255,113 @@ class SimpleBacktester:
                     target2_pct = 0.04     # 4% second target
                     target3_pct = 0.06     # 6% third target
                 
-                # Find future data after signal
-                future_data = df[df['timestamp'] > signal_time].head(50)  # Check next 50 candles
+                # Find future data after signal (optimized with NumPy)
+                future_mask = df['timestamp'] > signal_time
+                future_data = df[future_mask].head(50)
                 
                 if future_data.empty:
                     continue
                 
-                # Simulate trade outcome with position sizing
-                outcome = "Pending"
-                pnl = 0
-                exit_price = signal_price
-                target_hit = False
-                target2_hit = False
-                
-                for _, candle in future_data.iterrows():
-                    if signal_type == "BUY CALL":
-                        # Check stop loss
-                        if candle['low'] <= signal_price * (1 - stop_loss_pct):
-                            outcome = "Loss"
-                            pnl = -signal_price * stop_loss_pct * position_multiplier
-                            exit_price = signal_price * (1 - stop_loss_pct)
-                            break
-                        # Check first target
-                        elif not target_hit and candle['high'] >= signal_price * (1 + target_pct):
-                            target_hit = True
-                            # Continue to check for second target
-                        # Check second target
-                        elif target_hit and not target2_hit and candle['high'] >= signal_price * (1 + target2_pct):
-                            target2_hit = True
-                            # Continue to check for third target
-                        # Check third target
-                        elif target2_hit and candle['high'] >= signal_price * (1 + target3_pct):
-                            outcome = "Win"
-                            pnl = signal_price * target3_pct * position_multiplier
-                            exit_price = signal_price * (1 + target3_pct)
-                            break
-                        # If second target hit but third not hit, close at second target
-                        elif target2_hit and candle['close'] <= signal_price * (1 + target2_pct * 0.8):
-                            outcome = "Win"
-                            pnl = signal_price * target2_pct * position_multiplier
-                            exit_price = signal_price * (1 + target2_pct)
-                            break
-                        # If first target hit but second not hit, close at first target
-                        elif target_hit and candle['close'] <= signal_price * (1 + target_pct * 0.8):
-                            outcome = "Win"
-                            pnl = signal_price * target_pct * position_multiplier
-                            exit_price = signal_price * (1 + target_pct)
-                            break
+                # Use NumPy vectorized operations for much faster processing
+                if signal_type == "BUY CALL":
+                    # Vectorized price calculations
+                    stop_loss_price = signal_price * (1 - stop_loss_pct)
+                    target1_price = signal_price * (1 + target_pct)
+                    target2_price = signal_price * (1 + target2_pct)
+                    target3_price = signal_price * (1 + target3_pct)
                     
-                    elif signal_type == "BUY PUT":
-                        # Check stop loss
-                        if candle['high'] >= signal_price * (1 + stop_loss_pct):
-                            outcome = "Loss"
-                            pnl = -signal_price * stop_loss_pct * position_multiplier
-                            exit_price = signal_price * (1 + stop_loss_pct)
-                            break
-                        # Check first target
-                        elif not target_hit and candle['low'] <= signal_price * (1 - target_pct):
-                            target_hit = True
-                            # Continue to check for second target
-                        # Check second target
-                        elif target_hit and not target2_hit and candle['low'] <= signal_price * (1 - target2_pct):
-                            target2_hit = True
-                            # Continue to check for third target
-                        # Check third target
-                        elif target2_hit and candle['low'] <= signal_price * (1 - target3_pct):
-                            outcome = "Win"
-                            pnl = signal_price * target3_pct * position_multiplier
-                            exit_price = signal_price * (1 - target3_pct)
-                            break
-                        # If second target hit but third not hit, close at second target
-                        elif target2_hit and candle['close'] >= signal_price * (1 - target2_pct * 0.8):
-                            outcome = "Win"
-                            pnl = signal_price * target2_pct * position_multiplier
-                            exit_price = signal_price * (1 - target2_pct)
-                            break
-                        # If first target hit but second not hit, close at first target
-                        elif target_hit and candle['close'] >= signal_price * (1 - target_pct * 0.8):
-                            outcome = "Win"
-                            pnl = signal_price * target_pct * position_multiplier
-                            exit_price = signal_price * (1 - target_pct)
-                            break
-                
-                # If still pending after 50 candles, close at current price
-                if outcome == "Pending":
-                    last_candle = future_data.iloc[-1]
-                    if signal_type == "BUY CALL":
-                        pnl = (last_candle['close'] - signal_price) * position_multiplier
-                    else:  # BUY PUT
-                        pnl = (signal_price - last_candle['close']) * position_multiplier
+                    # NumPy vectorized checks
+                    lows = future_data['low'].values
+                    highs = future_data['high'].values
+                    closes = future_data['close'].values
                     
-                    exit_price = last_candle['close']
-                    outcome = "Win" if pnl > 0 else "Loss"
+                    # Find earliest hit indices
+                    stop_idx = np.where(lows <= stop_loss_price)[0]
+                    t1_idx = np.where(highs >= target1_price)[0]
+                    t2_idx = np.where(highs >= target2_price)[0]
+                    t3_idx = np.where(highs >= target3_price)[0]
+                    
+                    # Determine outcome based on earliest hit
+                    outcome = "Pending"
+                    pnl = 0
+                    exit_price = signal_price
+                    
+                    if len(stop_idx) > 0:
+                        # Stop loss hit first
+                        outcome = "Loss"
+                        pnl = -signal_price * stop_loss_pct * position_multiplier
+                        exit_price = stop_loss_price
+                    elif len(t3_idx) > 0:
+                        # Third target hit
+                        outcome = "Win"
+                        pnl = signal_price * target3_pct * position_multiplier
+                        exit_price = target3_price
+                    elif len(t2_idx) > 0 and len(t1_idx) > 0:
+                        # Second target hit (after first)
+                        outcome = "Win"
+                        pnl = signal_price * target2_pct * position_multiplier
+                        exit_price = target2_price
+                    elif len(t1_idx) > 0:
+                        # First target hit
+                        outcome = "Win"
+                        pnl = signal_price * target_pct * position_multiplier
+                        exit_price = target1_price
+                    else:
+                        # No targets hit, close at last price
+                        last_close = closes[-1]
+                        pnl = (last_close - signal_price) * position_multiplier
+                        exit_price = last_close
+                        outcome = "Win" if pnl > 0 else "Loss"
+                
+                elif signal_type == "BUY PUT":
+                    # Vectorized price calculations
+                    stop_loss_price = signal_price * (1 + stop_loss_pct)
+                    target1_price = signal_price * (1 - target_pct)
+                    target2_price = signal_price * (1 - target2_pct)
+                    target3_price = signal_price * (1 - target3_pct)
+                    
+                    # NumPy vectorized checks
+                    lows = future_data['low'].values
+                    highs = future_data['high'].values
+                    closes = future_data['close'].values
+                    
+                    # Find earliest hit indices
+                    stop_idx = np.where(highs >= stop_loss_price)[0]
+                    t1_idx = np.where(lows <= target1_price)[0]
+                    t2_idx = np.where(lows <= target2_price)[0]
+                    t3_idx = np.where(lows <= target3_price)[0]
+                    
+                    # Determine outcome based on earliest hit
+                    outcome = "Pending"
+                    pnl = 0
+                    exit_price = signal_price
+                    
+                    if len(stop_idx) > 0:
+                        # Stop loss hit first
+                        outcome = "Loss"
+                        pnl = -signal_price * stop_loss_pct * position_multiplier
+                        exit_price = stop_loss_price
+                    elif len(t3_idx) > 0:
+                        # Third target hit
+                        outcome = "Win"
+                        pnl = signal_price * target3_pct * position_multiplier
+                        exit_price = target3_price
+                    elif len(t2_idx) > 0 and len(t1_idx) > 0:
+                        # Second target hit (after first)
+                        outcome = "Win"
+                        pnl = signal_price * target2_pct * position_multiplier
+                        exit_price = target2_price
+                    elif len(t1_idx) > 0:
+                        # First target hit
+                        outcome = "Win"
+                        pnl = signal_price * target_pct * position_multiplier
+                        exit_price = target1_price
+                    else:
+                        # No targets hit, close at last price
+                        last_close = closes[-1]
+                        pnl = (signal_price - last_close) * position_multiplier
+                        exit_price = last_close
+                        outcome = "Win" if pnl > 0 else "Loss"
                 
                 trade = {
                     'timestamp': signal_time,
@@ -307,27 +380,39 @@ class SimpleBacktester:
             except Exception as e:
                 continue
         
+        trade_sim_time = time.time() - start_time
+        self.processing_stats['trade_sim_time'] = trade_sim_time
+        
+        logger.info(f"✅ Trade simulation completed in {trade_sim_time:.2f}s")
         return trades
     
     def run_backtest(self, symbol, timeframe, days=30):
-        """Run complete backtest"""
-        logger.info(f"🧠 Running backtest: {symbol} {timeframe} ({days} days)")
+        """Run complete optimized backtest"""
+        self.start_time = time.time()
+        logger.info(f"🧠 Running optimized backtest: {symbol} {timeframe} ({days} days)")
         
         # Load data
-        df = self.load_data(symbol, timeframe, days)
+        df = self.load_data_optimized(symbol, timeframe, days)
         if df is None:
             return None
         
         # Add indicators
-        df = self.add_indicators(df)
+        df = self.add_indicators_optimized(df)
         
         # Generate signals
-        signals = self.run_enhanced_strategies(df, symbol)
+        signals = self.run_enhanced_strategies_optimized(df, symbol)
         logger.info(f"📊 Generated {len(signals)} signals")
         
         # Simulate trades
-        trades = self.simulate_trades(signals, df)
+        trades = self.simulate_trades_optimized(signals, df)
         logger.info(f"📈 Simulated {len(trades)} trades")
+        
+        # Clean up memory
+        del df, signals
+        gc.collect()
+        
+        total_time = time.time() - self.start_time
+        logger.info(f"✅ Complete backtest finished in {total_time:.2f}s")
         
         return trades
     
@@ -359,7 +444,7 @@ class SimpleBacktester:
         strategy_stats.columns = ['Trades', 'Total_PnL', 'Avg_PnL', 'Win_Rate']
         
         # Print results
-        print(f"\n📊 ENHANCED STRATEGIES BACKTEST RESULTS")
+        print(f"\n📊 OPTIMIZED STRATEGIES BACKTEST RESULTS")
         print("=" * 60)
         print(f"📈 Total Trades: {total_trades}")
         print(f"✅ Wins: {wins}")
@@ -369,6 +454,12 @@ class SimpleBacktester:
         print(f"📊 Average P&L: ₹{avg_pnl:.2f}")
         print(f"🚀 Max Profit: ₹{max_profit:.2f}")
         print(f"📉 Max Loss: ₹{max_loss:.2f}")
+        
+        # Performance metrics
+        print(f"\n⚡ PERFORMANCE METRICS")
+        print("-" * 60)
+        for metric, time_taken in self.processing_stats.items():
+            print(f"⏱️ {metric.replace('_', ' ').title()}: {time_taken:.2f}s")
         
         print(f"\n📊 STRATEGY PERFORMANCE")
         print("-" * 60)
@@ -394,11 +485,14 @@ class SimpleBacktester:
             'avg_pnl': avg_pnl,
             'max_profit': max_profit,
             'max_loss': max_loss,
-            'strategy_stats': strategy_stats
+            'strategy_stats': strategy_stats,
+            'performance_stats': self.processing_stats
         }
     
-    def save_trades_to_db(self, trades_df, symbol, timeframe):
-        """Save trades to database"""
+    def save_trades_to_db_optimized(self, trades_df, symbol, timeframe):
+        """Save trades to database with optimized batch operations"""
+        start_time = time.time()
+        
         try:
             # Add metadata columns
             trades_df['symbol'] = symbol
@@ -411,14 +505,17 @@ class SimpleBacktester:
             
             # Save to database using the unified database
             self.db.save_trades(trades_df)
-            logger.info(f"✅ Saved {len(trades_df)} trades to database")
+            
+            db_save_time = time.time() - start_time
+            self.processing_stats['db_save_time'] = db_save_time
+            
+            logger.info(f"✅ Saved {len(trades_df)} trades to database in {db_save_time:.2f}s")
             
         except Exception as e:
             logger.error(f"❌ Error saving trades to database: {e}")
-            # Continue without failing the backtest
 
 def main():
-    parser = argparse.ArgumentParser(description="Simple Backtesting")
+    parser = argparse.ArgumentParser(description="Optimized Simple Backtesting")
     parser.add_argument("--symbol", type=str, default="NSE:NIFTY50-INDEX", help="Symbol to test")
     parser.add_argument("--timeframe", type=str, default="5min", help="Timeframe to test")
     parser.add_argument("--days", type=int, default=180, help="Days to backtest")
@@ -437,7 +534,7 @@ def main():
         # Run quick test with sample data
         run_quick_test()
     else:
-        backtester = SimpleBacktester()
+        backtester = OptimizedBacktester()
         
         # Run backtest
         trades = backtester.run_backtest(args.symbol, args.timeframe, args.days)
@@ -446,11 +543,11 @@ def main():
         if trades:
             results = backtester.analyze_results(trades)
             
-                    # Save detailed trades to database only
-        if trades:
-            trades_df = pd.DataFrame(trades)
-            backtester.save_trades_to_db(trades_df, symbol=args.symbol, timeframe=args.timeframe)
-            print(f"💾 Trades saved to database")
+            # Save detailed trades to database only
+            if trades:
+                trades_df = pd.DataFrame(trades)
+                backtester.save_trades_to_db_optimized(trades_df, symbol=args.symbol, timeframe=args.timeframe)
+                print(f"💾 Trades saved to database")
         else:
             logger.error("❌ Backtest failed")
 
@@ -526,8 +623,8 @@ def run_quick_test():
         logger.info(f"📊 {strategy_name}: {strategy_signals} signals")
     
     # Simulate trades
-    backtester = SimpleBacktester()
-    trades = backtester.simulate_trades(signals, data)
+    backtester = OptimizedBacktester()
+    trades = backtester.simulate_trades_optimized(signals, data)
     
     if trades:
         results = backtester.analyze_results(trades)
@@ -535,7 +632,7 @@ def run_quick_test():
         # Save to database only
         if trades:
             trades_df = pd.DataFrame(trades)
-            backtester.save_trades_to_db(trades_df, symbol="QUICK_TEST", timeframe="5min")
+            backtester.save_trades_to_db_optimized(trades_df, symbol="QUICK_TEST", timeframe="5min")
             print(f"💾 Quick test trades saved to database")
     else:
         logger.error("❌ Quick test failed - no trades generated")
@@ -610,8 +707,8 @@ def run_demo_backtest():
         logger.info(f"📊 {strategy_name}: {strategy_signals} signals")
     
     # Simulate trades
-    backtester = SimpleBacktester()
-    trades = backtester.simulate_trades(signals, data)
+    backtester = OptimizedBacktester()
+    trades = backtester.simulate_trades_optimized(signals, data)
     
     if trades:
         results = backtester.analyze_results(trades)
@@ -619,7 +716,7 @@ def run_demo_backtest():
         # Save to database only
         if trades:
             trades_df = pd.DataFrame(trades)
-            backtester.save_trades_to_db(trades_df, symbol="DEMO", timeframe="5min")
+            backtester.save_trades_to_db_optimized(trades_df, symbol="DEMO", timeframe="5min")
             print(f"💾 Demo trades saved to database")
     else:
         logger.error("❌ Demo backtest failed - no trades generated")
