@@ -354,27 +354,31 @@ class OptionSignalMapper:
             premium_per_lot = entry_price * contract.lot_size
             
             if premium_per_lot <= 0:
+                logger.warning(f"⚠️ Invalid premium per lot: {premium_per_lot}")
                 return 0
             
             # Calculate maximum lots based on risk
             max_lots = int(adjusted_risk / premium_per_lot)
             
-            # Cap by available capital
-            available_capital = capital
+            # Cap by available capital (use 80% of capital for safety)
+            available_capital = capital * 0.8
             max_affordable_lots = int(available_capital // premium_per_lot)
             max_lots = min(max_lots, max_affordable_lots)
             
             # Apply per-contract caps
-            per_contract_max_lots = int(signal.get('max_lots_per_contract', 100))
+            per_contract_max_lots = int(signal.get('max_lots_per_contract', 10))  # Reduced from 100
             max_lots = min(max_lots, per_contract_max_lots)
             
-            # Ensure minimum 1 lot if we can afford it
+            # Ensure minimum 1 lot if we can afford it and risk is reasonable
             if max_lots < 1:
-                if adjusted_risk >= premium_per_lot:
+                # If we can afford at least 1 lot and risk is within 5% of capital
+                if premium_per_lot <= available_capital and adjusted_risk >= premium_per_lot * 0.5:
                     return 1
                 else:
+                    logger.warning(f"⚠️ Cannot afford 1 lot: premium={premium_per_lot}, capital={available_capital}, risk={adjusted_risk}")
                     return 0
             
+            logger.debug(f"Position size: {max_lots} lots, premium/lot: {premium_per_lot}, risk: {adjusted_risk}")
             return max_lots
             
         except Exception as e:
