@@ -870,4 +870,179 @@ class UnifiedDatabase:
             print(f"   Rejected backtest signals deleted: {rejected_backtest_deleted}")
             
         except Exception as e:
-            print(f"❌ Error during cleanup: {e}") 
+            print(f"❌ Error during cleanup: {e}")
+
+    def save_open_option_position(self, position_data: Dict):
+        """Save open option position to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Create table if it doesn't exist
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS open_option_positions (
+                    position_id TEXT PRIMARY KEY,
+                    contract_symbol TEXT NOT NULL,
+                    underlying TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    entry_time TEXT NOT NULL,
+                    entry_price REAL NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    premium_risk REAL NOT NULL,
+                    strike REAL NOT NULL,
+                    expiry TEXT NOT NULL,
+                    option_type TEXT NOT NULL,
+                    lot_size INTEGER NOT NULL,
+                    status TEXT DEFAULT 'OPEN',
+                    created_at TEXT NOT NULL
+                )
+            ''')
+            
+            query = """
+            INSERT OR REPLACE INTO open_option_positions (
+                position_id, contract_symbol, underlying, strategy, entry_time,
+                entry_price, quantity, premium_risk, strike, expiry, option_type, lot_size,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            
+            cursor.execute(query, (
+                position_data['id'],
+                position_data['contract_symbol'],
+                position_data['underlying'],
+                position_data['strategy'],
+                position_data['entry_time'],
+                position_data['entry_price'],
+                position_data['quantity'],
+                position_data['premium_risk'],
+                position_data['strike'],
+                position_data['expiry'],
+                position_data['option_type'],
+                position_data['lot_size'],
+                datetime.now().isoformat()
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+        except Exception as e:
+            print(f"❌ Error saving open option position: {e}")
+
+    def update_option_position_status(self, position_id: str, status: str, exit_data: Dict = None):
+        """Update option position status (close position)."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if status == 'CLOSED' and exit_data:
+                # Create closed positions table if it doesn't exist
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS closed_option_positions (
+                        position_id TEXT PRIMARY KEY,
+                        contract_symbol TEXT NOT NULL,
+                        underlying TEXT NOT NULL,
+                        strategy TEXT NOT NULL,
+                        entry_time TEXT NOT NULL,
+                        exit_time TEXT NOT NULL,
+                        entry_price REAL NOT NULL,
+                        exit_price REAL NOT NULL,
+                        quantity INTEGER NOT NULL,
+                        premium_risk REAL NOT NULL,
+                        pnl REAL NOT NULL,
+                        returns REAL NOT NULL,
+                        exit_reason TEXT NOT NULL,
+                        created_at TEXT NOT NULL
+                    )
+                ''')
+                
+                # Move from open to closed
+                cursor.execute('DELETE FROM open_option_positions WHERE position_id = ?', (position_id,))
+                
+                # Insert into closed positions
+                closed_query = """
+                INSERT INTO closed_option_positions (
+                    position_id, contract_symbol, underlying, strategy, entry_time, exit_time,
+                    entry_price, exit_price, quantity, premium_risk, pnl, returns, exit_reason,
+                    created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """
+                
+                cursor.execute(closed_query, (
+                    position_id,
+                    exit_data.get('contract_symbol'),
+                    exit_data.get('underlying'),
+                    exit_data.get('strategy'),
+                    exit_data.get('entry_time'),
+                    exit_data.get('exit_time'),
+                    exit_data.get('entry_price'),
+                    exit_data.get('exit_price'),
+                    exit_data.get('quantity'),
+                    exit_data.get('premium_risk'),
+                    exit_data.get('pnl'),
+                    exit_data.get('returns'),
+                    exit_data.get('exit_reason'),
+                    datetime.now().isoformat()
+                ))
+            else:
+                # Just update status
+                cursor.execute('UPDATE open_option_positions SET status = ? WHERE position_id = ?', (status, position_id))
+            
+            conn.commit()
+            conn.close()
+            
+        except Exception as e:
+            print(f"❌ Error updating option position status: {e}")
+
+    def get_open_option_positions(self) -> List[Dict]:
+        """Get all open option positions from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Create table if it doesn't exist
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS open_option_positions (
+                    position_id TEXT PRIMARY KEY,
+                    contract_symbol TEXT NOT NULL,
+                    underlying TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    entry_time TEXT NOT NULL,
+                    entry_price REAL NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    premium_risk REAL NOT NULL,
+                    strike REAL NOT NULL,
+                    expiry TEXT NOT NULL,
+                    option_type TEXT NOT NULL,
+                    lot_size INTEGER NOT NULL,
+                    status TEXT DEFAULT 'OPEN',
+                    created_at TEXT NOT NULL
+                )
+            ''')
+            
+            query = "SELECT * FROM open_option_positions WHERE status = 'OPEN'"
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            
+            positions = []
+            for row in rows:
+                positions.append({
+                    'id': row[0],
+                    'contract_symbol': row[1],
+                    'underlying': row[2],
+                    'strategy': row[3],
+                    'entry_time': row[4],
+                    'entry_price': row[5],
+                    'quantity': row[6],
+                    'premium_risk': row[7],
+                    'strike': row[8],
+                    'expiry': row[9],
+                    'option_type': row[10],
+                    'lot_size': row[11]
+                })
+            
+            conn.close()
+            return positions
+            
+        except Exception as e:
+            print(f"❌ Error getting open option positions: {e}")
+            return [] 
