@@ -67,12 +67,26 @@ def get_performance_stats(db_path: str = "trading_signals.db") -> dict:
             ORDER BY trades DESC
         """, conn)
         
+        # Get daily performance
+        daily_stats = pd.read_sql_query("""
+            SELECT 
+                DATE(timestamp) as date,
+                COUNT(*) as trades,
+                SUM(CASE WHEN signal = 'BUY CALL' THEN 1 ELSE 0 END) as buy_signals,
+                SUM(CASE WHEN signal = 'BUY PUT' THEN 1 ELSE 0 END) as sell_signals
+            FROM live_signals 
+            WHERE timestamp > date('now', '-7 days')
+            GROUP BY DATE(timestamp)
+            ORDER BY date DESC
+        """, conn)
+        
         conn.close()
         
         return {
             'total_trades': total_trades,
             'recent_trades': recent_trades,
-            'strategy_stats': strategy_stats
+            'strategy_stats': strategy_stats,
+            'daily_stats': daily_stats
         }
     except Exception as e:
         print(f"❌ Error getting performance stats: {e}")
@@ -97,6 +111,11 @@ def print_dashboard():
             print(f"\n🎯 STRATEGY PERFORMANCE")
             for _, row in stats['strategy_stats'].iterrows():
                 print(f"   {row['strategy']}: {row['trades']} trades, {row['avg_confidence']:.1f}% avg confidence")
+        
+        if not stats['daily_stats'].empty:
+            print(f"\n📅 DAILY PERFORMANCE (Last 7 days)")
+            for _, row in stats['daily_stats'].head(5).iterrows():
+                print(f"   {row['date']}: {row['trades']} trades ({row['buy_signals']} buy, {row['sell_signals']} sell)")
     
     # Get latest trades
     latest_trades = get_latest_trades(limit=10)
