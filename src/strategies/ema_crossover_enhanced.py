@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
 from src.core.strategy import Strategy
@@ -31,6 +32,19 @@ class EmaCrossoverEnhanced(Strategy):
         self.rsi_period = params.get("rsi_period", 14)
         self.ema_slope_period = params.get("ema_slope_period", 5)  # EMA slope for momentum
         super().__init__("ema_crossover_enhanced", params)
+
+    def _ensure_emas(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
+        """
+        Ensure EMA columns exist. Returns a DataFrame with 'ema_short' & 'ema_long'.
+        If inplace=False, returns a copy (safe). If inplace=True, modifies provided df.
+        """
+        need_copy = not inplace
+        if 'ema_short' in df.columns and 'ema_long' in df.columns:
+            return df if not need_copy else df.copy()
+        out = df if inplace else df.copy()
+        out['ema_short'] = out['close'].ewm(span=self.ema_short, adjust=False).mean()
+        out['ema_long'] = out['close'].ewm(span=self.ema_long, adjust=False).mean()
+        return out
 
     def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Add strategy-specific indicators."""
@@ -84,6 +98,140 @@ class EmaCrossoverEnhanced(Strategy):
             return {'crossover': True, 'direction': -1}
         else:
             return {'crossover': False, 'direction': 0}
+
+    # -----------------------
+    # FAST: vectorized API
+    # -----------------------
+    def analyze_vectorized(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Vectorized detection of EMA crossovers with enhanced filters.
+        Returns a DataFrame of signals (one row per signal) with columns:
+        ['timestamp', 'signal', 'price', 'confidence_score', 'stop_loss', 'target1', 'target2', 'target3', 'position_multiplier', 'reasoning']
+        Signal values: 'BUY CALL' (bullish crossover), 'BUY PUT' (bearish crossover)
+        """
+        # Ensure we have enough data
+        if len(df) < self.min_candles:
+            return pd.DataFrame()
+        
+        # Ensure indicators are present
+        if 'ema_short' not in df.columns:
+            df = self.add_indicators(df)
+        
+        # look-ahead safe crossover detection
+        buy_mask = (df['ema_short'] > df['ema_long']) & (
+            df['ema_short'].shift(1) <= df['ema_long'].shift(1)
+        )
+        sell_mask = (df['ema_short'] < df['ema_long']) & (
+            df['ema_short'].shift(1) >= df['ema_long'].shift(1)
+        )
+
+        # Apply filters
+        atr_filter = df['atr'] > self.atr_threshold
+        adx_filter = df['adx'] > self.adx_threshold
+        volume_filter = df['volume_ratio_ma'] > 1.0
+        
+        # RSI filters
+        bullish_rsi = df['rsi'] > 45
+        bearish_rsi = df['rsi'] < 55
+        
+        # EMA slope momentum
+        bullish_momentum = df['ema_slope'] > 0
+        bearish_momentum = df['ema_slope'] < 0
+        
+        # Trend alignment
+        bullish_trend = df['close'] > df['ema_trend']
+        bearish_trend = df['close'] < df['ema_trend']
+        
+        # Calculate confidence scores vectorized
+        confidence_scores = pd.Series(0, index=df.index)
+        
+        # For bullish signals
+        bullish_mask = buy_mask & atr_filter & adx_filter & bullish_rsi & volume_filter & bullish_momentum
+        confidence_scores.loc[bullish_mask & bullish_trend] += 40  # Strong trend alignment
+        confidence_scores.loc[bullish_mask & (df['close'] > df['ema_long'])] += 25  # Moderate trend alignment
+        confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
+        confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
+        confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
+        confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
+        confidence_scores.loc[bullish_mask] += 5   # EMA slope momentum
+        
+        # For bearish signals
+        bearish_mask = sell_mask & atr_filter & adx_filter & bearish_rsi & volume_filter & bearish_momentum
+        confidence_scores.loc[bearish_mask & bearish_trend] += 40  # Strong trend alignment
+        confidence_scores.loc[bearish_mask & (df['close'] < df['ema_long'])] += 25  # Moderate trend alignment
+        confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
+        confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
+        confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
+        confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
+        confidence_scores.loc[bearish_mask] += 5   # EMA slope momentum
+        
+        # Apply confidence threshold
+        valid_signals = confidence_scores >= self.min_confidence_threshold
+        
+        # Generate final signal mask
+        signal_mask = (bullish_mask | bearish_mask) & valid_signals
+        
+        if not signal_mask.any():
+            # no signals
+            return pd.DataFrame()
+
+        signals_df = df.loc[signal_mask, ['timestamp', 'close', 'ema_short', 'ema_long', 'atr', 'adx', 'rsi']].copy()
+        
+        # label signals to match your backtester expectations
+        signals_df['signal'] = np.where(bullish_mask.loc[signals_df.index], 'BUY CALL', 'BUY PUT')
+        signals_df['price'] = signals_df['close']
+        signals_df['confidence_score'] = confidence_scores[signal_mask]
+        
+        # Calculate stop loss and targets (ATR-based)
+        signals_df['stop_loss'] = 1.5 * signals_df['atr']
+        signals_df['target1'] = 2.0 * signals_df['atr']
+        signals_df['target2'] = 3.0 * signals_df['atr']
+        signals_df['target3'] = 4.0 * signals_df['atr']
+        
+        # Dynamic position sizing
+        high_confidence = signals_df['confidence_score'] >= 80
+        signals_df['position_multiplier'] = np.where(high_confidence, 1.0, 0.8)
+        
+        # Add reasoning
+        signals_df['reasoning'] = (
+            f"EMA crossover, ATR {signals_df['atr'].round(2)}, "
+            f"ADX {signals_df['adx'].round(2)}, "
+            f"RSI {signals_df['rsi'].round(1)}"
+        )
+
+        return signals_df[['timestamp', 'signal', 'price', 'confidence_score', 'stop_loss', 'target1', 'target2', 'target3', 'position_multiplier', 'reasoning']]
+
+    # -----------------------
+    # Compatibility: single-row API (uses precomputed EMAs)
+    # -----------------------
+    def analyze_row(self, idx: int, row: pd.Series, df: pd.DataFrame) -> Optional[dict]:
+        """
+        Backwards-compatible single-row analyzer.
+        Assumes EMAs are precomputed in df (or will compute them once).
+        Returns a dict like {'signal': 'BUY CALL', 'price': ..., 'confidence_score': ...} or None.
+        Important: For performance, call _ensure_emas(df) once outside when using this in a loop.
+        """
+        # ensure EMAs exist (compute once per run ideally)
+        df_ema = self._ensure_emas(df, inplace=False)
+
+        if idx <= 0 or idx >= len(df_ema):
+            return None
+
+        cur_s = float(df_ema['ema_short'].iat[idx])
+        cur_l = float(df_ema['ema_long'].iat[idx])
+        prev_s = float(df_ema['ema_short'].iat[idx-1])
+        prev_l = float(df_ema['ema_long'].iat[idx-1])
+
+        # same conditions as vectorized masks
+        if (cur_s > cur_l) and (prev_s <= prev_l):
+            confidence = abs((cur_s - cur_l) / (abs(cur_l) + 1e-9))
+            return {'signal': 'BUY CALL', 'price': float(df_ema['close'].iat[idx]), 'confidence_score': float(confidence)}
+        if (cur_s < cur_l) and (prev_s >= prev_l):
+            confidence = abs((cur_s - cur_l) / (abs(cur_l) + 1e-9))
+            return {'signal': 'BUY PUT', 'price': float(df_ema['close'].iat[idx]), 'confidence_score': float(confidence)}
+        return None
 
     def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
         """Analyze data and generate trading signals using enhanced filters."""
@@ -221,122 +369,147 @@ class EmaCrossoverEnhanced(Strategy):
         except Exception as e:
             logging.error(f"Error in EmaCrossoverEnhanced analysis: {e}")
             return {'signal': 'ERROR', 'reason': str(e)}
-    
-    def analyze_vectorized(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Vectorized analysis of the entire dataframe - much faster than row-by-row processing.
-        Returns a DataFrame with signals for all candles that meet the criteria.
-        """
-        try:
-            # Ensure we have enough data
-            if len(df) < self.min_candles:
-                return pd.DataFrame()
-            
-            # Create a copy to avoid modifying original
-            df = df.copy()
-            
-            # Ensure indicators are present
-            if 'ema_short' not in df.columns:
-                df = self.add_indicators(df)
-            
-            # Initialize signals DataFrame
-            signals = pd.DataFrame(index=df.index)
-            signals['signal'] = 'NO TRADE'
-            signals['price'] = df['close']
-            signals['confidence_score'] = 0
-            signals['stop_loss'] = 0.0
-            signals['target1'] = 0.0
-            signals['target2'] = 0.0
-            signals['target3'] = 0.0
-            signals['position_multiplier'] = 1.0
-            signals['reasoning'] = ''
-            
-            # Detect crossovers vectorized (look-ahead safe with shift)
-            # Bullish crossover: ema_short crosses above ema_long
-            bullish_cross = (df['ema_short'] > df['ema_long']) & (df['ema_short'].shift(1) <= df['ema_long'].shift(1))
-            
-            # Bearish crossover: ema_short crosses below ema_long
-            bearish_cross = (df['ema_short'] < df['ema_long']) & (df['ema_short'].shift(1) >= df['ema_long'].shift(1))
-            
-            # ATR filter
-            atr_filter = df['atr'] > self.atr_threshold
-            
-            # ADX filter
-            adx_filter = df['adx'] > self.adx_threshold
-            
-            # RSI filters
-            bullish_rsi = df['rsi'] > 45
-            bearish_rsi = df['rsi'] < 55
-            
-            # Volume confirmation
-            volume_filter = df['volume_ratio_ma'] > 1.0
-            
-            # EMA slope momentum
-            bullish_momentum = df['ema_slope'] > 0
-            bearish_momentum = df['ema_slope'] < 0
-            
-            # Trend alignment
-            bullish_trend = df['close'] > df['ema_trend']
-            bearish_trend = df['close'] < df['ema_trend']
-            
-            # Calculate confidence scores vectorized
-            confidence_scores = pd.Series(0, index=df.index)
-            
-            # For bullish signals
-            bullish_mask = bullish_cross & atr_filter & adx_filter & bullish_rsi & volume_filter & bullish_momentum
-            confidence_scores.loc[bullish_mask & bullish_trend] += 40  # Strong trend alignment
-            confidence_scores.loc[bullish_mask & (df['close'] > df['ema_long'])] += 25  # Moderate trend alignment
-            confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
-            confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
-            confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
-            confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
-            confidence_scores.loc[bullish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
-            confidence_scores.loc[bullish_mask] += 5   # EMA slope momentum
-            
-            # For bearish signals
-            bearish_mask = bearish_cross & atr_filter & adx_filter & bearish_rsi & volume_filter & bearish_momentum
-            confidence_scores.loc[bearish_mask & bearish_trend] += 40  # Strong trend alignment
-            confidence_scores.loc[bearish_mask & (df['close'] < df['ema_long'])] += 25  # Moderate trend alignment
-            confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
-            confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
-            confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
-            confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.2)] += 10  # Volume spike
-            confidence_scores.loc[bearish_mask & (df['volume_ratio_ma'] > 1.0)] += 5   # Above average volume
-            confidence_scores.loc[bearish_mask] += 5   # EMA slope momentum
-            
-            # Apply confidence threshold
-            valid_signals = confidence_scores >= self.min_confidence_threshold
-            
-            # Generate signals
-            signals.loc[bullish_mask & valid_signals, 'signal'] = 'BUY CALL'
-            signals.loc[bearish_mask & valid_signals, 'signal'] = 'BUY PUT'
-            
-            # Set confidence scores
-            signals.loc[valid_signals, 'confidence_score'] = confidence_scores[valid_signals]
-            
-            # Calculate stop loss and targets (ATR-based)
-            signals.loc[valid_signals, 'stop_loss'] = 1.5 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target1'] = 2.0 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target2'] = 3.0 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target3'] = 4.0 * df.loc[valid_signals, 'atr']
-            
-            # Dynamic position sizing
-            high_confidence = confidence_scores >= 80
-            signals.loc[valid_signals & high_confidence, 'position_multiplier'] = 1.0
-            signals.loc[valid_signals & ~high_confidence, 'position_multiplier'] = 0.8
-            
-            # Add reasoning
-            signals.loc[valid_signals, 'reasoning'] = (
-                f"EMA crossover, ATR {df.loc[valid_signals, 'atr'].round(2)}, "
-                f"ADX {df.loc[valid_signals, 'adx'].round(2)}, "
-                f"RSI {df.loc[valid_signals, 'rsi'].round(1)}"
-            )
-            
-            # Return only valid signals
-            valid_signals_df = signals[signals['signal'] != 'NO TRADE'].copy()
-            
-            return valid_signals_df
-            
-        except Exception as e:
-            logging.error(f"Error in EmaCrossoverEnhanced vectorized analysis: {e}")
-            return pd.DataFrame() 
+
+# -----------------------
+# Test harness to validate parity
+# -----------------------
+def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, verbose: bool = True):
+    """
+    Compare signals produced by analyze_row (row-by-row) vs analyze_vectorized.
+    Returns (identical:bool, details:dict)
+    """
+    # Precompute EMAs once
+    df_ema = strategy._ensure_emas(df, inplace=False)
+
+    # collect row-wise signals using analyze_row (fast now since EMAs are precomputed)
+    row_signals = []
+    for i in range(1, len(df_ema)):
+        res = strategy.analyze_row(i, df_ema.iloc[i], df_ema)
+        if res and res.get('signal'):
+            row_signals.append({
+                'timestamp': pd.to_datetime(df_ema['timestamp'].iat[i]),
+                'signal': res['signal'],
+                'price': res.get('price')
+            })
+    row_df = pd.DataFrame(row_signals)
+
+    # collect vectorized signals
+    vec_df = strategy.analyze_vectorized(df)
+
+    # normalize timestamps and compare sets
+    if row_df.empty and vec_df.empty:
+        if verbose:
+            print("Both methods produced zero signals — identical.")
+        return True, {'row_count': 0, 'vec_count': 0, 'diff': 0, 'mismatches': []}
+
+    # ensure timestamps are datetime64
+    if not row_df.empty:
+        row_df['timestamp'] = pd.to_datetime(row_df['timestamp'])
+    if not vec_df.empty:
+        vec_df['timestamp'] = pd.to_datetime(vec_df['timestamp'])
+
+    # Merge on timestamp to find differences
+    if row_df.empty:
+        merged = vec_df.merge(pd.DataFrame(columns=['timestamp','signal','price']), on='timestamp', how='left', indicator=True)
+    elif vec_df.empty:
+        merged = row_df.merge(pd.DataFrame(columns=['timestamp','signal','price']), on='timestamp', how='left', indicator=True)
+    else:
+        merged = row_df.merge(vec_df[['timestamp','signal','price']], on='timestamp', suffixes=('_row', '_vec'), how='outer', indicator=True)
+
+    # find mismatches where signals differ or recording differs
+    mismatches = []
+    if not merged.empty:
+        for _, r in merged.iterrows():
+            ts = r['timestamp']
+            row_sig = r.get('signal_row') if 'signal_row' in r else r.get('signal') if '_row' not in r else None
+            vec_sig = r.get('signal_vec') if 'signal_vec' in r else None
+            if row_sig != vec_sig:
+                mismatches.append({'timestamp': ts, 'row': row_sig, 'vec': vec_sig})
+
+    diff_count = len(mismatches)
+    if verbose:
+        print(f"Row signals: {len(row_df)} | Vectorized signals: {len(vec_df)} | Differences: {diff_count}")
+        if diff_count:
+            print("Sample mismatches (first 10):")
+            for m in mismatches[:10]:
+                print(m)
+
+    details = {
+        'row_count': len(row_df),
+        'vec_count': len(vec_df),
+        'diff': diff_count,
+        'mismatches': mismatches
+    }
+    return diff_count == 0, details
+
+# -----------------------
+# Test harness to validate parity
+# -----------------------
+def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, verbose: bool = True):
+    """
+    Compare signals produced by analyze_row (row-by-row) vs analyze_vectorized.
+    Returns (identical:bool, details:dict)
+    """
+    # Precompute EMAs once
+    df_ema = strategy._ensure_emas(df, inplace=False)
+
+    # collect row-wise signals using analyze_row (fast now since EMAs are precomputed)
+    row_signals = []
+    for i in range(1, len(df_ema)):
+        res = strategy.analyze_row(i, df_ema.iloc[i], df_ema)
+        if res and res.get('signal'):
+            row_signals.append({
+                'timestamp': pd.to_datetime(df_ema['timestamp'].iat[i]),
+                'signal': res['signal'],
+                'price': res.get('price')
+            })
+    row_df = pd.DataFrame(row_signals)
+
+    # collect vectorized signals
+    vec_df = strategy.analyze_vectorized(df)
+
+    # normalize timestamps and compare sets
+    if row_df.empty and vec_df.empty:
+        if verbose:
+            print("Both methods produced zero signals — identical.")
+        return True, {'row_count': 0, 'vec_count': 0, 'diff': 0, 'mismatches': []}
+
+    # ensure timestamps are datetime64
+    if not row_df.empty:
+        row_df['timestamp'] = pd.to_datetime(row_df['timestamp'])
+    if not vec_df.empty:
+        vec_df['timestamp'] = pd.to_datetime(vec_df['timestamp'])
+
+    # Merge on timestamp to find differences
+    if row_df.empty:
+        merged = vec_df.merge(pd.DataFrame(columns=['timestamp','signal','price']), on='timestamp', how='left', indicator=True)
+    elif vec_df.empty:
+        merged = row_df.merge(pd.DataFrame(columns=['timestamp','signal','price']), on='timestamp', how='left', indicator=True)
+    else:
+        merged = row_df.merge(vec_df[['timestamp','signal','price']], on='timestamp', suffixes=('_row', '_vec'), how='outer', indicator=True)
+
+    # find mismatches where signals differ or recording differs
+    mismatches = []
+    if not merged.empty:
+        for _, r in merged.iterrows():
+            ts = r['timestamp']
+            row_sig = r.get('signal_row') if 'signal_row' in r else r.get('signal') if '_row' not in r else None
+            vec_sig = r.get('signal_vec') if 'signal_vec' in r else None
+            if row_sig != vec_sig:
+                mismatches.append({'timestamp': ts, 'row': row_sig, 'vec': vec_sig})
+
+    diff_count = len(mismatches)
+    if verbose:
+        print(f"Row signals: {len(row_df)} | Vectorized signals: {len(vec_df)} | Differences: {diff_count}")
+        if diff_count:
+            print("Sample mismatches (first 10):")
+            for m in mismatches[:10]:
+                print(m)
+
+    details = {
+        'row_count': len(row_df),
+        'vec_count': len(vec_df),
+        'diff': diff_count,
+        'mismatches': mismatches
+    }
+    return diff_count == 0, details 

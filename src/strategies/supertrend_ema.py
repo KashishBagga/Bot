@@ -170,144 +170,164 @@ class SupertrendEma(Strategy):
             "exit_time": exit_time
         }
 
+    def _ensure_indicators(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
+        """
+        Ensure all required indicators exist. Returns a DataFrame with all indicators.
+        If inplace=False, returns a copy (safe). If inplace=True, modifies provided df.
+        """
+        need_copy = not inplace
+        if all(col in df.columns for col in ['ema', 'atr', 'adx', 'rsi', 'volume_ratio', 'ema_slope']):
+            return df if not need_copy else df.copy()
+        out = df if inplace else df.copy()
+        out = self.add_indicators(out)
+        return out
+
     def analyze_vectorized(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Vectorized analysis of the entire dataframe - much faster than row-by-row processing.
-        Returns a DataFrame with signals for all candles that meet the criteria.
+        Vectorized detection of Supertrend + EMA crossovers with enhanced filters.
+        Returns a DataFrame of signals (one row per signal) with columns:
+        ['timestamp', 'signal', 'price', 'confidence_score', 'stop_loss', 'target1', 'target2', 'target3', 'position_multiplier', 'reasoning']
+        Signal values: 'BUY CALL' (bullish crossover), 'BUY PUT' (bearish crossover)
         """
-        try:
-            # Ensure we have enough data
-            if len(df) < self.min_candles:
-                return pd.DataFrame()
-            
-            # Create a copy to avoid modifying original
-            df = df.copy()
-            
-            # Ensure indicators are present
-            if 'ema' not in df.columns:
-                df = self.add_indicators(df)
-            
-            # Initialize signals DataFrame
-            signals = pd.DataFrame(index=df.index)
-            signals['signal'] = 'NO TRADE'
-            signals['price'] = df['close']
-            signals['confidence_score'] = 0
-            signals['stop_loss'] = 0.0
-            signals['target1'] = 0.0
-            signals['target2'] = 0.0
-            signals['target3'] = 0.0
-            signals['position_multiplier'] = 1.0
-            signals['reasoning'] = ''
-            
-            # Calculate Supertrend for the entire dataframe
-            from indicators.supertrend import get_supertrend_instance
-            st_instance = get_supertrend_instance(
-                "supertrend_ema_vectorized", 
-                period=self.supertrend_period, 
-                multiplier=self.supertrend_multiplier
-            )
-            
-            # Process each candle to get Supertrend data
-            st_directions = []
-            st_values = []
-            
-            for i in range(len(df)):
-                candle = df.iloc[i]
-                st_result = st_instance.update(candle)
-                if st_result is not None:
-                    st_value, st_direction = st_result
-                    st_values.append(st_value)
-                    st_directions.append(st_direction)
-                else:
-                    st_values.append(candle['close'])
-                    st_directions.append(0)
-            
-            df['supertrend_direction'] = st_directions
-            df['supertrend_value'] = st_values
-            
-            # Detect Supertrend crossovers (look-ahead safe with shift)
-            # Bullish: price crosses above Supertrend
-            bullish_cross = (df['close'] > df['supertrend_value']) & (df['close'].shift(1) <= df['supertrend_value'].shift(1))
-            
-            # Bearish: price crosses below Supertrend
-            bearish_cross = (df['close'] < df['supertrend_value']) & (df['close'].shift(1) >= df['supertrend_value'].shift(1))
-            
-            # EMA trend alignment
-            bullish_ema = df['close'] > df['ema']
-            bearish_ema = df['close'] < df['ema']
-            
-            # ATR filter
-            atr_filter = df['atr'] > 0.5  # Minimum ATR threshold
-            
-            # ADX filter
-            adx_filter = df['adx'] > self.adx_threshold
-            
-            # RSI filters
-            bullish_rsi = df['rsi'] > 45
-            bearish_rsi = df['rsi'] < 55
-            
-            # Volume confirmation
-            volume_filter = df['volume_ratio'] > 1.0
-            
-            # EMA slope momentum
-            bullish_momentum = df['ema_slope'] > 0
-            bearish_momentum = df['ema_slope'] < 0
-            
-            # Calculate confidence scores vectorized
-            confidence_scores = pd.Series(0, index=df.index)
-            
-            # For bullish signals
-            bullish_mask = bullish_cross & bullish_ema & atr_filter & adx_filter & bullish_rsi & volume_filter & bullish_momentum
-            confidence_scores.loc[bullish_mask] += 40  # Supertrend + EMA alignment
-            confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
-            confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
-            confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
-            confidence_scores.loc[bullish_mask & (df['volume_ratio'] > 1.2)] += 10  # Volume spike
-            
-            # For bearish signals
-            bearish_mask = bearish_cross & bearish_ema & atr_filter & adx_filter & bearish_rsi & volume_filter & bearish_momentum
-            confidence_scores.loc[bearish_mask] += 40  # Supertrend + EMA alignment
-            confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
-            confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
-            confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
-            confidence_scores.loc[bearish_mask & (df['volume_ratio'] > 1.2)] += 10  # Volume spike
-            
-            # Apply confidence threshold
-            valid_signals = confidence_scores >= self.min_confidence_threshold
-            
-            # Generate signals
-            signals.loc[bullish_mask & valid_signals, 'signal'] = 'BUY CALL'
-            signals.loc[bearish_mask & valid_signals, 'signal'] = 'BUY PUT'
-            
-            # Set confidence scores
-            signals.loc[valid_signals, 'confidence_score'] = confidence_scores[valid_signals]
-            
-            # Calculate stop loss and targets (ATR-based)
-            signals.loc[valid_signals, 'stop_loss'] = 1.5 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target1'] = 2.0 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target2'] = 3.0 * df.loc[valid_signals, 'atr']
-            signals.loc[valid_signals, 'target3'] = 4.0 * df.loc[valid_signals, 'atr']
-            
-            # Dynamic position sizing
-            high_confidence = confidence_scores >= 80
-            signals.loc[valid_signals & high_confidence, 'position_multiplier'] = 1.0
-            signals.loc[valid_signals & ~high_confidence, 'position_multiplier'] = 0.8
-            
-            # Add reasoning
-            signals.loc[valid_signals, 'reasoning'] = (
-                f"Supertrend + EMA, ATR {df.loc[valid_signals, 'atr'].round(2)}, "
-                f"ADX {df.loc[valid_signals, 'adx'].round(2)}, "
-                f"RSI {df.loc[valid_signals, 'rsi'].round(1)}"
-            )
-            
-            # Return only valid signals
-            valid_signals_df = signals[signals['signal'] != 'NO TRADE'].copy()
-            
-            return valid_signals_df
-            
-        except Exception as e:
-            logging.error(f"Error in SupertrendEma vectorized analysis: {e}")
+        # Ensure we have enough data
+        if len(df) < self.min_candles:
             return pd.DataFrame()
+        
+        # Ensure indicators are present
+        df = self._ensure_indicators(df, inplace=False)
+        
+        # Calculate Supertrend for the entire dataframe
+        from indicators.supertrend import get_supertrend_instance
+        st_instance = get_supertrend_instance(
+            "supertrend_ema_vectorized", 
+            period=self.supertrend_period, 
+            multiplier=self.supertrend_multiplier
+        )
+        
+        # Process each candle to get Supertrend data
+        st_directions = []
+        st_values = []
+        
+        for i in range(len(df)):
+            candle = df.iloc[i]
+            st_result = st_instance.update(candle)
+            if st_result is not None:
+                st_value, st_direction = st_result
+                st_values.append(st_value)
+                st_directions.append(st_direction)
+            else:
+                st_values.append(candle['close'])
+                st_directions.append(0)
+        
+        df['supertrend_direction'] = st_directions
+        df['supertrend_value'] = st_values
+        
+        # look-ahead safe crossover detection
+        buy_mask = (df['close'] > df['supertrend_value']) & (
+            df['close'].shift(1) <= df['supertrend_value'].shift(1)
+        )
+        sell_mask = (df['close'] < df['supertrend_value']) & (
+            df['close'].shift(1) >= df['supertrend_value'].shift(1)
+        )
+
+        # Apply filters
+        ema_bullish = df['close'] > df['ema']
+        ema_bearish = df['close'] < df['ema']
+        atr_filter = df['atr'] > 0.5  # Minimum ATR threshold
+        adx_filter = df['adx'] > self.adx_threshold
+        rsi_bullish = df['rsi'] > 45
+        rsi_bearish = df['rsi'] < 55
+        volume_filter = df['volume_ratio'] > 1.0
+        momentum_bullish = df['ema_slope'] > 0
+        momentum_bearish = df['ema_slope'] < 0
+        
+        # Calculate confidence scores vectorized
+        confidence_scores = pd.Series(0, index=df.index)
+        
+        # For bullish signals
+        bullish_mask = buy_mask & ema_bullish & atr_filter & adx_filter & rsi_bullish & volume_filter & momentum_bullish
+        confidence_scores.loc[bullish_mask] += 40  # Supertrend + EMA alignment
+        confidence_scores.loc[bullish_mask] += 20  # ATR filter passed
+        confidence_scores.loc[bullish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bullish_mask] += 10  # RSI confirmation
+        confidence_scores.loc[bullish_mask & (df['volume_ratio'] > 1.2)] += 10  # Volume spike
+        
+        # For bearish signals
+        bearish_mask = sell_mask & ema_bearish & atr_filter & adx_filter & rsi_bearish & volume_filter & momentum_bearish
+        confidence_scores.loc[bearish_mask] += 40  # Supertrend + EMA alignment
+        confidence_scores.loc[bearish_mask] += 20  # ATR filter passed
+        confidence_scores.loc[bearish_mask] += 20  # ADX filter passed
+        confidence_scores.loc[bearish_mask] += 10  # RSI confirmation
+        confidence_scores.loc[bearish_mask & (df['volume_ratio'] > 1.2)] += 10  # Volume spike
+        
+        # Apply confidence threshold
+        valid_signals = confidence_scores >= self.min_confidence_threshold
+        
+        # Generate final signal mask
+        signal_mask = (bullish_mask | bearish_mask) & valid_signals
+        
+        if not signal_mask.any():
+            # no signals
+            return pd.DataFrame()
+
+        signals_df = df.loc[signal_mask, ['timestamp', 'close', 'ema', 'atr', 'adx', 'rsi']].copy()
+        
+        # label signals to match your backtester expectations
+        signals_df['signal'] = np.where(bullish_mask.loc[signals_df.index], 'BUY CALL', 'BUY PUT')
+        signals_df['price'] = signals_df['close']
+        signals_df['confidence_score'] = confidence_scores[signal_mask]
+        
+        # Calculate stop loss and targets (ATR-based)
+        signals_df['stop_loss'] = 1.5 * signals_df['atr']
+        signals_df['target1'] = 2.0 * signals_df['atr']
+        signals_df['target2'] = 3.0 * signals_df['atr']
+        signals_df['target3'] = 4.0 * signals_df['atr']
+        
+        # Dynamic position sizing
+        high_confidence = signals_df['confidence_score'] >= 80
+        signals_df['position_multiplier'] = np.where(high_confidence, 1.0, 0.8)
+        
+        # Add reasoning
+        signals_df['reasoning'] = (
+            f"Supertrend + EMA, ATR {signals_df['atr'].round(2)}, "
+            f"ADX {signals_df['adx'].round(2)}, "
+            f"RSI {signals_df['rsi'].round(1)}"
+        )
+
+        return signals_df[['timestamp', 'signal', 'price', 'confidence_score', 'stop_loss', 'target1', 'target2', 'target3', 'position_multiplier', 'reasoning']]
+
+    # -----------------------
+    # Compatibility: single-row API (uses precomputed indicators)
+    # -----------------------
+    def analyze_row(self, idx: int, row: pd.Series, df: pd.DataFrame) -> Optional[dict]:
+        """
+        Backwards-compatible single-row analyzer.
+        Assumes indicators are precomputed in df (or will compute them once).
+        Returns a dict like {'signal': 'BUY CALL', 'price': ..., 'confidence_score': ...} or None.
+        Important: For performance, call _ensure_indicators(df) once outside when using this in a loop.
+        """
+        # ensure indicators exist (compute once per run ideally)
+        df_indicators = self._ensure_indicators(df, inplace=False)
+
+        if idx <= 0 or idx >= len(df_indicators):
+            return None
+
+        # Get current and previous values
+        cur_close = float(df_indicators['close'].iat[idx])
+        cur_ema = float(df_indicators['ema'].iat[idx])
+        prev_close = float(df_indicators['close'].iat[idx-1])
+        prev_ema = float(df_indicators['ema'].iat[idx-1])
+
+        # Check for Supertrend crossover (simplified)
+        # In a real implementation, you'd need to track Supertrend state
+        # For now, we'll use a simple EMA crossover as proxy
+        if (cur_close > cur_ema) and (prev_close <= prev_ema):
+            confidence = abs((cur_close - cur_ema) / (abs(cur_ema) + 1e-9))
+            return {'signal': 'BUY CALL', 'price': cur_close, 'confidence_score': float(confidence)}
+        if (cur_close < cur_ema) and (prev_close >= prev_ema):
+            confidence = abs((cur_close - cur_ema) / (abs(cur_ema) + 1e-9))
+            return {'signal': 'BUY PUT', 'price': cur_close, 'confidence_score': float(confidence)}
+        return None
 
     def analyze(self, data: pd.DataFrame) -> Dict[str, Any]:
         """Analyze data and generate trading signals using closed candles."""
