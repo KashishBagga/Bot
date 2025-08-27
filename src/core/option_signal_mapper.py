@@ -360,8 +360,8 @@ class OptionSignalMapper:
             # Calculate maximum lots based on risk
             max_lots = int(adjusted_risk / premium_per_lot)
             
-            # Cap by available capital (use 80% of capital for safety)
-            available_capital = capital * 0.8
+            # Cap by available capital (use 90% of capital for safety)
+            available_capital = capital * 0.9
             max_affordable_lots = int(available_capital // premium_per_lot)
             max_lots = min(max_lots, max_affordable_lots)
             
@@ -369,10 +369,11 @@ class OptionSignalMapper:
             per_contract_max_lots = int(signal.get('max_lots_per_contract', 10))  # Reduced from 100
             max_lots = min(max_lots, per_contract_max_lots)
             
-            # Ensure minimum 1 lot if we can afford it and risk is reasonable
+            # Ensure minimum 1 lot if we can afford it
             if max_lots < 1:
-                # If we can afford at least 1 lot and risk is within 5% of capital
-                if premium_per_lot <= available_capital and adjusted_risk >= premium_per_lot * 0.5:
+                # If we can afford at least 1 lot, take it
+                if premium_per_lot <= available_capital:
+                    logger.info(f"✅ Taking 1 lot despite risk constraints: premium={premium_per_lot}, capital={available_capital}")
                     return 1
                 else:
                     logger.warning(f"⚠️ Cannot afford 1 lot: premium={premium_per_lot}, capital={available_capital}, risk={adjusted_risk}")

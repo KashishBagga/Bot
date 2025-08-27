@@ -1,1048 +1,462 @@
+#!/usr/bin/env python3
 """
-Unified Database Manager for Trading Bot System
-Consolidates all database operations and provides optimized schema for complete signal tracking.
+Unified Database for Trading System
+Handles all database operations for backtesting and paper trading
 """
 
 import sqlite3
-import json
+import logging
 from datetime import datetime
-from typing import Dict, List, Any, Optional
-import pandas as pd
+from typing import Dict, List, Optional, Any
+import json
+
+logger = logging.getLogger(__name__)
 
 
 class UnifiedDatabase:
-    """Unified database manager that consolidates all trading signal storage needs."""
-    
     def __init__(self, db_path: str = "trading_signals.db"):
+        """Initialize database."""
         self.db_path = db_path
-        self.setup_all_tables()
+        self.init_database()
     
-    def setup_all_tables(self):
-        """Setup all required tables with optimized schema."""
+    def init_database(self):
+        """Initialize database schema."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # 1. BACKTESTING MASTER TABLE - For all backtesting signals
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS backtesting_signals (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    run_id INTEGER,  -- Links to backtesting_runs
-                    signal_time TEXT NOT NULL,
-                    strategy TEXT NOT NULL,
-                    symbol TEXT NOT NULL,
-                    signal TEXT NOT NULL,  -- BUY CALL, BUY PUT, NO TRADE, ERROR
-                    
-                    -- Core signal data
-                    price REAL,
-                    confidence TEXT,
-                    confidence_score INTEGER,
-                    strike_price INTEGER,
-                    stop_loss REAL,
-                    target REAL,
-                    target2 REAL,
-                    target3 REAL,
-                    trade_type TEXT,
-                    
-                    -- Outcome data
-                    outcome TEXT,  -- WIN, LOSS, BREAKEVEN, PENDING
-                    pnl REAL,
-                    targets_hit INTEGER,
-                    stoploss_count INTEGER,
-                    exit_time TEXT,
-                    failure_reason TEXT,
-                    
-                    -- Universal indicators (common across strategies)
-                    rsi REAL,
-                    macd REAL,
-                    macd_signal REAL,
-                    ema_20 REAL,
-                    atr REAL,
-                    
-                    -- Strategy-specific indicators (JSON for flexibility)
-                    indicators_data TEXT,  -- JSON with strategy-specific indicators
-                    reasoning TEXT,  -- Strategy reasoning
-                    
-                    -- Metadata
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    
-                    FOREIGN KEY (run_id) REFERENCES backtesting_runs (id)
-                )
-            ''')
-            
-            # 2. LIVE TRADING MASTER TABLE - For all live trading signals
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS live_signals (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    signal_time TEXT NOT NULL,
-                    strategy TEXT NOT NULL,
-                    symbol TEXT NOT NULL,
-                    signal TEXT NOT NULL,  -- BUY CALL, BUY PUT, NO TRADE, ERROR
-                    
-                    -- Core signal data
-                    price REAL,
-                    confidence TEXT,
-                    confidence_score INTEGER,
-                    strike_price INTEGER,
-                    stop_loss REAL,
-                    target REAL,
-                    target2 REAL,
-                    target3 REAL,
-                    trade_type TEXT,
-                    
-                    -- Execution tracking
-                    status TEXT DEFAULT 'GENERATED',  -- GENERATED, EXECUTED, REJECTED, CLOSED
-                    execution_price REAL,
-                    execution_time TEXT,
-                    exit_price REAL,
-                    exit_time TEXT,
-                    exit_reason TEXT,
-                    
-                    -- Outcome data
-                    outcome TEXT,  -- WIN, LOSS, BREAKEVEN, PENDING
-                    pnl REAL,
-                    pnl_percentage REAL,
-                    targets_hit INTEGER,
-                    stoploss_count INTEGER,
-                    failure_reason TEXT,
-                    
-                    -- Performance metrics
-                    max_favorable_excursion REAL,
-                    max_adverse_excursion REAL,
-                    holding_period_minutes INTEGER,
-                    
-                    -- Universal indicators (common across strategies)
-                    rsi REAL,
-                    macd REAL,
-                    macd_signal REAL,
-                    ema_20 REAL,
-                    atr REAL,
-                    
-                    -- Strategy-specific indicators (JSON for flexibility)
-                    indicators_data TEXT,  -- JSON with strategy-specific indicators
-                    reasoning TEXT,  -- Strategy reasoning
-                    
-                    -- Market context
-                    market_condition TEXT,
-                    volatility_at_entry REAL,
-                    volume_at_entry REAL,
-                    
-                    -- Metadata
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # 3. REJECTED SIGNALS TABLE - For comprehensive rejected signal analysis
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS rejected_signals (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    signal_time TEXT NOT NULL,
-                    strategy TEXT NOT NULL,
-                    symbol TEXT NOT NULL,
-                    signal_attempted TEXT,  -- What signal was attempted
-                    rejection_reason TEXT NOT NULL,
-                    rejection_category TEXT,  -- NO_TRADE, LOW_CONFIDENCE, ERROR, RISK_LIMIT
-                    
-                    -- Market data at rejection time
-                    price REAL,
-                    confidence_score INTEGER,
-                    
-                    -- Universal indicators (for analysis of why rejected)
-                    rsi REAL,
-                    macd REAL,
-                    macd_signal REAL,
-                    ema_20 REAL,
-                    atr REAL,
-                    
-                    -- Strategy-specific indicators (JSON for flexibility)
-                    indicators_data TEXT,  -- JSON with ALL indicator values
-                    reasoning TEXT,  -- Detailed reasoning for rejection
-                    
-                    -- Potential trade data (what would have been)
-                    potential_stop_loss REAL,
-                    potential_target REAL,
-                    potential_target2 REAL,
-                    potential_target3 REAL,
-                    
-                    -- Source tracking
-                    source TEXT DEFAULT 'LIVE',  -- LIVE or BACKTEST
-                    run_id INTEGER,  -- For backtesting runs
-                    
-                    -- Metadata
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # 4. BACKTESTING RUNS TABLE - For tracking backtest executions
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS backtesting_runs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    run_timestamp TEXT NOT NULL,
-                    run_name TEXT,
-                    period_days INTEGER,
-                    timeframe TEXT,
-                    symbols TEXT,  -- JSON array of symbols
-                    strategies TEXT,  -- JSON array of strategies
-                    parameters TEXT,  -- JSON of run parameters
-                    
-                    -- Performance summary
-                    total_signals INTEGER DEFAULT 0,
-                    valid_signals INTEGER DEFAULT 0,
-                    rejected_signals INTEGER DEFAULT 0,
-                    total_pnl REAL DEFAULT 0,
-                    win_rate REAL DEFAULT 0,
-                    
-                    -- Execution metrics
-                    duration_seconds REAL,
-                    signals_per_second REAL,
-                    
-                    -- Status
-                    status TEXT DEFAULT 'RUNNING',  -- RUNNING, COMPLETED, FAILED
-                    error_message TEXT,
-                    
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # 5. STRATEGY PERFORMANCE SUMMARY - For quick performance queries
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS strategy_performance (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    strategy TEXT NOT NULL,
-                    symbol TEXT NOT NULL,
-                    timeframe TEXT,
-                    period_start TEXT,
-                    period_end TEXT,
-                    source TEXT,  -- LIVE or BACKTEST
-                    run_id INTEGER,
-                    
-                    -- Signal counts
-                    total_analyses INTEGER,
-                    valid_signals INTEGER,
-                    rejected_signals INTEGER,
-                    no_trade_count INTEGER,
-                    error_count INTEGER,
-                    
-                    -- Performance metrics
-                    total_pnl REAL,
-                    win_rate REAL,
-                    avg_confidence REAL,
-                    max_drawdown REAL,
-                    
-                    -- Rejection analysis
-                    low_confidence_rejections INTEGER,
-                    no_trade_rejections INTEGER,
-                    error_rejections INTEGER,
-                    
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # 6. DATABASE VIEWS for easy querying
-            # Latest backtesting results view
-            cursor.execute('''
-                CREATE VIEW IF NOT EXISTS latest_backtest_summary AS
-                SELECT 
-                    br.id as run_id,
-                    br.run_timestamp,
-                    br.period_days,
-                    br.timeframe,
-                    br.total_signals,
-                    br.total_pnl,
-                    COUNT(bs.id) as detailed_signals,
-                    SUM(CASE WHEN bs.signal != 'NO TRADE' THEN 1 ELSE 0 END) as valid_signals,
-                    AVG(bs.confidence_score) as avg_confidence,
-                    SUM(bs.pnl) as calculated_pnl
-                FROM backtesting_runs br
-                LEFT JOIN backtesting_signals bs ON br.id = bs.run_id
-                WHERE br.id = (SELECT MAX(id) FROM backtesting_runs)
-                GROUP BY br.id
-            ''')
-            
-            # Strategy comparison view
-            cursor.execute('''
-                CREATE VIEW IF NOT EXISTS strategy_comparison AS
-                SELECT 
-                    strategy,
-                    symbol,
-                    COUNT(*) as total_signals,
-                    SUM(CASE WHEN signal NOT IN ('NO TRADE', 'ERROR') THEN 1 ELSE 0 END) as valid_signals,
-                    AVG(confidence_score) as avg_confidence,
-                    SUM(pnl) as total_pnl,
-                    AVG(pnl) as avg_pnl,
-                    SUM(CASE WHEN outcome = 'Win' THEN 1 ELSE 0 END) * 100.0 / 
-                        NULLIF(SUM(CASE WHEN outcome IN ('Win', 'Loss') THEN 1 ELSE 0 END), 0) as win_rate
-                FROM backtesting_signals 
-                WHERE run_id = (SELECT MAX(id) FROM backtesting_runs)
-                GROUP BY strategy, symbol
-                ORDER BY total_pnl DESC
-            ''')
-            
-            conn.commit()
-            conn.close()
-            print("✅ Unified database schema created successfully")
-            
-        except Exception as e:
-            print(f"❌ Database setup error: {e}")
-            raise
-    
-    def start_backtesting_run(self, run_name: str, period_days: int, timeframe: str, 
-                             symbols: List[str], strategies: List[str], 
-                             parameters: Dict = None) -> int:
-        """Start a new backtesting run and return run_id."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO backtesting_runs (
-                    run_timestamp, run_name, period_days, timeframe, symbols, strategies, parameters
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                datetime.now().isoformat(),
-                run_name,
-                period_days,
-                timeframe,
-                json.dumps(symbols),
-                json.dumps(strategies),
-                json.dumps(parameters or {})
-            ))
-            
-            run_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
-            
-            print(f"✅ Started backtesting run {run_id}: {run_name}")
-            return run_id
-            
-        except Exception as e:
-            print(f"❌ Error starting backtesting run: {e}")
-            return -1
-    
-    def log_backtesting_signal(self, run_id: int, strategy: str, symbol: str, 
-                              signal_data: Dict[str, Any]):
-        """Log a backtesting signal with complete indicator data."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Extract strategy-specific indicators
-            indicators_data = self._extract_strategy_indicators(strategy, signal_data)
-            
-            cursor.execute('''
-                INSERT INTO backtesting_signals (
-                    run_id, signal_time, strategy, symbol, signal,
-                    price, confidence, confidence_score, strike_price, stop_loss, target, target2, target3, trade_type,
-                    outcome, pnl, targets_hit, stoploss_count, exit_time, failure_reason,
-                    rsi, macd, macd_signal, ema_20, atr,
-                    indicators_data, reasoning
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                run_id,
-                signal_data.get('signal_time', datetime.now().isoformat()),
-                strategy,
-                symbol,
-                signal_data.get('signal', 'NO TRADE'),
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
                 
-                # Core data
-                signal_data.get('price', 0),
-                signal_data.get('confidence', 'Unknown'),
-                signal_data.get('confidence_score', 0),
-                signal_data.get('strike_price', 0),
-                signal_data.get('stop_loss', 0),
-                signal_data.get('target', 0),
-                signal_data.get('target2', 0),
-                signal_data.get('target3', 0),
-                signal_data.get('trade_type', 'Intraday'),
+                # Clear existing tables
+                cursor.execute("DROP TABLE IF EXISTS trading_signals")
+                cursor.execute("DROP TABLE IF EXISTS rejected_signals")
+                cursor.execute("DROP TABLE IF EXISTS open_option_positions")
+                cursor.execute("DROP TABLE IF EXISTS closed_option_positions")
+                cursor.execute("DROP TABLE IF EXISTS equity_curve")
+                cursor.execute("DROP TABLE IF EXISTS performance_metrics")
                 
-                # Outcome
-                signal_data.get('outcome', 'Pending'),
-                signal_data.get('pnl', 0),
-                signal_data.get('targets_hit', 0),
-                signal_data.get('stoploss_count', 0),
-                signal_data.get('exit_time'),
-                signal_data.get('failure_reason', ''),
+                # Create trading_signals table
+                cursor.execute("""
+                    CREATE TABLE trading_signals (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        timestamp DATETIME NOT NULL,
+                        strategy TEXT NOT NULL,
+                        signal TEXT NOT NULL,
+                        symbol TEXT NOT NULL,
+                        price REAL NOT NULL,
+                        confidence REAL,
+                        reasoning TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 
-                # Universal indicators
-                signal_data.get('rsi', 0),
-                signal_data.get('macd', 0),
-                signal_data.get('macd_signal', 0),
-                signal_data.get('ema_20', 0),
-                signal_data.get('atr', 0),
+                # Create rejected_signals table
+                cursor.execute("""
+                    CREATE TABLE rejected_signals (
+                        id TEXT PRIMARY KEY,
+                        timestamp DATETIME NOT NULL,
+                        strategy TEXT NOT NULL,
+                        signal_type TEXT NOT NULL,
+                        underlying TEXT NOT NULL,
+                        price REAL NOT NULL,
+                        confidence REAL NOT NULL,
+                        reasoning TEXT,
+                        rejection_reason TEXT NOT NULL,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 
-                # Strategy-specific data
-                json.dumps(indicators_data),
-                signal_data.get('reasoning', signal_data.get('rsi_reason', '') + ' | ' + signal_data.get('macd_reason', '') + ' | ' + signal_data.get('price_reason', ''))
-            ))
-            
-            conn.commit()
-            conn.close()
-            
-        except Exception as e:
-            print(f"❌ Error logging backtesting signal: {e}")
-    
-    def log_live_signal(self, strategy: str, symbol: str, signal_data: Dict[str, Any]) -> int:
-        """Log a live trading signal and return signal_id."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Extract strategy-specific indicators
-            indicators_data = self._extract_strategy_indicators(strategy, signal_data)
-            
-            cursor.execute('''
-                INSERT INTO live_signals (
-                    signal_time, strategy, symbol, signal,
-                    price, confidence, confidence_score, strike_price, stop_loss, target, target2, target3, trade_type,
-                    rsi, macd, macd_signal, ema_20, atr,
-                    indicators_data, reasoning,
-                    market_condition, volatility_at_entry, volume_at_entry
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                signal_data.get('signal_time', datetime.now().isoformat()),
-                strategy,
-                symbol,
-                signal_data.get('signal', 'NO TRADE'),
-                
-                # Core data
-                signal_data.get('price', 0),
-                signal_data.get('confidence', 'Unknown'),
-                signal_data.get('confidence_score', 0),
-                signal_data.get('strike_price', 0),
-                signal_data.get('stop_loss', 0),
-                signal_data.get('target', 0),
-                signal_data.get('target2', 0),
-                signal_data.get('target3', 0),
-                signal_data.get('trade_type', 'Intraday'),
-                
-                # Universal indicators
-                signal_data.get('rsi', 0),
-                signal_data.get('macd', 0),
-                signal_data.get('macd_signal', 0),
-                signal_data.get('ema_20', 0),
-                signal_data.get('atr', 0),
-                
-                # Strategy-specific and context
-                json.dumps(indicators_data),
-                signal_data.get('reasoning', ''),
-                signal_data.get('market_condition', 'Unknown'),
-                signal_data.get('volatility_at_entry', 0),
-                signal_data.get('volume_at_entry', 0)
-            ))
-            
-            signal_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
-            
-            return signal_id
-            
-        except Exception as e:
-            print(f"❌ Error logging live signal: {e}")
-            return -1
-    
-    def log_rejected_signal(self, strategy: str, symbol: str, rejection_data: Dict[str, Any], 
-                           source: str = 'LIVE', run_id: int = None):
-        """Log a rejected signal with complete analysis data."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Extract strategy-specific indicators
-            indicators_data = self._extract_strategy_indicators(strategy, rejection_data)
-            
-            # Determine rejection category
-            rejection_reason = rejection_data.get('rejection_reason', 'Unknown')
-            if 'low confidence' in rejection_reason.lower():
-                rejection_category = 'LOW_CONFIDENCE'
-            elif 'no trade' in rejection_reason.lower():
-                rejection_category = 'NO_TRADE'
-            elif 'error' in rejection_reason.lower():
-                rejection_category = 'ERROR'
-            elif 'risk' in rejection_reason.lower():
-                rejection_category = 'RISK_LIMIT'
-            else:
-                rejection_category = 'OTHER'
-            
-            cursor.execute('''
-                INSERT INTO rejected_signals (
-                    signal_time, strategy, symbol, signal_attempted, rejection_reason, rejection_category,
-                    price, confidence_score,
-                    rsi, macd, macd_signal, ema_20, atr,
-                    indicators_data, reasoning,
-                    potential_stop_loss, potential_target, potential_target2, potential_target3,
-                    source, run_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                rejection_data.get('timestamp', rejection_data.get('signal_time', datetime.now().isoformat())),
-                strategy,
-                symbol,
-                rejection_data.get('signal', 'UNKNOWN'),
-                rejection_reason,
-                rejection_category,
-                
-                # Market data
-                rejection_data.get('price', 0),
-                rejection_data.get('confidence_score', 0),
-                
-                # Universal indicators
-                rejection_data.get('rsi', 0),
-                rejection_data.get('macd', 0),
-                rejection_data.get('macd_signal', 0),
-                rejection_data.get('ema_20', 0),
-                rejection_data.get('atr', 0),
-                
-                # Strategy-specific data
-                json.dumps(indicators_data),
-                rejection_data.get('reasoning', rejection_data.get('reason', '')),
-                
-                # Potential trade data
-                rejection_data.get('stop_loss', 0),
-                rejection_data.get('target', 0),
-                rejection_data.get('target2', 0),
-                rejection_data.get('target3', 0),
-                
-                # Source tracking
-                source,
-                run_id
-            ))
-            
-            conn.commit()
-            conn.close()
-            
-        except Exception as e:
-            print(f"❌ Error logging rejected signal: {e}")
-    
-    def update_live_signal_outcome(self, signal_id: int, outcome_data: Dict[str, Any]):
-        """Update live signal with outcome and performance data."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                UPDATE live_signals SET
-                    status = ?, exit_price = ?, exit_time = ?, exit_reason = ?,
-                    outcome = ?, pnl = ?, pnl_percentage = ?, targets_hit = ?, stoploss_count = ?,
-                    max_favorable_excursion = ?, max_adverse_excursion = ?, holding_period_minutes = ?,
-                    failure_reason = ?, updated_at = ?
-                WHERE id = ?
-            ''', (
-                outcome_data.get('status', 'CLOSED'),
-                outcome_data.get('exit_price', 0),
-                outcome_data.get('exit_time', datetime.now().isoformat()),
-                outcome_data.get('exit_reason', ''),
-                outcome_data.get('outcome', 'UNKNOWN'),
-                outcome_data.get('pnl', 0),
-                outcome_data.get('pnl_percentage', 0),
-                outcome_data.get('targets_hit', 0),
-                outcome_data.get('stoploss_count', 0),
-                outcome_data.get('max_favorable_excursion', 0),
-                outcome_data.get('max_adverse_excursion', 0),
-                outcome_data.get('holding_period_minutes', 0),
-                outcome_data.get('failure_reason', ''),
-                datetime.now().isoformat(),
-                signal_id
-            ))
-            
-            conn.commit()
-            conn.close()
-            
-        except Exception as e:
-            print(f"❌ Error updating signal outcome: {e}")
-    
-    def finish_backtesting_run(self, run_id: int, summary_data: Dict[str, Any]):
-        """Finish a backtesting run with summary statistics."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                UPDATE backtesting_runs SET
-                    total_signals = ?, valid_signals = ?, rejected_signals = ?, total_pnl = ?, win_rate = ?,
-                    duration_seconds = ?, signals_per_second = ?, status = ?
-                WHERE id = ?
-            ''', (
-                summary_data.get('total_signals', 0),
-                summary_data.get('valid_signals', 0),
-                summary_data.get('rejected_signals', 0),
-                summary_data.get('total_pnl', 0),
-                summary_data.get('win_rate', 0),
-                summary_data.get('duration_seconds', 0),
-                summary_data.get('signals_per_second', 0),
-                'COMPLETED',
-                run_id
-            ))
-            
-            conn.commit()
-            conn.close()
-            
-        except Exception as e:
-            print(f"❌ Error finishing backtesting run: {e}")
-    
-    def _extract_strategy_indicators(self, strategy: str, signal_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract strategy-specific indicators from signal data."""
-        indicators = {}
-        
-        if strategy == 'insidebar_rsi':
-            indicators.update({
-                'rsi_level': signal_data.get('rsi_level'),
-                'inside_bar_detected': signal_data.get('inside_bar_detected'),
-                'rsi_reason': signal_data.get('rsi_reason'),
-                'price_reason': signal_data.get('price_reason')
-            })
-        
-        elif strategy == 'ema_crossover':
-            indicators.update({
-                'ema_fast': signal_data.get('ema_fast'),
-                'ema_slow': signal_data.get('ema_slow'),
-                'ema_9': signal_data.get('ema_9'),
-                'ema_21': signal_data.get('ema_21'),
-                'crossover_strength': signal_data.get('crossover_strength'),
-                'momentum': signal_data.get('momentum'),
-                'rsi_reason': signal_data.get('rsi_reason'),
-                'macd_reason': signal_data.get('macd_reason'),
-                'price_reason': signal_data.get('price_reason')
-            })
-        
-        elif strategy == 'supertrend_ema':
-            indicators.update({
-                'supertrend_value': signal_data.get('supertrend_value'),
-                'supertrend_direction': signal_data.get('supertrend_direction'),
-                'supertrend_upperband': signal_data.get('supertrend_upperband'),
-                'supertrend_lowerband': signal_data.get('supertrend_lowerband'),
-                'price_to_ema_ratio': signal_data.get('price_to_ema_ratio'),
-                'price_reason': signal_data.get('price_reason')
-            })
-        
-        elif strategy == 'supertrend_macd_rsi_ema':
-            indicators.update({
-                'supertrend': signal_data.get('supertrend'),
-                'supertrend_direction': signal_data.get('supertrend_direction'),
-                'option_chain_confirmation': signal_data.get('option_chain_confirmation'),
-                'option_symbol': signal_data.get('option_symbol'),
-                'option_expiry': signal_data.get('option_expiry'),
-                'option_strike': signal_data.get('option_strike'),
-                'option_type': signal_data.get('option_type'),
-                'option_entry_price': signal_data.get('option_entry_price'),
-                'rsi_reason': signal_data.get('rsi_reason'),
-                'macd_reason': signal_data.get('macd_reason'),
-                'price_reason': signal_data.get('price_reason')
-            })
-        
-        # Remove None values
-        return {k: v for k, v in indicators.items() if v is not None}
-    
-    def get_latest_backtest_summary(self) -> Optional[Dict[str, Any]]:
-        """Get summary of the latest backtesting run."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('SELECT * FROM latest_backtest_summary')
-            result = cursor.fetchone()
-            
-            if result:
-                columns = [description[0] for description in cursor.description]
-                return dict(zip(columns, result))
-            
-            conn.close()
-            return None
-            
-        except Exception as e:
-            print(f"❌ Error getting latest backtest summary: {e}")
-            return None
-    
-    def get_strategy_comparison(self, run_id: int = None) -> List[Dict[str, Any]]:
-        """Get strategy performance comparison."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            if run_id:
-                cursor.execute('''
-                    SELECT strategy, symbol, 
-                           COUNT(*) as total_signals,
-                           SUM(CASE WHEN signal NOT IN ('NO TRADE', 'ERROR') THEN 1 ELSE 0 END) as valid_signals,
-                           AVG(confidence_score) as avg_confidence,
-                           SUM(pnl) as total_pnl,
-                           AVG(pnl) as avg_pnl,
-                           SUM(CASE WHEN outcome = 'WIN' THEN 1 ELSE 0 END) * 100.0 / 
-                               NULLIF(SUM(CASE WHEN outcome IN ('WIN', 'LOSS') THEN 1 ELSE 0 END), 0) as win_rate
-                    FROM backtesting_signals 
-                    WHERE run_id = ?
-                    GROUP BY strategy, symbol
-                    ORDER BY total_pnl DESC
-                ''', (run_id,))
-            else:
-                cursor.execute('SELECT * FROM strategy_comparison')
-            
-            results = cursor.fetchall()
-            columns = [description[0] for description in cursor.description]
-            
-            conn.close()
-            return [dict(zip(columns, row)) for row in results]
-            
-        except Exception as e:
-            print(f"❌ Error getting strategy comparison: {e}")
-            return []
-    
-    def get_rejection_analysis(self, strategy: str = None, days: int = 7) -> Dict[str, Any]:
-        """Get comprehensive rejection analysis."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            where_clause = "WHERE signal_time >= datetime('now', '-{} days')".format(days)
-            if strategy:
-                where_clause += f" AND strategy = '{strategy}'"
-            
-            # Get rejection counts by category
-            cursor.execute(f'''
-                SELECT rejection_category, COUNT(*) as count
-                FROM rejected_signals
-                {where_clause}
-                GROUP BY rejection_category
-                ORDER BY count DESC
-            ''')
-            
-            categories = dict(cursor.fetchall())
-            
-            # Get rejection reasons
-            cursor.execute(f'''
-                SELECT rejection_reason, COUNT(*) as count
-                FROM rejected_signals
-                {where_clause}
-                GROUP BY rejection_reason
-                ORDER BY count DESC
-                LIMIT 10
-            ''')
-            
-            reasons = dict(cursor.fetchall())
-            
-            # Get strategy breakdown
-            cursor.execute(f'''
-                SELECT strategy, rejection_category, COUNT(*) as count
-                FROM rejected_signals
-                {where_clause}
-                GROUP BY strategy, rejection_category
-                ORDER BY strategy, count DESC
-            ''')
-            
-            strategy_breakdown = {}
-            for row in cursor.fetchall():
-                strategy_name, category, count = row
-                if strategy_name not in strategy_breakdown:
-                    strategy_breakdown[strategy_name] = {}
-                strategy_breakdown[strategy_name][category] = count
-            
-            conn.close()
-            
-            return {
-                'categories': categories,
-                'top_reasons': reasons,
-                'strategy_breakdown': strategy_breakdown,
-                'period_days': days
-            }
-            
-        except Exception as e:
-            print(f"❌ Error getting rejection analysis: {e}")
-            return {}
-
-    def save_trades(self, trades_df, symbol=None, timeframe=None):
-        """Save trades dataframe to database."""
-        try:
-            if trades_df.empty:
-                print("⚠️ No trades to save")
-                return
-            
-            conn = sqlite3.connect(self.db_path)
-            
-            # Extract symbol and timeframe from trades_df if not provided
-            if symbol is None and 'symbol' in trades_df.columns:
-                symbol = trades_df['symbol'].iloc[0]
-            elif symbol is None:
-                symbol = "NSE:NIFTY50-INDEX"  # Default fallback
-                
-            if timeframe is None and 'timeframe' in trades_df.columns:
-                timeframe = trades_df['timeframe'].iloc[0]
-            elif timeframe is None:
-                timeframe = "5min"  # Default fallback
-            
-            # Start a backtesting run
-            run_id = self.start_backtesting_run(
-                run_name=f"Backtest_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-                period_days=30,
-                timeframe=timeframe,
-                symbols=[symbol],
-                strategies=["ema_crossover_enhanced", "supertrend_ema", "supertrend_macd_rsi_ema"]
-            )
-            
-            # Convert trades to signals format
-            for _, trade in trades_df.iterrows():
-                signal_data = {
-                    'signal_time': trade['timestamp'],
-                    'signal': trade['signal'],
-                    'price': trade['entry_price'],
-                    'confidence_score': trade['confidence'],
-                    'outcome': trade['outcome'],
-                    'pnl': trade['pnl'],
-                    'reasoning': trade['reasoning'],
-                    'stop_loss': 0,  # Default values
-                    'target': 0,
-                    'target2': 0,
-                    'target3': 0
-                }
-                
-                self.log_backtesting_signal(
-                    run_id=run_id,
-                    strategy=trade['strategy'],
-                    symbol=symbol,
-                    signal_data=signal_data
-                )
-            
-            # Finish the backtesting run
-            summary_data = {
-                'total_signals': len(trades_df),
-                'valid_signals': len(trades_df),
-                'rejected_signals': 0,
-                'total_pnl': trades_df['pnl'].sum(),
-                'win_rate': (trades_df['outcome'] == 'Win').sum() / len(trades_df) * 100,
-                'duration_seconds': 0,
-                'signals_per_second': 0
-            }
-            
-            self.finish_backtesting_run(run_id, summary_data)
-            
-            conn.close()
-            print(f"✅ Saved {len(trades_df)} trades to database")
-            
-        except Exception as e:
-            print(f"❌ Error saving trades to database: {e}")
-    
-    def cleanup_old_data(self, days_to_keep: int = 30):
-        """Clean up old rejected signals and backtesting data."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Keep only recent rejected signals for live trading
-            cursor.execute('''
-                DELETE FROM rejected_signals 
-                WHERE source = 'LIVE' AND signal_time < datetime('now', '-{} days')
-            '''.format(days_to_keep))
-            
-            live_deleted = cursor.rowcount
-            
-            # For backtesting, keep only the last 10 runs
-            cursor.execute('''
-                DELETE FROM backtesting_runs 
-                WHERE id NOT IN (
-                    SELECT id FROM backtesting_runs 
-                    ORDER BY id DESC LIMIT 10
-                )
-            ''')
-            
-            backtest_runs_deleted = cursor.rowcount
-            
-            # Clean up orphaned backtesting signals
-            cursor.execute('''
-                DELETE FROM backtesting_signals 
-                WHERE run_id NOT IN (SELECT id FROM backtesting_runs)
-            ''')
-            
-            backtest_signals_deleted = cursor.rowcount
-            
-            # Clean up orphaned rejected signals from backtesting
-            cursor.execute('''
-                DELETE FROM rejected_signals 
-                WHERE source = 'BACKTEST' AND run_id NOT IN (SELECT id FROM backtesting_runs)
-            ''')
-            
-            rejected_backtest_deleted = cursor.rowcount
-            
-            conn.commit()
-            conn.close()
-            
-            print(f"✅ Cleanup completed:")
-            print(f"   Live rejected signals deleted: {live_deleted}")
-            print(f"   Backtest runs deleted: {backtest_runs_deleted}")
-            print(f"   Backtest signals deleted: {backtest_signals_deleted}")
-            print(f"   Rejected backtest signals deleted: {rejected_backtest_deleted}")
-            
-        except Exception as e:
-            print(f"❌ Error during cleanup: {e}")
-
-    def save_open_option_position(self, position_data: Dict):
-        """Save open option position to database."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Create table if it doesn't exist
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS open_option_positions (
-                    position_id TEXT PRIMARY KEY,
-                    contract_symbol TEXT NOT NULL,
-                    underlying TEXT NOT NULL,
-                    strategy TEXT NOT NULL,
-                    entry_time TEXT NOT NULL,
-                    entry_price REAL NOT NULL,
-                    quantity INTEGER NOT NULL,
-                    premium_risk REAL NOT NULL,
-                    strike REAL NOT NULL,
-                    expiry TEXT NOT NULL,
-                    option_type TEXT NOT NULL,
-                    lot_size INTEGER NOT NULL,
-                    status TEXT DEFAULT 'OPEN',
-                    created_at TEXT NOT NULL
-                )
-            ''')
-            
-            query = """
-            INSERT OR REPLACE INTO open_option_positions (
-                position_id, contract_symbol, underlying, strategy, entry_time,
-                entry_price, quantity, premium_risk, strike, expiry, option_type, lot_size,
-                created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """
-            
-            cursor.execute(query, (
-                position_data['id'],
-                position_data['contract_symbol'],
-                position_data['underlying'],
-                position_data['strategy'],
-                position_data['entry_time'],
-                position_data['entry_price'],
-                position_data['quantity'],
-                position_data['premium_risk'],
-                position_data['strike'],
-                position_data['expiry'],
-                position_data['option_type'],
-                position_data['lot_size'],
-                datetime.now().isoformat()
-            ))
-            
-            conn.commit()
-            conn.close()
-            
-        except Exception as e:
-            print(f"❌ Error saving open option position: {e}")
-
-    def update_option_position_status(self, position_id: str, status: str, exit_data: Dict = None):
-        """Update option position status (close position)."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            if status == 'CLOSED' and exit_data:
-                # Create closed positions table if it doesn't exist
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS closed_option_positions (
-                        position_id TEXT PRIMARY KEY,
+                # Create open_option_positions table
+                cursor.execute("""
+                    CREATE TABLE open_option_positions (
+                        id TEXT PRIMARY KEY,
+                        timestamp DATETIME NOT NULL,
                         contract_symbol TEXT NOT NULL,
                         underlying TEXT NOT NULL,
                         strategy TEXT NOT NULL,
-                        entry_time TEXT NOT NULL,
-                        exit_time TEXT NOT NULL,
+                        signal_type TEXT NOT NULL,
                         entry_price REAL NOT NULL,
-                        exit_price REAL NOT NULL,
                         quantity INTEGER NOT NULL,
-                        premium_risk REAL NOT NULL,
-                        pnl REAL NOT NULL,
-                        returns REAL NOT NULL,
-                        exit_reason TEXT NOT NULL,
-                        created_at TEXT NOT NULL
+                        lot_size INTEGER NOT NULL,
+                        strike REAL NOT NULL,
+                        expiry DATETIME NOT NULL,
+                        option_type TEXT NOT NULL,
+                        status TEXT DEFAULT 'OPEN',
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                ''')
+                """)
                 
-                # Move from open to closed
-                cursor.execute('DELETE FROM open_option_positions WHERE position_id = ?', (position_id,))
+                # Create closed_option_positions table
+                cursor.execute("""
+                    CREATE TABLE closed_option_positions (
+                        id TEXT PRIMARY KEY,
+                        entry_timestamp DATETIME NOT NULL,
+                        exit_timestamp DATETIME,
+                        contract_symbol TEXT NOT NULL,
+                        underlying TEXT NOT NULL,
+                        strategy TEXT NOT NULL,
+                        signal_type TEXT NOT NULL,
+                        entry_price REAL NOT NULL,
+                        exit_price REAL,
+                        quantity INTEGER NOT NULL,
+                        lot_size INTEGER NOT NULL,
+                        strike REAL NOT NULL,
+                        expiry DATETIME NOT NULL,
+                        option_type TEXT NOT NULL,
+                        pnl REAL,
+                        exit_reason TEXT,
+                        status TEXT DEFAULT 'CLOSED',
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 
-                # Insert into closed positions
-                closed_query = """
-                INSERT INTO closed_option_positions (
-                    position_id, contract_symbol, underlying, strategy, entry_time, exit_time,
-                    entry_price, exit_price, quantity, premium_risk, pnl, returns, exit_reason,
-                    created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """
+                # Create equity_curve table
+                cursor.execute("""
+                    CREATE TABLE equity_curve (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        timestamp DATETIME NOT NULL,
+                        capital REAL NOT NULL,
+                        open_trades INTEGER DEFAULT 0,
+                        daily_pnl REAL DEFAULT 0,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 
-                cursor.execute(closed_query, (
-                    position_id,
-                    exit_data.get('contract_symbol'),
-                    exit_data.get('underlying'),
-                    exit_data.get('strategy'),
-                    exit_data.get('entry_time'),
-                    exit_data.get('exit_time'),
-                    exit_data.get('entry_price'),
-                    exit_data.get('exit_price'),
-                    exit_data.get('quantity'),
-                    exit_data.get('premium_risk'),
-                    exit_data.get('pnl'),
-                    exit_data.get('returns'),
-                    exit_data.get('exit_reason'),
-                    datetime.now().isoformat()
-                ))
-            else:
-                # Just update status
-                cursor.execute('UPDATE open_option_positions SET status = ? WHERE position_id = ?', (status, position_id))
-            
-            conn.commit()
-            conn.close()
-            
+                # Create performance_metrics table
+                cursor.execute("""
+                    CREATE TABLE performance_metrics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        timestamp DATETIME NOT NULL,
+                        total_trades INTEGER DEFAULT 0,
+                        winning_trades INTEGER DEFAULT 0,
+                        losing_trades INTEGER DEFAULT 0,
+                        win_rate REAL DEFAULT 0,
+                        total_pnl REAL DEFAULT 0,
+                        avg_pnl REAL DEFAULT 0,
+                        max_drawdown REAL DEFAULT 0,
+                        sharpe_ratio REAL DEFAULT 0,
+                        profit_factor REAL DEFAULT 0,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                
+                conn.commit()
+                logger.info("✅ Unified database schema created successfully")
+                
         except Exception as e:
-            print(f"❌ Error updating option position status: {e}")
+            logger.error(f"❌ Error initializing database: {e}")
+            raise
+    
+    def save_trading_signal(self, signal):
+        """Save trading signal to database."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO trading_signals 
+                    (timestamp, strategy, signal, symbol, price, confidence, reasoning)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    signal['timestamp'],
+                    signal['strategy'],
+                    signal['signal'],
+                    signal.get('symbol', ''),
+                    signal['price'],
+                    signal.get('confidence', 0),
+                    signal.get('reasoning', '')
+                ))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Error saving trading signal: {e}")
+    
+    def save_rejected_signal(self, rejected_signal):
+        """Save rejected signal to database."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO rejected_signals 
+                    (id, timestamp, strategy, signal_type, underlying, price, confidence, reasoning, rejection_reason)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    rejected_signal.id,
+                    rejected_signal.timestamp,
+                    rejected_signal.strategy,
+                    rejected_signal.signal_type,
+                    rejected_signal.underlying,
+                    rejected_signal.price,
+                    rejected_signal.confidence,
+                    rejected_signal.reasoning,
+                    rejected_signal.rejection_reason
+                ))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Error saving rejected signal: {e}")
+    
+    def save_open_option_position(self, trade):
+        """Save open option position to database."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO open_option_positions 
+                    (id, timestamp, contract_symbol, underlying, strategy, signal_type, 
+                     entry_price, quantity, lot_size, strike, expiry, option_type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    trade.id,
+                    trade.timestamp,
+                    trade.contract_symbol,
+                    trade.underlying,
+                    trade.strategy,
+                    trade.signal_type,
+                    trade.entry_price,
+                    trade.quantity,
+                    trade.lot_size,
+                    trade.strike,
+                    trade.expiry,
+                    trade.option_type
+                ))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Error saving open option position: {e}")
+    
+    def update_option_position_status(self, trade_id: str, status: str, pnl: float = None, exit_reason: str = None):
+        """Update option position status and move to closed table if needed."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                if status == 'CLOSED':
+                    # Get the open position
+                    cursor.execute("SELECT * FROM open_option_positions WHERE id = ?", (trade_id,))
+                    open_position = cursor.fetchone()
+                    
+                    if open_position:
+                        # Insert into closed table
+                        cursor.execute("""
+                            INSERT INTO closed_option_positions 
+                            (id, entry_timestamp, exit_timestamp, contract_symbol, underlying, strategy, signal_type,
+                             entry_price, exit_price, quantity, lot_size, strike, expiry, option_type, pnl, exit_reason)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            open_position[0],  # id
+                            open_position[1],  # timestamp
+                            datetime.now(),   # exit_timestamp
+                            open_position[2],  # contract_symbol
+                            open_position[3],  # underlying
+                            open_position[4],  # strategy
+                            open_position[5],  # signal_type
+                            open_position[6],  # entry_price
+                            None,             # exit_price (will be updated)
+                            open_position[7],  # quantity
+                            open_position[8],  # lot_size
+                            open_position[9],  # strike
+                            open_position[10], # expiry
+                            open_position[11], # option_type
+                            pnl,              # pnl
+                            exit_reason       # exit_reason
+                        ))
+                        
+                        # Delete from open table
+                        cursor.execute("DELETE FROM open_option_positions WHERE id = ?", (trade_id,))
+                
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Error updating option position status: {e}")
+    
+    def save_equity_point(self, timestamp: datetime, capital: float, open_trades: int, daily_pnl: float):
+        """Save equity curve point."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO equity_curve (timestamp, capital, open_trades, daily_pnl)
+                    VALUES (?, ?, ?, ?)
+                """, (timestamp, capital, open_trades, daily_pnl))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Error saving equity point: {e}")
+    
+    def save_performance_metrics(self, metrics: Dict):
+        """Save performance metrics for a session."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO performance_metrics 
+                    (session_date, initial_capital, final_capital, total_trades, winning_trades, 
+                     losing_trades, win_rate, total_pnl, avg_pnl, max_drawdown, rejected_signals)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    datetime.now().date(),
+                    metrics['initial_capital'],
+                    metrics['current_capital'],
+                    metrics['total_trades'],
+                    metrics['winning_trades'],
+                    metrics['losing_trades'],
+                    metrics['win_rate'],
+                    metrics['total_pnl'],
+                    metrics['avg_pnl'],
+                    metrics['max_drawdown'],
+                    metrics.get('rejected_signals', 0)
+                ))
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Error saving performance metrics: {e}")
 
     def get_open_option_positions(self) -> List[Dict]:
-        """Get all open option positions from database."""
+        """Get all open option positions."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Create table if it doesn't exist
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS open_option_positions (
-                    position_id TEXT PRIMARY KEY,
-                    contract_symbol TEXT NOT NULL,
-                    underlying TEXT NOT NULL,
-                    strategy TEXT NOT NULL,
-                    entry_time TEXT NOT NULL,
-                    entry_price REAL NOT NULL,
-                    quantity INTEGER NOT NULL,
-                    premium_risk REAL NOT NULL,
-                    strike REAL NOT NULL,
-                    expiry TEXT NOT NULL,
-                    option_type TEXT NOT NULL,
-                    lot_size INTEGER NOT NULL,
-                    status TEXT DEFAULT 'OPEN',
-                    created_at TEXT NOT NULL
-                )
-            ''')
-            
-            query = "SELECT * FROM open_option_positions WHERE status = 'OPEN'"
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            
-            positions = []
-            for row in rows:
-                positions.append({
-                    'id': row[0],
-                    'contract_symbol': row[1],
-                    'underlying': row[2],
-                    'strategy': row[3],
-                    'entry_time': row[4],
-                    'entry_price': row[5],
-                    'quantity': row[6],
-                    'premium_risk': row[7],
-                    'strike': row[8],
-                    'expiry': row[9],
-                    'option_type': row[10],
-                    'lot_size': row[11]
-                })
-            
-            conn.close()
-            return positions
-            
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM open_option_positions WHERE status = 'OPEN'")
+                rows = cursor.fetchall()
+                
+                positions = []
+                for row in rows:
+                    positions.append({
+                        'id': row[0],
+                        'timestamp': row[1],
+                        'contract_symbol': row[2],
+                        'underlying': row[3],
+                        'strategy': row[4],
+                        'signal_type': row[5],
+                        'entry_price': row[6],
+                        'quantity': row[7],
+                        'lot_size': row[8],
+                        'strike': row[9],
+                        'expiry': row[10],
+                        'option_type': row[11]
+                    })
+                
+                return positions
         except Exception as e:
-            print(f"❌ Error getting open option positions: {e}")
-            return [] 
+            logger.error(f"❌ Error getting open positions: {e}")
+            return []
+    
+    def get_trading_signals(self, start_date: datetime = None, end_date: datetime = None) -> List[Dict]:
+        """Get trading signals with optional date filtering."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+            
+                query = "SELECT * FROM trading_signals"
+                params = []
+                
+                if start_date and end_date:
+                    query += " WHERE timestamp BETWEEN ? AND ?"
+                    params = [start_date, end_date]
+                elif start_date:
+                    query += " WHERE timestamp >= ?"
+                    params = [start_date]
+                elif end_date:
+                    query += " WHERE timestamp <= ?"
+                    params = [end_date]
+                
+                query += " ORDER BY timestamp DESC"
+                
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+                
+                signals = []
+                for row in rows:
+                    signals.append({
+                        'id': row[0],
+                        'timestamp': row[1],
+                        'strategy': row[2],
+                        'signal': row[3],
+                        'symbol': row[4],
+                        'price': row[5],
+                        'confidence': row[6],
+                        'reasoning': row[7]
+                    })
+                
+                return signals
+        except Exception as e:
+            logger.error(f"❌ Error getting trading signals: {e}")
+            return []
+    
+    def get_rejected_signals(self, start_date: datetime = None, end_date: datetime = None) -> List[Dict]:
+        """Get rejected signals with optional date filtering."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+            
+                query = "SELECT * FROM rejected_signals"
+                params = []
+                
+                if start_date and end_date:
+                    query += " WHERE timestamp BETWEEN ? AND ?"
+                    params = [start_date, end_date]
+                elif start_date:
+                    query += " WHERE timestamp >= ?"
+                    params = [start_date]
+                elif end_date:
+                    query += " WHERE timestamp <= ?"
+                    params = [end_date]
+                
+                query += " ORDER BY timestamp DESC"
+                
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+                
+                signals = []
+                for row in rows:
+                    signals.append({
+                        'id': row[0],
+                        'timestamp': row[1],
+                        'strategy': row[2],
+                        'signal_type': row[3],
+                        'underlying': row[4],
+                        'price': row[5],
+                        'confidence': row[6],
+                        'reasoning': row[7],
+                        'rejection_reason': row[8]
+                    })
+                
+                return signals
+        except Exception as e:
+            logger.error(f"❌ Error getting rejected signals: {e}")
+            return []
+
+    def get_performance_summary(self) -> Dict:
+        """Get overall performance summary."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+            
+                # Get total signals
+                cursor.execute("SELECT COUNT(*) FROM trading_signals")
+                total_signals = cursor.fetchone()[0]
+                
+                # Get total rejected signals
+                cursor.execute("SELECT COUNT(*) FROM rejected_signals")
+                total_rejected = cursor.fetchone()[0]
+                
+                # Get total trades
+                cursor.execute("SELECT COUNT(*) FROM closed_option_positions")
+                total_trades = cursor.fetchone()[0]
+                
+                # Get winning trades
+                cursor.execute("SELECT COUNT(*) FROM closed_option_positions WHERE pnl > 0")
+                winning_trades = cursor.fetchone()[0]
+                
+                # Get total P&L
+                cursor.execute("SELECT SUM(pnl) FROM closed_option_positions")
+                total_pnl = cursor.fetchone()[0] or 0
+                
+                # Get average P&L
+                cursor.execute("SELECT AVG(pnl) FROM closed_option_positions")
+                avg_pnl = cursor.fetchone()[0] or 0
+                
+                return {
+                    'total_signals': total_signals,
+                    'total_rejected': total_rejected,
+                    'total_trades': total_trades,
+                    'winning_trades': winning_trades,
+                    'win_rate': (winning_trades / total_trades * 100) if total_trades > 0 else 0,
+                    'total_pnl': total_pnl,
+                    'avg_pnl': avg_pnl
+                }
+        except Exception as e:
+            logger.error(f"❌ Error getting performance summary: {e}")
+            return {} 

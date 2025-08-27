@@ -23,7 +23,7 @@ import traceback
 sys.path.append(str(Path(__file__).parent / "src"))
 
 from src.data.local_data_loader import LocalDataLoader
-from src.models.unified_database import UnifiedDatabase
+from src.models.backtest_database import BacktestDatabase
 from src.core.indicators import add_technical_indicators
 
 # Configure logging
@@ -37,7 +37,7 @@ class OptimizedBacktester:
     def __init__(self):
         """Initialize the optimized backtester"""
         self.base_dir = Path("historical_data_20yr")
-        self.db = UnifiedDatabase()
+        self.db = BacktestDatabase()
         self.data_loader = LocalDataLoader()
         
         # Performance tracking
@@ -140,7 +140,7 @@ class OptimizedBacktester:
             logger.error(f"❌ Error adding indicators: {e}")
             return df
     
-    def run_enhanced_strategies_optimized(self, df, symbol, disable_tqdm: bool = False):
+    def run_enhanced_strategies_optimized(self, df, symbol, session_id, disable_tqdm: bool = False):
         """Run all enhanced strategies with optimized processing - row-wise + parallel.
            Assumes indicators are already present in df (do NOT recompute here)."""
         start_time = time.time()
@@ -179,7 +179,7 @@ class OptimizedBacktester:
                     signals_df = strategy.analyze_vectorized(df)
                     
                     if not signals_df.empty:
-                        # Convert DataFrame signals to list format
+                        # Convert DataFrame signals to list format and log to database
                         for idx, row in signals_df.iterrows():
                             signal = {
                                 'timestamp': df.loc[idx, 'timestamp'],
@@ -195,6 +195,22 @@ class OptimizedBacktester:
                                 'position_multiplier': row['position_multiplier']
                             }
                             strategy_signals.append(signal)
+                            
+                            # Log signal to database
+                            signal_id = self.db.save_backtest_signal(
+                                session_id=session_id,
+                                timestamp=signal['timestamp'],
+                                strategy_name=signal['strategy'],
+                                signal_type=signal['signal'],
+                                price=signal['price'],
+                                confidence=signal['confidence'],
+                                reasoning=signal['reasoning'],
+                                stop_loss=signal['stop_loss'],
+                                target1=signal['target1'],
+                                target2=signal['target2'],
+                                target3=signal['target3'],
+                                position_multiplier=signal['position_multiplier']
+                            )
                     
                     logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals (vectorized)")
                     return strategy_signals
@@ -234,6 +250,22 @@ class OptimizedBacktester:
                                     'position_multiplier': result.get('position_multiplier', 1.0)
                                 }
                                 strategy_signals.append(signal)
+                                
+                                # Log signal to database
+                                signal_id = self.db.save_backtest_signal(
+                                    session_id=session_id,
+                                    timestamp=signal['timestamp'],
+                                    strategy_name=signal['strategy'],
+                                    signal_type=signal['signal'],
+                                    price=signal['price'],
+                                    confidence=signal['confidence'],
+                                    reasoning=signal['reasoning'],
+                                    stop_loss=signal['stop_loss'],
+                                    target1=signal['target1'],
+                                    target2=signal['target2'],
+                                    target3=signal['target3'],
+                                    position_multiplier=signal['position_multiplier']
+                                )
                         except Exception as e:
                             # log for debugging, but continue processing
                             logger.debug(f"⚠️ {strategy_name} row {j} error: {e}")
@@ -268,7 +300,7 @@ class OptimizedBacktester:
         logger.info(f"✅ Strategy analysis completed in {strategy_time:.2f}s")
         return signals
     
-    def simulate_trades_optimized(self, signals, df):
+    def simulate_trades_optimized(self, signals, df, session_id):
         """Simulate trades with optimized performance using NumPy vectorized operations and correct earliest-hit logic."""
         start_time = time.time()
         trades = []
@@ -430,6 +462,34 @@ class OptimizedBacktester:
                     'position_multiplier': position_multiplier
                 }
                 trades.append(trade)
+                
+                # Log trade to database
+                try:
+                    # Find the signal ID for this trade
+                    signal_id = None
+                    # For now, we'll use a simple approach - in a real system you'd track signal IDs
+                    
+                    # Save trade to database
+                    trade_id = self.db.save_backtest_trade(
+                        session_id=session_id,
+                        signal_id=signal_id or 0,  # Use 0 if no signal ID tracking
+                        strategy_name=signal['strategy'],
+                        entry_timestamp=signal_time,
+                        entry_price=signal_price,
+                        quantity=int(position_multiplier)
+                    )
+                    
+                    # Close the trade immediately (since this is backtesting)
+                    if trade_id:
+                        self.db.close_backtest_trade(
+                            trade_id=trade_id,
+                            exit_timestamp=signal_time,  # Use same timestamp for simplicity
+                            exit_price=float(exit_price),
+                            pnl=float(pnl),
+                            exit_reason=outcome
+                        )
+                except Exception as e:
+                    logger.debug(f"⚠️ Error logging trade to database: {e}")
 
             except Exception as e:
                 logger.debug(f"⚠️ simulate_trades error for signal {signal}: {e}")
@@ -442,9 +502,21 @@ class OptimizedBacktester:
         return trades
     
     def run_backtest(self, symbol, timeframe, days=30):
-        """Run complete optimized backtest"""
+        """Run complete optimized backtest with session management"""
         self.start_time = time.time()
         logger.info(f"🧠 Running optimized backtest: {symbol} {timeframe} ({days} days)")
+        
+        # Create backtest session
+        session_id = f"backtest_{symbol.replace(':', '_')}_{timeframe}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        session_name = f"Backtest {symbol} {timeframe} {days} days"
+        start_date = datetime.now() - timedelta(days=days)
+        end_date = datetime.now()
+        initial_capital = 100000.0
+        
+        # Initialize session in database
+        self.db.create_backtest_session(session_id, session_name, start_date, end_date, 
+                                       symbol, timeframe, initial_capital)
+        logger.info(f"📊 Created backtest session: {session_id}")
         
         # Load data
         df = self.load_data_optimized(symbol, timeframe, days)
@@ -454,13 +526,36 @@ class OptimizedBacktester:
         # Add indicators ONCE
         df = self.add_indicators_optimized(df)
         
-        # Generate signals (DO NOT recalc indicators inside the function)
-        signals = self.run_enhanced_strategies_optimized(df, symbol, disable_tqdm=self.disable_tqdm)
+        # Generate signals with session logging
+        signals = self.run_enhanced_strategies_optimized(df, symbol, session_id, disable_tqdm=self.disable_tqdm)
         logger.info(f"📊 Generated {len(signals)} signals")
         
-        # Simulate trades
-        trades = self.simulate_trades_optimized(signals, df)
+        # Simulate trades with session logging
+        trades = self.simulate_trades_optimized(signals, df, session_id)
         logger.info(f"📈 Simulated {len(trades)} trades")
+        
+        # Analyze results
+        results = self.analyze_results(trades)
+        
+        # Finalize session
+        if results:
+            final_capital = initial_capital + results['total_pnl']
+            total_return = (final_capital - initial_capital) / initial_capital * 100
+            
+            self.db.finalize_backtest_session(
+                session_id=session_id,
+                final_capital=final_capital,
+                total_return=total_return,
+                max_drawdown=results.get('max_drawdown', 0),
+                sharpe_ratio=results.get('sharpe_ratio', 0),
+                profit_factor=results.get('profit_factor', 0),
+                total_trades=results['total_trades'],
+                winning_trades=results['wins'],
+                win_rate=results['win_rate'],
+                avg_trade_duration=results.get('avg_duration', 0)
+            )
+            
+            logger.info(f"✅ Session finalized: {session_id}")
         
         # Clean up memory
         del df, signals
