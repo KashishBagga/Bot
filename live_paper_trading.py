@@ -12,8 +12,11 @@ import argparse
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 import json
+import sqlite3
+from pathlib import Path
+import uuid
 import threading
 from dataclasses import dataclass
 
@@ -78,19 +81,11 @@ class RejectedSignal:
 
 
 class LivePaperTradingSystem:
-    def __init__(
-        self,
-        initial_capital: float = 100000.0,
-        max_risk_per_trade: float = 0.02,
-        confidence_cutoff: float = 40.0,
-        exposure_limit: float = 0.6,
-        max_daily_loss_pct: float = 0.03,
-        commission_bps: float = 1.0,
-        slippage_bps: float = 5.0,
-        symbols: List[str] = None,
-        data_provider: str = "paper"
-    ):
-        """Initialize live paper trading system."""
+    def __init__(self, initial_capital: float = 100000.0, max_risk_per_trade: float = 0.02,
+                 confidence_cutoff: float = 40.0, exposure_limit: float = 0.6,
+                 max_daily_loss_pct: float = 0.03, commission_bps: float = 1.0,
+                 slippage_bps: float = 5.0, symbols: List[str] = None, data_provider: str = 'paper'):
+        """Initialize the live paper trading system."""
         self.initial_capital = float(initial_capital)
         self.current_capital = float(initial_capital)
         self.max_risk_per_trade = float(max_risk_per_trade)
@@ -100,8 +95,25 @@ class LivePaperTradingSystem:
         self.commission_bps = commission_bps
         self.slippage_bps = slippage_bps
         self.symbols = symbols or ['NSE:NIFTY50-INDEX']
-        self.data_provider = data_provider
-
+        
+        # Trading state
+        self.open_trades = {}
+        self.closed_trades = []
+        self.daily_pnl = 0.0
+        self.daily_loss_limit_hit = False
+        self.is_running = False
+        
+        # Data caching for performance
+        self.data_cache = {}  # symbol -> (data, last_update_time)
+        self.cache_duration = 60  # seconds - refresh cache every minute
+        self.max_cached_candles = 1000
+        
+        # Performance tracking
+        self.total_signals_generated = 0
+        self.total_signals_rejected = 0
+        self.total_trades_executed = 0
+        self.session_start_time = datetime.now()
+        
         # Initialize components
         self.db = UnifiedDatabase()
         self.data_loader = LocalDataLoader()
@@ -111,53 +123,30 @@ class LivePaperTradingSystem:
         self.db.init_database()
         
         # Real-time data manager - use Fyers if credentials available, otherwise paper broker
-        if data_provider == "fyers":
+        if data_provider == 'fyers':
             try:
-                from src.data.realtime_data_manager import create_data_provider
-                from refresh_fyers_token import check_and_refresh_token
-                
-                # Get fresh token
-                access_token = check_and_refresh_token()
-                if access_token:
-                    fyers_provider = create_data_provider('fyers', app_id="C607KIH6W0-100", access_token=access_token)
-                    if fyers_provider.connect():
-                        self.data_manager = RealTimeDataManager(fyers_provider)
-                        logger.info("✅ Using Fyers live data with fresh token")
-                    else:
-                        self.data_manager = RealTimeDataManager([PaperBrokerAPI()])
-                        logger.info("⚠️ Fyers connection failed, using paper broker")
-                else:
-                    self.data_manager = RealTimeDataManager([PaperBrokerAPI()])
-                    logger.info("⚠️ Could not get Fyers token, using paper broker")
+                from src.data.realtime_data_manager import FyersDataProvider
+                self.data_manager = FyersDataProvider()
+                logger.info("✅ Using Fyers live data")
             except Exception as e:
-                logger.error(f"❌ Error setting up Fyers: {e}")
-                self.data_manager = RealTimeDataManager([PaperBrokerAPI()])
-                logger.info("⚠️ Using paper broker as fallback")
+                logger.warning(f"⚠️ Fyers not available, falling back to paper data: {e}")
+                self.data_manager = None
         else:
-            self.data_manager = RealTimeDataManager([PaperBrokerAPI()])
-
-        # Trading state
-        self.open_trades: Dict[str, PaperTrade] = {}
-        self.closed_trades: List[PaperTrade] = []
-        self.rejected_signals: List[RejectedSignal] = []
-        self.daily_pnl = 0.0
-        self.daily_loss_limit_hit = False
-        self.max_drawdown = 0.0
-        self.peak_capital = float(initial_capital)
-        self.equity_curve = []
-        self.is_running = False
-
-        # ALL strategies run by default
-        self.strategy_instances = {
+            self.data_manager = None
+            logger.info("✅ Using paper data simulation")
+        
+        # Initialize strategies
+        self.strategies = {
             'ema_crossover_enhanced': EmaCrossoverEnhanced(),
             'supertrend_ema': SupertrendEma(),
             'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
         }
-
+        
         logger.info(f"🚀 Live Paper Trading System initialized with ₹{initial_capital:,.2f} capital")
-        logger.info(f"📊 Symbols: {self.symbols}")
-        logger.info(f"📈 ALL Strategies Active: {list(self.strategy_instances.keys())}")
-        logger.info(f"🔄 Data Provider: {data_provider}")
+        logger.info(f"📊 Symbols: {', '.join(self.symbols)}")
+        logger.info(f"🎯 Strategies: {', '.join(self.strategies.keys())}")
+        logger.info(f"📛 Risk: {max_risk_per_trade*100:.1f}% per trade, {exposure_limit*100:.1f}% max exposure")
+        logger.info(f"📉 Daily loss limit: {max_daily_loss_pct*100:.1f}%")
 
     def _apply_slippage(self, price: float, is_buy: bool) -> float:
         """Apply slippage to price."""
@@ -227,70 +216,152 @@ class LivePaperTradingSystem:
             logger.error(f"❌ Error selecting option contract: {e}")
             return None
 
-    def _open_paper_trade(self, signal: Dict, option_contract: OptionContract, 
-                         entry_price: float, timestamp: datetime) -> Optional[str]:
-        """Open a paper trade."""
+    def _open_paper_trade(self, signal: Dict, option_contract: Any, entry_price: float, timestamp: datetime) -> Optional[str]:
+        """Open a new paper trade with improved position sizing and risk management."""
         try:
-            # Calculate position size
-            risk_amount = self.current_capital * self.max_risk_per_trade
-            confidence = float(signal.get('confidence', 50))
-            confidence_multiplier = min(max(confidence / 50.0, 0.5), 1.5)
-            adjusted_risk = risk_amount * confidence_multiplier
+            # Generate unique trade ID using UUID
+            trade_id = str(uuid.uuid4())
             
-            premium_per_lot = entry_price * option_contract.lot_size
-            max_lots = int(adjusted_risk / premium_per_lot)
+            # Calculate position size with dynamic lot sizing
+            position_size = self._calculate_dynamic_position_size(signal, entry_price)
+            if position_size <= 0:
+                logger.info(f"⚠️ Position size too small for {signal['strategy']}")
+                return None
             
-            # Cap by available capital
-            available_capital = self.current_capital * 0.9
-            max_affordable_lots = int(available_capital // premium_per_lot)
-            max_lots = min(max_lots, max_affordable_lots, 10)  # Max 10 lots
+            # Calculate notional value
+            notional_value = position_size * entry_price
             
-            if max_lots < 1:
-                if premium_per_lot <= available_capital:
-                    max_lots = 1
-                else:
-                    return None
-
-            # Apply slippage
-            exec_price = self._apply_slippage(entry_price, is_buy=True)
+            # Check exposure limits with symbol-wise tracking
+            if not self._check_exposure_limits(signal['symbol'], notional_value):
+                logger.warning(f"🚫 Exposure limit exceeded for {signal['symbol']}")
+                return None
             
-            # Calculate commission
-            notional = max_lots * exec_price * option_contract.lot_size
-            commission = self._commission_amount(notional)
+            # Apply slippage and commission
+            execution_price = self._apply_slippage(entry_price, True)  # True for buy
+            commission = self._commission_amount(notional_value)
             
-            # Deduct commission
-            self.current_capital -= commission
-
-            # Create trade
-            trade_id = f"{option_contract.symbol}_{int(time.time())}"
+            # Create trade object
             trade = PaperTrade(
                 id=trade_id,
                 timestamp=timestamp,
-                contract_symbol=option_contract.symbol,
+                contract_symbol=signal['symbol'],
                 underlying=option_contract.underlying,
                 strategy=signal['strategy'],
                 signal_type=signal['signal'],
-                entry_price=exec_price,
-                quantity=max_lots * option_contract.lot_size,
+                entry_price=execution_price,
+                quantity=position_size,
                 lot_size=option_contract.lot_size,
                 strike=option_contract.strike,
                 expiry=option_contract.expiry,
-                option_type=option_contract.option_type.value
+                option_type=option_contract.option_type.value,
+                status='OPEN',
+                commission=commission,
+                confidence=signal.get('confidence', 0),
+                reasoning=signal.get('reasoning', ''),
+                stop_loss=signal.get('stop_loss'),
+                target1=signal.get('target1'),
+                target2=signal.get('target2'),
+                target3=signal.get('target3')
             )
-
+            
+            # Deduct capital
+            self.current_capital -= (notional_value + commission)
+            
+            # Store trade
             self.open_trades[trade_id] = trade
             
-            # Log trade to database
+            # Log to database
             self.db.save_open_option_position(trade)
             
-            logger.info(f"✅ Opened {signal['signal']} paper trade: {trade_id}")
-            logger.info(f"   Contract: {option_contract.symbol} | Size: {max_lots} lots | Premium: ₹{notional:,.2f}")
+            self.total_trades_executed += 1
+            
+            logger.info(f"✅ Opened trade {trade_id[:8]}... | {signal['signal']} {signal['strategy']}")
+            logger.info(f"   Symbol: {signal['symbol']} | Size: {position_size} | Price: ₹{execution_price:.2f}")
+            logger.info(f"   Notional: ₹{notional_value:,.2f} | Commission: ₹{commission:.2f}")
             
             return trade_id
-
+            
         except Exception as e:
-            logger.error(f"❌ Error opening paper trade: {e}")
+            logger.error(f"❌ Error opening trade: {e}")
             return None
+    
+    def _calculate_dynamic_position_size(self, signal: Dict, entry_price: float) -> int:
+        """Calculate position size with dynamic lot sizing based on confidence and volatility."""
+        try:
+            # Base risk amount
+            base_risk = self.current_capital * self.max_risk_per_trade
+            
+            # Confidence multiplier (0.5 to 2.0 based on confidence)
+            confidence = signal.get('confidence', 50)
+            confidence_multiplier = max(0.5, min(2.0, confidence / 50.0))
+            
+            # Volatility adjustment (if we have ATR data)
+            volatility_multiplier = 1.0
+            if 'atr' in signal:
+                # Adjust based on ATR - higher volatility = smaller position
+                atr = signal['atr']
+                if atr and atr > 0:
+                    volatility_multiplier = max(0.5, min(1.5, 1.0 / (atr / entry_price)))
+            
+            # Calculate adjusted risk
+            adjusted_risk = base_risk * confidence_multiplier * volatility_multiplier
+            
+            # Calculate position size
+            if signal.get('stop_loss'):
+                risk_per_unit = abs(entry_price - signal['stop_loss'])
+            else:
+                # Default 2% risk per unit if no stop loss
+                risk_per_unit = entry_price * 0.02
+            
+            if risk_per_unit <= 0:
+                return 0
+            
+            position_size = int(adjusted_risk / risk_per_unit)
+            
+            # Ensure minimum position size
+            min_position = 1
+            if position_size < min_position:
+                position_size = min_position if adjusted_risk >= risk_per_unit else 0
+            
+            return position_size
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating position size: {e}")
+            return 0
+    
+    def _check_exposure_limits(self, symbol: str, new_notional: float) -> bool:
+        """Check exposure limits with symbol-wise tracking."""
+        try:
+            # Calculate current exposure by symbol
+            symbol_exposure = 0.0
+            total_exposure = 0.0
+            
+            for trade in self.open_trades.values():
+                trade_notional = trade.entry_price * trade.quantity
+                total_exposure += trade_notional
+                if trade.contract_symbol == symbol:
+                    symbol_exposure += trade_notional
+            
+            # Add new trade
+            total_exposure += new_notional
+            symbol_exposure += new_notional
+            
+            # Check total exposure limit
+            if total_exposure / self.current_capital > self.exposure_limit:
+                logger.warning(f"🚫 Total exposure limit exceeded: {total_exposure/self.current_capital:.2%}")
+                return False
+            
+            # Check symbol-specific exposure limit (50% of total limit)
+            symbol_limit = self.exposure_limit * 0.5
+            if symbol_exposure / self.current_capital > symbol_limit:
+                logger.warning(f"🚫 Symbol exposure limit exceeded for {symbol}: {symbol_exposure/self.current_capital:.2%}")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking exposure limits: {e}")
+            return False
 
     def _close_paper_trade(self, trade_id: str, exit_price: float, 
                           exit_reason: str, timestamp: datetime) -> Optional[PaperTrade]:
@@ -348,42 +419,100 @@ class LivePaperTradingSystem:
         
         return trade
 
-    def _check_trade_exits(self, current_prices: Dict[str, float], timestamp: datetime) -> List[PaperTrade]:
-        """Check for trade exits based on current prices."""
-        closed_trades = []
+    def _check_trade_exits(self, current_prices: Dict[str, float], timestamp: datetime) -> List[Dict]:
+        """Check for trade exits using vectorized operations and improved exit logic."""
+        if not self.open_trades:
+            return []
         
-        for trade_id, trade in list(self.open_trades.items()):
-            current_price = current_prices.get(trade.contract_symbol)
-            if current_price is None:
-                continue
-
-            # Premium-based exit logic
-            entry_premium = trade.entry_price
-            premium_change_pct = (current_price - entry_premium) / entry_premium if entry_premium > 0 else 0
-
-            # Exit conditions
+        closed_trades = []
+        trades_to_close = []
+        
+        # Create DataFrame for vectorized operations
+        trades_data = []
+        for trade_id, trade in self.open_trades.items():
+            if trade.contract_symbol in current_prices:
+                trades_data.append({
+                    'trade_id': trade_id,
+                    'trade': trade,
+                    'current_price': current_prices[trade.contract_symbol],
+                    'entry_price': trade.entry_price,
+                    'signal_type': trade.signal_type,
+                    'stop_loss': trade.stop_loss,
+                    'target1': trade.target1,
+                    'target2': trade.target2,
+                    'target3': trade.target3,
+                    'entry_time': trade.timestamp
+                })
+        
+        if not trades_data:
+            return []
+        
+        # Convert to DataFrame for vectorized operations
+        df = pd.DataFrame(trades_data)
+        
+        # Calculate price movements
+        df['price_change_pct'] = (df['current_price'] - df['entry_price']) / df['entry_price']
+        
+        # Check exit conditions vectorized
+        for _, row in df.iterrows():
+            trade_id = row['trade_id']
+            trade = row['trade']
+            current_price = row['current_price']
+            price_change_pct = row['price_change_pct']
+            
             exit_reason = None
-            if premium_change_pct <= -0.5:  # 50% loss
-                exit_reason = 'Stop Loss - Premium -50%'
-            elif premium_change_pct >= 0.5:  # 50% gain
-                exit_reason = 'Target Hit - Premium +50%'
-            elif premium_change_pct <= -0.3:  # 30% loss
-                exit_reason = 'Stop Loss - Premium -30%'
-            elif premium_change_pct >= 0.25:  # 25% gain
-                exit_reason = 'Target Hit - Premium +25%'
-
-            if exit_reason:
-                closed_trade = self._close_paper_trade(trade_id, current_price, exit_reason, timestamp)
-                if closed_trade:
-                    closed_trades.append(closed_trade)
-
+            should_exit = False
+            
+            # Check stop loss
+            if trade.stop_loss:
+                if (trade.signal_type == 'BUY CALL' and current_price <= trade.stop_loss) or \
+                   (trade.signal_type == 'BUY PUT' and current_price >= trade.stop_loss):
+                    exit_reason = 'Stop Loss'
+                    should_exit = True
+            
+            # Check targets (priority order)
+            if not should_exit and trade.target3 and abs(price_change_pct) >= 0.06:  # 6% target
+                exit_reason = 'Target 3'
+                should_exit = True
+            elif not should_exit and trade.target2 and abs(price_change_pct) >= 0.04:  # 4% target
+                exit_reason = 'Target 2'
+                should_exit = True
+            elif not should_exit and trade.target1 and abs(price_change_pct) >= 0.025:  # 2.5% target
+                exit_reason = 'Target 1'
+                should_exit = True
+            
+            # Check time-based exit (if trade is older than 4 hours)
+            if not should_exit:
+                trade_duration = (timestamp - trade.timestamp).total_seconds() / 3600
+                if trade_duration > 4:  # 4 hours
+                    exit_reason = 'Time Exit'
+                    should_exit = True
+            
+            # Check trailing stop (if trade is in profit)
+            if not should_exit and price_change_pct > 0.02:  # 2% profit
+                # Implement trailing stop logic here
+                # For now, use simple trailing stop
+                trailing_stop_pct = 0.01  # 1% trailing stop
+                if price_change_pct < trailing_stop_pct:
+                    exit_reason = 'Trailing Stop'
+                    should_exit = True
+            
+            if should_exit:
+                trades_to_close.append((trade_id, current_price, exit_reason))
+        
+        # Close trades
+        for trade_id, exit_price, exit_reason in trades_to_close:
+            closed_trade = self._close_paper_trade(trade_id, exit_price, exit_reason, timestamp)
+            if closed_trade:
+                closed_trades.append(closed_trade)
+        
         return closed_trades
 
     def _generate_signals(self, index_data: pd.DataFrame) -> List[Dict]:
         """Generate trading signals from ALL strategies."""
         signals = []
         
-        for strategy_name, strategy in self.strategy_instances.items():
+        for strategy_name, strategy in self.strategies.items():
             try:
                 if hasattr(strategy, 'analyze_vectorized'):
                     signals_df = strategy.analyze_vectorized(index_data)
@@ -403,29 +532,146 @@ class LivePaperTradingSystem:
 
         return signals
 
-    def _log_rejected_signal(self, signal: Dict, rejection_reason: str):
-        """Log rejected signal with reasoning."""
-        rejected_signal = RejectedSignal(
-            id=f"rejected_{int(time.time())}",
-            timestamp=signal['timestamp'],
-            strategy=signal['strategy'],
-            signal_type=signal['signal'],
-            underlying=signal.get('underlying', ''),
-            price=signal['price'],
-            confidence=signal['confidence'],
-            reasoning=signal.get('reasoning', ''),
-            rejection_reason=rejection_reason
-        )
-        
-        self.rejected_signals.append(rejected_signal)
-        
-        # Log to database
-        self.db.save_rejected_signal(rejected_signal)
-        
-        logger.debug(f"🚫 Rejected signal: {signal['strategy']} {signal['signal']} - {rejection_reason}")
+    def _log_rejected_signal(self, signal: Dict, reason: str):
+        """Log rejected signal with detailed reasoning for debugging."""
+        try:
+            rejected_signal = RejectedSignal(
+                id=str(uuid.uuid4()),
+                timestamp=datetime.now(),
+                strategy=signal['strategy'],
+                signal_type=signal['signal'],
+                underlying=signal['symbol'],
+                price=signal['price'],
+                confidence=signal.get('confidence', 0),
+                reasoning=signal.get('reasoning', ''),
+                rejection_reason=reason
+            )
+            
+            self.rejected_signals.append(rejected_signal)
+            self.db.save_rejected_signal(rejected_signal)
+            
+            self.total_signals_rejected += 1
+            
+            logger.info(f"🚫 Rejected signal: {signal['strategy']} {signal['signal']} | Reason: {reason}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error logging rejected signal: {e}")
+    
+    def _log_signal_generation(self, symbol: str, signals: List[Dict]):
+        """Log signal generation with detailed metrics."""
+        try:
+            logger.info(f"📈 Generated {len(signals)} signals for {symbol}")
+            
+            # Log signal details
+            for signal in signals:
+                logger.info(f"   {signal['strategy']}: {signal['signal']} @ ₹{signal['price']:.2f} "
+                          f"(Confidence: {signal.get('confidence', 0):.1f})")
+            
+            self.total_signals_generated += len(signals)
+            
+        except Exception as e:
+            logger.error(f"❌ Error logging signal generation: {e}")
+    
+    def _update_performance_metrics(self):
+        """Update and log performance metrics."""
+        try:
+            # Calculate current metrics
+            total_trades = len(self.closed_trades)
+            winning_trades = len([t for t in self.closed_trades if t.pnl > 0])
+            win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
+            
+            total_pnl = sum(t.pnl for t in self.closed_trades)
+            avg_pnl = total_pnl / total_trades if total_trades > 0 else 0
+            
+            # Calculate drawdown
+            peak_capital = self.initial_capital
+            current_capital = self.current_capital
+            for trade in self.closed_trades:
+                if trade.pnl > 0:
+                    current_capital += trade.pnl
+                    peak_capital = max(peak_capital, current_capital)
+            
+            drawdown = ((peak_capital - current_capital) / peak_capital * 100) if peak_capital > 0 else 0
+            
+            # Log performance summary
+            logger.info(f"📊 Performance Update:")
+            logger.info(f"   Trades: {total_trades} | Wins: {winning_trades} | Win Rate: {win_rate:.1f}%")
+            logger.info(f"   P&L: ₹{total_pnl:+.2f} | Avg: ₹{avg_pnl:+.2f}")
+            logger.info(f"   Capital: ₹{self.current_capital:,.2f} | Drawdown: {drawdown:.2f}%")
+            logger.info(f"   Signals: {self.total_signals_generated} generated, {self.total_signals_rejected} rejected")
+            
+            # Save to database
+            self.db.save_performance_metrics(
+                timestamp=datetime.now(),
+                total_trades=total_trades,
+                winning_trades=winning_trades,
+                losing_trades=total_trades - winning_trades,
+                win_rate=win_rate,
+                total_pnl=total_pnl,
+                avg_pnl=avg_pnl,
+                max_drawdown=drawdown
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Error updating performance metrics: {e}")
+    
+    def _generate_session_report(self) -> Dict:
+        """Generate comprehensive session report."""
+        try:
+            session_duration = datetime.now() - self.session_start_time
+            
+            # Calculate metrics
+            total_trades = len(self.closed_trades)
+            winning_trades = len([t for t in self.closed_trades if t.pnl > 0])
+            win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
+            
+            total_pnl = sum(t.pnl for t in self.closed_trades)
+            avg_pnl = total_pnl / total_trades if total_trades > 0 else 0
+            
+            # Strategy performance
+            strategy_performance = {}
+            for trade in self.closed_trades:
+                strategy = trade.strategy
+                if strategy not in strategy_performance:
+                    strategy_performance[strategy] = {'trades': 0, 'wins': 0, 'pnl': 0}
+                
+                strategy_performance[strategy]['trades'] += 1
+                if trade.pnl > 0:
+                    strategy_performance[strategy]['wins'] += 1
+                strategy_performance[strategy]['pnl'] += trade.pnl
+            
+            # Calculate win rates for strategies
+            for strategy in strategy_performance:
+                trades = strategy_performance[strategy]['trades']
+                wins = strategy_performance[strategy]['wins']
+                strategy_performance[strategy]['win_rate'] = (wins / trades * 100) if trades > 0 else 0
+            
+            report = {
+                'session_duration': str(session_duration),
+                'total_signals_generated': self.total_signals_generated,
+                'total_signals_rejected': self.total_signals_rejected,
+                'total_trades_executed': self.total_trades_executed,
+                'total_trades_closed': total_trades,
+                'winning_trades': winning_trades,
+                'losing_trades': total_trades - winning_trades,
+                'win_rate': win_rate,
+                'total_pnl': total_pnl,
+                'avg_pnl': avg_pnl,
+                'initial_capital': self.initial_capital,
+                'final_capital': self.current_capital,
+                'return_pct': ((self.current_capital - self.initial_capital) / self.initial_capital * 100),
+                'strategy_performance': strategy_performance,
+                'open_trades': len(self.open_trades)
+            }
+            
+            return report
+            
+        except Exception as e:
+            logger.error(f"❌ Error generating session report: {e}")
+            return {}
 
     def _trading_loop(self):
-        """Main trading loop."""
+        """Main trading loop with improved monitoring and performance tracking."""
         logger.info("🔄 Starting live paper trading loop...")
         
         while self.is_running:
@@ -445,7 +691,7 @@ class LivePaperTradingSystem:
                 for symbol in self.symbols:
                     try:
                         # Get real-time index price
-                        index_price = self.data_manager.get_underlying_price(symbol)
+                        index_price = self.data_manager.get_underlying_price(symbol) if self.data_manager else None
                         if index_price is None:
                             logger.warning(f"⚠️ Could not get price for {symbol}")
                             continue
@@ -460,7 +706,7 @@ class LivePaperTradingSystem:
                         signals = self._generate_signals(index_data)
                         
                         if signals:
-                            logger.info(f"📈 Generated {len(signals)} signals for {symbol}")
+                            self._log_signal_generation(symbol, signals)
                         
                         # Process new signals
                         for signal in signals:
@@ -489,7 +735,7 @@ class LivePaperTradingSystem:
                         if self.open_trades:
                             current_prices = {}
                             for trade in self.open_trades.values():
-                                price = self.data_manager.get_underlying_price(trade.contract_symbol)
+                                price = self.data_manager.get_underlying_price(trade.contract_symbol) if self.data_manager else None
                                 if price:
                                     current_prices[trade.contract_symbol] = price
 
@@ -498,17 +744,9 @@ class LivePaperTradingSystem:
                                 if closed_trades:
                                     logger.info(f"🔒 Closed {len(closed_trades)} trades")
 
-                        # Update equity curve (less frequently)
-                        if len(self.equity_curve) == 0 or (current_time - self.equity_curve[-1]['timestamp']).seconds > 300:
-                            self.equity_curve.append({
-                                'timestamp': current_time,
-                                'capital': self.current_capital,
-                                'open_trades': len(self.open_trades),
-                                'daily_pnl': self.daily_pnl
-                            })
-                            
-                            # Save to database
-                            self.db.save_equity_point(current_time, self.current_capital, len(self.open_trades), self.daily_pnl)
+                        # Update performance metrics every 10 trades
+                        if len(self.closed_trades) % 10 == 0 and len(self.closed_trades) > 0:
+                            self._update_performance_metrics()
 
                     except Exception as e:
                         logger.error(f"❌ Error processing {symbol}: {e}")
@@ -537,8 +775,14 @@ class LivePaperTradingSystem:
     def _get_recent_index_data(self, symbol: str) -> Optional[pd.DataFrame]:
         """Get recent index data for signal generation."""
         try:
+            # Check cache first
+            if symbol in self.data_cache and \
+               (datetime.now() - self.data_cache[symbol][1]).total_seconds() < self.cache_duration:
+                logger.debug(f"Using cached data for {symbol}")
+                return self.data_cache[symbol][0]
+
             # Load last 1000 candles for signal generation
-            df = self.data_loader.load_data(symbol, '5min', 1000)
+            df = self.data_loader.load_data(symbol, '5min', self.max_cached_candles)
             if df is None or df.empty:
                 return None
 
@@ -547,6 +791,8 @@ class LivePaperTradingSystem:
             backtester = OptimizedBacktester()
             df = backtester.add_indicators_optimized(df)
             
+            # Cache the data
+            self.data_cache[symbol] = (df, datetime.now())
             return df
 
         except Exception as e:
@@ -566,65 +812,69 @@ class LivePaperTradingSystem:
         logger.info("✅ Live paper trading started successfully")
 
     def stop_trading(self):
-        """Stop live paper trading."""
-        logger.info("🛑 Stopping live paper trading...")
+        """Stop the trading system and generate final report."""
+        logger.info("🛑 Stopping paper trading system...")
         self.is_running = False
         
-        # Close all open trades
-        current_prices = {}
-        for trade in self.open_trades.values():
-            current_prices[trade.contract_symbol] = trade.entry_price * 0.5  # Assume 50% loss
+        # Close all open positions
+        if self.open_trades:
+            logger.info(f"🔒 Closing {len(self.open_trades)} open positions...")
+            for trade_id in list(self.open_trades.keys()):
+                # Use current market price or last known price
+                exit_price = self.open_trades[trade_id].entry_price * 0.5  # Assume 50% loss for manual close
+                self._close_paper_trade(trade_id, exit_price, "Manual Close", datetime.now())
         
-        for trade_id in list(self.open_trades.keys()):
-            self._close_paper_trade(trade_id, current_prices.get(trade_id, 0), 'Trading Stopped', datetime.now())
-
-    def get_performance_report(self) -> Dict:
-        """Get performance report."""
-        total_trades = len(self.closed_trades)
-        winning_trades = len([t for t in self.closed_trades if t.pnl > 0])
-        losing_trades = len([t for t in self.closed_trades if t.pnl < 0])
+        # Generate final session report
+        report = self._generate_session_report()
         
-        win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
-        total_pnl = sum(t.pnl for t in self.closed_trades)
-        avg_pnl = total_pnl / total_trades if total_trades > 0 else 0
+        # Print comprehensive session summary
+        self._print_session_summary(report)
         
-        returns = ((self.current_capital - self.initial_capital) / self.initial_capital * 100)
+        logger.info("✅ Paper trading system stopped")
+    
+    def _print_session_summary(self, report: Dict):
+        """Print comprehensive session summary."""
+        if not report:
+            return
         
-        return {
-            'initial_capital': self.initial_capital,
-            'current_capital': self.current_capital,
-            'returns': returns,
-            'total_trades': total_trades,
-            'winning_trades': winning_trades,
-            'losing_trades': losing_trades,
-            'win_rate': win_rate,
-            'total_pnl': total_pnl,
-            'avg_pnl': avg_pnl,
-            'max_drawdown': self.max_drawdown * 100,
-            'open_trades': len(self.open_trades),
-            'daily_pnl': self.daily_pnl,
-            'rejected_signals': len(self.rejected_signals)
-        }
-
-    def print_performance_report(self):
-        """Print performance report."""
-        report = self.get_performance_report()
+        print("\n" + "=" * 80)
+        print("📊 PAPER TRADING SESSION SUMMARY")
+        print("=" * 80)
+        print(f"⏱️ Session Duration: {report.get('session_duration', 'N/A')}")
+        print(f"💰 Initial Capital: ₹{report.get('initial_capital', 0):,.2f}")
+        print(f"💰 Final Capital: ₹{report.get('final_capital', 0):,.2f}")
+        print(f"📈 Return: {report.get('return_pct', 0):+.2f}%")
+        print()
         
-        print("\n" + "=" * 60)
-        print("📊 LIVE PAPER TRADING PERFORMANCE REPORT")
-        print("=" * 60)
-        print(f"💰 Capital: ₹{report['current_capital']:,.2f} / ₹{report['initial_capital']:,.2f}")
-        print(f"📈 Returns: {report['returns']:+.2f}%")
-        print(f"📊 Total Trades: {report['total_trades']}")
-        print(f"✅ Wins: {report['winning_trades']} | ❌ Losses: {report['losing_trades']}")
-        print(f"🎯 Win Rate: {report['win_rate']:.1f}%")
-        print(f"💵 Total P&L: ₹{report['total_pnl']:+.2f}")
-        print(f"📊 Avg P&L: ₹{report['avg_pnl']:+.2f}")
-        print(f"📉 Max Drawdown: {report['max_drawdown']:.2f}%")
-        print(f"📈 Open Trades: {report['open_trades']}")
-        print(f"📊 Daily P&L: ₹{report['daily_pnl']:+.2f}")
-        print(f"🚫 Rejected Signals: {report['rejected_signals']}")
-        print("=" * 60)
+        print("📊 SIGNAL GENERATION:")
+        print(f"   Generated: {report.get('total_signals_generated', 0)}")
+        print(f"   Rejected: {report.get('total_signals_rejected', 0)}")
+        print(f"   Execution Rate: {((report.get('total_trades_executed', 0) / max(report.get('total_signals_generated', 1), 1)) * 100):.1f}%")
+        print()
+        
+        print("📈 TRADE PERFORMANCE:")
+        print(f"   Total Trades: {report.get('total_trades_closed', 0)}")
+        print(f"   Winning Trades: {report.get('winning_trades', 0)}")
+        print(f"   Losing Trades: {report.get('losing_trades', 0)}")
+        print(f"   Win Rate: {report.get('win_rate', 0):.1f}%")
+        print(f"   Total P&L: ₹{report.get('total_pnl', 0):+.2f}")
+        print(f"   Average P&L: ₹{report.get('avg_pnl', 0):+.2f}")
+        print()
+        
+        print("🎯 STRATEGY PERFORMANCE:")
+        strategy_perf = report.get('strategy_performance', {})
+        for strategy, perf in strategy_perf.items():
+            status = "✅ PROFITABLE" if perf['pnl'] > 0 else "❌ LOSS"
+            print(f"   {strategy}:")
+            print(f"     Trades: {perf['trades']} | Win Rate: {perf['win_rate']:.1f}%")
+            print(f"     P&L: ₹{perf['pnl']:+.2f} | Status: {status}")
+        print()
+        
+        print("🔓 OPEN POSITIONS:")
+        print(f"   Remaining: {report.get('open_trades', 0)}")
+        print()
+        
+        print("=" * 80)
 
 
 def main():
