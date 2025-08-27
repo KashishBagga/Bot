@@ -16,7 +16,8 @@ from pathlib import Path
 import gc
 import time
 from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import traceback
 
 # Add src directory to path
 sys.path.append(str(Path(__file__).parent / "src"))
@@ -48,6 +49,7 @@ class OptimizedBacktester:
             'trade_sim_time': 0,
             'db_save_time': 0
         }
+        self.disable_tqdm = False  # Can be set to True for non-interactive environments
         
         logger.info("🚀 Optimized Backtester Initialized")
         logger.info(f"📁 Data Directory: {self.base_dir}")
@@ -138,251 +140,272 @@ class OptimizedBacktester:
             logger.error(f"❌ Error adding indicators: {e}")
             return df
     
-    def run_enhanced_strategies_optimized(self, df, symbol):
-        """Run all enhanced strategies with optimized processing - row-wise + parallel"""
+    def run_enhanced_strategies_optimized(self, df, symbol, disable_tqdm: bool = False):
+        """Run all enhanced strategies with optimized processing - row-wise + parallel.
+           Assumes indicators are already present in df (do NOT recompute here)."""
         start_time = time.time()
         signals = []
-        
+
         # Import enhanced original strategies
         from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
         from src.strategies.supertrend_ema import SupertrendEma
         from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
 
-        # Initialize enhanced original strategies
         strategies = {
             'ema_crossover_enhanced': EmaCrossoverEnhanced(),
             'supertrend_ema': SupertrendEma(),
             'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
         }
-        
+
         logger.info(f"🧠 Running {len(strategies)} enhanced strategies with optimized processing...")
-        
-        # Pre-calculate indicators ONCE for the entire dataset
-        logger.info("📊 Pre-calculating indicators...")
-        df_with_indicators = add_technical_indicators(df)
-        
-        # Cache frequently used calculations
-        df_with_indicators['timestamp'] = pd.to_datetime(df_with_indicators['timestamp'])
-        logger.info(f"📊 Indicators calculated for {len(df_with_indicators)} candles")
-        
-        # Process strategies with row-wise analysis (much faster than slicing)
-        min_candles = 200  # Minimum candles required for analysis
-        
-        # Parallel strategy execution for better performance
+
+        # Ensure timestamp is datetime
+        if df['timestamp'].dtype != 'datetime64[ns]':
+            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+
+        # Pre-cache length
+        n = len(df)
+        min_candles = 200
+
+        # Prepare an index map and maybe column arrays for vectorized access if strategies need them
+        # NOTE: we still call analyze_row for compatibility. If strategies support analyze_vectorized,
+        # that would be faster and we can call it here once per strategy.
         def process_strategy(strategy_name, strategy):
             strategy_signals = []
-            
-            # Use tqdm for progress tracking instead of frequent logging
-            for j in tqdm(range(min_candles, len(df_with_indicators)), 
-                         desc=f"Processing {strategy_name}", 
-                         leave=False):
-                try:
-                    # Row-wise processing - much faster than slicing
-                    row = df_with_indicators.iloc[j]
-                    
-                    # Use analyze_row if available, otherwise fallback to analyze
-                    if hasattr(strategy, 'analyze_row'):
-                        result = strategy.analyze_row(j, row, df_with_indicators)
-                    else:
-                        # Fallback to original method
-                        data_slice = df_with_indicators.iloc[:j+1]
-                        result = strategy.analyze(data_slice)
-                    
-                    if result and result.get('signal') != 'NO TRADE':
-                        signal = {
-                            'timestamp': row['timestamp'],
-                            'strategy': strategy_name,
-                            'signal': result['signal'],
-                            'price': result.get('price', row['close']),
-                            'confidence': result.get('confidence_score', 0),
-                            'reasoning': result.get('reasoning', '')[:100],
-                            'stop_loss': result.get('stop_loss'),
-                            'target1': result.get('target1'),
-                            'target2': result.get('target2'),
-                            'target3': result.get('target3'),
-                            'position_multiplier': result.get('position_multiplier', 1.0)
-                        }
-                        strategy_signals.append(signal)
-                        
-                except Exception as e:
-                    continue
-            
+            try:
+                # prefer an analyze_row API (row-wise), fallback to analyze (slice)
+                use_row = hasattr(strategy, 'analyze_row')
+
+                rng = range(min_candles, n)
+                it = tqdm(rng, desc=f"Processing {strategy_name}", leave=False, disable=disable_tqdm)
+
+                for j in it:
+                    try:
+                        if use_row:
+                            # lightweight row access
+                            row = df.iloc[j]  # acceptable given it's a single Series
+                            result = strategy.analyze_row(j, row, df)
+                        else:
+                            # fallback - still slower
+                            result = strategy.analyze(df.iloc[:j+1])
+
+                        if result and result.get('signal') and result.get('signal') != 'NO TRADE':
+                            signal = {
+                                'timestamp': df.iat[j, df.columns.get_loc('timestamp')],
+                                'strategy': strategy_name,
+                                'signal': result['signal'],
+                                'price': result.get('price', df.iat[j, df.columns.get_loc('close')]),
+                                'confidence': result.get('confidence_score', 0),
+                                'reasoning': str(result.get('reasoning', ''))[:100],
+                                'stop_loss': result.get('stop_loss'),
+                                'target1': result.get('target1'),
+                                'target2': result.get('target2'),
+                                'target3': result.get('target3'),
+                                'position_multiplier': result.get('position_multiplier', 1.0)
+                            }
+                            strategy_signals.append(signal)
+                    except Exception as e:
+                        # log for debugging, but continue processing
+                        logger.debug(f"⚠️ {strategy_name} row {j} error: {e}")
+                        logger.debug(traceback.format_exc())
+                        continue
+            except Exception as e:
+                logger.error(f"❌ Fatal error processing strategy {strategy_name}: {e}")
+                logger.error(traceback.format_exc())
+
             logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals")
             return strategy_signals
-        
+
         # Execute strategies in parallel
-        with ThreadPoolExecutor(max_workers=min(len(strategies), 4)) as executor:
-            futures = {executor.submit(process_strategy, name, strategy): name 
-                      for name, strategy in strategies.items()}
-            
-            for future in futures:
+        max_workers = min(len(strategies), os.cpu_count() or 4)
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_name = {executor.submit(process_strategy, name, strat): name for name, strat in strategies.items()}
+
+            for fut in as_completed(future_to_name):
+                name = future_to_name[fut]
                 try:
-                    strategy_signals = future.result()
-                    signals.extend(strategy_signals)
+                    res = fut.result()
+                    if res:
+                        signals.extend(res)
                 except Exception as e:
-                    logger.error(f"❌ Error in strategy execution: {e}")
-        
+                    logger.error(f"❌ Error in strategy future {name}: {e}")
+                    logger.error(traceback.format_exc())
+
         strategy_time = time.time() - start_time
         self.processing_stats['strategy_time'] = strategy_time
-        
         logger.info(f"✅ Strategy analysis completed in {strategy_time:.2f}s")
         return signals
     
     def simulate_trades_optimized(self, signals, df):
-        """Simulate trades with optimized performance using NumPy vectorized operations"""
+        """Simulate trades with optimized performance using NumPy vectorized operations and correct earliest-hit logic."""
         start_time = time.time()
         trades = []
-        
+
+        # Pre-extract arrays for speed
+        timestamps = df['timestamp'].values
+        lows_arr = df['low'].values
+        highs_arr = df['high'].values
+        closes_arr = df['close'].values
+
         for signal in signals:
             try:
                 signal_time = signal['timestamp']
-                signal_price = signal['price']
+                signal_price = float(signal['price'])
                 signal_type = signal['signal']
-                
-                # Get position multiplier from signal
-                position_multiplier = signal.get('position_multiplier', 1.0)
-                
-                # Use ATR-based stops and targets from enhanced strategies
+                position_multiplier = float(signal.get('position_multiplier', 1.0))
+
+                # compute percents
                 if signal.get('stop_loss') and signal.get('target1'):
-                    stop_loss_pct = signal['stop_loss'] / signal_price
-                    target_pct = signal['target1'] / signal_price
-                    target2_pct = signal.get('target2', signal['target1']) / signal_price
-                    target3_pct = signal.get('target3', signal['target2'] if signal.get('target2') else signal['target1']) / signal_price
+                    stop_loss_pct = float(signal['stop_loss']) / signal_price
+                    target_pct = float(signal['target1']) / signal_price
+                    target2_pct = float(signal.get('target2', signal['target1'])) / signal_price
+                    target3_pct = float(signal.get('target3', signal.get('target2', signal['target1']))) / signal_price
                 else:
-                    # Default percentage-based values
-                    stop_loss_pct = 0.015  # 1.5% stop loss
-                    target_pct = 0.025     # 2.5% first target
-                    target2_pct = 0.04     # 4% second target
-                    target3_pct = 0.06     # 6% third target
-                
-                # Find future data after signal (optimized with NumPy)
-                future_mask = df['timestamp'] > signal_time
-                future_data = df[future_mask].head(50)
-                
-                if future_data.empty:
+                    stop_loss_pct = 0.015
+                    target_pct = 0.025
+                    target2_pct = 0.04
+                    target3_pct = 0.06
+
+                # find start index (first index where timestamp > signal_time)
+                # use numpy searchsorted for speed (timestamps must be sorted)
+                try:
+                    start_idx = np.searchsorted(timestamps, np.datetime64(signal_time), side='right')
+                except Exception:
+                    # fallback to boolean mask
+                    mask = df['timestamp'].values > np.datetime64(signal_time)
+                    start_idx = np.argmax(mask) if mask.any() else len(df)
+
+                if start_idx >= len(df):
                     continue
-                
-                # Use NumPy vectorized operations for much faster processing
+
+                end_idx = min(start_idx + 50, len(df))
+                # slice views (no copy if possible)
+                lows = lows_arr[start_idx:end_idx]
+                highs = highs_arr[start_idx:end_idx]
+                closes = closes_arr[start_idx:end_idx]
+
+                # init outcome values
+                outcome = "Pending"
+                pnl = 0.0
+                exit_price = signal_price
+
                 if signal_type == "BUY CALL":
-                    # Vectorized price calculations
-                    stop_loss_price = signal_price * (1 - stop_loss_pct)
-                    target1_price = signal_price * (1 + target_pct)
-                    target2_price = signal_price * (1 + target2_pct)
-                    target3_price = signal_price * (1 + target3_pct)
-                    
-                    # NumPy vectorized checks
-                    lows = future_data['low'].values
-                    highs = future_data['high'].values
-                    closes = future_data['close'].values
-                    
-                    # Find earliest hit indices
-                    stop_idx = np.where(lows <= stop_loss_price)[0]
-                    t1_idx = np.where(highs >= target1_price)[0]
-                    t2_idx = np.where(highs >= target2_price)[0]
-                    t3_idx = np.where(highs >= target3_price)[0]
-                    
-                    # Determine outcome based on earliest hit
-                    outcome = "Pending"
-                    pnl = 0
-                    exit_price = signal_price
-                    
-                    if len(stop_idx) > 0:
-                        # Stop loss hit first
-                        outcome = "Loss"
-                        pnl = -signal_price * stop_loss_pct * position_multiplier
-                        exit_price = stop_loss_price
-                    elif len(t3_idx) > 0:
-                        # Third target hit
-                        outcome = "Win"
-                        pnl = signal_price * target3_pct * position_multiplier
-                        exit_price = target3_price
-                    elif len(t2_idx) > 0 and len(t1_idx) > 0:
-                        # Second target hit (after first)
-                        outcome = "Win"
-                        pnl = signal_price * target2_pct * position_multiplier
-                        exit_price = target2_price
-                    elif len(t1_idx) > 0:
-                        # First target hit
-                        outcome = "Win"
-                        pnl = signal_price * target_pct * position_multiplier
-                        exit_price = target1_price
-                    else:
-                        # No targets hit, close at last price
-                        last_close = closes[-1]
+                    stop_price = signal_price * (1 - stop_loss_pct)
+                    t1_price = signal_price * (1 + target_pct)
+                    t2_price = signal_price * (1 + target2_pct)
+                    t3_price = signal_price * (1 + target3_pct)
+
+                    # boolean arrays
+                    stop_hit = (lows <= stop_price)
+                    t1_hit = (highs >= t1_price)
+                    t2_hit = (highs >= t2_price)
+                    t3_hit = (highs >= t3_price)
+
+                    # find first indices (or set to large number if not hit)
+                    def first_idx(bool_arr):
+                        idxs = np.nonzero(bool_arr)[0]
+                        return idxs[0] if idxs.size > 0 else np.iinfo(np.int32).max
+
+                    idx_stop = first_idx(stop_hit)
+                    idx_t1 = first_idx(t1_hit)
+                    idx_t2 = first_idx(t2_hit)
+                    idx_t3 = first_idx(t3_hit)
+
+                    # pick earliest event
+                    first_event_idx = min(idx_stop, idx_t1, idx_t2, idx_t3)
+
+                    if first_event_idx == np.iinfo(np.int32).max:
+                        # no events -> close at last close
+                        last_close = float(closes[-1])
                         pnl = (last_close - signal_price) * position_multiplier
                         exit_price = last_close
                         outcome = "Win" if pnl > 0 else "Loss"
-                
-                elif signal_type == "BUY PUT":
-                    # Vectorized price calculations
-                    stop_loss_price = signal_price * (1 + stop_loss_pct)
-                    target1_price = signal_price * (1 - target_pct)
-                    target2_price = signal_price * (1 - target2_pct)
-                    target3_price = signal_price * (1 - target3_pct)
-                    
-                    # NumPy vectorized checks
-                    lows = future_data['low'].values
-                    highs = future_data['high'].values
-                    closes = future_data['close'].values
-                    
-                    # Find earliest hit indices
-                    stop_idx = np.where(highs >= stop_loss_price)[0]
-                    t1_idx = np.where(lows <= target1_price)[0]
-                    t2_idx = np.where(lows <= target2_price)[0]
-                    t3_idx = np.where(lows <= target3_price)[0]
-                    
-                    # Determine outcome based on earliest hit
-                    outcome = "Pending"
-                    pnl = 0
-                    exit_price = signal_price
-                    
-                    if len(stop_idx) > 0:
-                        # Stop loss hit first
-                        outcome = "Loss"
-                        pnl = -signal_price * stop_loss_pct * position_multiplier
-                        exit_price = stop_loss_price
-                    elif len(t3_idx) > 0:
-                        # Third target hit
-                        outcome = "Win"
-                        pnl = signal_price * target3_pct * position_multiplier
-                        exit_price = target3_price
-                    elif len(t2_idx) > 0 and len(t1_idx) > 0:
-                        # Second target hit (after first)
-                        outcome = "Win"
-                        pnl = signal_price * target2_pct * position_multiplier
-                        exit_price = target2_price
-                    elif len(t1_idx) > 0:
-                        # First target hit
-                        outcome = "Win"
-                        pnl = signal_price * target_pct * position_multiplier
-                        exit_price = target1_price
                     else:
-                        # No targets hit, close at last price
-                        last_close = closes[-1]
+                        # decide which event it was
+                        if idx_stop == first_event_idx:
+                            outcome = "Loss"
+                            pnl = -signal_price * stop_loss_pct * position_multiplier
+                            exit_price = stop_price
+                        elif idx_t3 == first_event_idx:
+                            outcome = "Win"
+                            pnl = signal_price * target3_pct * position_multiplier
+                            exit_price = t3_price
+                        elif idx_t2 == first_event_idx:
+                            outcome = "Win"
+                            pnl = signal_price * target2_pct * position_multiplier
+                            exit_price = t2_price
+                        else:  # idx_t1 == first_event_idx
+                            outcome = "Win"
+                            pnl = signal_price * target_pct * position_multiplier
+                            exit_price = t1_price
+
+                elif signal_type == "BUY PUT":
+                    stop_price = signal_price * (1 + stop_loss_pct)
+                    t1_price = signal_price * (1 - target_pct)
+                    t2_price = signal_price * (1 - target2_pct)
+                    t3_price = signal_price * (1 - target3_pct)
+
+                    stop_hit = (highs >= stop_price)
+                    t1_hit = (lows <= t1_price)
+                    t2_hit = (lows <= t2_price)
+                    t3_hit = (lows <= t3_price)
+
+                    def first_idx(bool_arr):
+                        idxs = np.nonzero(bool_arr)[0]
+                        return idxs[0] if idxs.size > 0 else np.iinfo(np.int32).max
+
+                    idx_stop = first_idx(stop_hit)
+                    idx_t1 = first_idx(t1_hit)
+                    idx_t2 = first_idx(t2_hit)
+                    idx_t3 = first_idx(t3_hit)
+
+                    first_event_idx = min(idx_stop, idx_t1, idx_t2, idx_t3)
+
+                    if first_event_idx == np.iinfo(np.int32).max:
+                        last_close = float(closes[-1])
                         pnl = (signal_price - last_close) * position_multiplier
                         exit_price = last_close
                         outcome = "Win" if pnl > 0 else "Loss"
-                
+                    else:
+                        if idx_stop == first_event_idx:
+                            outcome = "Loss"
+                            pnl = -signal_price * stop_loss_pct * position_multiplier
+                            exit_price = stop_price
+                        elif idx_t3 == first_event_idx:
+                            outcome = "Win"
+                            pnl = signal_price * target3_pct * position_multiplier
+                            exit_price = t3_price
+                        elif idx_t2 == first_event_idx:
+                            outcome = "Win"
+                            pnl = signal_price * target2_pct * position_multiplier
+                            exit_price = t2_price
+                        else:  # idx_t1 == first_event_idx
+                            outcome = "Win"
+                            pnl = signal_price * target_pct * position_multiplier
+                            exit_price = t1_price
+
+                # record trade
                 trade = {
                     'timestamp': signal_time,
                     'strategy': signal['strategy'],
                     'signal': signal_type,
                     'entry_price': signal_price,
-                    'exit_price': exit_price,
+                    'exit_price': float(exit_price),
                     'outcome': outcome,
-                    'pnl': pnl,
-                    'confidence': signal['confidence'],
-                    'reasoning': signal['reasoning'],
+                    'pnl': float(pnl),
+                    'confidence': signal.get('confidence', 0),
+                    'reasoning': signal.get('reasoning', ''),
                     'position_multiplier': position_multiplier
                 }
                 trades.append(trade)
-                
+
             except Exception as e:
+                logger.debug(f"⚠️ simulate_trades error for signal {signal}: {e}")
+                logger.debug(traceback.format_exc())
                 continue
-        
+
         trade_sim_time = time.time() - start_time
         self.processing_stats['trade_sim_time'] = trade_sim_time
-        
         logger.info(f"✅ Trade simulation completed in {trade_sim_time:.2f}s")
         return trades
     
@@ -396,11 +419,11 @@ class OptimizedBacktester:
         if df is None:
             return None
         
-        # Add indicators
+        # Add indicators ONCE
         df = self.add_indicators_optimized(df)
         
-        # Generate signals
-        signals = self.run_enhanced_strategies_optimized(df, symbol)
+        # Generate signals (DO NOT recalc indicators inside the function)
+        signals = self.run_enhanced_strategies_optimized(df, symbol, disable_tqdm=self.disable_tqdm)
         logger.info(f"📊 Generated {len(signals)} signals")
         
         # Simulate trades
