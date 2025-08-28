@@ -37,7 +37,7 @@ class FyersClient:
         
         # Rate limiting
         self.last_api_call = 0
-        self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls
+        self.min_call_interval = 0.1  # Minimum 0.1 seconds between API calls
         
         # Initialize session model
         self.session = fyersModel.SessionModel(
@@ -255,8 +255,14 @@ class FyersClient:
         self._rate_limit()
         
         try:
-            response = self.fyers.quotes({"symbols": symbols})
-            logger.info(f"Quotes fetched for {len(symbols)} symbols")
+            # Convert list to comma-separated string for Fyers API
+            if isinstance(symbols, list):
+                symbols_str = ','.join(symbols)
+            else:
+                symbols_str = symbols
+                
+            response = self.fyers.quotes({"symbols": symbols_str})
+            logger.info(f"Quotes fetched for {len(symbols) if isinstance(symbols, list) else 1} symbols")
             return response
         except Exception as e:
             logger.error(f"Error fetching quotes: {e}")
@@ -293,14 +299,14 @@ class FyersClient:
             
             for fyers_symbol in symbol_variations:
                 try:
-                    # Get quotes for the symbol
+                    # Get quotes for the symbol (pass as string, not list)
                     response = self.fyers.quotes({"symbols": fyers_symbol})
                     
                     # Check for specific error codes
                     if response and 'code' in response:
                         if response['code'] == 429:
-                            logger.warning(f"Rate limit hit for {symbol}. Waiting 30 seconds before retry...")
-                            time.sleep(30)  # Wait 30 seconds for rate limit
+                            logger.warning(f"Rate limit hit for {symbol}. Waiting 1 second before retry...")
+                            time.sleep(1)  # Wait 1 second for rate limit
                             continue
                         elif response['code'] == 401:
                             logger.error(f"Authentication failed for {symbol}. Token may have expired. Response: {response}")

@@ -105,7 +105,7 @@ class LivePaperTradingSystem:
         
         # Data caching for performance
         self.data_cache = {}  # symbol -> (data, last_update_time)
-        self.cache_duration = 60  # seconds - refresh cache every minute
+        self.cache_duration = 30  # seconds - refresh cache every 30 seconds
         self.max_cached_candles = 1000
         
         # Performance tracking
@@ -737,7 +737,7 @@ class LivePaperTradingSystem:
         # Cache for prices to avoid rate limiting
         price_cache = {}
         last_price_update = {}
-        price_cache_duration = 30  # Cache prices for 30 seconds
+        price_cache_duration = 10  # Cache prices for 10 seconds
         
         while self.is_running:
             try:
@@ -829,7 +829,7 @@ class LivePaperTradingSystem:
                         logger.error(f"❌ Error processing {symbol}: {e}")
 
                 # Sleep for 2 minutes between iterations during market hours
-                time.sleep(120)
+                time.sleep(60)
 
             except Exception as e:
                 logger.error(f"❌ Error in trading loop: {e}")
@@ -894,7 +894,9 @@ class LivePaperTradingSystem:
                     # Convert Fyers data to DataFrame
                     df = pd.DataFrame(live_data['candles'], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
                     df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+                    # Keep timestamp as column for strategies, but also set as index
                     df.set_index('timestamp', inplace=True)
+                    df['timestamp'] = df.index  # Add timestamp column back for strategies
                     
                     logger.info(f"✅ Historical data fetched: {len(df)} candles for {symbol}")
                     
@@ -942,7 +944,9 @@ class LivePaperTradingSystem:
                     
                     df = pd.DataFrame(minimal_data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
                     df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+                    # Keep timestamp as column for strategies, but also set as index
                     df.set_index('timestamp', inplace=True)
+                    df['timestamp'] = df.index  # Add timestamp column back for strategies
                     
                     logger.info(f"✅ Created minimal dataset with live price: {len(df)} candles for {symbol}")
                     
