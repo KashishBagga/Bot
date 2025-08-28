@@ -266,19 +266,27 @@ class FyersClient:
                     
                     # Handle different response formats
                     if isinstance(data, list) and len(data) > 0:
+                        # Format: [{"v": {"lp": price, ...}}]
                         if 'v' in data[0]:
                             v_data = data[0]['v']
                             if 'lp' in v_data:  # Last price
                                 return float(v_data['lp'])
                             elif 'ltp' in v_data:  # Alternative field name
                                 return float(v_data['ltp'])
-                    elif isinstance(data, dict) and symbol in data:
-                        if 'lp' in data[symbol]:
-                            return float(data[symbol]['lp'])
-                        elif 'ltp' in data[symbol]:
-                            return float(data[symbol]['ltp'])
+                    elif isinstance(data, dict):
+                        # Format: {"symbol": {"lp": price, ...}}
+                        if symbol in data:
+                            if 'lp' in data[symbol]:
+                                return float(data[symbol]['lp'])
+                            elif 'ltp' in data[symbol]:
+                                return float(data[symbol]['ltp'])
+                        # Try direct access if symbol not found
+                        elif 'lp' in data:
+                            return float(data['lp'])
+                        elif 'ltp' in data:
+                            return float(data['ltp'])
             
-            logger.warning(f"Could not extract price from response for {symbol}")
+            logger.warning(f"Could not extract price from response for {symbol}. Response: {response}")
             return None
             
         except Exception as e:
