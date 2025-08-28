@@ -4,6 +4,7 @@ Handles authentication and API requests to the Fyers trading platform.
 """
 import webbrowser
 import logging
+import time
 from fyers_apiv3 import fyersModel
 from src.config.settings import (
     FYERS_CLIENT_ID, 
@@ -34,6 +35,10 @@ class FyersClient:
         self.access_token = None
         self.fyers = None
         
+        # Rate limiting
+        self.last_api_call = 0
+        self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls
+        
         # Initialize session model
         self.session = fyersModel.SessionModel(
             client_id=self.client_id,
@@ -43,6 +48,17 @@ class FyersClient:
             secret_key=self.secret_key,
             grant_type=self.grant_type
         )
+    
+    def _rate_limit(self):
+        """Implement rate limiting to prevent 429 errors."""
+        current_time = time.time()
+        time_since_last_call = current_time - self.last_api_call
+        
+        if time_since_last_call < self.min_call_interval:
+            sleep_time = self.min_call_interval - time_since_last_call
+            time.sleep(sleep_time)
+        
+        self.last_api_call = time.time()
     
     def generate_auth_url(self):
         """Generate the authorization URL for authentication.
@@ -235,6 +251,9 @@ class FyersClient:
             logger.error("Fyers client not initialized")
             return None
         
+        # Apply rate limiting
+        self._rate_limit()
+        
         try:
             response = self.fyers.quotes({"symbols": symbols})
             logger.info(f"Quotes fetched for {len(symbols)} symbols")
@@ -255,6 +274,9 @@ class FyersClient:
         if not self.fyers:
             logger.error("Fyers client not initialized")
             return None
+        
+        # Apply rate limiting
+        self._rate_limit()
         
         try:
             # Get quotes for the symbol
@@ -310,6 +332,9 @@ class FyersClient:
         if not self.fyers:
             logger.error("Fyers client not initialized")
             return None
+        
+        # Apply rate limiting
+        self._rate_limit()
         
         data = {
             "symbol": symbol,

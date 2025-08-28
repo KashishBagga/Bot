@@ -734,6 +734,11 @@ class LivePaperTradingSystem:
         """Main trading loop with improved monitoring and performance tracking."""
         logger.info("🔄 Starting live paper trading loop...")
         
+        # Cache for prices to avoid rate limiting
+        price_cache = {}
+        last_price_update = {}
+        price_cache_duration = 30  # Cache prices for 30 seconds
+        
         while self.is_running:
             try:
                 current_time = datetime.now()
@@ -747,14 +752,26 @@ class LivePaperTradingSystem:
                 # Market is open - process trading
                 logger.info(f"📊 Market is open - processing signals at {current_time.strftime('%H:%M:%S')}")
                 
-                # Get current index data
+                # Get current index data with caching to avoid rate limiting
                 for symbol in self.symbols:
                     try:
-                        # Get real-time index price
-                        index_price = self.data_manager.get_underlying_price(symbol) if self.data_manager else None
-                        if index_price is None:
-                            logger.warning(f"⚠️ Could not get price for {symbol}")
-                            continue
+                        # Check if we need to update price cache
+                        if (symbol not in price_cache or 
+                            symbol not in last_price_update or
+                            (current_time - last_price_update[symbol]).total_seconds() > price_cache_duration):
+                            
+                            # Get real-time index price
+                            index_price = self.data_manager.get_underlying_price(symbol) if self.data_manager else None
+                            if index_price is None:
+                                logger.warning(f"⚠️ Could not get price for {symbol}")
+                                continue
+                            
+                            # Cache the price
+                            price_cache[symbol] = index_price
+                            last_price_update[symbol] = current_time
+                        else:
+                            # Use cached price
+                            index_price = price_cache[symbol]
 
                         # Get recent index data for signal generation
                         index_data = self._get_recent_index_data(symbol)
@@ -791,13 +808,13 @@ class LivePaperTradingSystem:
                                 current_time
                             )
 
-                        # Check for trade exits
+                        # Check for trade exits using cached prices
                         if self.open_trades:
                             current_prices = {}
                             for trade in self.open_trades.values():
-                                price = self.data_manager.get_underlying_price(trade.contract_symbol) if self.data_manager else None
-                                if price:
-                                    current_prices[trade.contract_symbol] = price
+                                # Use cached price if available, otherwise skip
+                                if trade.contract_symbol in price_cache:
+                                    current_prices[trade.contract_symbol] = price_cache[trade.contract_symbol]
 
                             if current_prices:
                                 closed_trades = self._check_trade_exits(current_prices, current_time)
