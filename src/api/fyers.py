@@ -37,7 +37,7 @@ class FyersClient:
         
         # Rate limiting
         self.last_api_call = 0
-        self.min_call_interval = 0.1  # Minimum 0.1 seconds between API calls
+        self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls to avoid rate limits
         
         # Initialize session model
         self.session = fyersModel.SessionModel(
@@ -285,74 +285,76 @@ class FyersClient:
         self._rate_limit()
         
         try:
-            # Convert symbol format for Fyers API
-            # Fyers expects format like "NSE:NIFTY50-EQ" or "NSE:NIFTY50-INDEX"
-            fyers_symbol = symbol
-            
-            # Try different symbol formats if the original doesn't work
-            symbol_variations = [
-                symbol,  # Original: "NSE:NIFTY50-INDEX"
-                symbol.replace('-INDEX', '-EQ'),  # "NSE:NIFTY50-EQ"
-                symbol.replace('NSE:', '').replace('-INDEX', ''),  # "NIFTY50"
-                f"NSE:{symbol.replace('NSE:', '').replace('-INDEX', '')}-EQ"  # "NSE:NIFTY50-EQ"
-            ]
-            
-            for fyers_symbol in symbol_variations:
-                try:
-                    # Get quotes for the symbol (pass as string, not list)
-                    response = self.fyers.quotes({"symbols": fyers_symbol})
-                    
-                    # Check for specific error codes
-                    if response and 'code' in response:
-                        if response['code'] == 429:
-                            logger.warning(f"Rate limit hit for {symbol}. Waiting 1 second before retry...")
-                            time.sleep(1)  # Wait 1 second for rate limit
-                            continue
-                        elif response['code'] == 401:
-                            logger.error(f"Authentication failed for {symbol}. Token may have expired. Response: {response}")
-                            return None
-                        elif response['code'] != 200:
-                            logger.debug(f"API error for {fyers_symbol}. Code: {response['code']}, trying next format...")
-                            continue
-                    
-                    if response and 'code' in response and response['code'] == 200:
+            # First, try to get price from quotes API
+            # Use exact symbol format - no variations
+            try:
+                response = self.fyers.quotes({"symbols": symbol})
+                
+                if response and 'code' in response:
+                    if response['code'] == 429:
+                        logger.debug(f"Rate limit hit for quotes API")
+                        return None
+                    elif response['code'] == 401:
+                        logger.error(f"Authentication failed for {symbol}. Token may have expired.")
+                        return None
+                    elif response['code'] == 200:
                         if 'd' in response and response['d']:
                             data = response['d']
                             
                             # Handle different response formats
                             if isinstance(data, list) and len(data) > 0:
-                                # Format: [{"v": {"lp": price, ...}}]
                                 if 'v' in data[0]:
                                     v_data = data[0]['v']
-                                    if 'lp' in v_data:  # Last price
-                                        logger.info(f"✅ Found price for {symbol} using format {fyers_symbol}")
+                                    if 'lp' in v_data:
+                                        logger.info(f"✅ Found price for {symbol} using quotes API")
                                         return float(v_data['lp'])
-                                    elif 'ltp' in v_data:  # Alternative field name
-                                        logger.info(f"✅ Found price for {symbol} using format {fyers_symbol}")
+                                    elif 'ltp' in v_data:
+                                        logger.info(f"✅ Found price for {symbol} using quotes API")
                                         return float(v_data['ltp'])
                             elif isinstance(data, dict):
-                                # Format: {"symbol": {"lp": price, ...}}
-                                if fyers_symbol in data:
-                                    if 'lp' in data[fyers_symbol]:
-                                        logger.info(f"✅ Found price for {symbol} using format {fyers_symbol}")
-                                        return float(data[fyers_symbol]['lp'])
-                                    elif 'ltp' in data[fyers_symbol]:
-                                        logger.info(f"✅ Found price for {symbol} using format {fyers_symbol}")
-                                        return float(data[fyers_symbol]['ltp'])
-                                # Try direct access if symbol not found
+                                if symbol in data:
+                                    if 'lp' in data[symbol]:
+                                        logger.info(f"✅ Found price for {symbol} using quotes API")
+                                        return float(data[symbol]['lp'])
+                                    elif 'ltp' in data[symbol]:
+                                        logger.info(f"✅ Found price for {symbol} using quotes API")
+                                        return float(data[symbol]['ltp'])
                                 elif 'lp' in data:
-                                    logger.info(f"✅ Found price for {symbol} using format {fyers_symbol}")
+                                    logger.info(f"✅ Found price for {symbol} using quotes API")
                                     return float(data['lp'])
                                 elif 'ltp' in data:
-                                    logger.info(f"✅ Found price for {symbol} using format {fyers_symbol}")
+                                    logger.info(f"✅ Found price for {symbol} using quotes API")
                                     return float(data['ltp'])
-                
-                except Exception as e:
-                    logger.debug(f"Error with symbol format {fyers_symbol}: {e}")
-                    continue
             
-            logger.warning(f"Could not extract price from any symbol format for {symbol}")
-            return None
+            except Exception as e:
+                logger.debug(f"Error with quotes API for {symbol}: {e}")
+            
+            # Fallback: Get latest price from historical data
+            logger.info(f"📊 Using historical data fallback for {symbol}")
+            try:
+                from datetime import datetime
+                today = datetime.now().strftime('%Y-%m-%d')
+                data = self.get_historical_data(
+                    symbol=symbol,
+                    resolution="1",  # 1-minute data
+                    date_format=1,
+                    range_from=today,
+                    range_to=today,
+                    cont_flag=1
+                )
+                
+                if data and 'candles' in data and len(data['candles']) > 0:
+                    latest_candle = data['candles'][-1]
+                    latest_price = latest_candle[4]  # Close price
+                    logger.info(f"✅ Found price for {symbol} using historical data: ₹{latest_price:,.2f}")
+                    return float(latest_price)
+                else:
+                    logger.warning(f"No historical data available for {symbol}")
+                    return None
+                    
+            except Exception as e:
+                logger.error(f"Error getting historical data for {symbol}: {e}")
+                return None
             
         except Exception as e:
             logger.error(f"Error getting underlying price for {symbol}: {e}")

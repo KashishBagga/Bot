@@ -22,13 +22,11 @@ def get_latest_trades(db_path: str = "trading_signals.db", limit: int = 20) -> p
             strategy,
             signal,
             price,
-            confidence_score,
+            confidence,
             reasoning,
-            stop_loss,
-            target1,
-            target2,
-            target3
-        FROM live_signals 
+            symbol,
+            created_at
+        FROM trading_signals 
         ORDER BY timestamp DESC 
         LIMIT ?
         """
@@ -46,13 +44,13 @@ def get_performance_stats(db_path: str = "trading_signals.db") -> dict:
         
         # Get total trades
         total_trades = pd.read_sql_query(
-            "SELECT COUNT(*) as count FROM live_signals", conn
+            "SELECT COUNT(*) as count FROM trading_signals", conn
         ).iloc[0]['count']
         
         # Get recent trades (last 7 days)
         week_ago = datetime.now() - timedelta(days=7)
         recent_trades = pd.read_sql_query(
-            "SELECT COUNT(*) as count FROM live_signals WHERE timestamp > ?", 
+            "SELECT COUNT(*) as count FROM trading_signals WHERE timestamp > ?", 
             conn, params=(week_ago,)
         ).iloc[0]['count']
         
@@ -61,8 +59,8 @@ def get_performance_stats(db_path: str = "trading_signals.db") -> dict:
             SELECT 
                 strategy,
                 COUNT(*) as trades,
-                AVG(confidence_score) as avg_confidence
-            FROM live_signals 
+                AVG(confidence) as avg_confidence
+            FROM trading_signals 
             GROUP BY strategy
             ORDER BY trades DESC
         """, conn)
@@ -74,7 +72,7 @@ def get_performance_stats(db_path: str = "trading_signals.db") -> dict:
                 COUNT(*) as trades,
                 SUM(CASE WHEN signal = 'BUY CALL' THEN 1 ELSE 0 END) as buy_signals,
                 SUM(CASE WHEN signal = 'BUY PUT' THEN 1 ELSE 0 END) as sell_signals
-            FROM live_signals 
+            FROM trading_signals 
             WHERE timestamp > date('now', '-7 days')
             GROUP BY DATE(timestamp)
             ORDER BY date DESC

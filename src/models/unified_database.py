@@ -36,11 +36,11 @@ class UnifiedDatabase:
                 # Create trading_signals table
                 cursor.execute("""
                     CREATE TABLE trading_signals (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                         timestamp DATETIME NOT NULL,
-                        strategy TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
                         signal TEXT NOT NULL,
-                        symbol TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
                         price REAL NOT NULL,
                         confidence REAL,
                         reasoning TEXT,
@@ -83,7 +83,7 @@ class UnifiedDatabase:
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
-                
+            
                 # Create closed_option_positions table
                 cursor.execute("""
                     CREATE TABLE closed_option_positions (
@@ -92,55 +92,55 @@ class UnifiedDatabase:
                         exit_timestamp DATETIME,
                         contract_symbol TEXT NOT NULL,
                         underlying TEXT NOT NULL,
-                        strategy TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
                         signal_type TEXT NOT NULL,
                         entry_price REAL NOT NULL,
-                        exit_price REAL,
+                    exit_price REAL,
                         quantity INTEGER NOT NULL,
                         lot_size INTEGER NOT NULL,
                         strike REAL NOT NULL,
                         expiry DATETIME NOT NULL,
                         option_type TEXT NOT NULL,
                         pnl REAL,
-                        exit_reason TEXT,
+                    exit_reason TEXT,
                         status TEXT DEFAULT 'CLOSED',
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
+                )
                 """)
-                
+            
                 # Create equity_curve table
                 cursor.execute("""
                     CREATE TABLE equity_curve (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                         timestamp DATETIME NOT NULL,
                         capital REAL NOT NULL,
                         open_trades INTEGER DEFAULT 0,
                         daily_pnl REAL DEFAULT 0,
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
                 """)
-                
+            
                 # Create performance_metrics table
                 cursor.execute("""
                     CREATE TABLE performance_metrics (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                         timestamp DATETIME NOT NULL,
                         total_trades INTEGER DEFAULT 0,
                         winning_trades INTEGER DEFAULT 0,
                         losing_trades INTEGER DEFAULT 0,
                         win_rate REAL DEFAULT 0,
-                        total_pnl REAL DEFAULT 0,
+                    total_pnl REAL DEFAULT 0,
                         avg_pnl REAL DEFAULT 0,
                         max_drawdown REAL DEFAULT 0,
                         sharpe_ratio REAL DEFAULT 0,
                         profit_factor REAL DEFAULT 0,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
+                )
                 """)
-                
-                conn.commit()
-                logger.info("✅ Unified database schema created successfully")
-                
+            
+            conn.commit()
+            logger.info("✅ Unified database schema created successfully")
+            
         except Exception as e:
             logger.error(f"❌ Error initializing database: {e}")
             raise
@@ -163,7 +163,7 @@ class UnifiedDatabase:
                     signal.get('confidence', 0),
                     signal.get('reasoning', '')
                 ))
-                conn.commit()
+            conn.commit()
         except Exception as e:
             logger.error(f"❌ Error saving trading signal: {e}")
     
@@ -187,7 +187,7 @@ class UnifiedDatabase:
                     rejected_signal.reasoning,
                     rejected_signal.rejection_reason
                 ))
-                conn.commit()
+            conn.commit()
         except Exception as e:
             logger.error(f"❌ Error saving rejected signal: {e}")
     
@@ -215,7 +215,7 @@ class UnifiedDatabase:
                     trade.expiry,
                     trade.option_type
                 ))
-                conn.commit()
+            conn.commit()
         except Exception as e:
             logger.error(f"❌ Error saving open option position: {e}")
     
@@ -224,7 +224,7 @@ class UnifiedDatabase:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+            
                 if status == 'CLOSED':
                     # Get the open position
                     cursor.execute("SELECT * FROM open_option_positions WHERE id = ?", (trade_id,))
@@ -258,8 +258,8 @@ class UnifiedDatabase:
                         
                         # Delete from open table
                         cursor.execute("DELETE FROM open_option_positions WHERE id = ?", (trade_id,))
-                
-                conn.commit()
+            
+            conn.commit()
         except Exception as e:
             logger.error(f"❌ Error updating option position status: {e}")
     
@@ -272,7 +272,7 @@ class UnifiedDatabase:
                     INSERT INTO equity_curve (timestamp, capital, open_trades, daily_pnl)
                     VALUES (?, ?, ?, ?)
                 """, (timestamp, capital, open_trades, daily_pnl))
-                conn.commit()
+            conn.commit()
         except Exception as e:
             logger.error(f"❌ Error saving equity point: {e}")
     
@@ -299,7 +299,7 @@ class UnifiedDatabase:
                     metrics['max_drawdown'],
                     metrics.get('rejected_signals', 0)
                 ))
-                conn.commit()
+            conn.commit()
         except Exception as e:
             logger.error(f"❌ Error saving performance metrics: {e}")
 

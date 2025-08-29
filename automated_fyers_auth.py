@@ -15,6 +15,7 @@ from fyers_apiv3 import fyersModel
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
+import sys
 
 class FyersAuthHandler(BaseHTTPRequestHandler):
     """HTTP server to capture the auth code from Fyers redirect."""
@@ -90,17 +91,14 @@ class AutomatedFyersAuth:
         # Get credentials from environment
         self.client_id = os.getenv("FYERS_CLIENT_ID")
         self.secret_key = os.getenv("FYERS_SECRET_KEY")
-        # For automated auth, we need to use localhost
-        # But preserve the original redirect URI for manual auth
-        self.original_redirect_uri = os.getenv("FYERS_REDIRECT_URI", "https://trade.fyers.in/")
-        self.redirect_uri = "http://localhost:8080"  # For automated auth
+        self.redirect_uri = os.getenv("FYERS_REDIRECT_URI", "https://trade.fyers.in/")
         self.response_type = os.getenv("FYERS_RESPONSE_TYPE", "code")
         self.state = os.getenv("FYERS_STATE", "sample")
         
         if not self.client_id or not self.secret_key:
             raise ValueError("FYERS_CLIENT_ID and FYERS_SECRET_KEY must be set in .env file")
     
-    def start_auth_server(self, port=8080):
+    def start_auth_server(self, port=8080):  # Changed back to 8080 since conflicts are resolved
         """Start HTTP server to capture auth code."""
         def auth_code_callback(auth_code):
             self.auth_code = auth_code
@@ -149,20 +147,22 @@ class AutomatedFyersAuth:
         """Open browser automatically and wait for auth."""
         try:
             print(f"🔗 Opening authentication URL: {auth_url}")
+            print("📋 IMPORTANT: After login, you'll be redirected to Fyers trade page.")
+            print("🔍 Look for the auth code in the URL parameters.")
+            print("📝 The URL will contain something like: auth_code=XXXXX&state=sample")
+            print("📝 Copy only the auth code part (XXXXX) and paste it below:")
+            
             webbrowser.open(auth_url, new=1)
             
-            # Wait for auth code (max 5 minutes)
-            timeout = 300  # 5 minutes
-            start_time = time.time()
+            # Wait for manual input instead of automatic capture
+            auth_code = input("\n🔑 Enter the auth code from the URL: ").strip()
             
-            while not self.auth_code and (time.time() - start_time) < timeout:
-                time.sleep(1)
-            
-            if self.auth_code:
-                print("✅ Authentication completed successfully!")
+            if auth_code:
+                self.auth_code = auth_code
+                print("✅ Authentication code captured!")
                 return True
             else:
-                print("❌ Authentication timeout - no auth code received")
+                print("❌ No auth code provided")
                 return False
                 
         except Exception as e:
@@ -268,67 +268,61 @@ class AutomatedFyersAuth:
         except Exception:
             return False
     
-    def run_automated_auth(self):
-        """Run the complete automated authentication process."""
-        print("🚀 Starting Automated Fyers Authentication")
-        print("=" * 50)
-        
+    def authenticate(self):
+        """Perform complete authentication flow."""
         try:
-            # Check if we already have a valid token
-            existing_token = os.getenv("FYERS_ACCESS_TOKEN")
-            if existing_token and self.check_token_validity(existing_token):
-                print("✅ Existing access token is still valid!")
-                return existing_token
-            
-            # Start auth server
-            self.start_auth_server()
+            print("🚀 Starting Fyers Authentication")
+            print("=" * 50)
             
             # Generate auth URL
             auth_url, session = self.generate_auth_url()
             if not auth_url:
-                return None
+                return False
             
-            # Open browser and wait for auth
+            # Open browser and get auth code manually
             if not self.open_browser_automated(auth_url):
-                return None
+                return False
             
             # Generate access token
             access_token = self.generate_access_token(session, self.auth_code)
             if not access_token:
-                return None
+                return False
             
-            # Test the access token
+            # Test the token
             if not self.test_access_token(access_token):
-                return None
+                return False
             
-            print("\n🎉 Automated authentication completed successfully!")
-            return access_token
+            print("✅ Authentication completed successfully!")
+            return True
             
         except Exception as e:
-            print(f"❌ Error in automated auth: {e}")
-            return None
-        finally:
-            # Stop auth server
-            self.stop_auth_server()
+            print(f"❌ Error in authentication flow: {e}")
+            return False
 
 def main():
-    """Main function to run automated authentication."""
-    try:
-        auth_handler = AutomatedFyersAuth()
-        access_token = auth_handler.run_automated_auth()
-        
-        if access_token:
-            print(f"\n✅ Authentication successful!")
-            print(f"🔑 Access token: {access_token[:50]}...")
-            print("\nYou can now use this token in your trading scripts.")
-            return True
-        else:
-            print("\n❌ Authentication failed!")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Fatal error: {e}")
-        return False
+    """Main function to run the authentication utility."""
+    print("🔄 Fyers Token Refresh Utility")
+    print("=" * 32)
+    
+    # Check if we already have a valid token
+    existing_token = os.getenv("FYERS_ACCESS_TOKEN")
+    if existing_token:
+        auth_util = AutomatedFyersAuth()
+        if auth_util.check_token_validity(existing_token):
+            print("✅ Current token is still valid!")
+            return
+    
+    print("⚠️ Token has expired. Refreshing...")
+    
+    # Initialize auth utility
+    auth_util = AutomatedFyersAuth()
+    
+    # Run authentication
+    if auth_util.authenticate():
+        print("✅ Token refresh completed successfully!")
+    else:
+        print("❌ Failed to refresh token!")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main() 
