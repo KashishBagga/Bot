@@ -1,44 +1,49 @@
 #!/usr/bin/env python3
 """
-Automated Fyers API Authentication
-Handles the complete authentication flow without manual intervention
+Automated Fyers Authentication with automatic auth code capture
 """
 
 import os
-import time
-import json
-import requests
-import webbrowser
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
-from fyers_apiv3 import fyersModel
-import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
-import urllib.parse
 import sys
+import time
+import webbrowser
+import logging
+from urllib.parse import urlparse, parse_qs
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
+from fyers_apiv3 import fyersModel
+from src.config.settings import (
+    FYERS_CLIENT_ID, 
+    FYERS_SECRET_KEY, 
+    FYERS_REDIRECT_URI,
+    FYERS_RESPONSE_TYPE,
+    FYERS_GRANT_TYPE,
+    FYERS_STATE,
+    setup_logging
+)
 
-class FyersAuthHandler(BaseHTTPRequestHandler):
-    """HTTP server to capture the auth code from Fyers redirect."""
+# Set up logger
+logger = setup_logging('fyers_auth')
+
+class AuthCodeHandler(BaseHTTPRequestHandler):
+    """HTTP handler to capture auth code from redirect URL"""
     
-    def __init__(self, *args, auth_code_callback=None, **kwargs):
-        self.auth_code_callback = auth_code_callback
-        super().__init__(*args, **kwargs)
+    auth_code = None
+    server_stopped = False
     
     def do_GET(self):
-        """Handle the redirect from Fyers with auth code."""
+        """Handle GET request and extract auth code from URL"""
         try:
-            # Parse the URL to extract auth code
-            parsed_url = urllib.parse.urlparse(self.path)
-            query_params = urllib.parse.parse_qs(parsed_url.query)
+            # Parse the URL
+            parsed_url = urlparse(self.path)
             
-            # Extract auth code
-            auth_code = query_params.get('auth_code', [None])[0]
-            state = query_params.get('state', [None])[0]
+            # Extract query parameters
+            query_params = parse_qs(parsed_url.query)
             
-            if auth_code:
-                # Store the auth code
-                if self.auth_code_callback:
-                    self.auth_code_callback(auth_code)
+            # Check if auth_code is present
+            if 'auth_code' in query_params:
+                AuthCodeHandler.auth_code = query_params['auth_code'][0]
+                logger.info(f"✅ Authentication code captured automatically: {AuthCodeHandler.auth_code[:20]}...")
                 
                 # Send success response
                 self.send_response(200)
@@ -48,14 +53,23 @@ class FyersAuthHandler(BaseHTTPRequestHandler):
                 success_html = """
                 <html>
                 <head><title>Authentication Successful</title></head>
-                <body>
-                <h1>✅ Fyers Authentication Successful!</h1>
-                <p>You can close this window now.</p>
-                <p>Your access token will be generated automatically.</p>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h1 style="color: green;">✅ Authentication Successful!</h1>
+                    <p>You can close this window now.</p>
+                    <p>The trading system will continue automatically.</p>
                 </body>
                 </html>
                 """
                 self.wfile.write(success_html.encode())
+                
+                # Stop the server after capturing the code
+                def stop_server():
+                    time.sleep(1)  # Give time for response to be sent
+                    AuthCodeHandler.server_stopped = True
+                    self.server.shutdown()
+                
+                threading.Thread(target=stop_server, daemon=True).start()
+                
             else:
                 # Send error response
                 self.send_response(400)
@@ -64,265 +78,248 @@ class FyersAuthHandler(BaseHTTPRequestHandler):
                 
                 error_html = """
                 <html>
-                <head><title>Authentication Failed</title></head>
-                <body>
-                <h1>❌ Authentication Failed</h1>
-                <p>No auth code received. Please try again.</p>
+                <head><title>Authentication Error</title></head>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h1 style="color: red;">❌ Authentication Error</h1>
+                    <p>No auth code found in URL.</p>
+                    <p>Please try again.</p>
                 </body>
                 </html>
                 """
                 self.wfile.write(error_html.encode())
                 
         except Exception as e:
-            print(f"❌ Error handling redirect: {e}")
+            logger.error(f"Error handling request: {e}")
             self.send_response(500)
             self.end_headers()
+    
+    def log_message(self, format, *args):
+        """Suppress HTTP server logs"""
+        pass
 
-class AutomatedFyersAuth:
-    """Automated Fyers authentication handler."""
-    
-    def __init__(self):
-        """Initialize the automated auth handler."""
-        load_dotenv()
-        self.auth_code = None
-        self.server = None
-        self.server_thread = None
+def start_auth_server(port=8080):
+    """Start HTTP server to capture auth code"""
+    try:
+        server = HTTPServer(('localhost', port), AuthCodeHandler)
+        logger.info(f"🌐 Auth server started on port {port}")
         
-        # Get credentials from environment
-        self.client_id = os.getenv("FYERS_CLIENT_ID")
-        self.secret_key = os.getenv("FYERS_SECRET_KEY")
-        self.redirect_uri = os.getenv("FYERS_REDIRECT_URI", "https://trade.fyers.in/")
-        self.response_type = os.getenv("FYERS_RESPONSE_TYPE", "code")
-        self.state = os.getenv("FYERS_STATE", "sample")
+        # Run server in a separate thread
+        server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+        server_thread.start()
         
-        if not self.client_id or not self.secret_key:
-            raise ValueError("FYERS_CLIENT_ID and FYERS_SECRET_KEY must be set in .env file")
-    
-    def start_auth_server(self, port=8080):  # Changed back to 8080 since conflicts are resolved
-        """Start HTTP server to capture auth code."""
-        def auth_code_callback(auth_code):
-            self.auth_code = auth_code
-            print(f"✅ Auth code received: {auth_code[:20]}...")
+        return server
         
-        # Create custom handler with callback
-        class Handler(FyersAuthHandler):
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, auth_code_callback=auth_code_callback, **kwargs)
+    except Exception as e:
+        logger.error(f"Failed to start auth server: {e}")
+        return None
+
+def check_and_refresh_token():
+    """Check if token exists and is valid, refresh if needed"""
+    try:
+        # Check if token exists in .env
+        if not os.path.exists('.env'):
+            logger.warning("⚠️ .env file not found")
+            return False
         
-        # Start server
-        self.server = HTTPServer(('localhost', port), Handler)
-        self.server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)
-        self.server_thread.start()
-        print(f"✅ Auth server started on port {port}")
-    
-    def stop_auth_server(self):
-        """Stop the auth server."""
-        if self.server:
-            self.server.shutdown()
-            self.server.server_close()
-            print("✅ Auth server stopped")
-    
-    def generate_auth_url(self):
-        """Generate the authentication URL."""
-        try:
-            # Initialize session model
-            session = fyersModel.SessionModel(
-                client_id=self.client_id,
-                secret_key=self.secret_key,
-                redirect_uri=self.redirect_uri,
-                response_type=self.response_type,
-                state=self.state,
-                grant_type="authorization_code"
-            )
-            
-            # Generate auth URL
-            auth_url = session.generate_authcode()
-            return auth_url, session
-            
-        except Exception as e:
-            print(f"❌ Error generating auth URL: {e}")
-            return None, None
-    
-    def open_browser_automated(self, auth_url):
-        """Open browser automatically and wait for auth."""
-        try:
-            print(f"🔗 Opening authentication URL: {auth_url}")
-            print("📋 IMPORTANT: After login, you'll be redirected to Fyers trade page.")
-            print("🔍 Look for the auth code in the URL parameters.")
-            print("📝 The URL will contain something like: auth_code=XXXXX&state=sample")
-            print("📝 Copy only the auth code part (XXXXX) and paste it below:")
-            
-            webbrowser.open(auth_url, new=1)
-            
-            # Wait for manual input instead of automatic capture
-            auth_code = input("\n🔑 Enter the auth code from the URL: ").strip()
-            
-            if auth_code:
-                self.auth_code = auth_code
-                print("✅ Authentication code captured!")
-                return True
-            else:
-                print("❌ No auth code provided")
-                return False
-                
-        except Exception as e:
-            print(f"❌ Error in automated browser auth: {e}")
+        # Read current token
+        with open('.env', 'r') as f:
+            env_content = f.read()
+        
+        # Check if access token exists
+        if 'FYERS_ACCESS_TOKEN=' not in env_content:
+            logger.info("🔑 No access token found, need to authenticate")
             return False
-    
-    def generate_access_token(self, session, auth_code):
-        """Generate access token from auth code."""
-        try:
-            print("🔄 Generating access token...")
-            
-            # Set auth code in session
-            session.set_token(auth_code)
-            
-            # Generate token
-            response = session.generate_token()
-            
-            if 'access_token' in response:
-                access_token = response['access_token']
-                print("✅ Access token generated successfully!")
-                
-                # Update .env file
-                self.update_env_file("FYERS_ACCESS_TOKEN", access_token)
-                self.update_env_file("FYERS_AUTH_CODE", auth_code)
-                
-                return access_token
-            else:
-                print(f"❌ Failed to generate access token: {response}")
-                return None
-                
-        except Exception as e:
-            print(f"❌ Error generating access token: {e}")
-            return None
-    
-    def test_access_token(self, access_token):
-        """Test the access token by fetching user profile."""
-        try:
-            print("🧪 Testing access token...")
-            
-            fyers = fyersModel.FyersModel(
-                token=access_token,
-                is_async=False,
-                client_id=self.client_id,
-                log_path=""
-            )
-            
-            profile = fyers.get_profile()
-            
-            if 'code' in profile and profile['code'] == 200:
-                print("✅ Access token test successful!")
-                print(f"👤 Logged in as: {profile.get('data', {}).get('name', 'Unknown')}")
-                print(f"🆔 User ID: {profile.get('data', {}).get('fy_id', 'Unknown')}")
-                print(f"📧 Email: {profile.get('data', {}).get('email_id', 'Unknown')}")
-                return True
-            else:
-                print(f"❌ Access token test failed: {profile}")
-                return False
-                
-        except Exception as e:
-            print(f"❌ Error testing access token: {e}")
-            return False
-    
-    def update_env_file(self, key, value):
-        """Update a value in the .env file."""
-        try:
-            # Read current .env content
-            with open(".env", "r") as file:
-                lines = file.readlines()
-            
-            # Update the value for the key
-            updated = False
-            with open(".env", "w") as file:
-                for line in lines:
-                    if line.strip().startswith(f"{key}="):
-                        file.write(f"{key}={value}\n")
-                        updated = True
-                    else:
-                        file.write(line)
-                
-                # Add key-value if not found
-                if not updated:
-                    file.write(f"\n{key}={value}\n")
-            
-            print(f"✅ Updated {key} in .env file")
-            return True
-        except Exception as e:
-            print(f"❌ Error updating .env file: {e}")
-            return False
-    
-    def check_token_validity(self, access_token):
-        """Check if the current access token is still valid."""
-        try:
-            fyers = fyersModel.FyersModel(
-                token=access_token,
-                is_async=False,
-                client_id=self.client_id,
-                log_path=""
-            )
-            
-            profile = fyers.get_profile()
-            return 'code' in profile and profile['code'] == 200
-            
-        except Exception:
-            return False
-    
-    def authenticate(self):
-        """Perform complete authentication flow."""
-        try:
-            print("🚀 Starting Fyers Authentication")
-            print("=" * 50)
-            
-            # Generate auth URL
-            auth_url, session = self.generate_auth_url()
-            if not auth_url:
-                return False
-            
-            # Open browser and get auth code manually
-            if not self.open_browser_automated(auth_url):
-                return False
-            
-            # Generate access token
-            access_token = self.generate_access_token(session, self.auth_code)
-            if not access_token:
-                return False
-            
-            # Test the token
-            if not self.test_access_token(access_token):
-                return False
-            
-            print("✅ Authentication completed successfully!")
-            return True
-            
-        except Exception as e:
-            print(f"❌ Error in authentication flow: {e}")
-            return False
+        
+        # Extract token
+        for line in env_content.split('\n'):
+            if line.startswith('FYERS_ACCESS_TOKEN='):
+                token = line.split('=')[1].strip()
+                if token and token != 'None':
+                    logger.info("🔑 Access token found, checking validity...")
+                    
+                    # Test token validity
+                    try:
+                        fyers = fyersModel.FyersModel(
+                            token=token,
+                            is_async=False,
+                            client_id=FYERS_CLIENT_ID,
+                            log_path=""
+                        )
+                        
+                        profile = fyers.get_profile()
+                        if 'code' in profile and profile['code'] == 200:
+                            logger.info("✅ Token is valid")
+                            return True
+                        else:
+                            logger.warning("⚠️ Token has expired")
+                            return False
+                            
+                    except Exception as e:
+                        logger.warning(f"⚠️ Token validation failed: {e}")
+                        return False
+        
+        logger.info("🔑 No valid access token found")
+        return False
+        
+    except Exception as e:
+        logger.error(f"Error checking token: {e}")
+        return False
 
 def main():
-    """Main function to run the authentication utility."""
+    """Main authentication function"""
     print("🔄 Fyers Token Refresh Utility")
     print("=" * 32)
     
-    # Check if we already have a valid token
-    existing_token = os.getenv("FYERS_ACCESS_TOKEN")
-    if existing_token:
-        auth_util = AutomatedFyersAuth()
-        if auth_util.check_token_validity(existing_token):
-            print("✅ Current token is still valid!")
-            return
+    # Check if token is valid
+    if check_and_refresh_token():
+        print("✅ Token is valid, no need to refresh")
+        return True
     
     print("⚠️ Token has expired. Refreshing...")
     
-    # Initialize auth utility
-    auth_util = AutomatedFyersAuth()
+    # Start auth server
+    auth_server = start_auth_server()
+    if not auth_server:
+        print("❌ Failed to start auth server")
+        return False
     
-    # Run authentication
-    if auth_util.authenticate():
-        print("✅ Token refresh completed successfully!")
-    else:
-        print("❌ Failed to refresh token!")
-        sys.exit(1)
+    try:
+        # Initialize session
+        session = fyersModel.SessionModel(
+            client_id=FYERS_CLIENT_ID,
+            redirect_uri=FYERS_REDIRECT_URI,
+            response_type=FYERS_RESPONSE_TYPE,
+            state=FYERS_STATE,
+            secret_key=FYERS_SECRET_KEY,
+            grant_type=FYERS_GRANT_TYPE
+        )
+        
+        # Generate auth URL
+        auth_url = session.generate_authcode()
+        
+        print("🚀 Starting Fyers Authentication")
+        print("=" * 48)
+        print(f"🔗 Opening authentication URL...")
+        
+        # Open browser automatically
+        webbrowser.open(auth_url, new=1)
+        
+        print("📋 IMPORTANT: The browser will open automatically.")
+        print("🔍 After login, you'll be redirected to our local server.")
+        print("📝 The auth code will be captured automatically.")
+        print("⏳ Waiting for authentication...")
+        
+        # Wait for auth code to be captured
+        timeout = 120  # 2 minutes timeout
+        start_time = time.time()
+        
+        while not AuthCodeHandler.auth_code and not AuthCodeHandler.server_stopped:
+            if time.time() - start_time > timeout:
+                print("❌ Authentication timeout")
+                return False
+            time.sleep(0.1)
+        
+        if not AuthCodeHandler.auth_code:
+            print("❌ No auth code captured")
+            return False
+        
+        # Generate access token
+        print("🔄 Generating access token...")
+        
+        session.set_token(AuthCodeHandler.auth_code)
+        response = session.generate_token()
+        
+        if 'access_token' in response:
+            access_token = response['access_token']
+            print("✅ Access token generated successfully!")
+            
+            # Update .env file
+            update_env_file(access_token, AuthCodeHandler.auth_code)
+            
+            # Test the token
+            print("🧪 Testing access token...")
+            test_token(access_token)
+            
+            print("✅ Authentication completed successfully!")
+            print("✅ Token refresh completed successfully!")
+            return True
+            
+        else:
+            print(f"❌ Failed to generate access token: {response}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Authentication error: {e}")
+        return False
+    
+    finally:
+        # Stop auth server
+        if auth_server:
+            auth_server.shutdown()
+
+def update_env_file(access_token, auth_code):
+    """Update .env file with new tokens"""
+    try:
+        # Read existing .env file
+        env_lines = []
+        if os.path.exists('.env'):
+            with open('.env', 'r') as f:
+                env_lines = f.readlines()
+        
+        # Update or add tokens
+        updated = False
+        auth_updated = False
+        
+        for i, line in enumerate(env_lines):
+            if line.startswith('FYERS_ACCESS_TOKEN='):
+                env_lines[i] = f'FYERS_ACCESS_TOKEN={access_token}\n'
+                updated = True
+            elif line.startswith('FYERS_AUTH_CODE='):
+                env_lines[i] = f'FYERS_AUTH_CODE={auth_code}\n'
+                auth_updated = True
+        
+        if not updated:
+            env_lines.append(f'FYERS_ACCESS_TOKEN={access_token}\n')
+        if not auth_updated:
+            env_lines.append(f'FYERS_AUTH_CODE={auth_code}\n')
+        
+        # Write back to .env file
+        with open('.env', 'w') as f:
+            f.writelines(env_lines)
+        
+        print("✅ Updated FYERS_ACCESS_TOKEN in .env file")
+        print("✅ Updated FYERS_AUTH_CODE in .env file")
+        
+    except Exception as e:
+        print(f"❌ Error updating .env file: {e}")
+
+def test_token(access_token):
+    """Test if the access token works"""
+    try:
+        fyers = fyersModel.FyersModel(
+            token=access_token,
+            is_async=False,
+            client_id=FYERS_CLIENT_ID,
+            log_path=""
+        )
+        
+        profile = fyers.get_profile()
+        if 'code' in profile and profile['code'] == 200:
+            print("✅ Access token test successful!")
+            
+            # Get user info
+            if 'data' in profile:
+                user_data = profile['data']
+                print(f"👤 Logged in as: {user_data.get('name', 'Unknown')}")
+                print(f"🆔 User ID: {user_data.get('fy_id', 'Unknown')}")
+                print(f"📧 Email: {user_data.get('email_id', 'Unknown')}")
+            
+        else:
+            print(f"❌ Access token test failed: {profile}")
+            
+    except Exception as e:
+        print(f"❌ Error testing access token: {e}")
 
 if __name__ == "__main__":
-    main() 
+    success = main()
+    sys.exit(0 if success else 1) 

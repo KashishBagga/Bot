@@ -28,7 +28,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 # Add src to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from src.models.unified_database import UnifiedDatabase
+from src.models.unified_database_updated import UnifiedDatabase, UnifiedTradingDatabase
 from src.models.option_contract import OptionContract, OptionChain, OptionType, StrikeSelection
 from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
 from src.strategies.supertrend_ema import SupertrendEma
@@ -188,7 +188,7 @@ class HealthMetricsHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
 class LivePaperTradingSystem:
-    def __init__(self, initial_capital: float = 100000.0, max_risk_per_trade: float = 0.02,
+    def __init__(self, initial_capital: float = 20000.0, max_risk_per_trade: float = 0.02,
                  confidence_cutoff: float = 40.0, exposure_limit: float = 0.6,
                  max_daily_loss_pct: float = 0.03, commission_bps: float = 1.0,
                  slippage_bps: float = 5.0, symbols: List[str] = None,
@@ -268,7 +268,7 @@ class LivePaperTradingSystem:
         self._open_keys = set()
         
         # Database
-        self.db = UnifiedDatabase()
+        self.db = UnifiedTradingDatabase("unified_trading.db")
         
         # Threading safety
         self._lock = threading.RLock()
@@ -319,21 +319,15 @@ class LivePaperTradingSystem:
         return self.cash + mtm
 
     def _initialize_strategies(self):
-        """Initialize trading strategies."""
+        """Initialize trading strategies"""
         try:
-            from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
-            from src.strategies.supertrend_ema import SupertrendEma
-            from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
-            
-            self.strategies = {
-                'ema_crossover_enhanced': EmaCrossoverEnhanced(),
-                'supertrend_ema': SupertrendEma(),
-                'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
-            }
-            logger.info("✅ Strategies initialized successfully")
+            # Use the unified strategy engine instead of individual strategies
+            from src.core.unified_strategy_engine import UnifiedStrategyEngine
+            self.strategy_engine = UnifiedStrategyEngine(self.symbols, self.confidence_cutoff)
+            logger.info(f"✅ Unified Strategy Engine initialized with {len(self.symbols)} symbols")
         except Exception as e:
-            logger.error(f"❌ Error initializing strategies: {e}")
-            raise Exception(f"Strategy initialization failed: {e}")
+            logger.error(f"❌ Error initializing strategy engine: {e}")
+            raise
 
     def _reset_trading_state(self):
         """Reset trading state to clear any phantom data."""
@@ -381,29 +375,62 @@ class LivePaperTradingSystem:
         logger.info("🗄️ Initializing database tables...")
         self.db.init_database()
         
-        # Real-time data manager - ONLY use Fyers live data
+        # Initialize Fyers client with automated authentication
         if self.data_provider == 'fyers':
             try:
-                from src.api.fyers import FyersClient
-                # Check and refresh token if needed
-                try:
-                    from automated_fyers_auth import AutomatedFyersAuth
-                    auth_util = AutomatedFyersAuth()
-                    access_token = os.getenv("FYERS_ACCESS_TOKEN")
-                    
-                    if not access_token or not auth_util.check_token_validity(access_token):
-                        print("⚠️ Token expired or missing. Please run: python3 refresh_fyers_token.py")
-                        raise Exception("Invalid or missing access token")
-                        
-                except Exception as e:
-                    print(f"❌ Fyers initialization failed: {e}")
-                    raise Exception(f"Fyers initialization failed: {e}")
+                logger.info("🔐 Initializing Fyers with automated authentication...")
                 
-                # Initialize Fyers client with existing token
-                self.data_manager = FyersClient()
-                self.data_manager.access_token = access_token
-                self.data_manager.initialize_client()
+                # Run automated authentication script
+                import subprocess
+                import sys
+                result = subprocess.run([sys.executable, 'automated_fyers_auth.py'], 
+                                      capture_output=True, text=True, timeout=300)
+                
+                if result.returncode != 0:
+                    raise Exception(f"Authentication failed: {result.stderr}")
+                
                 logger.info("✅ Using Fyers live data with fresh token")
+                
+                # Initialize Fyers client
+                from src.api.fyers import FyersClient
+                self.data_manager = FyersClient()
+                
+                # Initialize the client with the access token
+                if not self.data_manager.initialize_client():
+                    raise Exception("Failed to initialize Fyers client")
+                
+                self.data_provider = self.data_manager
+                
+                # Initialize WebSocket for real-time data
+                try:
+                    from src.api.fyers_websocket import FyersWebSocketManager
+                    from src.config.settings import FYERS_CLIENT_ID
+                    
+                    # Get access token from Fyers client
+                    access_token = self.data_manager.access_token
+                    if access_token:
+                        self.websocket_manager = FyersWebSocketManager(access_token, FYERS_CLIENT_ID)
+                        
+                        # Add callbacks for real-time data
+                        self.websocket_manager.add_price_callback(self._on_price_update)
+                        self.websocket_manager.add_candle_callback(self._on_candle_update)
+                        
+                        # Connect to WebSocket
+                        if self.websocket_manager.connect(self.symbols):
+                            logger.info("🔌 WebSocket connected for real-time data streaming")
+                        else:
+                            logger.warning("⚠️ WebSocket connection failed, falling back to REST API")
+                            self.websocket_manager = None
+                    else:
+                        logger.warning("⚠️ No access token available for WebSocket")
+                        self.websocket_manager = None
+                        
+                except ImportError as e:
+                    logger.warning(f"⚠️ WebSocket not available: {e}, using REST API only")
+                    self.websocket_manager = None
+                except Exception as e:
+                    logger.warning(f"⚠️ WebSocket initialization failed: {e}, using REST API only")
+                    self.websocket_manager = None
                 
             except Exception as e:
                 logger.error(f"❌ Fyers initialization failed: {e}")
@@ -412,25 +439,34 @@ class LivePaperTradingSystem:
         else:
             logger.error("❌ Only 'fyers' data provider is supported for live trading")
             raise Exception("Only 'fyers' data provider is supported for live trading")
-
-    def _get_available_strategies(self):
-        """Get list of available strategies."""
-        return ['ema_crossover_enhanced', 'supertrend_ema', 'supertrend_macd_rsi_ema']
-
-    def safe_pct(self, value: float, denominator: float) -> float:
-        """Safely calculate percentage with division by zero protection."""
-        if denominator == 0:
-            return 0.0
-        return (value / denominator) * 100
-
-    def now_kolkata(self) -> datetime:
-        """Get current time in Kolkata timezone."""
-        return datetime.now(tz=self.tz)
-
-    def _make_open_key(self, strategy: str, contract_sym: str, option_type: str) -> Tuple[str, str, str]:
-        """Create canonical open key for position tracking."""
-        return (strategy, contract_sym, option_type)
-
+    
+    def _on_price_update(self, symbol: str, price: float, timestamp):
+        """Callback for real-time price updates"""
+        try:
+            # Update price cache
+            self.price_cache[symbol] = (price, time.time())
+            
+            # Update live prices for exposure calculation
+            if hasattr(self, 'live_prices'):
+                self.live_prices[symbol] = price
+            
+            if self.verbose:
+                logger.debug(f"📈 Real-time price update: {symbol} = ₹{price:,.2f}")
+                
+        except Exception as e:
+            logger.error(f"❌ Error in price update callback: {e}")
+    
+    def _on_candle_update(self, symbol: str, candles):
+        """Callback for real-time candle updates"""
+        try:
+            if candles and len(candles) > 0:
+                latest_candle = candles[-1]
+                if self.verbose:
+                    logger.debug(f"📊 Real-time candle update: {symbol} = ₹{latest_candle[4]:,.2f}")
+                    
+        except Exception as e:
+            logger.error(f"❌ Error in candle update callback: {e}")
+    
     def _get_price_cached(self, symbol: str, ttl: int = 5) -> Optional[float]:
         """Canonical cached price helper. Stores timestamps as epoch seconds."""
         now = time.time()
@@ -442,12 +478,22 @@ class LivePaperTradingSystem:
                     logger.debug(f"Using cached price for {symbol}: {price} (age {now-ts:.1f}s)")
                 return price
 
+        # Try WebSocket first for real-time data
+        if hasattr(self, 'websocket_manager') and self.websocket_manager and self.websocket_manager.is_healthy():
+            live_price = self.websocket_manager.get_live_price(symbol)
+            if live_price is not None and live_price > 0:
+                self.price_cache[symbol] = (live_price, now)
+                if self.verbose:
+                    logger.debug(f"📡 WebSocket price for {symbol}: {live_price}")
+                return live_price
+
+        # Fallback to REST API
         try:
             price = self.data_manager.get_underlying_price(symbol)
             if price is not None and price > 0:
                 self.price_cache[symbol] = (price, now)
                 if self.verbose:
-                    logger.debug(f"Fetched and cached price for {symbol}: {price}")
+                    logger.debug(f"🌐 REST API price for {symbol}: {price}")
                 return price
         except Exception as e:
             logger.debug(f"Error fetching price for {symbol}: {e}")
@@ -505,56 +551,122 @@ class LivePaperTradingSystem:
         if float(signal.get('confidence', 0.0)) < self.confidence_cutoff:
             return False, f"Confidence {signal.get('confidence', 0.0)} below threshold {self.confidence_cutoff}"
 
-        # Exposure check
-        current_exposure = self._current_total_exposure()
-        logger.debug(f"Current exposure: {current_exposure:.2%}, Limit: {self.exposure_limit:.2%}")
-        
-        if current_exposure >= self.exposure_limit:
-            return False, f"Exposure {current_exposure:.2%} at limit {self.exposure_limit:.2%}"
+        # Exposure check disabled for 1 lot trading
+        # current_exposure = self._current_total_exposure()
+        # logger.debug(f"Current exposure: {current_exposure:.2%}, Limit: {self.exposure_limit:.2%}")
+        # 
+        # if current_exposure >= self.exposure_limit:
+        #     return False, f"Exposure {current_exposure:.2%} at limit {self.exposure_limit:.2%}"
 
         return True, "Signal accepted"
 
-    def _select_option_contract(self, symbol: str, signal_type: str, current_price: float) -> Optional[OptionContract]:
-        """Select appropriate option contract based on signal - using cached prices."""
+    def _select_option_contract(self, signal: Dict, current_price: float) -> Optional[Any]:
+        """Select option contract using REAL option chain data from Fyers."""
         try:
-            # Use the provided current_price (already cached)
-            if not current_price or current_price <= 0:
-                logger.error(f"❌ Invalid price received for {symbol}: {current_price}")
-                return None
+            symbol = signal['symbol']
+            signal_type = signal['signal']
             
-            logger.info(f"📊 Live price for {symbol}: ₹{current_price:,.2f}")
+            # Get REAL option chain data from Fyers
+            option_chain = self.data_provider.get_option_chain(symbol)
             
-            # Create option contract based on live price
-            from src.models.option_contract import OptionContract, OptionType
-            from datetime import datetime, timedelta
+            # Accumulate options data for backtesting
+            self._accumulate_options_data(symbol, option_chain)
             
-            # Calculate ATM strike (round to nearest 50 for NIFTY, 100 for BANKNIFTY)
-            if 'NIFTY50' in symbol:
-                strike_round = 50
-                lot_size = 50
-            elif 'NIFTYBANK' in symbol:
-                strike_round = 100
-                lot_size = 25
-            else:
-                strike_round = 50
-                lot_size = 50
+            if not option_chain:
+                logger.warning(f"⚠️ Could not fetch real option chain for {symbol}, using fallback")
+                return self._create_fallback_option_contract(signal, current_price)
             
-            atm_strike = round(current_price / strike_round) * strike_round
+            # Use real option data
+            atm_strike = option_chain['atm_strike']
+            expiry_date = option_chain['expiry_date']
             
-            # Determine option type
-            if 'CALL' in signal_type.upper():
+            # Determine option type and get real premium
+            if 'CALL' in signal_type:
                 option_type = OptionType.CALL
-                # Use live market conditions for premium calculation
-                premium = current_price * 0.015  # 1.5% of underlying
-            elif 'PUT' in signal_type.upper():
+                if 'CE' in option_chain['options']:
+                    real_premium = option_chain['options']['CE']['ltp']
+                    option_symbol = option_chain['options']['CE']['symbol']
+                else:
+                    logger.warning(f"⚠️ No CE option found in real data for {symbol}")
+                    return self._create_fallback_option_contract(signal, current_price)
+            elif 'PUT' in signal_type:
                 option_type = OptionType.PUT
-                # Use live market conditions for premium calculation
-                premium = current_price * 0.015  # 1.5% of underlying
+                if 'PE' in option_chain['options']:
+                    real_premium = option_chain['options']['PE']['ltp']
+                    option_symbol = option_chain['options']['PE']['symbol']
+                else:
+                    logger.warning(f"⚠️ No PE option found in real data for {symbol}")
+                    return self._create_fallback_option_contract(signal, current_price)
             else:
                 logger.error(f"❌ Invalid signal type: {signal_type}")
                 return None
             
-            # Create contract with live data
+            # Get lot size based on symbol
+            if 'NIFTY50' in symbol:
+                lot_size = 50
+            elif 'NIFTYBANK' in symbol:
+                lot_size = 25
+            else:
+                lot_size = 50  # Default
+            
+            # Create contract with REAL data
+            contract = OptionContract(
+                symbol=option_symbol,
+                underlying=symbol,
+                strike=atm_strike,
+                expiry=datetime.strptime(expiry_date, '%Y-%m-%d'),
+                option_type=option_type,
+                lot_size=lot_size,
+                bid=option_chain['options'].get('CE' if option_type == OptionType.CALL else 'PE', {}).get('bid', real_premium * 0.95),
+                ask=option_chain['options'].get('CE' if option_type == OptionType.CALL else 'PE', {}).get('ask', real_premium * 1.05),
+                last=real_premium,
+                volume=option_chain['options'].get('CE' if option_type == OptionType.CALL else 'PE', {}).get('volume', 1000),
+                open_interest=option_chain['options'].get('CE' if option_type == OptionType.CALL else 'PE', {}).get('oi', 5000),
+                implied_volatility=0.25,
+                delta=0.5 if option_type == OptionType.CALL else -0.5,
+                gamma=0.01,
+                theta=-real_premium * 0.1,
+                vega=real_premium * 0.5
+            )
+            
+            logger.info(f"✅ Using REAL option data: {option_type.value} Strike ₹{atm_strike:,.0f}, Premium ₹{real_premium:.2f}")
+            return contract
+
+        except Exception as e:
+            logger.error(f"❌ Error selecting option contract: {e}")
+            return self._create_fallback_option_contract(signal, current_price)
+
+    def _create_fallback_option_contract(self, signal: Dict, current_price: float) -> Optional[Any]:
+        """Create fallback option contract when real data is unavailable."""
+        try:
+            symbol = signal['symbol']
+            signal_type = signal['signal']
+            
+            # Calculate ATM strike
+            atm_strike = round(current_price / 50) * 50
+            
+            # Determine option type
+            if 'CALL' in signal_type:
+                option_type = OptionType.CALL
+                # Use more realistic premium calculation for ATM options
+                premium = current_price * 0.008  # 0.8% of underlying for ATM options
+            elif 'PUT' in signal_type:
+                option_type = OptionType.PUT
+                # Use more realistic premium calculation for ATM options
+                premium = current_price * 0.008  # 0.8% of underlying for ATM options
+            else:
+                logger.error(f"❌ Invalid signal type: {signal_type}")
+                return None
+            
+            # Get lot size based on symbol
+            if 'NIFTY50' in symbol:
+                lot_size = 50
+            elif 'NIFTYBANK' in symbol:
+                lot_size = 25
+            else:
+                lot_size = 50  # Default
+            
+            # Create contract with fallback data
             contract = OptionContract(
                 symbol=f"{symbol.replace(':', '')}{self.now_kolkata().strftime('%d%m%y')}{atm_strike}{'CE' if option_type == OptionType.CALL else 'PE'}",
                 underlying=symbol,
@@ -565,7 +677,6 @@ class LivePaperTradingSystem:
                 bid=premium * 0.95,  # 5% spread
                 ask=premium * 1.05,
                 last=premium,
-                premium=premium,  # Explicit premium field
                 volume=1000,
                 open_interest=5000,
                 implied_volatility=0.25,
@@ -575,11 +686,11 @@ class LivePaperTradingSystem:
                 vega=premium * 0.5
             )
             
-            logger.info(f"📊 Created option contract based on live data: {option_type.value} Strike ₹{atm_strike:,.0f}, Premium ₹{premium:.2f}")
+            logger.warning(f"⚠️ Created FALLBACK option contract: {option_type.value} Strike ₹{atm_strike:,.0f}, Premium ₹{premium:.2f}")
             return contract
 
         except Exception as e:
-            logger.error(f"❌ Error selecting option contract: {e}")
+            logger.error(f"❌ Error creating fallback option contract: {e}")
             return None
 
     def _open_paper_trade(self, signal: Dict, option_contract: Any, entry_price: float, timestamp: datetime, last_prices: Dict[str, float] = None) -> Optional[str]:
@@ -593,18 +704,33 @@ class LivePaperTradingSystem:
                 adjusted_risk = risk_amount * confidence_multiplier
 
                 premium_per_lot = entry_price * option_contract.lot_size
-                max_lots = int(adjusted_risk // premium_per_lot) if premium_per_lot > 0 else 0
-                available_capital = self.cash * 0.9
-                max_affordable_lots = int(available_capital // premium_per_lot) if premium_per_lot > 0 else 0
-                max_lots = max(0, min(max_lots, max_affordable_lots, 10))
-
-                if max_lots < 1:
-                    logger.info(f"⚠️ Position size too small for {signal['strategy']}")
-                    return None
-
-                # Quantity in shares
-                lots = max_lots
+                
+                # Always use exactly 1 lot per trade for simplicity
+                lots = 1
                 quantity_shares = lots * option_contract.lot_size
+                
+                # Check if we can afford 1 lot
+                available_capital = self.cash * 0.9
+                if premium_per_lot > available_capital:
+                    logger.info(f"⚠️ Cannot afford 1 lot for {signal['strategy']} - need ₹{premium_per_lot:,.2f}, have ₹{available_capital:,.2f}")
+                    
+                    # Log capital rejection to database
+                    rejection_data = {
+                        'timestamp': timestamp,
+                        'symbol': signal['symbol'],
+                        'strategy': signal['strategy'],
+                        'signal_type': signal['signal'],
+                        'confidence': signal.get('confidence', 0),
+                        'required_capital': premium_per_lot,
+                        'available_capital': available_capital,
+                        'capital_shortfall': premium_per_lot - available_capital,
+                        'option_premium': entry_price,
+                        'lot_size': option_contract.lot_size,
+                        'total_cost_per_lot': premium_per_lot
+                    }
+                    self.db.save_capital_rejection_log(rejection_data)
+                    
+                    return None
 
                 # Apply slippage and calculate costs
                 exec_price = self._apply_slippage(entry_price, is_buy=True)
@@ -800,35 +926,8 @@ class LivePaperTradingSystem:
     
     def _check_exposure_limits(self, symbol: str, new_notional: float, last_prices: Dict[str, float] = None) -> bool:
         """Check exposure limits using equity-based calculation."""
-        try:
-            equity = self._equity(last_prices)
-            if equity <= 0:
-                logger.warning("Estimated equity <= 0; blocking new trade")
-                return False
-
-            # current cost of long BUY positions (use entry_value if present)
-            current_cost = sum(getattr(t, 'entry_value', t.entry_price * t.quantity)
-                               for t in self.open_trades.values() if t.signal_type.startswith('BUY'))
-
-            total_cost = current_cost + new_notional
-            total_exposure_with_new = total_cost / equity
-            if total_exposure_with_new > self.exposure_limit:
-                logger.warning(f"🚫 Total exposure limit exceeded: {total_exposure_with_new:.2%}")
-                return False
-
-            # symbol-specific exposure (50% of total limit)
-            symbol_cost = sum(getattr(t, 'entry_value', t.entry_price * t.quantity)
-                              for t in self.open_trades.values() if t.signal_type.startswith('BUY') and t.underlying == symbol)
-            symbol_exposure_with_new = (symbol_cost + new_notional) / equity
-            symbol_limit = self.exposure_limit * 0.5
-            if symbol_exposure_with_new > symbol_limit:
-                logger.warning(f"🚫 Symbol exposure limit exceeded for {symbol}: {symbol_exposure_with_new:.2%}")
-                return False
-
-            return True
-        except Exception as e:
-            logger.error(f"❌ Error checking exposure limits: {e}")
-            return False
+        # DISABLED: Always allow trades for 1 lot trading
+        return True
 
     def _close_paper_trade(self, trade_id: str, exit_price: float,
                           exit_reason: str, timestamp: datetime) -> Optional[PaperTrade]:
@@ -1023,56 +1122,57 @@ class LivePaperTradingSystem:
         return closed_trades
 
     def _generate_signals(self, index_data: pd.DataFrame) -> List[Dict]:
-        """Generate trading signals from ALL strategies with persistent deduplication."""
-        signals = []
-        current_time = time.time()
-        
-        # Clean old entries from dedupe cache using strategy-specific TTLs
-        for key, timestamp in list(self._signal_dedupe_cache.items()):
-            strategy_name = key.split('_')[0]  # Extract strategy name from key
-            ttl = self.strategy_dedupe_ttls.get(strategy_name, self.default_dedupe_ttl)
-            if current_time - timestamp >= ttl:
-                del self._signal_dedupe_cache[key]
-        
-        for strategy_name, strategy in self.strategies.items():
-            try:
-                if hasattr(strategy, 'analyze_vectorized'):
-                    signals_df = strategy.analyze_vectorized(index_data)
-                    if not signals_df.empty:
-                        for idx, row in signals_df.iterrows():
-                            # Create unique signal identifier
-                            signal_key = f"{strategy_name}_{row['signal']}_{row['price']:.0f}"
-                            
-                            # Get strategy-specific TTL
-                            ttl = self.strategy_dedupe_ttls.get(strategy_name, self.default_dedupe_ttl)
-                            
-                            # Skip if we've already seen this signal recently
-                            if signal_key in self._signal_dedupe_cache:
-                                continue
-                            
-                            self._signal_dedupe_cache[signal_key] = current_time
-                            
-                            signal = {
-                                'timestamp': index_data.loc[idx, 'timestamp'],
-                                'strategy': strategy_name,
-                                'signal': row['signal'],
-                                'price': float(row['price']),
-                                'confidence': float(row.get('confidence_score', 50)),
-                                'reasoning': str(row.get('reasoning', ''))[:200]
-                            }
-                            signals.append(signal)
-            except Exception as e:
-                logger.error(f"❌ Error in {strategy_name}: {e}")
-
-        # Limit signals to prevent overwhelming the system
-        max_signals_per_cycle = 5
-        if len(signals) > max_signals_per_cycle:
-            # Sort by confidence and take top signals
-            signals.sort(key=lambda x: x.get('confidence', 0), reverse=True)
-            signals = signals[:max_signals_per_cycle]
-            logger.info(f"📊 Limited signals to top {max_signals_per_cycle} by confidence")
-
-        return signals
+        """Generate trading signals using unified strategy engine."""
+        try:
+            # Prepare data for unified engine - handle multiple symbols
+            current_prices = {}
+            data_dict = {}
+            
+            # Get data for all symbols
+            for symbol in self.symbols:
+                recent_data = self._get_recent_index_data(symbol)
+                if recent_data is not None and not recent_data.empty:
+                    data_dict[symbol] = recent_data
+                    current_prices[symbol] = recent_data['close'].iloc[-1]
+            
+            if not data_dict:
+                logger.debug("⚠️ No data available for signal generation")
+                return []
+            
+            # Use unified strategy engine
+            signals = self.strategy_engine.generate_signals(data_dict, current_prices)
+            
+            # Apply deduplication
+            current_time = time.time()
+            deduplicated_signals = []
+            
+            for signal in signals:
+                # Create unique signal identifier
+                signal_key = f"{signal['strategy']}_{signal['signal']}_{signal.get('current_price', 0):.0f}"
+                
+                # Skip if we've already seen this signal recently
+                if signal_key in self._signal_dedupe_cache:
+                    continue
+                
+                self._signal_dedupe_cache[signal_key] = current_time
+                deduplicated_signals.append(signal)
+            
+            # Limit signals to prevent overwhelming the system
+            max_signals_per_cycle = 5
+            if len(deduplicated_signals) > max_signals_per_cycle:
+                # Sort by confidence and take top signals
+                deduplicated_signals.sort(key=lambda x: x.get('confidence', 0), reverse=True)
+                deduplicated_signals = deduplicated_signals[:max_signals_per_cycle]
+                logger.info(f"📊 Limited signals to top {max_signals_per_cycle} by confidence")
+            
+            if deduplicated_signals:
+                logger.info(f"📊 Generated {len(deduplicated_signals)} signals")
+            
+            return deduplicated_signals
+            
+        except Exception as e:
+            logger.error(f"❌ Error generating signals with unified engine: {e}")
+            return []
 
     def _log_rejected_signal(self, signal: Dict, reason: str):
         """Log rejected signal with detailed reasoning for debugging."""
@@ -1234,8 +1334,8 @@ class LivePaperTradingSystem:
                     strategy_performance[strategy]['wins'] += 1
             
             return {
-                'session_start': getattr(self, 'session_start', datetime.now()),
-                'session_end': datetime.now(),
+                'session_start': getattr(self, 'session_start', self.now_kolkata()),
+                'session_end': self.now_kolkata(),
                 'total_signals_generated': self.total_signals_generated,
                 'total_signals_rejected': self.total_signals_rejected,
                 'total_trades_executed': self.total_trades_executed,
@@ -1262,152 +1362,76 @@ class LivePaperTradingSystem:
             return {}
 
     def _trading_loop(self):
-        """Main trading loop - runs in separate thread."""
+        """Main trading loop with optimized logging."""
         logger.info("🔄 Trading loop started - entering main loop")
         
-        # No price caching - fetch fresh prices each time
-        
-        while self.is_running:
+        while not self._stop_event.is_set():
             try:
                 current_time = self.now_kolkata()
-                logger.info(f"🔄 Trading loop iteration at {current_time.strftime('%H:%M:%S')}")
                 
-                # Check if market is open (9:15 AM to 3:30 PM IST)
-                if not self._is_market_open(current_time):
-                    # Outside market hours - sleep longer
-                    logger.info(f"💤 Outside market hours, sleeping for 5 minutes")
-                    time.sleep(300)  # Sleep for 5 minutes
-                    continue
-
-                # Market is open - process trading
-                logger.info(f"📊 Market is open - processing signals at {current_time.strftime('%H:%M:%S')}")
+                # Reduced logging frequency - only log every 5 minutes
+                if not hasattr(self, '_last_status_log') or (current_time - self._last_status_log).total_seconds() > 300:
+                    logger.info(f"🔄 Trading loop iteration at {current_time.strftime('%H:%M:%S')}")
+                    self._last_status_log = current_time
                 
-                # Get current index data - fetch fresh prices each time
-                index_prices = {}  # For signal generation
-                contract_prices = {}  # For exits/equity/exposure
-                
-                for symbol in self.symbols:
-                    try:
-                        # Get real-time index price using cache
-                        index_price = self._get_price_cached(symbol)
-                        if index_price is None:
-                            logger.warning(f"⚠️ Could not get price for {symbol}")
-                            continue
-                        
-                        index_prices[symbol] = index_price
-
-                        # Get recent index data for signal generation
-                        index_data = self._get_recent_index_data(symbol)
-                        if index_data is None or index_data.empty:
-                            logger.warning(f"⚠️ Could not get data for {symbol}")
-                            continue
-
-                        # Generate signals from ALL strategies
-                        signals = self._generate_signals(index_data)
-                        
-                        # Process signals
-                        for signal in signals:
-                            signal['symbol'] = symbol
-                            # Remove this line to prevent double counting
-                            # self.total_signals_generated += 1
-                            
-                            # Block new trades after EOD exit is triggered
-                            if self.eod_exit_triggered:
-                                logger.debug(f"🚫 Blocking new trade - EOD exit triggered")
-                                continue
-                            
-                            # Check if we're past 15:20 IST (EOD exit time)
-                            ist_time = current_time.astimezone(self.tz) if current_time.tzinfo else current_time.replace(tzinfo=ZoneInfo("UTC")).astimezone(self.tz)
-                            if ist_time.hour == 15 and ist_time.minute >= 20:
-                                if not self.eod_exit_triggered:
-                                    logger.info("🕐 EOD exit time reached - blocking new trades")
-                                    self.eod_exit_triggered = True
-                                continue
-                            
-                            # Check if we should open a trade
-                            should_open, reason = self._should_open_trade(signal)
-                            if not should_open:
-                                self.total_signals_rejected += 1
-                                logger.info(f"🚫 Signal rejected: {reason}")
-                                continue
-                            
-                            # Select option contract
-                            option_contract = self._select_option_contract(symbol, signal['signal'], index_price)
-                            if option_contract is None:
-                                self.total_signals_rejected += 1
-                                logger.info(f"🚫 Could not select option contract for {signal['strategy']}")
-                                continue
-                            
-                            # Open trade using ask price for buying
-                            trade_id = self._open_paper_trade(signal, option_contract, option_contract.ask, current_time, contract_prices)
-                            if trade_id:
-                                logger.info(f"✅ Trade opened: {trade_id[:8]}...")
-                                # Update contract prices with the new trade
-                                contract_prices[option_contract.symbol] = option_contract.ask
-                            else:
-                                self.total_signals_rejected += 1
-                                logger.info(f"🚫 Failed to open trade for {signal['strategy']}")
+                if self._is_market_open():
+                    # Only log market status every 5 minutes
+                    if not hasattr(self, '_last_market_log') or (current_time - self._last_market_log).total_seconds() > 300:
+                        logger.debug(f"📊 Market is open - processing signals at {current_time.strftime('%H:%M:%S')}")
+                        self._last_market_log = current_time
                     
-                    except Exception as e:
-                        logger.error(f"❌ Error processing {symbol}: {e}")
-                        continue
+                    # Process signals for each symbol
+                    for symbol in self.symbols:
+                        try:
+                            # Get live price with reduced logging
+                            index_price = self._get_price_cached(symbol)
+                            if not index_price:
+                                logger.debug(f"⚠️ No price data for {symbol}")
+                                continue
+                            
+                            # Only log price updates every 2 minutes
+                            if not hasattr(self, f'_last_price_log_{symbol}') or (current_time - getattr(self, f'_last_price_log_{symbol}', current_time)).total_seconds() > 120:
+                                logger.debug(f"📊 Live price for {symbol}: ₹{index_price:,.2f}")
+                                setattr(self, f'_last_price_log_{symbol}', current_time)
+                            
+                            # Get recent data for signal generation
+                            recent_data = self._get_recent_index_data(symbol)
+                            if recent_data is None:
+                                continue
+                            
+                            # Generate signals with reduced logging
+                            signals = self._generate_signals(recent_data)
+                            if signals:
+                                logger.debug(f"📊 Generated {len(signals)} signals for {symbol}")
+                                
+                                # Process signals
+                                for signal in signals:
+                                    self._process_signal(signal, index_price)
+                            
+                        except Exception as e:
+                            logger.error(f"❌ Error processing {symbol}: {e}")
+                    
+                    # Update performance metrics less frequently
+                    if len(self.closed_trades) % 5 == 0 and len(self.closed_trades) != self._last_metrics_count:
+                        self._update_performance_metrics()
+                        self._last_metrics_count = len(self.closed_trades)
+                    
+                    # Check trade exits
+                    self._check_trade_exits()
+                    
+                    # Log status less frequently
+                    if not hasattr(self, '_last_status_update') or (current_time - self._last_status_update).total_seconds() > 60:
+                        logger.debug(f"📊 Status: Cash: ₹{self.cash:,.2f}, Equity: ₹{self._equity():,.2f}, Exposure: {self._current_total_exposure():.1%}, Open Trades: {len(self.open_trades)}")
+                        self._last_status_update = current_time
                 
-                # Update contract prices for all open trades using concurrent fetching
-                missing_contracts = [trade.contract_symbol for trade in self.open_trades.values() 
-                                   if trade.contract_symbol not in contract_prices]
+                # Sleep for trading interval
+                time.sleep(self.trading_interval)
                 
-                if missing_contracts:
-                    fetched_ltps = self._fetch_option_ltps_concurrent(missing_contracts)
-                    contract_prices.update(fetched_ltps)
-                
-                # Fallback to entry price for any missing contracts
-                for trade in self.open_trades.values():
-                    if trade.contract_symbol not in contract_prices:
-                        contract_prices[trade.contract_symbol] = trade.entry_price
-                
-                # Check for trade exits using contract prices
-                if contract_prices:
-                    closed_trades = self._check_trade_exits(contract_prices, current_time)
-                    if closed_trades:
-                        logger.info(f"🔒 Closed {len(closed_trades)} trades")
-                
-                # Log current status using contract prices for equity calculation
-                equity = self._equity(contract_prices)
-                exposure = self._current_total_exposure(contract_prices)
-                
-                if self.verbose:
-                    logger.info(f"📊 Status: Cash: ₹{self.cash:,.2f}, Equity: ₹{equity:,.2f}, Exposure: {exposure:.1%}, Open Trades: {len(self.open_trades)}")
-                else:
-                    # Only log if there are open trades or significant changes
-                    if len(self.open_trades) > 0 or abs(equity - self.initial_capital) > self.initial_capital * 0.01:
-                        logger.info(f"📊 Status: Cash: ₹{self.cash:,.2f}, Equity: ₹{equity:,.2f}, Exposure: {exposure:.1%}, Open Trades: {len(self.open_trades)}")
-                
-                # Update performance metrics every 10 trades or 15 minutes (whichever comes first)
-                should_update_metrics = False
-                
-                # Trade-based update
-                if len(self.closed_trades) - self._last_metrics_count >= 10:
-                    should_update_metrics = True
-                
-                # Time-based update
-                current_time = time.time()
-                if (self._last_metrics_time is None or 
-                    current_time - self._last_metrics_time >= self._metrics_update_interval):
-                    should_update_metrics = True
-                
-                if should_update_metrics:
-                    self._update_performance_metrics()
-                    self._last_metrics_count = len(self.closed_trades)
-                    self._last_metrics_time = current_time
-                
-                # Use event wait instead of sleep for better responsiveness
-                if self._stop_event.wait(timeout=15):
-                    logger.info("🛑 Stop event received, exiting trading loop")
-                    break
-
             except Exception as e:
-                logger.exception(f"❌ Error in trading loop: {e}")
-                time.sleep(60)
+                logger.error(f"❌ Error in trading loop: {e}")
+                time.sleep(self.trading_interval)
+        
+        logger.info("🛑 Stop event received, exiting trading loop")
 
     def _is_market_open(self, current_time: Optional[datetime] = None) -> bool:
         """Check if market is open (market timezone = Asia/Kolkata)."""
@@ -1457,9 +1481,10 @@ class LivePaperTradingSystem:
             latest_timestamp = df['timestamp'].iloc[-1]
             last_processed = self._last_bar_ts.get(symbol, pd.Timestamp(0, tz=ZoneInfo("Asia/Kolkata")))
             
+            # In test mode or if no new candle, still allow signal generation but log it
             if latest_timestamp <= last_processed:
-                logger.debug(f"⏭️ No new candle data for {symbol} - skipping signal generation")
-                return None
+                logger.debug(f"⏭️ No new candle data for {symbol} - using existing data for signal generation")
+                # Don't return None, continue with existing data
             
             # Update last processed timestamp
             self._last_bar_ts[symbol] = latest_timestamp
@@ -1724,11 +1749,120 @@ class LivePaperTradingSystem:
         except Exception as e:
             logger.error(f"❌ Error logging P&L update: {e}")
 
+    def _accumulate_options_data(self, symbol: str, option_chain: Dict = None):
+        """Accumulate options data for historical analysis using real Fyers Option Chain API."""
+        try:
+            # Get raw option chain data from Fyers API
+            raw_option_chain = self.data_manager.get_option_chain(symbol)
+            
+            if raw_option_chain:
+                # Save raw data to database
+                self.database.save_raw_options_chain(raw_option_chain)
+                
+                # Log key metrics
+                options_chain = raw_option_chain.get('optionsChain', [])
+                call_oi = raw_option_chain.get('callOi', 0)
+                put_oi = raw_option_chain.get('putOi', 0)
+                indiavix = raw_option_chain.get('indiavixData', {}).get('ltp', 0)
+                
+                logger.info(f"📊 Accumulated raw option chain for {symbol}")
+                logger.info(f"📈 Call OI: {call_oi:,}, Put OI: {put_oi:,}")
+                logger.info(f"📊 India VIX: {indiavix:.2f}")
+                logger.info(f"📋 Total Options: {len(options_chain)}")
+                
+                # Count real strikes
+                real_strikes = set()
+                for option in options_chain:
+                    if option.get('option_type') in ['CE', 'PE']:
+                        strike = option.get('strike_price', -1)
+                        if strike > 0:
+                            real_strikes.add(strike)
+                
+                real_strikes = sorted(list(real_strikes))
+                logger.info(f"🎯 Real Strikes: {len(real_strikes)} strikes")
+                if real_strikes:
+                    logger.info(f"📊 Strike Range: {real_strikes[0]} - {real_strikes[-1]}")
+                
+            else:
+                logger.warning(f"⚠️ Could not fetch raw option chain for {symbol}")
+                
+        except Exception as e:
+            logger.error(f"❌ Error accumulating options data for {symbol}: {e}")
+
+    def accumulate_options_data_continuously(self, symbols: List[str] = None, interval_seconds: int = 60):
+        """Continuously accumulate options data for all major indexes."""
+        if symbols is None:
+            symbols = ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX', 'NSE:FINNIFTY-INDEX']
+        
+        logger.info(f"🚀 Starting continuous options data accumulation for {len(symbols)} symbols")
+        logger.info(f"📊 Symbols: {', '.join(symbols)}")
+        logger.info(f"⏰ Interval: {interval_seconds} seconds")
+        
+        try:
+            while not self._stop_event.is_set():
+                start_time = time.time()
+                
+                for symbol in symbols:
+                    try:
+                        # Get option chain data
+                        option_chain = self.data_provider.get_option_chain(symbol)
+                        
+                        if option_chain:
+                            # Accumulate the data
+                            self._accumulate_options_data(symbol, option_chain)
+                            logger.debug(f"✅ Accumulated options data for {symbol}")
+                        else:
+                            logger.warning(f"⚠️ Could not fetch options data for {symbol}")
+                            
+                    except Exception as e:
+                        logger.error(f"❌ Error accumulating options data for {symbol}: {e}")
+                
+                # Calculate sleep time
+                elapsed = time.time() - start_time
+                sleep_time = max(0, interval_seconds - elapsed)
+                
+                if sleep_time > 0:
+                    logger.debug(f"💤 Sleeping for {sleep_time:.1f} seconds")
+                    time.sleep(sleep_time)
+                    
+        except KeyboardInterrupt:
+            logger.info("🛑 Options data accumulation stopped by user")
+        except Exception as e:
+            logger.error(f"❌ Error in options data accumulation: {e}")
+        finally:
+            logger.info("✅ Options data accumulation completed")
+
+    def get_accumulated_options_summary(self) -> Dict:
+        """Get summary of accumulated options data."""
+        try:
+            return self.db.get_options_data_summary()
+        except Exception as e:
+            logger.error(f"❌ Error getting options data summary: {e}")
+            return {}
+
+    def _get_available_strategies(self):
+        """Get list of available strategies."""
+        return ['ema_crossover_enhanced', 'supertrend_ema', 'supertrend_macd_rsi_ema']
+
+    def safe_pct(self, value: float, denominator: float) -> float:
+        """Safely calculate percentage with division by zero protection."""
+        if denominator == 0:
+            return 0.0
+        return (value / denominator) * 100
+
+    def now_kolkata(self) -> datetime:
+        """Get current time in Kolkata timezone."""
+        return datetime.now(tz=self.tz)
+
+    def _make_open_key(self, strategy: str, contract_sym: str, option_type: str) -> Tuple[str, str, str]:
+        """Create canonical open key for position tracking."""
+        return (strategy, contract_sym, option_type)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Live Paper Trading System')
     parser.add_argument('--symbols', nargs='+', default=['NSE:NIFTY50-INDEX'], help='Trading symbols')
-    parser.add_argument('--capital', type=float, default=100000.0, help='Initial capital')
+    parser.add_argument('--capital', type=float, default=20000.0, help='Initial capital')
     parser.add_argument('--risk', type=float, default=0.02, help='Max risk per trade')
     parser.add_argument('--confidence_cutoff', type=float, default=40.0,
                        help='Minimum confidence score to execute trades (default: 40.0)')
@@ -1746,16 +1880,18 @@ def main():
                        help='Take profit percentage (default: 25.0)')
     parser.add_argument('--time_stop_minutes', type=int, default=30,
                        help='Time-based exit in minutes (default: 30)')
-    parser.add_argument('--verbose', action='store_true',
-                       help='Enable verbose logging')
-    parser.add_argument('--data_provider', type=str, default='paper',
-                       help='Data provider (paper/fyers)')
+    parser.add_argument('--verbose', action='store_true', help='Enable verbose logging')
+    parser.add_argument('--data_provider', choices=['paper', 'fyers'], default='fyers', help='Data provider')
     parser.add_argument('--test_mode', action='store_true', help='Run in test mode for a few minutes')
+    parser.add_argument('--accumulate_options', action='store_true', help='Run in options data accumulation mode only')
+    parser.add_argument('--options_interval', type=int, default=60, help='Options data accumulation interval in seconds')
+    parser.add_argument('--options_symbols', nargs='+', default=['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX', 'NSE:FINNIFTY-INDEX'], help='Symbols for options data accumulation')
 
     args = parser.parse_args()
 
     # Initialize trading system
     trading_system = LivePaperTradingSystem(
+        symbols=args.symbols,
         initial_capital=args.capital,
         max_risk_per_trade=args.risk,
         confidence_cutoff=args.confidence_cutoff,
@@ -1763,55 +1899,44 @@ def main():
         max_daily_loss_pct=args.max_daily_loss_pct,
         commission_bps=args.commission_bps,
         slippage_bps=args.slippage_bps,
-        symbols=args.symbols,
-        data_provider=args.data_provider,
         stop_loss_pct=args.stop_loss_pct,
         take_profit_pct=args.take_profit_pct,
         time_stop_minutes=args.time_stop_minutes,
-        verbose=args.verbose
+        verbose=args.verbose,
+        data_provider=args.data_provider
     )
 
     try:
-        # Start trading
-        trading_system.start_trading()
-        
-        # Test mode: run for 5 minutes
-        if args.test_mode:
-            logger.info("🧪 Running in test mode for 5 minutes...")
-            time.sleep(300)  # 5 minutes
-            trading_system.stop_trading()
-            
-            # Generate and print session report
-            report = trading_system._generate_session_report()
-            trading_system._print_session_summary(report)
-            return
-        
-        # Continuous mode - run during market hours
-        logger.info("🔄 Starting continuous paper trading during market hours...")
-        logger.info("📅 Trading will run from 9:15 AM to 3:30 PM IST, Monday to Friday")
-        logger.info("⏹️ Press Ctrl+C to stop trading")
-        
-        # Run continuously until interrupted
-        while True:
-            time.sleep(60)  # Check every minute
-            
-            # Check if it's a new trading day
-            current_time = datetime.now()
-            if trading_system._is_market_open(current_time):
-                # Reset daily limits at market open
-                if current_time.hour == 9 and current_time.minute == 15:
-                    trading_system.daily_pnl = 0.0
-                    trading_system.daily_loss_limit_hit = False
-                    logger.info("🆕 New trading day started - resetting daily limits")
-        
-    except KeyboardInterrupt:
-        logger.info("🛑 Interrupted by user")
-        trading_system.stop_trading()
-        report = trading_system._generate_session_report()
-        trading_system._print_session_summary(report)
+        if args.accumulate_options:
+            # Run in options data accumulation mode only
+            logger.info("🚀 Starting options data accumulation mode")
+            trading_system.accumulate_options_data_continuously(
+                symbols=args.options_symbols,
+                interval_seconds=args.options_interval
+            )
+        else:
+            # Run normal trading mode
+            if args.test_mode:
+                logger.info("🧪 Running in test mode for a few minutes")
+                trading_system.start_trading()
+                time.sleep(300)  # Run for 5 minutes
+                trading_system.stop_trading()
+            else:
+                logger.info("🚀 Starting live paper trading")
+                trading_system.start_trading()
+                
+                # Keep running until interrupted
+                try:
+                    while True:
+                        time.sleep(1)
+                except KeyboardInterrupt:
+                    logger.info("🛑 Stopping trading system...")
+                    trading_system.stop_trading()
+                    
     except Exception as e:
-        logger.error(f"❌ Fatal error: {e}")
+        logger.error(f"❌ Error in main execution: {e}")
         trading_system.stop_trading()
+        raise
 
 
 if __name__ == "__main__":
