@@ -21,7 +21,7 @@ import re
 from typing import Optional
 
 # Set up logger
-logger = setup_logging('fyers_api')
+logger = logging.getLogger(__name__)
 
 class FyersClient:
     """Fyers API client for authentication and trading."""
@@ -479,8 +479,8 @@ class FyersClient:
                 
                 if response and 'code' in response:
                     if response['code'] == 429:
-                        logger.debug(f"Rate limit hit for quotes API")
-                        return None
+                        logger.debug(f"Rate limit hit for quotes API for {symbol}, using historical fallback")
+                        # Don't return None here, let it fall through to historical data
                     elif response['code'] == 401:
                         logger.error(f"Authentication failed for {symbol}. Token may have expired.")
                         return None

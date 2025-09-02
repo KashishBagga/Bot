@@ -1,21 +1,17 @@
-"""
-Unified Trading Database
-A comprehensive database system that combines live trading, backtesting, and analytics
-in a single database with proper relationships and naming conventions.
-"""
-
 import sqlite3
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, List, Optional, Any
 from datetime import datetime
+import pandas as pd
 import json
 
 logger = logging.getLogger(__name__)
 
-class UnifiedTradingDatabase:
-    """Unified database for all trading and backtesting data."""
+class UnifiedDatabase:
+    """Unified database for all trading data."""
     
-    def __init__(self, db_path: str = "unified_trading.db"):
+    def __init__(self, db_path: str = 'unified_trading.db'):
+        """Initialize unified database."""
         self.db_path = db_path
         self.init_database()
     
@@ -24,14 +20,6 @@ class UnifiedTradingDatabase:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
-                # Clear existing tables
-                cursor.execute("DROP TABLE IF EXISTS trading_signals")
-                cursor.execute("DROP TABLE IF EXISTS rejected_signals")
-                cursor.execute("DROP TABLE IF EXISTS open_option_positions")
-                cursor.execute("DROP TABLE IF EXISTS closed_option_positions")
-                cursor.execute("DROP TABLE IF EXISTS equity_curve")
-                cursor.execute("DROP TABLE IF EXISTS performance_metrics")
                 
                 # Live trading signals
                 cursor.execute("""
@@ -68,33 +56,14 @@ class UnifiedTradingDatabase:
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
-                
-                # Capital rejection logs
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS capital_rejection_logs (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        timestamp DATETIME NOT NULL,
-                        symbol TEXT NOT NULL,
-                        strategy TEXT NOT NULL,
-                        signal_type TEXT NOT NULL,
-                        confidence REAL NOT NULL,
-                        required_capital REAL NOT NULL,
-                        available_capital REAL NOT NULL,
-                        capital_shortfall REAL NOT NULL,
-                        option_premium REAL NOT NULL,
-                        lot_size INTEGER NOT NULL,
-                        total_cost_per_lot REAL NOT NULL,
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-                
+            
                 conn.commit()
                 logger.info("✅ Unified database schema created successfully")
-                
+            
         except Exception as e:
             logger.error(f"❌ Error creating unified database: {e}")
             raise
-
+    
     def save_live_trading_signal(self, signal_data: Dict):
         """Save live trading signal to database."""
         try:
@@ -119,134 +88,140 @@ class UnifiedTradingDatabase:
                     signal_data.get('target3'),
                     signal_data.get('position_multiplier', 1.0)
                 ))
+                
                 conn.commit()
-                logger.debug(f"✅ Saved live trading signal for {signal_data['strategy']}")
+                logger.info(f"✅ Live trading signal saved: {signal_data['symbol']} {signal_data['signal_type']}")
+                return True
+                
         except Exception as e:
             logger.error(f"❌ Error saving live trading signal: {e}")
-
-    def save_rejected_signal(self, rejection_data: Dict):
+            return False
+    
+    def save_rejected_signal(self, signal_data: Dict):
         """Save rejected signal to database."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT INTO rejected_signals 
-                    (timestamp, symbol, strategy, signal_type, confidence, rejection_reason, 
-                     rejection_type, additional_data)
+                    (timestamp, symbol, strategy, signal_type, confidence, 
+                     rejection_reason, rejection_type, additional_data)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    rejection_data['timestamp'],
-                    rejection_data['symbol'],
-                    rejection_data['strategy'],
-                    rejection_data['signal_type'],
-                    rejection_data['confidence'],
-                    rejection_data['rejection_reason'],
-                    rejection_data['rejection_type'],
-                    json.dumps(rejection_data.get('additional_data', {}))
+                    signal_data['timestamp'],
+                    signal_data['symbol'],
+                    signal_data['strategy'],
+                    signal_data['signal_type'],
+                    signal_data['confidence'],
+                    signal_data['rejection_reason'],
+                    signal_data['rejection_type'],
+                    json.dumps(signal_data.get('additional_data', {}))
                 ))
+                
                 conn.commit()
-                logger.debug(f"✅ Saved rejected signal for {rejection_data['strategy']}")
+                logger.info(f"✅ Rejected signal saved: {signal_data['symbol']} - {signal_data['rejection_reason']}")
+                return True
+                
         except Exception as e:
             logger.error(f"❌ Error saving rejected signal: {e}")
-
-    def save_capital_rejection_log(self, rejection_data: Dict):
-        """Save capital rejection log to database."""
+            return False
+    
+    def get_live_trading_signals(self, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get live trading signals from database."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("""
-                    INSERT INTO capital_rejection_logs 
-                    (timestamp, symbol, strategy, signal_type, confidence, 
-                     required_capital, available_capital, capital_shortfall,
-                     option_premium, lot_size, total_cost_per_lot)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    rejection_data['timestamp'],
-                    rejection_data['symbol'],
-                    rejection_data['strategy'],
-                    rejection_data['signal_type'],
-                    rejection_data['confidence'],
-                    rejection_data['required_capital'],
-                    rejection_data['available_capital'],
-                    rejection_data['capital_shortfall'],
-                    rejection_data['option_premium'],
-                    rejection_data['lot_size'],
-                    rejection_data['total_cost_per_lot']
-                ))
-                conn.commit()
-                logger.debug(f"✅ Saved capital rejection log for {rejection_data['strategy']}")
+                
+                if symbol:
+                    cursor.execute("""
+                        SELECT * FROM live_trading_signals 
+                        WHERE symbol = ? 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    """, (symbol, limit))
+                else:
+                    cursor.execute("""
+                        SELECT * FROM live_trading_signals 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    """, (limit,))
+                
+                columns = [description[0] for description in cursor.description]
+                rows = cursor.fetchall()
+                
+                return [dict(zip(columns, row)) for row in rows]
+                
         except Exception as e:
-            logger.error(f"❌ Error saving capital rejection log: {e}")
-
-    def get_performance_summary(self) -> Dict:
-        """Get comprehensive performance summary."""
+            logger.error(f"❌ Error getting live trading signals: {e}")
+            return []
+    
+    def get_rejected_signals(self, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get rejected signals from database."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 
-                # Get rejected signals count
-                cursor.execute("""
-                    SELECT COUNT(*) FROM rejected_signals
-                """)
-                rejected_signals = cursor.fetchone()[0]
+                if symbol:
+                    cursor.execute("""
+                        SELECT * FROM rejected_signals 
+                        WHERE symbol = ? 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    """, (symbol, limit))
+                else:
+                    cursor.execute("""
+                        SELECT * FROM rejected_signals 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    """, (limit,))
                 
-                # Get capital rejections count
-                cursor.execute("""
-                    SELECT COUNT(*) FROM capital_rejection_logs
-                """)
-                capital_rejections = cursor.fetchone()[0]
+                columns = [description[0] for description in cursor.description]
+                rows = cursor.fetchall()
                 
-                summary = {
-                    'current_status': {
-                        'rejected_signals': rejected_signals,
-                        'capital_rejections': capital_rejections
-                    }
+                return [dict(zip(columns, row)) for row in rows]
+                
+        except Exception as e:
+            logger.error(f"❌ Error getting rejected signals: {e}")
+            return []
+    
+    def get_performance_summary(self) -> Dict[str, Any]:
+        """Get performance summary from database."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Total signals
+                cursor.execute("SELECT COUNT(*) FROM live_trading_signals")
+                total_signals = cursor.fetchone()[0]
+                
+                # Total rejected
+                cursor.execute("SELECT COUNT(*) FROM rejected_signals")
+                total_rejected = cursor.fetchone()[0]
+                
+                # Signals by type
+                cursor.execute("""
+                    SELECT signal_type, COUNT(*) 
+                    FROM live_trading_signals 
+                    GROUP BY signal_type
+                """)
+                signals_by_type = dict(cursor.fetchall())
+                
+                # Rejections by type
+                cursor.execute("""
+                    SELECT rejection_type, COUNT(*) 
+                    FROM rejected_signals 
+                    GROUP BY rejection_type
+                """)
+                rejections_by_type = dict(cursor.fetchall())
+                
+                return {
+                    'total_signals': total_signals,
+                    'total_rejected': total_rejected,
+                    'signals_by_type': signals_by_type,
+                    'rejections_by_type': rejections_by_type,
+                    'success_rate': (total_signals / (total_signals + total_rejected)) * 100 if (total_signals + total_rejected) > 0 else 0
                 }
-                
-                return summary
                 
         except Exception as e:
             logger.error(f"❌ Error getting performance summary: {e}")
             return {}
-
-    def get_rejection_summary(self) -> Dict:
-        """Get summary of all rejections."""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                
-                # Get rejection counts by type
-                cursor.execute("""
-                    SELECT rejection_type, COUNT(*) as count
-                    FROM rejected_signals
-                    GROUP BY rejection_type
-                """)
-                rejection_counts = dict(cursor.fetchall())
-                
-                # Get capital rejection summary
-                cursor.execute("""
-                    SELECT 
-                        COUNT(*) as total_rejections,
-                        AVG(capital_shortfall) as avg_shortfall,
-                        SUM(capital_shortfall) as total_shortfall
-                    FROM capital_rejection_logs
-                """)
-                capital_summary = cursor.fetchone()
-                
-                return {
-                    'rejection_counts': rejection_counts,
-                    'capital_rejections': {
-                        'total': capital_summary[0] if capital_summary else 0,
-                        'avg_shortfall': capital_summary[1] if capital_summary else 0,
-                        'total_shortfall': capital_summary[2] if capital_summary else 0
-                    }
-                }
-                
-        except Exception as e:
-            logger.error(f"❌ Error getting rejection summary: {e}")
-            return {}
-
-# Legacy compatibility
-class UnifiedDatabase(UnifiedTradingDatabase):
-    """Legacy class for backward compatibility."""
-    pass

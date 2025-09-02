@@ -116,11 +116,11 @@ class OptimizedBacktester:
             required_indicators = {'ema_20', 'ema_50', 'supertrend', 'rsi', 'macd'}
             if not required_indicators.issubset(set(df.columns)):
                 # Use the unified indicators function - compute once only
-                df = add_technical_indicators(df)
-                
-                # Add market condition analysis
-                from src.core.market_conditions import analyze_market_conditions
-                df = analyze_market_conditions(df)
+            df = add_technical_indicators(df)
+            
+            # Add market condition analysis
+            from src.core.market_conditions import analyze_market_conditions
+            df = analyze_market_conditions(df)
             
             # Debug: Show market condition distribution
             if 'market_condition' in df.columns:
@@ -145,7 +145,7 @@ class OptimizedBacktester:
            Assumes indicators are already present in df (do NOT recompute here)."""
         start_time = time.time()
         signals = []
-
+        
         # Import enhanced original strategies
         from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
         from src.strategies.supertrend_ema import SupertrendEma
@@ -156,7 +156,7 @@ class OptimizedBacktester:
             'supertrend_ema': SupertrendEma(),
             'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
         }
-
+        
         logger.info(f"🧠 Running {len(strategies)} enhanced strategies with optimized processing...")
 
         # Ensure timestamp is datetime
@@ -238,17 +238,17 @@ class OptimizedBacktester:
                             if result and result.get('signal') and result.get('signal') != 'NO TRADE':
                                 signal = {
                                     'timestamp': df.iat[j, df.columns.get_loc('timestamp')],
-                                    'strategy': strategy_name,
-                                    'signal': result['signal'],
+                                'strategy': strategy_name,
+                                'signal': result['signal'],
                                     'price': result.get('price', df.iat[j, df.columns.get_loc('close')]),
-                                    'confidence': result.get('confidence_score', 0),
+                                'confidence': result.get('confidence_score', 0),
                                     'reasoning': str(result.get('reasoning', ''))[:100],
-                                    'stop_loss': result.get('stop_loss'),
-                                    'target1': result.get('target1'),
-                                    'target2': result.get('target2'),
-                                    'target3': result.get('target3'),
-                                    'position_multiplier': result.get('position_multiplier', 1.0)
-                                }
+                                'stop_loss': result.get('stop_loss'),
+                                'target1': result.get('target1'),
+                                'target2': result.get('target2'),
+                                'target3': result.get('target3'),
+                                'position_multiplier': result.get('position_multiplier', 1.0)
+                            }
                                 strategy_signals.append(signal)
                                 
                                 # Log signal to database
@@ -266,12 +266,12 @@ class OptimizedBacktester:
                                     target3=signal['target3'],
                                     position_multiplier=signal['position_multiplier']
                                 )
-                        except Exception as e:
+                    except Exception as e:
                             # log for debugging, but continue processing
                             logger.debug(f"⚠️ {strategy_name} row {j} error: {e}")
                             logger.debug(traceback.format_exc())
-                            continue
-                    
+                        continue
+                
                     logger.info(f"📊 {strategy_name}: {len(strategy_signals)} signals (row-wise)")
                     return strategy_signals
                     
@@ -317,7 +317,7 @@ class OptimizedBacktester:
                 signal_price = float(signal['price'])
                 signal_type = signal['signal']
                 position_multiplier = float(signal.get('position_multiplier', 1.0))
-
+                
                 # compute percents
                 if signal.get('stop_loss') and signal.get('target1'):
                     stop_loss_pct = float(signal['stop_loss']) / signal_price
@@ -341,7 +341,7 @@ class OptimizedBacktester:
 
                 if start_idx >= len(df):
                     continue
-
+                
                 end_idx = min(start_idx + 50, len(df))
                 # slice views (no copy if possible)
                 lows = lows_arr[start_idx:end_idx]
@@ -352,8 +352,8 @@ class OptimizedBacktester:
                 outcome = "Pending"
                 pnl = 0.0
                 exit_price = signal_price
-
-                if signal_type == "BUY CALL":
+                
+                    if signal_type == "BUY CALL":
                     stop_price = signal_price * (1 - stop_loss_pct)
                     t1_price = signal_price * (1 + target_pct)
                     t2_price = signal_price * (1 + target2_pct)
@@ -402,8 +402,8 @@ class OptimizedBacktester:
                             outcome = "Win"
                             pnl = signal_price * target_pct * position_multiplier
                             exit_price = t1_price
-
-                elif signal_type == "BUY PUT":
+                    
+                    elif signal_type == "BUY PUT":
                     stop_price = signal_price * (1 + stop_loss_pct)
                     t1_price = signal_price * (1 - target_pct)
                     t2_price = signal_price * (1 - target2_pct)
@@ -490,12 +490,12 @@ class OptimizedBacktester:
                         )
                 except Exception as e:
                     logger.debug(f"⚠️ Error logging trade to database: {e}")
-
+                
             except Exception as e:
                 logger.debug(f"⚠️ simulate_trades error for signal {signal}: {e}")
                 logger.debug(traceback.format_exc())
                 continue
-
+        
         trade_sim_time = time.time() - start_time
         self.processing_stats['trade_sim_time'] = trade_sim_time
         logger.info(f"✅ Trade simulation completed in {trade_sim_time:.2f}s")
@@ -693,11 +693,11 @@ def main():
         if trades:
             results = backtester.analyze_results(trades)
             
-            # Save detailed trades to database only
-            if trades:
-                trades_df = pd.DataFrame(trades)
+                    # Save detailed trades to database only
+        if trades:
+            trades_df = pd.DataFrame(trades)
                 backtester.save_trades_to_db_optimized(trades_df, symbol=args.symbol, timeframe=args.timeframe)
-                print(f"💾 Trades saved to database")
+            print(f"💾 Trades saved to database")
         else:
             logger.error("❌ Backtest failed")
 
