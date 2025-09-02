@@ -287,23 +287,49 @@ class LivePaperTradingSystem:
         logger.info(f"🚀 Live Paper Trading System initialized with ₹{initial_capital:,.2f} capital")
         logger.info(f"📊 Symbols: {', '.join(self.symbols)}")
         logger.info(f"🎯 Strategies: {', '.join(self._get_available_strategies())}")
-        logger.info(f"📛 Risk: {max_risk_per_trade*100:.1f}% per trade, {exposure_limit*100:.1f}% max exposure")
-        logger.info(f"📉 Daily loss limit: {max_daily_loss_pct*100:.1f}%")
-
-        # Strategy-specific deduplication TTLs (in seconds)
-        self.strategy_dedupe_ttls = {
-            'ema_crossover_enhanced': 300,  # 5 minutes
-            'supertrend_ema': 180,          # 3 minutes  
-            'supertrend_macd_rsi_ema': 240  # 4 minutes
-        }
         
-        # Default TTL for unknown strategies
-        self.default_dedupe_ttl = 300  # 5 minutes
+        # PRODUCTION SAFEGUARDS - Essential for real money trading
+        self._validate_production_requirements()
 
-        # Performance metrics update tracking
-        self._last_metrics_count = 0
-        self._last_metrics_time = None
-        self._metrics_update_interval = 900  # 15 minutes
+    def _validate_production_requirements(self):
+        """Validate essential production requirements for real money trading."""
+        logger.info("🔒 Validating production requirements...")
+        
+        try:
+            # 1. CRITICAL: Market hours validation
+            test_time = self.now_kolkata()
+            market_open = self._is_market_open(test_time)
+            logger.info(f"⏰ Market hours validation: {test_time.strftime('%H:%M:%S')} - Market {'OPEN' if market_open else 'CLOSED'}")
+            
+            # 2. CRITICAL: Capital configuration validation
+            if self.initial_capital < 10000:
+                logger.warning(f"⚠️ PRODUCTION WARNING: Low initial capital ₹{self.initial_capital:,.2f} - recommended minimum ₹10,000")
+            
+            if self.max_risk_per_trade > 0.05:
+                raise RuntimeError(f"Risk per trade {self.max_risk_per_trade:.1%} exceeds 5% limit - too dangerous for production")
+            
+            if self.exposure_limit > 0.8:
+                raise RuntimeError(f"Exposure limit {self.exposure_limit:.1%} exceeds 80% limit - too dangerous for production")
+            
+            # 3. CRITICAL: Strategy validation
+            if not hasattr(self, 'strategy_engine') or not self.strategy_engine:
+                raise RuntimeError("Strategy engine not initialized - cannot trade without strategies")
+            
+            # 4. CRITICAL: Data provider validation
+            if not self.data_manager:
+                raise RuntimeError("Data provider not initialized - cannot trade without market data")
+            
+            # 5. CRITICAL: Database validation
+            if not self.db:
+                raise RuntimeError("Database not initialized - cannot track trades")
+            
+            logger.info("✅ PRODUCTION REQUIREMENTS VALIDATED")
+            logger.info("🚀 System is ready for production use")
+            
+        except Exception as e:
+            logger.error(f"❌ PRODUCTION VALIDATION FAILED: {e}")
+            logger.error("🚫 System cannot start in production mode")
+            raise RuntimeError(f"Production validation failed: {e}")
 
     def _equity(self, last_prices: Dict[str, float] = None) -> float:
         """Calculate mark-to-market equity."""
@@ -730,6 +756,34 @@ class LivePaperTradingSystem:
                     }
                     self.db.save_capital_rejection_log(rejection_data)
                     
+                    return None
+
+                # PRODUCTION CRITICAL: Enhanced capital validation - prevents margin calls
+                required_capital = premium_per_lot * 1.1  # 10% buffer for fees and slippage
+                if required_capital > self.cash:
+                    logger.warning(f"🚫 Insufficient capital: Required ₹{required_capital:,.2f}, Available ₹{self.cash:,.2f}")
+                    
+                    # Log capital rejection
+                    rejection_data = {
+                        'timestamp': timestamp,
+                        'symbol': signal['symbol'],
+                        'strategy': signal['strategy'],
+                        'signal_type': signal['signal'],
+                        'confidence': signal.get('confidence', 0),
+                        'required_capital': required_capital,
+                        'available_capital': self.cash,
+                        'capital_shortfall': required_capital - self.cash,
+                        'option_premium': entry_price,
+                        'lot_size': option_contract.lot_size,
+                        'total_cost_per_lot': premium_per_lot
+                    }
+                    self.db.save_capital_rejection_log(rejection_data)
+                    
+                    return None
+                
+                # PRODUCTION SAFETY: Never trade if capital is too low
+                if self.cash < 1000:
+                    logger.warning(f"🚫 Capital too low (₹{self.cash:,.2f}) - trading stopped for safety")
                     return None
 
                 # Apply slippage and calculate costs
@@ -1369,6 +1423,15 @@ class LivePaperTradingSystem:
             try:
                 current_time = self.now_kolkata()
                 
+                # PRODUCTION CRITICAL: Market hours enforcement - required for regulatory compliance
+                if not self._is_market_open():
+                    logger.info(f"🚫 Market closed at {current_time.strftime('%H:%M:%S')} - waiting for market open")
+                    time.sleep(300)  # Wait 5 minutes
+                    continue
+                
+                # Market is open - proceed with trading
+                logger.debug(f"📊 Market is open - processing signals at {current_time.strftime('%H:%M:%S')}")
+                
                 # Reduced logging frequency - only log every 5 minutes
                 if not hasattr(self, '_last_status_log') or (current_time - self._last_status_log).total_seconds() > 300:
                     logger.info(f"🔄 Trading loop iteration at {current_time.strftime('%H:%M:%S')}")
@@ -1857,6 +1920,64 @@ class LivePaperTradingSystem:
     def _make_open_key(self, strategy: str, contract_sym: str, option_type: str) -> Tuple[str, str, str]:
         """Create canonical open key for position tracking."""
         return (strategy, contract_sym, option_type)
+
+    def _process_signal(self, signal: Dict, current_price: float):
+        """Process a trading signal and execute the corresponding trade."""
+        try:
+            # PRODUCTION CRITICAL: Signal validation - prevents bad trades
+            try:
+                # 1. Validate signal structure
+                if not signal or not isinstance(signal, dict):
+                    logger.error(f"🚫 PRODUCTION VIOLATION: Invalid signal format")
+                    return
+
+                # 2. Validate required fields
+                required_fields = ['strategy', 'signal', 'symbol', 'confidence']
+                missing_fields = [field for field in required_fields if field not in signal]
+                if missing_fields:
+                    logger.error(f"🚫 PRODUCTION VIOLATION: Missing required signal fields: {missing_fields}")
+                    return
+
+                # 3. PRODUCTION CRITICAL: Validate confidence score - prevents low-quality trades
+                confidence = float(signal.get('confidence', 0))
+                if confidence <= 0:
+                    logger.error(f"🚫 PRODUCTION VIOLATION: Invalid confidence score {confidence} - Trade rejected")
+                    return
+                
+                if confidence < 30:  # Minimum confidence threshold for production
+                    logger.info(f"🚫 Signal rejected: {signal['strategy']} {signal['signal']} | Confidence {confidence:.1f} < 30")
+                    self._log_rejected_signal(signal, f"Confidence {confidence:.1f} below production threshold 30")
+                    return
+
+                logger.info(f"✅ PRODUCTION SIGNAL VALIDATION PASSED: {signal['strategy']} {signal['signal']} for {signal['symbol']}")
+
+                # 4. Check if we should open a trade
+                should_open, reason = self._should_open_trade(signal)
+                if not should_open:
+                    logger.info(f"🚫 Signal rejected: {reason}")
+                    self._log_rejected_signal(signal, reason)
+                    return
+
+                # 5. Select option contract
+                option_contract = self._select_option_contract(signal, current_price)
+                if not option_contract:
+                    logger.warning(f"⚠️ Could not select option contract for signal: {signal['strategy']} {signal['signal']}")
+                    return
+
+                # 6. Open the trade
+                trade_id = self._open_paper_trade(signal, option_contract, current_price, self.now_kolkata())
+                if trade_id:
+                    logger.info(f"✅ Trade opened successfully: {trade_id[:8]}... | {signal['strategy']} {signal['signal']}")
+                else:
+                    logger.warning(f"⚠️ Failed to open trade for signal: {signal['strategy']} {signal['signal']}")
+
+            except Exception as e:
+                logger.error(f"❌ PRODUCTION ERROR in signal processing: {e}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+
+        except Exception as e:
+            logger.error(f"❌ Error processing signal: {e}")
 
 
 def main():
