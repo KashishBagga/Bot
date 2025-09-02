@@ -7,12 +7,12 @@ Enhanced database with raw options chain storage capabilities.
 """
 
 import sqlite3
+import json
 import logging
-from typing import Dict, List, Optional
-from datetime import datetime
-from src.config.settings import setup_logging
+from typing import Dict, List, Optional, Tuple
+from datetime import datetime, timedelta
 
-logger = setup_logging('unified_database')
+logger = logging.getLogger(__name__)
 
 class UnifiedTradingDatabase:
     """Unified database for all trading data including raw options chain."""
@@ -75,6 +75,11 @@ class UnifiedTradingDatabase:
                     entry_timestamp TEXT NOT NULL,
                     current_price REAL,
                     unrealized_pnl REAL DEFAULT 0,
+                    status TEXT DEFAULT 'OPEN',
+                    exit_price REAL DEFAULT NULL,
+                    exit_time TEXT DEFAULT NULL,
+                    pnl REAL DEFAULT NULL,
+                    exit_reason TEXT DEFAULT NULL,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
@@ -118,21 +123,45 @@ class UnifiedTradingDatabase:
                 )
             ''')
             
-            # Create raw options chain table for storing complete API responses
+            # Create options_data table for storing individual option contracts
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS raw_options_chain (
+                CREATE TABLE IF NOT EXISTS options_data (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT NOT NULL,
                     symbol TEXT NOT NULL,
-                    raw_data TEXT NOT NULL,  -- JSON string of complete API response
-                    call_oi INTEGER,
-                    put_oi INTEGER,
-                    indiavix REAL,
-                    total_options INTEGER,
-                    total_strikes INTEGER,
-                    api_response_code INTEGER,
-                    api_message TEXT,
-                    api_status TEXT,
+                    option_symbol TEXT NOT NULL,
+                    option_type TEXT NOT NULL,
+                    strike_price REAL NOT NULL,
+                    expiry_date TEXT NOT NULL,
+                    lot_size INTEGER NOT NULL,
+                    underlying_price REAL,
+                    bid_price REAL,
+                    ask_price REAL,
+                    last_traded_price REAL,
+                    volume INTEGER,
+                    open_interest INTEGER,
+                    implied_volatility REAL,
+                    delta REAL,
+                    gamma REAL,
+                    theta REAL,
+                    vega REAL,
+                    bid_ask_spread REAL,
+                    data_quality_score REAL,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Create live trading signals table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS live_trading_signals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    signal_type TEXT NOT NULL,
+                    confidence_score REAL,
+                    price REAL,
+                    volume REAL,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
@@ -142,13 +171,17 @@ class UnifiedTradingDatabase:
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_trading_signals_symbol ON trading_signals(symbol)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_rejected_signals_timestamp ON rejected_signals(timestamp)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_rejected_signals_symbol ON rejected_signals(symbol)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_open_positions_timestamp ON open_option_positions(timestamp)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_open_positions_symbol ON open_option_positions(symbol)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_closed_positions_timestamp ON closed_option_positions(timestamp)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_closed_positions_symbol ON closed_option_positions(symbol)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_open_option_positions_timestamp ON open_option_positions(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_open_option_positions_symbol ON open_option_positions(symbol)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_closed_option_positions_timestamp ON closed_option_positions(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_closed_option_positions_symbol ON closed_option_positions(symbol)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_equity_curve_timestamp ON equity_curve(timestamp)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_raw_options_chain_timestamp ON raw_options_chain(timestamp)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_raw_options_chain_symbol ON raw_options_chain(symbol)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_timestamp ON options_data(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_symbol ON options_data(symbol)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_strike ON options_data(strike_price)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_expiry ON options_data(expiry_date)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_live_trading_signals_timestamp ON live_trading_signals(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_live_trading_signals_symbol ON live_trading_signals(symbol)')
             
             conn.commit()
             conn.close()
@@ -159,188 +192,375 @@ class UnifiedTradingDatabase:
             logger.error(f"❌ Error creating database schema: {e}")
             raise
 
-    def save_raw_options_chain(self, raw_data: Dict):
-        """Save raw option chain data to database for historical analysis.
-        
-        Args:
-            raw_data: Raw response from Fyers Option Chain API
-        """
+    def save_options_data(self, options_data: Dict):
+        """Save processed options data directly to options_data table."""
         try:
-            import json
+            symbol = options_data.get('symbol', 'UNKNOWN')
+            timestamp = options_data.get('timestamp', datetime.now().isoformat())
             
-            # Extract metadata
-            metadata = raw_data.get('_metadata', {})
-            symbol = metadata.get('symbol', '')
-            timestamp = metadata.get('timestamp', '')
-            api_response_code = metadata.get('api_response_code', 0)
-            api_message = metadata.get('api_message', '')
-            api_status = metadata.get('api_status', '')
-            
-            # Extract key metrics from the new data structure
-            data = raw_data.get('data', {})
+            # Get the options chain from the Fyers API response structure
+            data = options_data.get('data', {})
             options_chain = data.get('optionsChain', [])
-            call_oi = data.get('callOi', 0)
-            put_oi = data.get('putOi', 0)
-            indiavix = data.get('indiavixData', {}).get('ltp', 0)
+            underlying_price = data.get('underlyingPrice', 0)
             
-            # Count real strikes
-            real_strikes = set()
-            for option in options_chain:
-                if option.get('option_type') in ['CE', 'PE']:
-                    strike = option.get('strike_price', -1)
-                    if strike > 0:
-                        real_strikes.add(strike)
-            
-            total_strikes = len(real_strikes)
+            # Process individual options
+            processed_count = 0
             total_options = len(options_chain)
             
-            # Convert raw data to JSON string
-            raw_data_json = json.dumps(raw_data, default=str)
+            if total_options == 0:
+                logger.warning(f"⚠️ No options in chain for {symbol}")
+                return False
             
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    INSERT INTO raw_options_chain 
-                    (timestamp, symbol, raw_data, call_oi, put_oi, indiavix, 
-                     total_options, total_strikes, api_response_code, api_message, api_status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    timestamp,
-                    symbol,
-                    raw_data_json,
-                    call_oi,
-                    put_oi,
-                    indiavix,
-                    total_options,
-                    total_strikes,
-                    api_response_code,
-                    api_message,
-                    api_status
-                ))
-                conn.commit()
-                
-            logger.info(f"✅ Saved raw option chain data for {symbol}: {total_options} options, {total_strikes} strikes")
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
             
-        except Exception as e:
-            logger.error(f"❌ Error saving raw option chain data: {e}")
-
-    def get_raw_options_chain_summary(self) -> Dict:
-        """Get summary of accumulated raw option chain data."""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                
-                # Get total records
-                cursor.execute("SELECT COUNT(*) FROM raw_options_chain")
-                total_records = cursor.fetchone()[0]
-                
-                # Get unique symbols
-                cursor.execute("SELECT DISTINCT symbol FROM raw_options_chain")
-                symbols = [row[0] for row in cursor.fetchall()]
-                
-                # Get date range
-                cursor.execute("""
-                    SELECT MIN(timestamp), MAX(timestamp) 
-                    FROM raw_options_chain
-                """)
-                date_range = cursor.fetchone()
-                
-                # Get records per symbol
-                symbol_counts = {}
-                for symbol in symbols:
-                    cursor.execute("SELECT COUNT(*) FROM raw_options_chain WHERE symbol = ?", (symbol,))
-                    symbol_counts[symbol] = cursor.fetchone()[0]
-                
-                # Get latest data for each symbol
-                latest_data = {}
-                for symbol in symbols:
+            for option in options_chain:
+                try:
+                    # Extract option details from Fyers structure
+                    option_symbol = option.get('symbol', '')
+                    option_type = option.get('option_type', '')
+                    strike_price = option.get('strike_price', 0)
+                    
+                    # Skip if essential data is missing
+                    if not option_symbol or not option_type or strike_price <= 0:
+                        continue
+                    
+                    # Extract other fields with defaults
+                    ltp = option.get('ltp', 0)
+                    bid = option.get('bid', 0)
+                    ask = option.get('ask', 0)
+                    volume = option.get('volume', 0)
+                    oi = option.get('oi', 0)
+                    
+                    # Calculate derived fields
+                    bid_ask_spread = ask - bid if ask > 0 and bid > 0 else 0
+                    
+                    # Calculate data quality score for individual option
+                    option_quality = 0
+                    if bid > 0 and ask > 0:
+                        option_quality += 30  # Valid bid/ask
+                    if ltp > 0:
+                        option_quality += 20  # Valid LTP
+                    if volume > 0:
+                        option_quality += 20  # Valid volume
+                    if oi > 0:
+                        option_quality += 20  # Valid OI
+                    if bid_ask_spread > 0:
+                        option_quality += 10  # Valid spread
+                    
+                    # Insert individual option data
                     cursor.execute("""
-                        SELECT timestamp, call_oi, put_oi, indiavix, total_options, total_strikes
-                        FROM raw_options_chain 
-                        WHERE symbol = ? 
-                        ORDER BY timestamp DESC 
-                        LIMIT 1
-                    """, (symbol,))
-                    latest = cursor.fetchone()
-                    if latest:
-                        latest_data[symbol] = {
-                            'timestamp': latest[0],
-                            'call_oi': latest[1],
-                            'put_oi': latest[2],
-                            'indiavix': latest[3],
-                            'total_options': latest[4],
-                            'total_strikes': latest[5]
-                        }
-                
-                return {
-                    'total_records': total_records,
-                    'symbols': symbols,
-                    'date_range': {
-                        'start': date_range[0] if date_range[0] else None,
-                        'end': date_range[1] if date_range[1] else None
-                    },
-                    'records_per_symbol': symbol_counts,
-                    'latest_data': latest_data
-                }
-                
+                        INSERT OR REPLACE INTO options_data 
+                        (timestamp, symbol, option_symbol, option_type, strike_price,
+                         expiry_date, lot_size, underlying_price, bid_price, ask_price, 
+                         last_traded_price, volume, open_interest, implied_volatility, 
+                         delta, gamma, theta, vega, bid_ask_spread, data_quality_score, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        timestamp, symbol, option_symbol, option_type, strike_price,
+                        timestamp,  # Using timestamp as expiry_date for now
+                        50,  # Default lot size for Nifty
+                        underlying_price, bid, ask, ltp, volume, oi,
+                        0, 0, 0, 0, 0,  # Greeks placeholder
+                        bid_ask_spread, option_quality, datetime.now().isoformat()
+                    ))
+                    
+                    processed_count += 1
+                    
+                except Exception as e:
+                    logger.error(f"❌ Error processing option {option.get('strikePrice', 'UNKNOWN')}: {e}")
+                    continue
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"✅ Options data saved for {symbol}: {processed_count}/{total_options} valid options")
+            return processed_count > 0
+            
         except Exception as e:
-            logger.error(f"❌ Error getting raw options chain summary: {e}")
-            return {}
+            logger.error(f"❌ Error saving options data: {e}")
+            raise
 
-    def get_raw_options_chain_data(self, symbol: str, start_date: str = None, end_date: str = None, limit: int = 1000) -> List[Dict]:
-        """Get raw option chain data from database.
-        
-        Args:
-            symbol: Trading symbol
-            start_date: Start date filter (optional)
-            end_date: End date filter (optional)
-            limit: Maximum number of records to return
-            
-        Returns:
-            List of raw option chain data records
-        """
+    def update_option_position_status(self, trade_id: str, status: str, exit_price: float = None, 
+                                    exit_time: str = None, pnl: float = None, exit_reason: str = None):
+        """Update option position status when trade is closed."""
         try:
-            import json
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
             
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                
-                query = "SELECT * FROM raw_options_chain WHERE symbol = ?"
-                params = [symbol]
-                
-                if start_date:
-                    query += " AND DATE(timestamp) >= ?"
-                    params.append(start_date)
-                
-                if end_date:
-                    query += " AND DATE(timestamp) <= ?"
-                    params.append(end_date)
-                
-                query += " ORDER BY timestamp DESC LIMIT ?"
-                params.append(limit)
-                
-                cursor.execute(query, params)
-                rows = cursor.fetchall()
-                
-                # Convert to list of dictionaries
-                columns = [description[0] for description in cursor.description]
-                data = []
-                for row in rows:
-                    record = dict(zip(columns, row))
-                    # Parse JSON raw_data
-                    if record.get('raw_data'):
-                        try:
-                            record['raw_data'] = json.loads(record['raw_data'])
-                        except:
-                            pass
-                    data.append(record)
-                
-                logger.info(f"✅ Retrieved {len(data)} raw option chain records for {symbol}")
-                return data
-                
+            # First, check if trade_id column exists, if not add it
+            cursor.execute("PRAGMA table_info(open_option_positions)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            if 'trade_id' not in columns:
+                cursor.execute("ALTER TABLE open_option_positions ADD COLUMN trade_id TEXT")
+                conn.commit()
+            
+            if status == 'CLOSED':
+                cursor.execute("""
+                    UPDATE open_option_positions 
+                    SET status = ?, exit_price = ?, exit_time = ?, pnl = ?, exit_reason = ?, trade_id = ?
+                    WHERE id = (SELECT id FROM open_option_positions WHERE trade_id = ? LIMIT 1)
+                """, (status, exit_price, exit_time, pnl, exit_reason, trade_id, trade_id))
+            else:
+                cursor.execute("""
+                    UPDATE open_option_positions 
+                    SET status = ?, trade_id = ?
+                    WHERE id = (SELECT id FROM open_option_positions WHERE trade_id = ? LIMIT 1)
+                """, (status, trade_id, trade_id))
+            
+            conn.commit()
+            conn.close()
+            logger.info(f"✅ Updated option position status for {trade_id} to {status}")
+            return True
+            
         except Exception as e:
-            logger.error(f"❌ Error retrieving raw options chain data: {e}")
+            logger.error(f"❌ Error updating option position status: {e}")
+            return False
+
+    def get_latest_options_data(self, symbol: str, limit: int = 100) -> List[Dict]:
+        """Get latest options data for a symbol from the options_data table."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT * FROM options_data 
+                WHERE symbol = ? 
+                ORDER BY timestamp DESC 
+                LIMIT ?
+            """, (symbol, limit))
+            
+            columns = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+            
+            options_data = []
+            for row in rows:
+                option_dict = dict(zip(columns, row))
+                options_data.append(option_dict)
+            
+            conn.close()
+            return options_data
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting latest options data for {symbol}: {e}")
             return []
+
+    def _calculate_data_quality_score(self, data: Dict) -> float:
+        """Calculate data quality score (0-100)."""
+        try:
+            score = 100.0
+            options_chain = data.get('optionsChain', [])
+            
+            # Check for basic structure
+            if not options_chain:
+                score -= 30
+            
+            # Check for essential fields
+            if not data.get('callOi'):
+                score -= 20
+            if not data.get('putOi'):
+                score -= 20
+            
+            # Check for underlying price
+            if not data.get('underlying_price'):
+                score -= 15
+            
+            # Check for valid options
+            valid_options = 0
+            for option in options_chain:
+                if option.get('strike_price', 0) > 0:
+                    valid_options += 1
+            
+            if valid_options < 10:
+                score -= 15
+            
+            return max(0, score)
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating data quality score: {e}")
+            return 0.0
+    
+    def _is_market_hours(self) -> bool:
+        """Check if current time is within market hours (9:15 AM - 3:30 PM IST, Mon-Fri)."""
+        try:
+            from datetime import datetime
+            from zoneinfo import ZoneInfo
+            
+            now = datetime.now(ZoneInfo("Asia/Kolkata"))
+            
+            # Check if it's a weekday (Monday = 0, Sunday = 6)
+            if now.weekday() >= 5:  # Saturday or Sunday
+                return False
+            
+            # Check if it's within market hours (9:15 AM - 3:30 PM IST)
+            market_start = now.replace(hour=9, minute=15, second=0, microsecond=0)
+            market_end = now.replace(hour=15, minute=30, second=0, microsecond=0)
+            
+            return market_start <= now <= market_end
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking market hours: {e}")
+            return True  # Default to True if we can't determine
+
+    def save_trading_signal(self, signal_data: Dict) -> bool:
+        """Save trading signal to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                INSERT INTO trading_signals 
+                (timestamp, symbol, strategy, signal_type, confidence_score, price, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                signal_data.get('timestamp'),
+                signal_data.get('symbol'),
+                signal_data.get('strategy'),
+                signal_data.get('signal_type'),
+                signal_data.get('confidence', 0),
+                signal_data.get('price', 0),
+                signal_data.get('created_at')
+            ))
+            
+            conn.commit()
+            conn.close()
+            logger.info(f"✅ Trading signal saved: {signal_data.get('strategy')} {signal_data.get('signal_type')} for {signal_data.get('symbol')}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving trading signal: {e}")
+            return False
+
+    def save_rejected_signal(self, rejected_data: Dict) -> bool:
+        """Save rejected signal to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                INSERT INTO rejected_signals 
+                (timestamp, symbol, strategy, signal_type, confidence_score, rejection_reason, price, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                rejected_data.get('timestamp'),
+                rejected_data.get('symbol'),
+                rejected_data.get('strategy'),
+                rejected_data.get('signal_type'),
+                rejected_data.get('confidence', 0),
+                rejected_data.get('rejection_reason', ''),
+                rejected_data.get('price', 0),
+                rejected_data.get('created_at')
+            ))
+            
+            conn.commit()
+            conn.close()
+            logger.info(f"✅ Rejected signal saved: {rejected_data.get('strategy')} {rejected_data.get('signal_type')} for {rejected_data.get('symbol')}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving rejected signal: {e}")
+            return False
+
+    def get_trading_signals(self, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get trading signals from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if symbol:
+                cursor.execute("""
+                    SELECT * FROM trading_signals 
+                    WHERE symbol = ? 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                """, (symbol, limit))
+            else:
+                cursor.execute("""
+                    SELECT * FROM trading_signals 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                """, (limit,))
+            
+            columns = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+            
+            signals = []
+            for row in rows:
+                signal_dict = dict(zip(columns, row))
+                signals.append(signal_dict)
+            
+            conn.close()
+            return signals
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting trading signals: {e}")
+            return []
+
+    def get_rejected_signals(self, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get rejected signals from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if symbol:
+                cursor.execute("""
+                    SELECT * FROM rejected_signals 
+                    WHERE symbol = ? 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                """, (symbol, limit))
+            else:
+                cursor.execute("""
+                    SELECT * FROM rejected_signals 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                """, (limit,))
+            
+            columns = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+            
+            signals = []
+            for row in rows:
+                signal_dict = dict(zip(columns, row))
+                signals.append(signal_dict)
+            
+            conn.close()
+            return signals
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting rejected signals: {e}")
+            return []
+
+    def save_live_trading_signal(self, signal_data: Dict) -> bool:
+        """Save live trading signal to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                INSERT INTO live_trading_signals 
+                (timestamp, symbol, strategy, signal_type, confidence_score, price, volume, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                signal_data.get('timestamp'),
+                signal_data.get('symbol'),
+                signal_data.get('strategy'),
+                signal_data.get('signal_type'),
+                signal_data.get('confidence', 0),
+                signal_data.get('price', 0),
+                signal_data.get('volume', 0),
+                signal_data.get('created_at')
+            ))
+            
+            conn.commit()
+            conn.close()
+            logger.info(f"✅ Live trading signal saved: {signal_data.get('strategy')} {signal_data.get('signal_type')} for {signal_data.get('symbol')}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving live trading signal: {e}")
+            return False
 
 # Legacy compatibility
 class UnifiedDatabase(UnifiedTradingDatabase):
