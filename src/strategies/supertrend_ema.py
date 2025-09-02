@@ -383,6 +383,10 @@ class SupertrendEma(Strategy):
             if volume_ratio < 0.1:  # Very low threshold for testing
                 return {'signal': 'NO TRADE', 'reason': f'volume too low: {volume_ratio:.2f} < 0.1'}
             
+            # Fix: Handle negative volume values properly
+            if volume_ratio < 0.1 or pd.isna(volume_ratio):  # Very low threshold for testing
+                return {'signal': 'NO TRADE', 'reason': f'volume too low: {volume_ratio:.2f} < 0.1'}
+            
             # BUY CALL conditions with very relaxed filters
             if (supertrend_direction == 1 and  # SuperTrend uptrend
                 ema_9 > ema_21 and  # EMA crossover

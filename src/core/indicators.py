@@ -239,7 +239,22 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         df['macd_histogram'] = macd_data['histogram']
         
         # Add volume and price indicators with NaN guards
+        # Fix volume ratio to prevent negative values and handle zero volume
         df['volume_ratio'] = df['volume'].pct_change().fillna(0)
+        # Ensure volume ratio is non-negative and handle edge cases
+        df['volume_ratio'] = df['volume_ratio'].clip(lower=0).fillna(0)
+        
+        # EMERGENCY: Fix negative volume values
+        df['volume'] = df['volume'].clip(lower=0).fillna(0)
+        
+        # Add absolute volume check
+        df['volume_valid'] = (df['volume'] > 0).astype(int)
+        
+        # Normalize volume to prevent division by zero issues
+        df['volume_normalized'] = df['volume'].replace(0, 1)  # Replace 0 with 1 to prevent division issues
+        
+        # EMERGENCY: Ensure volume_ratio is always positive
+        df['volume_ratio'] = df['volume_ratio'].abs().clip(lower=0, upper=10).fillna(0)
         
         # Price position with division by zero protection
         range_ = (df['high'] - df['low']).replace(0, np.nan)
