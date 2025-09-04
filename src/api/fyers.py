@@ -57,8 +57,11 @@ class FyersClient:
         current_time = time.time()
         time_since_last_call = current_time - self.last_api_call
         
-        if time_since_last_call < self.min_call_interval:
-            sleep_time = self.min_call_interval - time_since_last_call
+        # Increased minimum interval to reduce API pressure
+        min_interval = max(self.min_call_interval, 0.5)  # At least 500ms between calls
+        
+        if time_since_last_call < min_interval:
+            sleep_time = min_interval - time_since_last_call
             time.sleep(sleep_time)
         
         self.last_api_call = time.time()

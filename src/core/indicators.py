@@ -226,6 +226,26 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     
     try:
+        # Check minimum data length for indicators
+        if len(df) < 20:  # Need at least 20 candles for most indicators
+            logging.warning(f"⚠️ Insufficient data for indicators: {len(df)} candles (minimum 20 required)")
+            # Return basic data without indicators
+            df['rsi'] = 50.0  # Neutral RSI
+            df['ema_9'] = df['close']
+            df['ema_21'] = df['close']
+            df['atr'] = 0.0
+            df['macd'] = 0.0
+            df['macd_signal'] = 0.0
+            df['macd_histogram'] = 0.0
+            df['volume_ratio'] = 0.0
+            df['volume_valid'] = 0
+            df['volume_normalized'] = 1.0
+            df['price_position'] = 0.5
+            df['candle_size'] = 0.0
+            df['body_ratio'] = 0.0
+            df['price_momentum'] = 0.0
+            return df
+        
         # Add basic indicators
         df['rsi'] = indicators.rsi(df)
         df['ema_9'] = indicators.ema(df, period=9)
@@ -239,10 +259,11 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         df['macd_histogram'] = macd_data['histogram']
         
         # Add volume and price indicators with NaN guards
-        # Fix volume ratio to prevent negative values and handle zero volume
-        df['volume_ratio'] = df['volume'].pct_change().fillna(0)
-        # Ensure volume ratio is non-negative and handle edge cases
-        df['volume_ratio'] = df['volume_ratio'].clip(lower=0).fillna(0)
+        # Fix volume ratio to use volume relative to moving average (more meaningful for index data)
+        volume_ma = df['volume'].rolling(window=20, min_periods=1).mean()
+        df['volume_ratio'] = (df['volume'] / volume_ma).fillna(1.0)
+        # Ensure volume ratio is reasonable and handle edge cases
+        df['volume_ratio'] = df['volume_ratio'].clip(lower=0.1, upper=10.0).fillna(1.0)
         
         # EMERGENCY: Fix negative volume values
         df['volume'] = df['volume'].clip(lower=0).fillna(0)
@@ -272,6 +293,24 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         
         # Add price momentum
         df['price_momentum'] = df['close'].pct_change(3).fillna(0)
+        
+        # Add market condition data
+        df['market_tradeable'] = True  # Default to tradeable
+        df['market_condition'] = 'TRENDING'  # Default to trending
+        df['market_reason'] = 'Normal market conditions'
+        
+        # Simple market condition detection based on ADX and price movement
+        if 'adx' in df.columns:
+            adx = df['adx'].iloc[-1] if len(df) > 0 else 25
+            if pd.isna(adx) or adx < 15:
+                df['market_condition'] = 'RANGING'
+                df['market_reason'] = f'Low ADX: {adx:.1f} < 15'
+            elif adx > 25:
+                df['market_condition'] = 'TRENDING'
+                df['market_reason'] = f'Strong trend: ADX {adx:.1f} > 25'
+            else:
+                df['market_condition'] = 'MIXED'
+                df['market_reason'] = f'Mixed conditions: ADX {adx:.1f}'
         
         return df
         

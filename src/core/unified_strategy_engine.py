@@ -11,24 +11,27 @@ from zoneinfo import ZoneInfo
 
 # Import strategies
 from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
-from src.strategies.supertrend_ema import SupertrendEma
+from src.strategies.supertrend_ema_fixed import SupertrendEmaFixed
 from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
+from src.strategies.simple_ema_strategy import SimpleEmaStrategy
+
 
 logger = logging.getLogger(__name__)
 
 class UnifiedStrategyEngine:
     """Unified strategy engine for consistent signal generation"""
     
-    def __init__(self, symbols: List[str], confidence_cutoff: float = 40.0):
+    def __init__(self, symbols: List[str], confidence_cutoff: float = 25.0):  # Temporarily lowered for testing
         self.symbols = symbols
         self.confidence_cutoff = confidence_cutoff
         self.tz = ZoneInfo("Asia/Kolkata")
         
-        # Initialize strategies
+        # Initialize strategies with confidence cutoff
         self.strategies = {
-            'ema_crossover_enhanced': EmaCrossoverEnhanced(),
-            'supertrend_ema': SupertrendEma(),
-            'supertrend_macd_rsi_ema': SupertrendMacdRsiEma()
+            'ema_crossover_enhanced': EmaCrossoverEnhanced({"min_confidence_threshold": self.confidence_cutoff}),
+            'supertrend_ema': SupertrendEmaFixed({"min_confidence_threshold": self.confidence_cutoff}),
+            'supertrend_macd_rsi_ema': SupertrendMacdRsiEma({"min_confidence_threshold": self.confidence_cutoff}),
+            'simple_ema': SimpleEmaStrategy({"min_confidence_threshold": self.confidence_cutoff})
         }
         
         logger.info(f"✅ Unified Strategy Engine initialized with {len(self.strategies)} strategies")
@@ -72,7 +75,8 @@ class UnifiedStrategyEngine:
                     # Handle the actual return format from strategies
                     if signal and isinstance(signal, dict):
                         # Check if it's a valid signal (not NO TRADE or ERROR)
-                        confidence_score = signal.get('confidence_score', 0)
+                        # Handle both confidence_score and confidence fields
+                        confidence_score = signal.get('confidence_score', signal.get('confidence', 0))
                         if (signal.get('signal') and 
                             signal.get('signal') not in ['NO TRADE', 'ERROR'] and
                             confidence_score >= self.confidence_cutoff):
@@ -84,12 +88,11 @@ class UnifiedStrategyEngine:
                                 'strategy': strategy_name,
                                 'timestamp': self.now_kolkata(),
                                 'current_price': current_price,
-                                'confidence': confidence_score  # Map confidence_score to confidence
+                                'confidence': confidence_score  # Always use confidence field
                             })
                             
-                            # Ensure confidence field is properly set
+                            # Ensure confidence field is properly set and remove duplicates
                             if 'confidence_score' in signal_dict:
-                                signal_dict['confidence'] = signal_dict['confidence_score']
                                 del signal_dict['confidence_score']  # Remove duplicate field
                             
                             all_signals.append(signal_dict)

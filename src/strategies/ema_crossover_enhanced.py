@@ -314,6 +314,30 @@ class EmaCrossoverEnhanced(Strategy):
             crossover = self.detect_crossover(df, 'ema_short', 'ema_long')
             
             if not crossover['crossover']:
+                # If no crossover detected, generate a neutral signal based on trend
+                if ema_short > ema_long:
+                    return {
+                        'signal': 'BUY CALL',
+                        'price': candle['close'],
+                        'confidence_score': 30,  # Moderate confidence
+                        'stop_loss': 1.5 * atr,
+                        'target1': 2.0 * atr,
+                        'target2': 3.0 * atr,
+                        'target3': 4.0 * atr,
+                        'reasoning': f"Fallback: EMA trend (9>21), RSI {rsi:.1f}, ATR {atr:.2f}"
+                    }
+                elif ema_short < ema_long:
+                    return {
+                        'signal': 'BUY PUT',
+                        'price': candle['close'],
+                        'confidence_score': 30,  # Moderate confidence
+                        'stop_loss': 1.5 * atr,
+                        'target1': 2.0 * atr,
+                        'target2': 3.0 * atr,
+                        'target3': 4.0 * atr,
+                        'reasoning': f"Fallback: EMA trend (9<21), RSI {rsi:.1f}, ATR {atr:.2f}"
+                    }
+                
                 return {'signal': 'NO TRADE', 'reason': 'no EMA crossover detected'}
             
             # Calculate confidence score

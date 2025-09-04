@@ -151,6 +151,17 @@ class UnifiedTradingDatabase:
                 )
             ''')
             
+            # Create raw_options_chain table for storing raw Fyers data
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS raw_options_chain (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    raw_data JSON NOT NULL,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
             # Create live trading signals table
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS live_trading_signals (
@@ -180,6 +191,8 @@ class UnifiedTradingDatabase:
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_symbol ON options_data(symbol)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_strike ON options_data(strike_price)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_options_data_expiry ON options_data(expiry_date)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_raw_options_chain_timestamp ON raw_options_chain(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_raw_options_chain_symbol ON raw_options_chain(symbol)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_live_trading_signals_timestamp ON live_trading_signals(timestamp)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_live_trading_signals_symbol ON live_trading_signals(symbol)')
             
@@ -561,6 +574,161 @@ class UnifiedTradingDatabase:
         except Exception as e:
             logger.error(f"❌ Error saving live trading signal: {e}")
             return False
+
+    def save_capital_rejection_log(self, rejection_data: Dict) -> bool:
+        """Save capital rejection log to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                INSERT INTO capital_rejection_logs (
+                    timestamp, symbol, strategy, signal_type, 
+                    required_capital, available_capital, reason
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                rejection_data.get('timestamp'),
+                rejection_data.get('symbol'),
+                rejection_data.get('strategy'),
+                rejection_data.get('signal_type'),
+                rejection_data.get('required_capital'),
+                rejection_data.get('available_capital'),
+                rejection_data.get('reason')
+            ))
+            
+            conn.commit()
+            conn.close()
+            logger.info(f"✅ Capital rejection log saved: {rejection_data.get('strategy')} {rejection_data.get('signal_type')} for {rejection_data.get('symbol')}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving capital rejection log: {e}")
+            return False
+
+    def save_raw_options_chain(self, raw_option_chain: Dict) -> bool:
+        """Save raw options chain data to database."""
+        try:
+            # Extract basic info
+            symbol = raw_option_chain.get('symbol', 'UNKNOWN')
+            timestamp = raw_option_chain.get('timestamp', datetime.now().isoformat())
+            
+            # Get the options chain from the Fyers API response structure
+            data = raw_option_chain.get('data', {})
+            options_chain = data.get('optionsChain', [])
+            underlying_price = data.get('underlyingPrice', 0)
+            
+            # Process individual options
+            processed_count = 0
+            total_options = len(options_chain)
+            
+            if total_options == 0:
+                logger.warning(f"⚠️ No options in chain for {symbol}")
+                return False
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            for option in options_chain:
+                try:
+                    # Extract option details from Fyers structure
+                    option_symbol = option.get('symbol', '')
+                    option_type = option.get('option_type', '')
+                    strike_price = option.get('strike_price', 0)
+                    
+                    # Skip if essential data is missing
+                    if not option_symbol or not option_type or strike_price <= 0:
+                        continue
+                    
+                    # Extract other fields with defaults
+                    ltp = option.get('ltp', 0)
+                    bid = option.get('bid', 0)
+                    ask = option.get('ask', 0)
+                    volume = option.get('volume', 0)
+                    oi = option.get('oi', 0)
+                    
+                    # Calculate derived fields
+                    bid_ask_spread = ask - bid if ask > 0 and bid > 0 else 0
+                    
+                    # Calculate data quality score for individual option
+                    option_quality = 0
+                    if bid > 0 and ask > 0:
+                        option_quality += 30  # Valid bid/ask
+                    if ltp > 0:
+                        option_quality += 20  # Valid LTP
+                    if volume > 0:
+                        option_quality += 20  # Valid volume
+                    if oi > 0:
+                        option_quality += 20  # Valid OI
+                    if bid_ask_spread > 0:
+                        option_quality += 10  # Valid spread
+                    
+                    # Insert individual option data
+                    cursor.execute("""
+                        INSERT OR REPLACE INTO options_data 
+                        (timestamp, symbol, option_symbol, option_type, strike_price,
+                         expiry_date, lot_size, underlying_price, bid_price, ask_price, 
+                         last_traded_price, volume, open_interest, implied_volatility, 
+                         delta, gamma, theta, vega, bid_ask_spread, data_quality_score, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        timestamp, symbol, option_symbol, option_type, strike_price,
+                        timestamp,  # Using timestamp as expiry_date for now
+                        50,  # Default lot size for Nifty
+                        underlying_price, bid, ask, ltp, volume, oi,
+                        0, 0, 0, 0, 0,  # Greeks placeholder
+                        bid_ask_spread, option_quality, datetime.now().isoformat()
+                    ))
+                    
+                    processed_count += 1
+                    
+                except Exception as e:
+                    logger.error(f"❌ Error processing option {option.get('strikePrice', 'UNKNOWN')}: {e}")
+                    continue
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"✅ Raw options chain saved for {symbol}: {processed_count}/{total_options} valid options")
+            return processed_count > 0
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving raw options chain: {e}")
+            return False
+
+    def get_live_trading_signals(self, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get live trading signals from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if symbol:
+                cursor.execute("""
+                    SELECT * FROM live_trading_signals 
+                    WHERE symbol = ? 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                """, (symbol, limit))
+            else:
+                cursor.execute("""
+                    SELECT * FROM live_trading_signals 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                """, (limit,))
+            
+            columns = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+            
+            signals = []
+            for row in rows:
+                signal = dict(zip(columns, row))
+                signals.append(signal)
+            
+            conn.close()
+            return signals
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting live trading signals: {e}")
+            return []
 
 # Legacy compatibility
 class UnifiedDatabase(UnifiedTradingDatabase):
