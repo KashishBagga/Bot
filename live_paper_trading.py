@@ -2288,6 +2288,9 @@ class LivePaperTradingSystem:
                     logger.info(f"🚫 Signal rejected: {signal['strategy']} {signal['signal']} | Confidence {confidence:.1f} < 25")
                     self._log_rejected_signal(signal, f"Confidence {confidence:.1f} below production threshold 25")
                     return
+                
+                # Log all valid signals to database (regardless of capital)
+                self._log_valid_signal(signal, current_price)
 
                 logger.info(f"✅ PRODUCTION SIGNAL VALIDATION PASSED: {signal['strategy']} {signal['signal']} for {signal['symbol']}")
 
@@ -2328,6 +2331,32 @@ class LivePaperTradingSystem:
 
         except Exception as e:
             logger.error(f"❌ Error processing signal: {e}")
+
+
+    def _log_valid_signal(self, signal: Dict, current_price: float):
+        """Log all valid signals to database for analysis."""
+        try:
+            signal_data = {
+                'timestamp': self.now_kolkata().isoformat(),
+                'symbol': signal['symbol'],
+                'strategy': signal['strategy'],
+                'signal_type': signal['signal'],
+                'confidence_score': signal.get('confidence', 0),
+                'price': current_price,
+                'volume': 0,  # Will be updated if available
+                'created_at': self.now_kolkata().isoformat()
+            }
+            
+            # Save to live_trading_signals table
+            self.db.save_live_trading_signal(signal_data)
+            
+            # Also log to unrestricted signals for dual metrics
+            self._log_unrestricted_signal(signal, None, current_price, self.now_kolkata().isoformat())
+            
+            logger.debug(f"📊 Valid signal logged: {signal['strategy']} {signal['signal']} (confidence: {signal.get('confidence', 0)})")
+            
+        except Exception as e:
+            logger.error(f"❌ Error logging valid signal: {e}")
 
     def _validate_data_quality(self, data: pd.DataFrame, symbol: str) -> bool:
         """Validate data quality before processing."""
