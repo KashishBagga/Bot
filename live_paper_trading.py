@@ -287,6 +287,11 @@ class LivePaperTradingSystem:
         self.option_chain_cache = {}
         self.option_chain_cache_time = {}
         self.option_chain_cache_ttl = 30  # 30 seconds cache TTL
+        
+        # Volume data cache to reduce API calls
+        self.volume_data_cache = {}
+        self.volume_data_cache_time = {}
+        self.volume_data_cache_ttl = 60  # 60 seconds cache TTL for volume data
         self._trading_thread = None
         
         # Initialize data provider
@@ -1598,6 +1603,43 @@ class LivePaperTradingSystem:
         
         return is_open
 
+
+    def _get_cached_volume_data(self, symbol: str) -> Optional[pd.DataFrame]:
+        """Get volume data with caching to reduce API calls."""
+        current_time = time.time()
+        
+        # Check if we have cached data that's still valid
+        if (symbol in self.volume_data_cache and 
+            symbol in self.volume_data_cache_time and
+            current_time - self.volume_data_cache_time[symbol] < self.volume_data_cache_ttl):
+            logger.debug(f"📋 Using cached volume data for {symbol}")
+            return self.volume_data_cache[symbol]
+        
+        # Fetch fresh data
+        logger.debug(f"📡 Fetching fresh volume data for {symbol}")
+        data = self.data_manager.get_historical_data(
+            symbol=symbol,
+            resolution="5",  # 5-minute data
+            date_format=1,
+            range_from=(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
+            range_to=datetime.now().strftime('%Y-%m-%d'),
+            cont_flag=1
+        )
+        
+        if data and 'candles' in data and len(data['candles']) > 0:
+            # Convert to DataFrame with timezone handling
+            df = pd.DataFrame(data['candles'], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s', utc=True).dt.tz_convert(ZoneInfo("Asia/Kolkata"))
+            df = df.sort_values('timestamp').reset_index(drop=True)
+            
+            # Cache the data
+            self.volume_data_cache[symbol] = df
+            self.volume_data_cache_time[symbol] = current_time
+            logger.debug(f"💾 Cached volume data for {symbol}")
+            return df
+        
+        return None
+
     def _get_recent_index_data(self, symbol: str) -> Optional[pd.DataFrame]:
         """Get recent index data for signal generation - prioritize data with volume."""
         try:
@@ -1609,27 +1651,15 @@ class LivePaperTradingSystem:
                     logger.info(f"✅ Using local historical data for {symbol}: {len(local_data)} candles with volume")
                     return local_data
                 else:
-                    logger.warning(f"⚠️ Local data has no volume for {symbol}, using Fyers API")
+                    logger.debug(f"📊 Local data has limited volume for {symbol}, using cached Fyers data")
             
-            # FALLBACK: Get data from Fyers API (ensures real volume data)
-            logger.info(f"📡 Fetching data from Fyers API for {symbol} (ensures real volume)")
-            data = self.data_manager.get_historical_data(
-                symbol=symbol,
-                resolution="5",  # 5-minute data
-                date_format=1,
-                range_from=(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
-                range_to=datetime.now().strftime('%Y-%m-%d'),
-                cont_flag=1
-            )
+            # FALLBACK: Get data from Fyers API (ensures real volume data) with caching
+            logger.debug(f"📡 Fetching volume data for {symbol} (with caching)")
+            df = self._get_cached_volume_data(symbol)
             
-            if not data or 'candles' not in data or len(data['candles']) == 0:
+            if df is None or df.empty:
                 logger.warning(f"⚠️ No historical data available for {symbol}")
                 return None
-            
-            # Convert to DataFrame with timezone handling
-            df = pd.DataFrame(data['candles'], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s', utc=True).dt.tz_convert(ZoneInfo("Asia/Kolkata"))
-            df = df.sort_values('timestamp').reset_index(drop=True)
             
             # Check if we have new candle data
             latest_timestamp = df['timestamp'].iloc[-1]
