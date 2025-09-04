@@ -282,6 +282,11 @@ class LivePaperTradingSystem:
         # Threading safety
         self._lock = threading.RLock()
         self._stop_event = threading.Event()
+        
+        # Option chain cache to reduce API calls
+        self.option_chain_cache = {}
+        self.option_chain_cache_time = {}
+        self.option_chain_cache_ttl = 30  # 30 seconds cache TTL
         self._trading_thread = None
         
         # Initialize data provider
@@ -621,8 +626,8 @@ class LivePaperTradingSystem:
             symbol = signal['symbol']
             signal_type = signal['signal']
             
-            # Get REAL option chain data from Fyers
-            option_chain = self.data_provider.get_option_chain(symbol)
+            # Get REAL option chain data from Fyers (with caching)
+            option_chain = self._get_cached_option_chain(symbol)
             
             # Accumulate options data for backtesting
             self._accumulate_options_data(symbol, option_chain)
@@ -2092,11 +2097,35 @@ class LivePaperTradingSystem:
         except Exception as e:
             logger.error(f"❌ Error logging P&L update: {e}")
 
+
+    def _get_cached_option_chain(self, symbol: str) -> Dict:
+        """Get option chain with caching to reduce API calls."""
+        current_time = time.time()
+        
+        # Check if we have cached data that's still valid
+        if (symbol in self.option_chain_cache and 
+            symbol in self.option_chain_cache_time and
+            current_time - self.option_chain_cache_time[symbol] < self.option_chain_cache_ttl):
+            logger.debug(f"📋 Using cached option chain for {symbol}")
+            return self.option_chain_cache[symbol]
+        
+        # Fetch fresh data
+        logger.debug(f"📡 Fetching fresh option chain for {symbol}")
+        option_chain = self.data_provider.get_option_chain(symbol)
+        
+        if option_chain:
+            # Cache the data
+            self.option_chain_cache[symbol] = option_chain
+            self.option_chain_cache_time[symbol] = current_time
+            logger.debug(f"💾 Cached option chain for {symbol}")
+        
+        return option_chain
+
     def _accumulate_options_data(self, symbol: str, option_chain: Dict = None):
         """Accumulate options data for historical analysis using real Fyers Option Chain API."""
         try:
-            # Get raw option chain data from Fyers API
-            raw_option_chain = self.data_manager.get_option_chain(symbol)
+            # Get raw option chain data from Fyers API (with caching)
+            raw_option_chain = self._get_cached_option_chain(symbol)
             
             if raw_option_chain:
                 # Save raw data to database
@@ -2148,8 +2177,8 @@ class LivePaperTradingSystem:
                 
                 for symbol in symbols:
                     try:
-                        # Get option chain data
-                        option_chain = self.data_provider.get_option_chain(symbol)
+                        # Get option chain data (with caching)
+                        option_chain = self._get_cached_option_chain(symbol)
                         
                         if option_chain:
                             # Accumulate the data

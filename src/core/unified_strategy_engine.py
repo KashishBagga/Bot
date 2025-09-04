@@ -11,9 +11,9 @@ from zoneinfo import ZoneInfo
 
 # Import strategies
 from src.strategies.ema_crossover_enhanced import EmaCrossoverEnhanced
-from src.strategies.supertrend_ema_fixed import SupertrendEmaFixed
 from src.strategies.supertrend_macd_rsi_ema import SupertrendMacdRsiEma
 from src.strategies.simple_ema_strategy import SimpleEmaStrategy
+from src.strategies.supertrend_ema import SupertrendEma
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class UnifiedStrategyEngine:
         # Initialize strategies with confidence cutoff
         self.strategies = {
             'ema_crossover_enhanced': EmaCrossoverEnhanced({"min_confidence_threshold": self.confidence_cutoff}),
-            'supertrend_ema': SupertrendEmaFixed({"min_confidence_threshold": self.confidence_cutoff}),
+            'supertrend_ema': SupertrendEma({"min_confidence_threshold": self.confidence_cutoff}),
             'supertrend_macd_rsi_ema': SupertrendMacdRsiEma({"min_confidence_threshold": self.confidence_cutoff}),
             'simple_ema': SimpleEmaStrategy({"min_confidence_threshold": self.confidence_cutoff})
         }
