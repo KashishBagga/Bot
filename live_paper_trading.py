@@ -220,7 +220,13 @@ class LivePaperTradingSystem:
         self.max_daily_loss_pct = max_daily_loss_pct
         self.commission_bps = commission_bps
         self.slippage_bps = slippage_bps
-        self.symbols = symbols or ['NSE:NIFTY50-INDEX']
+        self.symbols = symbols or [
+            'NSE:NIFTY50-INDEX',      # Nifty 50
+            'NSE:NIFTYBANK-INDEX',    # Bank Nifty  
+            'NSE:FINNIFTY-INDEX',     # Fin Nifty
+            'NSE:RELIANCE-EQ',        # Reliance
+            'NSE:HDFC-EQ'             # HDFC
+        ]
         self.data_provider = data_provider
         
         # Configurable exit rules
@@ -257,7 +263,7 @@ class LivePaperTradingSystem:
         self._signal_dedupe_cache = {}  # Persistent signal deduplication cache
         
         # Trading configuration
-        self.trading_interval = 5  # 5 seconds between trading loop iterations
+        self.trading_interval = 10  # 10 seconds between trading loop iterations (optimized)
         
         # Data management
         self.data_manager = None
@@ -274,7 +280,7 @@ class LivePaperTradingSystem:
         # Open position tracking for deduplication
         self._open_keys = set()
         # Trading configuration
-        self.trading_interval = 5  # 5 seconds between trading loop iterations
+        self.trading_interval = 10  # 10 seconds between trading loop iterations (optimized)
         
         # Database
         self.db = UnifiedTradingDatabase("unified_trading.db")
@@ -286,12 +292,74 @@ class LivePaperTradingSystem:
         # Option chain cache to reduce API calls
         self.option_chain_cache = {}
         self.option_chain_cache_time = {}
-        self.option_chain_cache_ttl = 30  # 30 seconds cache TTL
+        self.option_chain_cache_ttl = 60  # 60 seconds cache TTL (optimized)
         
         # Volume data cache to reduce API calls
         self.volume_data_cache = {}
         self.volume_data_cache_time = {}
-        self.volume_data_cache_ttl = 60  # 60 seconds cache TTL for volume data
+        self.volume_data_cache_ttl = 120  # 120 seconds cache TTL for volume data (optimized)
+                # Performance monitoring
+        self.performance_stats = {
+            'signals_generated': 0,
+            'trades_executed': 0,
+            'api_calls_made': 0,
+            'cache_hits': 0,
+            'cache_misses': 0
+        }
+        
+        # VIX-based dynamic frequency
+        self.vix_cache = {}
+        self.vix_cache_time = {}
+        self.vix_cache_ttl = 300  # 5 minutes cache for VIX
+        self.vix_thresholds = {
+            'low': 15,      # VIX < 15: Normal frequency (10s)
+            'medium': 25,   # VIX 15-25: Higher frequency (5s)
+            'high': 35,     # VIX 25-35: Very high frequency (3s)
+            'extreme': 50   # VIX > 35: Maximum frequency (1s)
+        }
+        self.interval_mapping = {
+            'low': 10,      # Normal market conditions
+            'medium': 5,    # Moderate volatility
+            'high': 3,      # High volatility
+            'extreme': 1    # Extreme volatility (scalping mode)
+        }
+        
+        # WebSocket configuration for high-liquidity indices
+        self.websocket_symbols = [
+            'NSE:NIFTY50-INDEX',      # High liquidity - WebSocket
+            'NSE:NIFTYBANK-INDEX',    # High liquidity - WebSocket
+            'NSE:FINNIFTY-INDEX'      # High liquidity - WebSocket
+        ]
+        self.rest_symbols = [
+            'NSE:RELIANCE-EQ',        # Lower liquidity - REST
+            'NSE:HDFC-EQ'             # Lower liquidity - REST
+        ]
+        self.websocket_data = {}  # Real-time WebSocket data
+        self.websocket_last_update = {}  # Last update timestamps
+        self.websocket_enabled = True  # Enable WebSocket for high-liquidity symbols
+        
+        # Mirror mode configuration for strict paper trading
+        self.mirror_mode = True  # Enable strict mirror mode
+        self.strict_market_hours = True  # Enforce exact market hours
+        self.real_time_order_book = True  # Use real-time order book simulation
+        self.exact_margin_logic = True  # Use exact margin calculations
+        self.trading_holidays = [
+            '2025-01-26',  # Republic Day
+            '2025-03-08',  # Holi
+            '2025-03-29',  # Good Friday
+            '2025-04-14',  # Ambedkar Jayanti
+            '2025-04-17',  # Ram Navami
+            '2025-05-01',  # Labour Day
+            '2025-06-17',  # Eid al-Adha
+            '2025-08-15',  # Independence Day
+            '2025-08-26',  # Janmashtami
+            '2025-10-02',  # Gandhi Jayanti
+            '2025-10-12',  # Dussehra
+            '2025-10-31',  # Diwali
+            '2025-11-01',  # Diwali
+            '2025-11-15',  # Guru Nanak Jayanti
+            '2025-12-25'   # Christmas
+        ]
         self._trading_thread = None
         
         # Initialize data provider
@@ -312,7 +380,7 @@ class LivePaperTradingSystem:
         
         # Rate limiting
         self.last_api_call = 0
-        self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls to avoid rate limits
+        self.min_call_interval = 1.0  # Minimum 1.0 seconds between API calls to avoid rate limits (optimized)
         
         # Price caching for API rate limiting
 
@@ -1568,7 +1636,7 @@ class LivePaperTradingSystem:
                     self._check_trade_exits(current_prices, current_time)
                     
                     # Log status less frequently
-                    if not hasattr(self, '_last_status_update') or (current_time - self._last_status_update).total_seconds() > 60:
+                    if not hasattr(self, '_last_status_update') or (current_time - self._last_status_update).total_seconds() > 300:  # Log status every 5 minutes
                         logger.debug(f"📊 Status: Cash: ₹{self.cash:,.2f}, Equity: ₹{self._equity():,.2f}, Exposure: {self._current_total_exposure():.1%}, Open Trades: {len(self.open_trades)}")
                         self._last_status_update = current_time
                 
