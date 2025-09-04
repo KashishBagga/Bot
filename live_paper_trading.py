@@ -655,7 +655,7 @@ class LivePaperTradingSystem:
                 for option in options_chain:
                     if option.get('option_type') == 'CE' and option.get('strike_price') == atm_strike:
                         ce_option = option
-                        break
+                        return  # Exit the main function instead of break
                 
                 if ce_option:
                     real_premium = ce_option.get('ltp', 0)
@@ -673,7 +673,7 @@ class LivePaperTradingSystem:
                 for option in options_chain:
                     if option.get('option_type') == 'PE' and option.get('strike_price') == atm_strike:
                         pe_option = option
-                        break
+                        return  # Exit the main function instead of break
                 
                 if pe_option:
                     real_premium = pe_option.get('ltp', 0)
@@ -1216,10 +1216,10 @@ class LivePaperTradingSystem:
             closed_trades.extend(self._close_all_trades('EOD Exit', timestamp, current_prices))
             return closed_trades
         
-        # Check for EOD exit (15:20 IST)
+        # Check for EOD exit (15:25 IST) - 5 minutes before market close
         IST = ZoneInfo("Asia/Kolkata")
         ist_time = timestamp.astimezone(IST) if timestamp.tzinfo else timestamp.replace(tzinfo=ZoneInfo("UTC")).astimezone(IST)
-        if ist_time.hour == 15 and ist_time.minute >= 20:
+        if ist_time.hour == 15 and ist_time.minute >= 25:
             if not self.eod_exit_triggered:
                 logger.info("🕐 EOD exit time - closing all positions and blocking new trades")
                 self.eod_exit_triggered = True
@@ -2483,12 +2483,26 @@ def main():
                     while True:
                         time.sleep(1)
                 except KeyboardInterrupt:
-                    logger.info("🛑 Stopping trading system...")
-                    trading_system.stop_trading()
+                    logger.info("�� KeyboardInterrupt received - stopping trading system...")
+                    try:
+                        trading_system.stop_trading()
+                        logger.info("✅ Trading system stopped gracefully")
+                    except Exception as e:
+                        logger.error(f"❌ Error during shutdown: {e}")
+                    return  # Exit the main function instead of break
                     
+    except KeyboardInterrupt:
+        logger.info("🛑 KeyboardInterrupt in main - stopping system...")
+        try:
+            trading_system.stop_trading()
+        except Exception as e:
+            logger.error(f"❌ Error during main shutdown: {e}")
     except Exception as e:
         logger.error(f"❌ Error in main execution: {e}")
-        trading_system.stop_trading()
+        try:
+            trading_system.stop_trading()
+        except Exception as e2:
+            logger.error(f"❌ Error during error shutdown: {e2}")
         raise
 
 
