@@ -225,7 +225,7 @@ class LivePaperTradingSystem:
             'NSE:NIFTYBANK-INDEX',    # Bank Nifty  
             'NSE:FINNIFTY-INDEX',     # Fin Nifty
             'NSE:RELIANCE-EQ',        # Reliance
-            'NSE:HDFC-EQ'             # HDFC
+            'NSE:HDFCBANK-EQ'             # HDFC
         ]
         self.data_provider = data_provider
         
@@ -332,7 +332,7 @@ class LivePaperTradingSystem:
         ]
         self.rest_symbols = [
             'NSE:RELIANCE-EQ',        # Lower liquidity - REST
-            'NSE:HDFC-EQ'             # Lower liquidity - REST
+            'NSE:HDFCBANK-EQ'             # Lower liquidity - REST
         ]
         self.websocket_data = {}  # Real-time WebSocket data
         self.websocket_last_update = {}  # Last update timestamps
