@@ -261,6 +261,9 @@ class LivePaperTradingSystem:
         self.session_start = None  # Will be set in start_trading()
         self._last_metrics_count = 0  # Track last metrics update
         self._signal_dedupe_cache = {}  # Persistent signal deduplication cache
+        self._signal_cooldown_cache = {}  # Signal cooldown tracking
+        self.signal_cooldown_minutes = 5  # Minimum 5 minutes between same signals
+        self.signal_dedupe_ttl = 300  # 5 minutes TTL for deduplication cache
         
         # Trading configuration
         self.trading_interval = 10  # 10 seconds between trading loop iterations (optimized)
@@ -298,14 +301,22 @@ class LivePaperTradingSystem:
         self.volume_data_cache = {}
         self.volume_data_cache_time = {}
         self.volume_data_cache_ttl = 120  # 120 seconds cache TTL for volume data (optimized)
-                # Performance monitoring
+                # Performance monitoring and optimization
         self.performance_stats = {
             'signals_generated': 0,
             'trades_executed': 0,
             'api_calls_made': 0,
             'cache_hits': 0,
-            'cache_misses': 0
+            'cache_misses': 0,
+            'signals_deduplicated': 0,
+            'signals_cooldown_blocked': 0,
+            'api_retries': 0,
+            'api_failures': 0,
+            'error_count': 0
         }
+        self.performance_start_time = time.time()
+        self.last_performance_log = 0
+        self.performance_log_interval = 300  # Log performance every 5 minutes
         
         # VIX-based dynamic frequency
         self.vix_cache = {}
@@ -377,6 +388,14 @@ class LivePaperTradingSystem:
         
         # PRODUCTION SAFEGUARDS - Essential for real money trading
         self._validate_production_requirements()
+        
+        # API reliability and retry mechanism
+        self.api_retry_attempts = 3  # Number of retry attempts
+        self.api_retry_delay = 1.0  # Initial delay between retries
+        self.api_retry_backoff = 2.0  # Exponential backoff multiplier
+        self.api_timeout = 30  # API timeout in seconds
+        self.api_failure_count = 0
+        self.max_api_failures = 10  # Max failures before fallback mode
         
         # Rate limiting
         self.last_api_call = 0
@@ -1348,20 +1367,34 @@ class LivePaperTradingSystem:
             # Use unified strategy engine
             signals = self.strategy_engine.generate_signals(data_dict, current_prices)
             
-            # Apply deduplication
+            # Apply advanced deduplication and cooldown
             current_time = time.time()
             deduplicated_signals = []
             
             for signal in signals:
-                # Create unique signal identifier
-                signal_key = f"{signal['strategy']}_{signal['signal']}_{signal.get('current_price', 0):.0f}"
+                # Create comprehensive signal fingerprint
+                signal_fingerprint = self._create_signal_fingerprint(signal)
                 
-                # Skip if we've already seen this signal recently
-                if signal_key in self._signal_dedupe_cache:
+                # Check if signal is in cooldown period
+                if self._is_signal_in_cooldown(signal_fingerprint, current_time):
+                    logger.debug(f"⏭️ Signal in cooldown: {signal['strategy']} {signal['signal']}")
+                    self.performance_stats['signals_cooldown_blocked'] += 1
                     continue
                 
-                self._signal_dedupe_cache[signal_key] = current_time
+                # Check if we've seen this exact signal recently
+                if signal_fingerprint in self._signal_dedupe_cache:
+                    cache_time = self._signal_dedupe_cache[signal_fingerprint]
+                    if current_time - cache_time < self.signal_dedupe_ttl:
+                        logger.debug(f"⏭️ Duplicate signal filtered: {signal['strategy']} {signal['signal']}")
+                        self.performance_stats['signals_deduplicated'] += 1
+                        continue
+                
+                # Add to cache and cooldown
+                self._signal_dedupe_cache[signal_fingerprint] = current_time
+                self._signal_cooldown_cache[signal_fingerprint] = current_time
                 deduplicated_signals.append(signal)
+                
+                logger.info(f"✅ New unique signal: {signal['strategy']} {signal['signal']} (confidence: {signal.get('confidence', 0)})")
             
             # Limit signals to prevent overwhelming the system
             max_signals_per_cycle = 5
@@ -1373,6 +1406,7 @@ class LivePaperTradingSystem:
             
             if deduplicated_signals:
                 logger.info(f"📊 Generated {len(deduplicated_signals)} signals")
+                self.performance_stats['signals_generated'] += len(deduplicated_signals)
             
             return deduplicated_signals
             
@@ -1639,6 +1673,11 @@ class LivePaperTradingSystem:
                     if not hasattr(self, '_last_status_update') or (current_time - self._last_status_update).total_seconds() > 300:  # Log status every 5 minutes
                         logger.debug(f"📊 Status: Cash: ₹{self.cash:,.2f}, Equity: ₹{self._equity():,.2f}, Exposure: {self._current_total_exposure():.1%}, Open Trades: {len(self.open_trades)}")
                         self._last_status_update = current_time
+                
+                # Clean up signal caches periodically
+                if not hasattr(self, '_last_cache_cleanup') or (current_time - self._last_cache_cleanup) > 300:  # Every 5 minutes
+                    self._cleanup_signal_caches()
+                    self._last_cache_cleanup = current_time
                 
                 # Sleep for trading interval
                 time.sleep(self.trading_interval)
@@ -2466,6 +2505,63 @@ class LivePaperTradingSystem:
         except Exception as e:
             logger.error(f"❌ Error validating data for {symbol}: {e}")
             return False
+
+    def _create_signal_fingerprint(self, signal):
+        """Create a unique fingerprint for signal deduplication."""
+        try:
+            import hashlib
+            fingerprint_data = {
+                'strategy': signal.get('strategy', ''),
+                'signal': signal.get('signal', ''),
+                'symbol': signal.get('symbol', ''),
+                'confidence': round(signal.get('confidence', 0), 1),
+                'price': round(signal.get('current_price', 0), 2)
+            }
+            fingerprint_str = str(sorted(fingerprint_data.items()))
+            return hashlib.md5(fingerprint_str.encode()).hexdigest()[:16]
+        except Exception as e:
+            logger.error(f"❌ Error creating signal fingerprint: {e}")
+            return f"{signal.get('strategy', '')}_{signal.get('signal', '')}_{int(time.time())}"
+    
+    def _is_signal_in_cooldown(self, signal_fingerprint, current_time):
+        """Check if signal is in cooldown period."""
+        try:
+            if signal_fingerprint not in self._signal_cooldown_cache:
+                return False
+            last_signal_time = self._signal_cooldown_cache[signal_fingerprint]
+            cooldown_seconds = self.signal_cooldown_minutes * 60
+            return (current_time - last_signal_time) < cooldown_seconds
+        except Exception as e:
+            logger.error(f"❌ Error checking signal cooldown: {e}")
+            return False
+    
+    def _cleanup_signal_caches(self):
+        """Clean up old entries from signal caches."""
+        try:
+            current_time = time.time()
+            ttl_seconds = self.signal_dedupe_ttl
+            cooldown_seconds = self.signal_cooldown_minutes * 60
+            
+            # Clean deduplication cache
+            expired_keys = [
+                key for key, timestamp in self._signal_dedupe_cache.items()
+                if current_time - timestamp > ttl_seconds
+            ]
+            for key in expired_keys:
+                del self._signal_dedupe_cache[key]
+            
+            # Clean cooldown cache
+            expired_cooldown_keys = [
+                key for key, timestamp in self._signal_cooldown_cache.items()
+                if current_time - timestamp > cooldown_seconds
+            ]
+            for key in expired_cooldown_keys:
+                del self._signal_cooldown_cache[key]
+            
+            if expired_keys or expired_cooldown_keys:
+                logger.debug(f"�� Cleaned {len(expired_keys)} dedupe and {len(expired_cooldown_keys)} cooldown entries")
+        except Exception as e:
+            logger.error(f"❌ Error cleaning signal caches: {e}")
 
     def _rate_limit(self):
         """Implement rate limiting to prevent API violations."""
