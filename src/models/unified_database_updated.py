@@ -734,3 +734,169 @@ class UnifiedTradingDatabase:
 class UnifiedDatabase(UnifiedTradingDatabase):
     """Legacy class for backward compatibility."""
     pass 
+    def save_open_option_position(self, trade):
+        """Save open option position to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Create option_positions table if it doesn't exist
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS option_positions (
+                    trade_id TEXT PRIMARY KEY,
+                    timestamp TEXT NOT NULL,
+                    contract_symbol TEXT NOT NULL,
+                    underlying TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    signal_type TEXT NOT NULL,
+                    entry_price REAL NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    lot_size INTEGER NOT NULL,
+                    strike REAL NOT NULL,
+                    expiry TEXT NOT NULL,
+                    option_type TEXT NOT NULL,
+                    status TEXT DEFAULT 'OPEN',
+                    commission REAL DEFAULT 0.0,
+                    confidence REAL DEFAULT 0.0,
+                    reasoning TEXT DEFAULT '',
+                    stop_loss REAL,
+                    target1 REAL,
+                    target2 REAL,
+                    target3 REAL,
+                    exit_price REAL,
+                    exit_time TEXT,
+                    pnl REAL,
+                    exit_reason TEXT,
+                    entry_value REAL,
+                    entry_commission REAL,
+                    entry_time TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute("""
+                INSERT OR REPLACE INTO option_positions 
+                (trade_id, timestamp, contract_symbol, underlying, strategy, signal_type,
+                 entry_price, quantity, lot_size, strike, expiry, option_type, status,
+                 commission, confidence, reasoning, stop_loss, target1, target2, target3,
+                 exit_price, exit_time, pnl, exit_reason, entry_value, entry_commission, entry_time)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                trade.id, 
+                trade.timestamp.isoformat(), 
+                trade.contract_symbol,
+                trade.underlying, 
+                trade.strategy, 
+                trade.signal_type,
+                trade.entry_price, 
+                trade.quantity, 
+                trade.lot_size,
+                trade.strike, 
+                trade.expiry.isoformat() if trade.expiry else None, 
+                trade.option_type,
+                trade.status, 
+                trade.commission, 
+                trade.confidence,
+                trade.reasoning, 
+                trade.stop_loss, 
+                trade.target1, 
+                trade.target2, 
+                trade.target3,
+                trade.exit_price, 
+                trade.exit_time.isoformat() if trade.exit_time else None, 
+                trade.pnl, 
+                trade.exit_reason, 
+                trade.entry_value, 
+                trade.entry_commission,
+                trade.entry_time.isoformat() if trade.entry_time else None
+            ))
+            
+            conn.commit()
+            conn.close()
+            logger.debug(f"✅ Saved open option position: {trade.id[:8]}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving open option position: {e}")
+            return False
+
+    def fetch_open_option_positions(self):
+        """Fetch all open option positions from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT * FROM option_positions 
+                WHERE status = 'OPEN'
+                ORDER BY timestamp DESC
+            """)
+            
+            columns = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+            
+            positions = []
+            for row in rows:
+                position = dict(zip(columns, row))
+                positions.append(position)
+            
+            conn.close()
+            return positions
+            
+        except Exception as e:
+            logger.error(f"❌ Error fetching open option positions: {e}")
+            return []
+
+        """Save open option position to database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS option_positions (
+                    trade_id TEXT PRIMARY KEY,
+                    timestamp TEXT NOT NULL,
+                    contract_symbol TEXT NOT NULL,
+                    underlying TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    signal_type TEXT NOT NULL,
+                    entry_price REAL NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    lot_size INTEGER NOT NULL,
+                    strike REAL NOT NULL,
+                    expiry TEXT NOT NULL,
+                    option_type TEXT NOT NULL,
+                    status TEXT DEFAULT 'OPEN',
+                    commission REAL DEFAULT 0.0,
+                    confidence REAL DEFAULT 0.0,
+                    reasoning TEXT DEFAULT '',
+                    entry_value REAL,
+                    entry_commission REAL,
+                    entry_time TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute("""
+                INSERT OR REPLACE INTO option_positions 
+                (trade_id, timestamp, contract_symbol, underlying, strategy, signal_type,
+                 entry_price, quantity, lot_size, strike, expiry, option_type, status,
+                 commission, confidence, reasoning, entry_value, entry_commission, entry_time)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                trade.id, trade.timestamp.isoformat(), trade.contract_symbol,
+                trade.underlying, trade.strategy, trade.signal_type,
+                trade.entry_price, trade.quantity, trade.lot_size,
+                trade.strike, trade.expiry.isoformat() if trade.expiry else None, 
+                trade.option_type, trade.status, trade.commission, 
+                trade.confidence, trade.reasoning, trade.entry_value, 
+                trade.entry_commission, trade.entry_time.isoformat() if trade.entry_time else None
+            ))
+            
+            conn.commit()
+            conn.close()
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving open option position: {e}")
+            return False

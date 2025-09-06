@@ -885,16 +885,13 @@ class LivePaperTradingSystem:
                 max_lots_by_capital = int(available_capital / premium_per_lot)
                 max_lots_by_risk = int(adjusted_risk / premium_per_lot)
                 
-                # Use the smaller of the two limits, allow fractional lots for small capital
+                # CRITICAL FIX: Only allow whole lots - no fractional lots
                 if max_lots_by_capital < 1:
-                    # If we can't afford 1 lot, try with fractional lot (0.1 lot minimum)
-                    lots = max(0.1, min(max_lots_by_capital, max_lots_by_risk))
-                    logger.info(f"�� Using fractional lot size: {lots:.1f} lots due to limited capital")
+                    logger.warning(f"⚠️ Cannot afford even 1 lot - need ₹{premium_per_lot:,.2f}, have ₹{available_capital:,.2f}")
+                    return None
                 else:
                     lots = max(1, min(max_lots_by_capital, max_lots_by_risk))
                 quantity_shares = lots * option_contract.lot_size
-                
-                # Check if we can afford the calculated lots
                 total_premium = entry_price * quantity_shares
                 if total_premium > available_capital:
                     logger.info(f"⚠️ Cannot afford {lots} lots for {signal['strategy']} - need ₹{total_premium:,.2f}, have ₹{available_capital:,.2f}")
@@ -1082,101 +1079,6 @@ class LivePaperTradingSystem:
             except Exception as e:
                 logger.error(f"❌ Error opening trade: {e}")
                 return None
-        
-        # Outside lock: save to database
-        try:
-            self.db.save_open_option_position(trade)
-        except Exception as e:
-            logger.exception("Failed to save trade to database")
-    
-    def _calculate_dynamic_position_size(self, signal: Dict, entry_price: float) -> int:
-        """Calculate position size with dynamic lot sizing based on confidence and volatility."""
-        try:
-            # Base risk amount (2% of capital)
-            base_risk = self.cash * self.max_risk_per_trade
-            
-            # Confidence multiplier (0.5 to 2.0 based on confidence)
-            confidence = signal.get('confidence', 50)
-            confidence_multiplier = max(0.5, min(2.0, confidence / 50.0))
-            
-            # Volatility adjustment (if we have ATR data)
-            volatility_multiplier = 1.0
-            if 'atr' in signal:
-                # Adjust based on ATR - higher volatility = smaller position
-                atr = signal['atr']
-                if atr and atr > 0:
-                    # Fix: Proper volatility calculation
-                    # Higher ATR relative to price = higher volatility = smaller position
-                    atr_ratio = atr / entry_price
-                    if atr_ratio > 0.1:  # High volatility (>10% ATR)
-                        volatility_multiplier = 0.5  # Reduce position size
-                    elif atr_ratio > 0.05:  # Medium volatility (5-10% ATR)
-                        volatility_multiplier = 0.8  # Slightly reduce position size
-                    else:  # Low volatility (<5% ATR)
-                        volatility_multiplier = 1.2  # Increase position size
-            
-            # Calculate adjusted risk
-            adjusted_risk = base_risk * confidence_multiplier * volatility_multiplier
-            
-            # For options, use a more conservative risk calculation
-            # Risk per unit should be the option premium (entry_price)
-            risk_per_unit = entry_price
-            
-            if risk_per_unit <= 0:
-                return 0
-            
-            # Calculate position size (how many option contracts we can buy)
-            position_size = int(adjusted_risk / risk_per_unit)
-            
-            # Limit position size to reasonable values for options trading
-            max_position = 10  # Maximum 10 contracts
-            min_position = 1   # Minimum 1 contract
-            
-            position_size = max(min_position, min(max_position, position_size))
-            
-            # Add debugging
-            logger.info(f"🔍 DEBUG: Position size calculation:")
-            logger.info(f"   Base risk: ₹{base_risk:,.2f}")
-            logger.info(f"   Confidence: {confidence}, Multiplier: {confidence_multiplier}")
-            logger.info(f"   Entry price: ₹{entry_price:,.2f}")
-            logger.info(f"   Risk per unit: ₹{risk_per_unit:,.2f}")
-            logger.info(f"   Raw position size: {int(adjusted_risk / risk_per_unit)}")
-            logger.info(f"   Final position size: {position_size}")
-            
-            return position_size
-            
-        except Exception as e:
-            logger.error(f"❌ Error calculating position size: {e}")
-            return 0
-    
-    def _check_exposure_limits(self, symbol: str, new_notional: float, last_prices: Dict[str, float] = None) -> bool:
-        """Check exposure limits using equity-based calculation."""
-        # DISABLED: Always allow trades for 1 lot trading
-        return True
-
-    def _close_paper_trade(self, trade_id: str, exit_price: float,
-                          exit_reason: str, timestamp: datetime) -> Optional[PaperTrade]:
-        """Close a paper trade with proper P&L and cash accounting.
-        Returns the closed PaperTrade object or None.
-        Does DB update outside the critical lock.
-        """
-        # Normalize timestamp to Kolkata tz
-        if timestamp.tzinfo is None:
-            # assume timestamp is local/UTC depending on your source; here we treat naive as UTC
-            timestamp = timestamp.replace(tzinfo=ZoneInfo("UTC")).astimezone(self.tz)
-        else:
-            timestamp = timestamp.astimezone(self.tz)
-
-        # We'll prepare db_payload to update DB after releasing lock
-        db_payload = None
-        closed_trade = None
-
-        with self._lock:
-            if trade_id not in self.open_trades:
-                return None
-
-            trade = self.open_trades[trade_id]
-
             # Determine whether this is effectively a sell (closing a long) or buy (closing a short)
             # Convention: quantity > 0 => long (we sold to close), quantity < 0 => short (we bought to close)
             is_buy = False
@@ -1226,12 +1128,19 @@ class LivePaperTradingSystem:
             # update daily pnl in-memory
             self.daily_pnl += pnl
 
+            # update daily pnl in-memory
+            self.daily_pnl += pnl
+            
+            # CRITICAL FIX: Update trade counters
+            self.total_trades_closed += 1
+            if trade.pnl is not None:
+                if trade.pnl > 0:
+                    self.winning_trades += 1
+                elif trade.pnl < 0:
+                    self.losing_trades += 1
+            
             # prepare DB payload (update outside lock)
-            db_payload = (trade_id, 'CLOSED', pnl, exit_reason)
-
-            closed_trade = trade
-
-        # outside lock: update DB and compute drawdown using fresh equity snapshot
+            db_payload = (trade_id, 'CLOSED', pnl, exit_reason)        # outside lock: update DB and compute drawdown using fresh equity snapshot
         try:
             # Update DB; tolerate DB errors
             try:
@@ -1239,8 +1148,6 @@ class LivePaperTradingSystem:
             except Exception:
                 logger.exception("Failed to update DB for closed trade %s", trade_id)
 
-            # Update peak / drawdown using a best-effort current prices map
-            last_prices = {}
             for t in self.open_trades.values():
                 # try to get real LTP if available; fallback to entry
                 ltp = None
