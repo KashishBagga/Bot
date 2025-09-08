@@ -70,8 +70,8 @@ class WorkingOptimizedModularTradingSystem:
         self.take_profit_percent = 0.05  # 5% take profit
         self.max_positions_per_symbol = 3  # Maximum 3 positions per symbol
         self.max_total_positions = 15  # Maximum 15 total positions
-        self.trade_cooldown_minutes = 5  # 5-minute cooldown between trades
-        self.daily_loss_limit = 0.05  # 5% daily loss limit
+        self.trade_cooldown_minutes = 0.17  # 10-second cooldown between trades
+        self.daily_loss_limit = 1.0  # 100% daily loss limit (DISABLED for paper trading)
         self.emergency_stop_loss = 0.20  # 20% emergency stop
         
         # Initialize enhanced systems
@@ -93,7 +93,7 @@ class WorkingOptimizedModularTradingSystem:
         self.strategy_engine = UnifiedStrategyEngine(symbols, confidence_cutoff)
         
         # Initialize database with connection pooling
-        self.db = UnifiedTradingDatabase("optimized_trading.db")
+        self.db = UnifiedTradingDatabase("data/crypto/crypto_trading.db")
         
         # Trading state
         self.is_running = False
@@ -617,7 +617,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Set up logging
-    logging.basicConfig(
+    logging.basicConfig(filename=f"logs/{args.market}/{args.market}_trading.log", 
         level=logging.INFO if args.verbose else logging.WARNING,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )

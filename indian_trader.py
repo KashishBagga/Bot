@@ -71,7 +71,7 @@ class WorkingOptimizedModularTradingSystem:
         self.max_positions_per_symbol = 3  # Maximum 3 positions per symbol
         self.max_total_positions = 15  # Maximum 15 total positions
         self.trade_cooldown_minutes = 0.17  # 10-second cooldown between trades
-        self.daily_loss_limit = 0.05  # 5% daily loss limit
+        self.daily_loss_limit = 1.0  # 100% daily loss limit (DISABLED for paper trading)
         self.emergency_stop_loss = 0.20  # 20% emergency stop
         
         # Initialize enhanced systems
@@ -93,7 +93,7 @@ class WorkingOptimizedModularTradingSystem:
         self.strategy_engine = UnifiedStrategyEngine(symbols, confidence_cutoff)
         
         # Initialize database with connection pooling
-        self.db = UnifiedTradingDatabase("data/crypto/crypto_trading.db")
+        self.db = UnifiedTradingDatabase("data/indian/indian_trading.db")
         
         # Trading state
         self.is_running = False
