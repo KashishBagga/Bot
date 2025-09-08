@@ -230,7 +230,8 @@ class PerformanceTracker:
             peak = equity_curve.expanding().max()
             drawdown = (equity_curve - peak) / peak * 100
             return drawdown.min()
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             return 0.0
     
     def _calculate_profit_factor(self, daily_pnl: pd.DataFrame) -> float:
@@ -239,7 +240,8 @@ class PerformanceTracker:
             gross_profit = daily_pnl[daily_pnl['total_pnl'] > 0]['total_pnl'].sum()
             gross_loss = abs(daily_pnl[daily_pnl['total_pnl'] < 0]['total_pnl'].sum())
             return (gross_profit / gross_loss).round(2) if gross_loss > 0 else float('inf')
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             return 0.0
     
     def _get_avg_trade_duration(self, start_date: str = None, end_date: str = None) -> float:
@@ -441,20 +443,14 @@ def main():
     end_date = datetime.now().strftime('%Y-%m-%d')
     start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
     
-    print("📊 PERFORMANCE TRACKER")
-    print("=" * 50)
     
     # Generate report
     report = tracker.generate_performance_report(start_date, end_date)
-    print(report)
     
     # Plot charts
     tracker.plot_equity_curve(start_date, end_date, "equity_curve.png")
     tracker.plot_daily_pnl(start_date, end_date, "daily_pnl.png")
     
-    print("\n📊 Charts saved as:")
-    print("   - equity_curve.png")
-    print("   - daily_pnl.png")
 
 
 if __name__ == "__main__":

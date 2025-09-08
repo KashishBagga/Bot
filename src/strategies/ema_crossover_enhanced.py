@@ -475,7 +475,7 @@ def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, 
     # normalize timestamps and compare sets
     if row_df.empty and vec_df.empty:
         if verbose:
-            print("Both methods produced zero signals — identical.")
+            pass
         return True, {'row_count': 0, 'vec_count': 0, 'diff': 0, 'mismatches': []}
 
     # ensure timestamps are datetime64
@@ -504,11 +504,10 @@ def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, 
 
     diff_count = len(mismatches)
     if verbose:
-        print(f"Row signals: {len(row_df)} | Vectorized signals: {len(vec_df)} | Differences: {diff_count}")
         if diff_count:
-            print("Sample mismatches (first 10):")
             for m in mismatches[:10]:
-                print(m)
+                pass
+                pass
 
     details = {
         'row_count': len(row_df),
@@ -547,7 +546,7 @@ def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, 
     # normalize timestamps and compare sets
     if row_df.empty and vec_df.empty:
         if verbose:
-            print("Both methods produced zero signals — identical.")
+            pass
         return True, {'row_count': 0, 'vec_count': 0, 'diff': 0, 'mismatches': []}
 
     # ensure timestamps are datetime64
@@ -576,16 +575,14 @@ def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, 
 
     diff_count = len(mismatches)
     if verbose:
-        print(f"Row signals: {len(row_df)} | Vectorized signals: {len(vec_df)} | Differences: {diff_count}")
         if diff_count:
-            print("Sample mismatches (first 10):")
             for m in mismatches[:10]:
-                print(m)
+                pass
 
     details = {
-        'row_count': len(row_df),
-        'vec_count': len(vec_df),
-        'diff': diff_count,
-        'mismatches': mismatches
+        "row_count": len(row_df),
+        "vec_count": len(vec_df),
+        "diff": diff_count,
+        "mismatches": mismatches
     }
-    return diff_count == 0, details 
+    return diff_count == 0, details

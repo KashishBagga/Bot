@@ -87,34 +87,24 @@ class ParquetDataStore:
             '1hour': '60', '4hour': '240', '1day': 'D'
         }
         
-        print(f"🚀 Setting up parquet data store with DIRECT API fetching:")
-        print(f"  📅 Period: {years_back} years")
-        print(f"  📈 Symbols: {list(symbols.values())}")
-        print(f"  🎯 Timeframes: {timeframes_to_fetch}")
-        print(f"  ✨ Strategy: Fetch each timeframe directly from API (most accurate)")
         
         # Calculate date range
         end_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
         start_date = (datetime.now() - timedelta(days=years_back * 365 + 1)).strftime('%Y-%m-%d')
         
-        print(f"📅 Date range: {start_date} to {end_date}")
         
         for symbol, name in symbols.items():
-            print(f"\n📈 Processing {name} ({symbol})...")
             
             # Process each timeframe separately
             for timeframe in timeframes_to_fetch:
                 if timeframe not in timeframe_to_resolution:
-                    print(f"  ⚠️ Skipping unknown timeframe: {timeframe}")
                     continue
                 
                 resolution = timeframe_to_resolution[timeframe]
-                print(f"\n  🎯 Fetching {timeframe} timeframe (resolution: {resolution})...")
                 
                 # Check if timeframe file already exists
                 timeframe_file = self._get_timeframe_file(symbol, timeframe)
                 if timeframe_file.exists():
-                    print(f"    ✅ {timeframe} data already exists, skipping")
                     continue
                 
                 try:
@@ -124,29 +114,23 @@ class ParquetDataStore:
                     chunk_days = 90 if use_chunks else 365
                     
                     if use_chunks:
-                        print(f"    📦 Using chunked fetching (max {chunk_days} days per request)")
                         df = self._fetch_candles_chunked(fyers, symbol, resolution, 
                                                        start_date, end_date, chunk_days)
                     else:
-                        print(f"    📊 Fetching all data in single request")
                         df = self._fetch_candles(fyers, symbol, resolution, 
                                                start_date, end_date)
                     
                     if df.empty:
-                        print(f"    ❗ No data available for {timeframe}")
                         continue
                     
-                    print(f"    ✅ Fetched {len(df)} candles for {timeframe}")
                     
                     # Add technical indicators
                     df = self._add_indicators(df)
                     
                     # Store this timeframe
                     self._store_timeframe_data(symbol, timeframe, df)
-                    print(f"    💾 Stored {timeframe}: {len(df)} candles")
                     
                 except Exception as e:
-                    print(f"    ❌ Failed to fetch {timeframe}: {e}")
                     continue
             
             # Update metadata for this symbol
@@ -164,14 +148,13 @@ class ParquetDataStore:
                             if len(tf_df) > largest_count:
                                 largest_count = len(tf_df)
                                 largest_tf = tf
-                        except:
+                        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
                             continue
                 
                 self._update_metadata(symbol, name, start_date, end_date, largest_count)
         
         self._save_metadata()
-        print(f"\n✅ Parquet data store setup completed!")
-        print(f"🎉 All timeframes fetched directly from API for maximum accuracy!")
         self._print_storage_info()
     
     def _fetch_candles(self, fyers, symbol: str, resolution: str, 
@@ -216,18 +199,14 @@ class ParquetDataStore:
             chunk_start_str = current_start.strftime('%Y-%m-%d')
             chunk_end_str = current_end.strftime('%Y-%m-%d')
             
-            print(f"  📦 Chunk {chunk_count}: {chunk_start_str} to {chunk_end_str}")
             
             try:
                 chunk_df = self._fetch_candles(fyers, symbol, resolution, 
                                              chunk_start_str, chunk_end_str)
                 if not chunk_df.empty:
                     all_chunks.append(chunk_df)
-                    print(f"    ✅ Got {len(chunk_df)} candles")
                 else:
-                    print(f"    ⚠️ No data for this chunk")
             except Exception as e:
-                print(f"    ❌ Chunk failed: {e}")
                 # Continue with next chunk instead of failing completely
             
             current_start = current_end + timedelta(days=1)
@@ -240,7 +219,6 @@ class ParquetDataStore:
         combined_df = combined_df.sort_index()
         combined_df = combined_df[~combined_df.index.duplicated(keep='first')]
         
-        print(f"  🔗 Combined {len(all_chunks)} chunks into {len(combined_df)} total candles")
         return combined_df
     
     def _add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -277,7 +255,6 @@ class ParquetDataStore:
             df['bollinger_mid'] = bb.bollinger_mavg()
             
         except Exception as e:
-            print(f"    ⚠️ Warning: Could not calculate some indicators: {e}")
         
         return df
     
@@ -306,7 +283,6 @@ class ParquetDataStore:
         file_path = self._get_timeframe_file(symbol, timeframe)
         
         if not file_path.exists():
-            print(f"❌ No data found for {symbol} at {timeframe}")
             return pd.DataFrame()
         
         try:
@@ -332,7 +308,6 @@ class ParquetDataStore:
             return df
             
         except Exception as e:
-            print(f"❌ Error loading data for {symbol} at {timeframe}: {e}")
             return pd.DataFrame()
     
     def load_multi_timeframe_data(self, symbol: str, timeframes: List[str], 
@@ -422,7 +397,6 @@ class ParquetDataStore:
     
     def _print_storage_info(self):
         """Print information about stored data."""
-        print(f"\n📊 Parquet Data Store Summary:")
         
         total_size_mb = 0
         total_symbols = len(self.metadata)
@@ -432,14 +406,7 @@ class ParquetDataStore:
             total_size_mb += size_mb
             timeframes = info.get('timeframes', [])
             
-            print(f"  • {info['name']} ({symbol})")
-            print(f"    📅 Period: {info['start_date']} to {info['end_date']}")
-            print(f"    📊 Base candles: {info['base_candles_count']:,}")
-            print(f"    🎯 Timeframes: {len(timeframes)} ({', '.join(timeframes)})")
-            print(f"    💾 Size: {size_mb} MB")
         
-        print(f"\n🎉 Total: {total_symbols} symbols, {total_size_mb:.2f} MB")
-        print(f"📁 Storage directory: {self.data_dir}")
     
     def get_storage_info(self) -> Dict:
         """Get detailed storage information."""
@@ -483,7 +450,6 @@ class ParquetDataStore:
                 if symbol in self.metadata:
                     del self.metadata[symbol]
                 
-                print(f"✅ Cleared data for {symbol}")
         else:
             # Clear all data
             for item in self.data_dir.iterdir():
@@ -493,6 +459,5 @@ class ParquetDataStore:
                     item.rmdir()
             
             self.metadata.clear()
-            print("✅ Cleared all data")
         
         self._save_metadata() 

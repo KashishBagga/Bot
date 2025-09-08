@@ -7,7 +7,6 @@ Get notified instantly if trades fail or data breaks
 def add_telegram_alerts():
     """Add Telegram alerts to live_paper_trading.py"""
     
-    print("📢 Adding Telegram Alerts...")
     
     with open('live_paper_trading.py', 'r') as f:
         content = f.read()
@@ -91,7 +90,6 @@ def add_telegram_alerts():
     with open('live_paper_trading.py', 'w') as f:
         f.write(content)
     
-    print("✅ Telegram Alerts Added!")
 
 if __name__ == "__main__":
     add_telegram_alerts()

@@ -455,7 +455,8 @@ class FyersClient:
             if match:
                 return int(match.group(1))
             return None
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             return None
 
     def get_underlying_price(self, symbol):

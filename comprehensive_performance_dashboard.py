@@ -52,7 +52,6 @@ class ComprehensivePerformanceDashboard:
             if result.returncode == 0:
                 logger.info("✅ Fresh backtest completed successfully")
                 logger.info("📊 Backtest output:")
-                print(result.stdout)
             else:
                 logger.error(f"❌ Backtest failed: {result.stderr}")
                 return False
@@ -407,87 +406,47 @@ class ComprehensivePerformanceDashboard:
     
     def print_comprehensive_dashboard(self, days: int = 60):
         """Print comprehensive performance dashboard."""
-        print("\n" + "="*100)
-        print("🚀 COMPREHENSIVE PERFORMANCE ANALYZER DASHBOARD")
-        print("="*100)
         
         # Get data
         trades_df = self.get_trades_data(days)
         rejected_df = self.get_rejected_signals_data(days)
         
         if trades_df.empty and rejected_df.empty:
-            print("❌ No trading data found for the specified period")
-            print("💡 Run some backtests first: python3 simple_backtest.py --days 60")
             return
         
         # Overall Performance Summary
-        print(f"\n📊 OVERALL PERFORMANCE SUMMARY (Last {days} days)")
-        print("-" * 60)
         
         if not trades_df.empty:
             overall_metrics = self.calculate_advanced_metrics(trades_df)
             
-            print(f"📈 Total Trades: {overall_metrics.get('total_trades', 0):,}")
-            print(f"✅ Winning Trades: {overall_metrics.get('winning_trades', 0):,}")
-            print(f"❌ Losing Trades: {overall_metrics.get('losing_trades', 0):,}")
-            print(f"🎯 Win Rate: {overall_metrics.get('win_rate', 0):.2f}%")
-            print(f"💰 Total P&L: ₹{overall_metrics.get('total_pnl', 0):,.2f}")
-            print(f"📊 Average P&L per Trade: ₹{overall_metrics.get('avg_pnl', 0):,.2f}")
-            print(f"📈 Maximum Profit: ₹{overall_metrics.get('max_profit', 0):,.2f}")
-            print(f"📉 Maximum Loss: ₹{overall_metrics.get('max_loss', 0):,.2f}")
-            print(f"⚖️ Profit Factor: {overall_metrics.get('profit_factor', 0):.2f}")
-            print(f"📊 Sharpe Ratio: {overall_metrics.get('sharpe_ratio', 0):.2f}")
-            print(f"📉 Maximum Drawdown: ₹{overall_metrics.get('max_drawdown', 0):,.2f}")
-            print(f"🎯 Calmar Ratio: {overall_metrics.get('calmar_ratio', 0):.2f}")
-            print(f"🎯 Average Targets Hit: {overall_metrics.get('avg_targets_hit', 0):.1f}")
-            print(f"🛑 Average Stop Losses: {overall_metrics.get('avg_stoploss_count', 0):.1f}")
-            print(f"🎯 Average Confidence: {overall_metrics.get('avg_confidence', 0):.1f}%")
-            print(f"🏆 High Confidence Win Rate: {overall_metrics.get('high_confidence_win_rate', 0):.2f}%")
         
         # Strategy Performance Comparison
         if not trades_df.empty:
-            print(f"\n🤖 STRATEGY PERFORMANCE COMPARISON")
-            print("-" * 60)
             
             strategy_comp = self.generate_strategy_comparison(trades_df)
             if not strategy_comp.empty:
-                print(f"{'Strategy':<25} {'Trades':<8} {'Win Rate':<10} {'Total P&L':<12} {'Avg P&L':<10} {'Sharpe':<8}")
-                print("-" * 75)
                 for _, row in strategy_comp.iterrows():
-                    print(f"{row['strategy']:<25} {row['trade_count']:<8} {row['win_rate']:<10.2f}% "
                           f"₹{row['total_pnl']:<11,.2f} ₹{row['avg_pnl']:<9,.2f} {row['sharpe_ratio']:<8.2f}")
         
         # Symbol Performance Comparison
         if not trades_df.empty:
-            print(f"\n📊 SYMBOL PERFORMANCE COMPARISON")
-            print("-" * 60)
             
             symbol_comp = self.generate_symbol_comparison(trades_df)
             if not symbol_comp.empty:
-                print(f"{'Symbol':<20} {'Trades':<8} {'Win Rate':<10} {'Total P&L':<12} {'Avg P&L':<10}")
-                print("-" * 60)
                 for _, row in symbol_comp.iterrows():
-                    print(f"{row['symbol']:<20} {row['trade_count']:<8} {row['win_rate']:<10.2f}% "
                           f"₹{row['total_pnl']:<11,.2f} ₹{row['avg_pnl']:<9,.2f}")
         
         # Daily Performance Analysis
         if not trades_df.empty:
-            print(f"\n📅 DAILY PERFORMANCE ANALYSIS (Last 10 days)")
-            print("-" * 80)
             
             daily_stats = self.generate_daily_analysis(trades_df)
             if not daily_stats.empty:
                 recent_days = daily_stats.tail(10)
-                print(f"{'Date':<12} {'Trades':<8} {'Wins':<6} {'Win Rate':<10} {'Daily P&L':<12} {'Cumulative':<12}")
-                print("-" * 70)
                 for date, row in recent_days.iterrows():
-                    print(f"{date:<12} {row['trades_count']:<8} {row['wins']:<6} {row['win_rate']:<10.2f}% "
                           f"₹{row['daily_pnl']:<11,.2f} ₹{row['cumulative_pnl']:<11,.2f}")
         
         # Rejection Analysis
         if not rejected_df.empty:
-            print(f"\n🚫 SIGNAL REJECTION ANALYSIS")
-            print("-" * 60)
             
             rejection_summary = rejected_df.groupby('rejection_reason').agg({
                 'strategy': 'count',
@@ -497,15 +456,10 @@ class ComprehensivePerformanceDashboard:
             rejection_summary.columns = ['Count', 'Avg Confidence']
             rejection_summary = rejection_summary.sort_values('Count', ascending=False)
             
-            print(f"{'Rejection Reason':<30} {'Count':<8} {'Avg Confidence':<15}")
-            print("-" * 55)
             for reason, row in rejection_summary.iterrows():
-                print(f"{reason:<30} {row['Count']:<8} {row['Avg Confidence']:<15.2f}%")
         
         # Market Condition Analysis
         if not trades_df.empty and 'market_condition' in trades_df.columns:
-            print(f"\n🌍 MARKET CONDITION ANALYSIS")
-            print("-" * 60)
             
             market_analysis = trades_df.groupby('market_condition').agg({
                 'outcome': lambda x: (x == 'Win').sum(),
@@ -516,16 +470,11 @@ class ComprehensivePerformanceDashboard:
                 market_analysis.columns = ['Wins', 'Trades', 'Total P&L', 'Avg P&L']
                 market_analysis['Win Rate'] = (market_analysis['Wins'] / market_analysis['Trades'] * 100).round(2)
                 
-                print(f"{'Market Condition':<20} {'Trades':<8} {'Win Rate':<10} {'Total P&L':<12} {'Avg P&L':<10}")
-                print("-" * 60)
                 for condition, row in market_analysis.iterrows():
-                    print(f"{condition:<20} {row['Trades']:<8} {row['Win Rate']:<10.2f}% "
                           f"₹{row['Total P&L']:<11,.2f} ₹{row['Avg P&L']:<9,.2f}")
         
         # Risk Analysis
         if not trades_df.empty:
-            print(f"\n⚠️ RISK ANALYSIS")
-            print("-" * 60)
             
             # Calculate risk metrics
             losing_trades = trades_df[trades_df['outcome'] == 'Loss']
@@ -534,18 +483,11 @@ class ComprehensivePerformanceDashboard:
                 max_consecutive_losses = self.calculate_max_consecutive_losses(trades_df)
                 risk_per_trade = abs(avg_loss) if avg_loss < 0 else 0
                 
-                print(f"📉 Average Loss: ₹{avg_loss:,.2f}")
-                print(f"🔄 Maximum Consecutive Losses: {max_consecutive_losses}")
-                print(f"⚠️ Risk per Trade: ₹{risk_per_trade:,.2f}")
-                print(f"📊 Risk-Reward Ratio: {abs(overall_metrics.get('max_profit', 0) / risk_per_trade):.2f}" if risk_per_trade > 0 else "📊 Risk-Reward Ratio: N/A")
         
         # Generate charts
         if not trades_df.empty:
             self.create_performance_charts(trades_df)
         
-        print(f"\n" + "="*100)
-        print("✅ COMPREHENSIVE PERFORMANCE ANALYSIS COMPLETE")
-        print("="*100)
     
     def calculate_max_consecutive_losses(self, df: pd.DataFrame) -> int:
         """Calculate maximum consecutive losses."""
@@ -582,19 +524,13 @@ def main():
         dashboard = ComprehensivePerformanceDashboard()
         
         if not args.no_backtest:
-            print(f"\n🔄 AUTOMATIC FRESH BACKTEST")
-            print("="*50)
-            print(f"📊 Running fresh backtest for {args.days} days with {args.timeframe} timeframe...")
             
             # Clear old data and run fresh backtest
             dashboard.clear_old_trading_data()
             success = dashboard.run_fresh_backtest(args.days, args.timeframe)
             
             if not success:
-                print("❌ Backtest failed. Showing existing data (if any)...")
         else:
-            print(f"\n📊 USING EXISTING DATA (no fresh backtest)")
-            print("="*50)
         
         # Show the performance dashboard
         dashboard.print_comprehensive_dashboard(days=args.days)

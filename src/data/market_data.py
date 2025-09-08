@@ -56,7 +56,6 @@ class MarketData:
             return df
             
         except Exception as e:
-            print(f"Error fetching candles: {e}")
             return pd.DataFrame()
     
     def preprocess_data(self, df):

@@ -12,7 +12,6 @@ import os
 
 def test_database_setup():
     """Test database setup and table creation"""
-    print("🔍 Testing database setup...")
     
     try:
         # Import the bot
@@ -23,9 +22,7 @@ def test_database_setup():
         
         # Check if database file exists
         if os.path.exists("trading_signals.db"):
-            print("✅ Database file created successfully")
         else:
-            print("❌ Database file not found")
             return False
         
         # Check tables
@@ -38,22 +35,17 @@ def test_database_setup():
             cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'")
             result = cursor.fetchone()
             if result:
-                print(f"✅ Table '{table}' exists")
             else:
-                print(f"❌ Table '{table}' not found")
                 return False
         
         conn.close()
-        print("✅ Database setup test passed")
         return True
         
     except Exception as e:
-        print(f"❌ Database setup test failed: {e}")
         return False
 
 def test_strategy_import():
     """Test strategy imports"""
-    print("\n🔍 Testing strategy imports...")
     
     try:
         from src.strategies.insidebar_rsi import InsidebarRsi
@@ -69,18 +61,14 @@ def test_strategy_import():
         }
         
         for name, strategy in strategies.items():
-            print(f"✅ Strategy '{name}' imported successfully")
         
-        print("✅ Strategy import test passed")
         return True
         
     except Exception as e:
-        print(f"❌ Strategy import test failed: {e}")
         return False
 
 def test_technical_indicators():
     """Test technical indicators"""
-    print("\n🔍 Testing technical indicators...")
     
     try:
         from live_trading_bot import LiveTradingBot
@@ -103,21 +91,16 @@ def test_technical_indicators():
         expected_indicators = ['ema_9', 'ema_21', 'rsi', 'macd', 'macd_signal']
         for indicator in expected_indicators:
             if indicator in data_with_indicators.columns:
-                print(f"✅ Indicator '{indicator}' added successfully")
             else:
-                print(f"❌ Indicator '{indicator}' not found")
                 return False
         
-        print("✅ Technical indicators test passed")
         return True
         
     except Exception as e:
-        print(f"❌ Technical indicators test failed: {e}")
         return False
 
 def test_market_data_generation():
     """Test market data generation"""
-    print("\n🔍 Testing market data generation...")
     
     try:
         from live_trading_bot import LiveTradingBot
@@ -130,20 +113,15 @@ def test_market_data_generation():
             data = bot.get_market_data(symbol)
             
             if data is not None and len(data) > 0:
-                print(f"✅ Market data generated for {symbol}: {len(data)} candles")
             else:
-                print(f"⚠️ No market data available for {symbol} (this is expected in test environment)")
         
-        print("✅ Market data generation test passed")
         return True
         
     except Exception as e:
-        print(f"❌ Market data generation test failed: {e}")
         return False
 
 def test_signal_processing():
     """Test signal processing"""
-    print("\n🔍 Testing signal processing...")
     
     try:
         from live_trading_bot import LiveTradingBot
@@ -174,19 +152,15 @@ def test_signal_processing():
         conn.close()
         
         if count > 0:
-            print("✅ Signal processing test passed")
             return True
         else:
-            print("❌ Signal was not stored in database")
             return False
         
     except Exception as e:
-        print(f"❌ Signal processing test failed: {e}")
         return False
 
 def test_daily_summary():
     """Test daily summary functionality"""
-    print("\n🔍 Testing daily summary...")
     
     try:
         from view_daily_trading_summary import DailyTradingSummaryViewer
@@ -195,22 +169,16 @@ def test_daily_summary():
         
         # Test viewer initialization
         if viewer.db_path:
-            print("✅ Daily summary viewer initialized")
         else:
-            print("❌ Daily summary viewer failed to initialize")
             return False
         
-        print("✅ Daily summary test passed")
         return True
         
     except Exception as e:
-        print(f"❌ Daily summary test failed: {e}")
         return False
 
 def main():
     """Run all tests"""
-    print("🧪 LIVE TRADING BOT TEST SUITE")
-    print("=" * 50)
     
     tests = [
         test_database_setup,
@@ -231,19 +199,11 @@ def main():
             else:
                 failed += 1
         except Exception as e:
-            print(f"❌ Test failed with exception: {e}")
             failed += 1
     
-    print("\n" + "=" * 50)
-    print(f"📊 TEST RESULTS:")
-    print(f"✅ Passed: {passed}")
-    print(f"❌ Failed: {failed}")
-    print(f"📈 Success Rate: {(passed/(passed+failed)*100):.1f}%")
     
     if failed == 0:
-        print("\n🎉 ALL TESTS PASSED! Live trading bot is ready for production.")
     else:
-        print(f"\n⚠️ {failed} tests failed. Please fix issues before running live trading.")
     
     return failed == 0
 

@@ -167,20 +167,15 @@ def check_and_refresh_token():
 
 def main():
     """Main authentication function"""
-    print("🔄 Fyers Token Refresh Utility")
-    print("=" * 32)
     
     # Check if token is valid
     if check_and_refresh_token():
-        print("✅ Token is valid, no need to refresh")
         return True
     
-    print("⚠️ Token has expired. Refreshing...")
     
     # Start auth server
     auth_server = start_auth_server()
     if not auth_server:
-        print("❌ Failed to start auth server")
         return False
     
     try:
@@ -197,17 +192,10 @@ def main():
         # Generate auth URL
         auth_url = session.generate_authcode()
         
-        print("🚀 Starting Fyers Authentication")
-        print("=" * 48)
-        print(f"🔗 Opening authentication URL...")
         
         # Open browser automatically
         webbrowser.open(auth_url, new=1)
         
-        print("📋 IMPORTANT: The browser will open automatically.")
-        print("🔍 After login, you'll be redirected to our local server.")
-        print("📝 The auth code will be captured automatically.")
-        print("⏳ Waiting for authentication...")
         
         # Wait for auth code to be captured
         timeout = 120  # 2 minutes timeout
@@ -215,41 +203,32 @@ def main():
         
         while not AuthCodeHandler.auth_code and not AuthCodeHandler.server_stopped:
             if time.time() - start_time > timeout:
-                print("❌ Authentication timeout")
                 return False
             time.sleep(0.1)
         
         if not AuthCodeHandler.auth_code:
-            print("❌ No auth code captured")
             return False
         
         # Generate access token
-        print("🔄 Generating access token...")
         
         session.set_token(AuthCodeHandler.auth_code)
         response = session.generate_token()
         
         if 'access_token' in response:
             access_token = response['access_token']
-            print("✅ Access token generated successfully!")
             
             # Update .env file
             update_env_file(access_token, AuthCodeHandler.auth_code)
             
             # Test the token
-            print("🧪 Testing access token...")
             test_token(access_token)
             
-            print("✅ Authentication completed successfully!")
-            print("✅ Token refresh completed successfully!")
             return True
             
         else:
-            print(f"❌ Failed to generate access token: {response}")
             return False
             
     except Exception as e:
-        print(f"❌ Authentication error: {e}")
         return False
     
     finally:
@@ -287,11 +266,8 @@ def update_env_file(access_token, auth_code):
         with open('.env', 'w') as f:
             f.writelines(env_lines)
         
-        print("✅ Updated FYERS_ACCESS_TOKEN in .env file")
-        print("✅ Updated FYERS_AUTH_CODE in .env file")
         
     except Exception as e:
-        print(f"❌ Error updating .env file: {e}")
 
 def test_token(access_token):
     """Test if the access token works"""
@@ -305,20 +281,14 @@ def test_token(access_token):
         
         profile = fyers.get_profile()
         if 'code' in profile and profile['code'] == 200:
-            print("✅ Access token test successful!")
             
             # Get user info
             if 'data' in profile:
                 user_data = profile['data']
-                print(f"👤 Logged in as: {user_data.get('name', 'Unknown')}")
-                print(f"🆔 User ID: {user_data.get('fy_id', 'Unknown')}")
-                print(f"📧 Email: {user_data.get('email_id', 'Unknown')}")
             
         else:
-            print(f"❌ Access token test failed: {profile}")
             
     except Exception as e:
-        print(f"❌ Error testing access token: {e}")
 
 if __name__ == "__main__":
     success = main()

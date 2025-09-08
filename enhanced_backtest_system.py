@@ -583,18 +583,6 @@ def main():
     
     # Print summary
     summary = results['summary']
-    print(f"\n{'='*60}")
-    print("ENHANCED BACKTEST RESULTS")
-    print(f"{'='*60}")
-    print(f"Initial Capital: ₹{summary['initial_capital']:,.2f}")
-    print(f"Final Capital: ₹{summary['final_capital']:,.2f}")
-    print(f"Total Return: {summary['total_return_pct']:+.2f}%")
-    print(f"Total P&L: ₹{summary['total_pnl']:+,.2f}")
-    print(f"Max Drawdown: {summary['max_drawdown_pct']:.2f}%")
-    print(f"Total Trades: {summary['total_trades']}")
-    print(f"Win Rate: {summary['win_rate_pct']:.1f}%")
-    print(f"Report: {report_file}")
-    print(f"{'='*60}")
 
 if __name__ == "__main__":
     main() 

@@ -57,7 +57,8 @@ class OptionsAnalyticsDashboard:
                     last_update = datetime.fromisoformat(date_range['end'].replace('Z', '+00:00'))
                     time_diff = datetime.now(timezone.utc) - last_update
                     data_freshness_minutes = int(time_diff.total_seconds() / 60)
-                except:
+                except Exception as e:
+            logger.error(f"Unexpected error: {e}")
                     data_freshness_minutes = None
             else:
                 data_freshness_minutes = None
@@ -92,32 +93,15 @@ class OptionsAnalyticsDashboard:
     
     def print_dashboard(self, detailed: bool = False):
         """Print comprehensive dashboard."""
-        print("\n" + "="*80)
-        print("🚀 ENHANCED UNIFIED OPTIONS ANALYTICS DASHBOARD")
-        print("="*80)
         
         # System Overview
         overview = self.get_system_overview()
         if overview:
-            print(f"\n📊 SYSTEM OVERVIEW")
-            print("-" * 50)
-            print(f"Total Records: {overview['total_records']:,}")
-            print(f"Symbols: {', '.join(overview['symbols'])}")
-            print(f"Average Quality Score: {overview['avg_quality_score']:.2f}")
-            print(f"Market Open Records: {overview['market_open_records']:,}")
-            print(f"Unacknowledged Alerts: {overview['unacknowledged_alerts']:,}")
             
             if overview['data_freshness_minutes'] is not None:
-                print(f"Data Freshness: {overview['data_freshness_minutes']} minutes ago")
             
-            print(f"\n📋 TABLE STATISTICS")
-            print("-" * 30)
             for table, count in overview['table_stats'].items():
-                print(f"  {table.replace('_', ' ').title()}: {count:,}")
         
-        print("\n" + "="*80)
-        print("✅ Dashboard generated successfully")
-        print("="*80)
 
 def main():
     parser = argparse.ArgumentParser(description='Options Analytics Dashboard')

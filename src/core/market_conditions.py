@@ -262,13 +262,22 @@ def analyze_market_conditions(df: pd.DataFrame) -> pd.DataFrame:
                 else:
                     condition = 'RANGING'
                 
-                # Tradeable condition - EXTREMELY LENIENT FOR DEBUGGING
-                volume_ok = True  # Skip volume check for debugging
-                volatility_ok = True  # Skip volatility check for debugging
+                # Proper volume validation
+                volume_ok = True
+                if volume is not None and len(volume) >= 20:
+                    avg_volume = np.mean(volume[-20:])
+                    current_volume = volume[-1]
+                    volume_ok = current_volume >= avg_volume * 0.5  # At least 50% of average
                 
-                # Extremely lenient tradeable condition for debugging
-                tradeable = True  # Allow all candles to be tradeable for testing
+                # Proper volatility validation
+                volatility_ok = True
+                if len(close_prices) >= 20:
+                    returns = np.diff(close_prices[-20:]) / close_prices[-21:-1]
+                    volatility = np.std(returns)
+                    volatility_ok = 0.001 <= volatility <= 0.1  # Reasonable volatility range
                 
+                # Proper tradeable condition
+                tradeable = volume_ok and volatility_ok and trend_strength > 1.0                
                 condition_dict = {
                     'condition': condition,
                     'trend_direction': trend_direction,

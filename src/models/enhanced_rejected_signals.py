@@ -164,13 +164,9 @@ class EnhancedRejectedSignals:
             
             # Only print success message once per session
             if not EnhancedRejectedSignals._tables_setup:
-                print("✅ Enhanced rejected signals tables created successfully")
-                print("  • rejected_signals_live: For live trading rejected signals")
-                print("  • rejected_signals_backtest: For backtesting rejected signals")
                 EnhancedRejectedSignals._tables_setup = True
             
         except Exception as e:
-            print(f"❌ Error setting up enhanced rejected signals tables: {e}")
     
     def log_rejected_signal(self, signal_data: Dict[str, Any], 
                            future_data: Optional[pd.DataFrame] = None,
@@ -368,10 +364,8 @@ class EnhancedRejectedSignals:
             if not is_backtest or (is_backtest and signal_data.get('_log_summary', False)):
                 source = "Backtest" if is_backtest else "Live"
                 pnl_summary = f"P&L: ₹{real_performance['pnl']:.2f}" if real_performance['pnl'] != 0 else "P&L: ₹0.00"
-                print(f"📋 {source} rejected signal logged: {signal_data.get('strategy', 'Unknown')} - {rejection_reason} ({pnl_summary})")
             
         except Exception as e:
-            print(f"❌ Error logging rejected signal: {e}")
     
     def get_missed_opportunities_report(self, days: int = 7, min_pnl: float = 50.0, 
                                       is_backtest: bool = False) -> Dict[str, Any]:
@@ -437,7 +431,6 @@ class EnhancedRejectedSignals:
             }
             
         except Exception as e:
-            print(f"❌ Error generating missed opportunities report: {e}")
             return {}
     
     def get_rejection_analysis(self, days: int = 7, is_backtest: bool = False) -> Dict[str, Any]:
@@ -518,7 +511,6 @@ class EnhancedRejectedSignals:
             }
             
         except Exception as e:
-            print(f"❌ Error generating rejection analysis: {e}")
             return {}
 
 # Convenience functions for easy integration
@@ -546,7 +538,6 @@ def log_rejected_signal_backtest(signal_data: Dict[str, Any],
 
 if __name__ == "__main__":
     # Test the enhanced system
-    print("🧪 Testing Enhanced Rejected Signals System with Real Performance Data")
     
     enhanced_system = EnhancedRejectedSignals()
     
@@ -606,15 +597,9 @@ if __name__ == "__main__":
         'failure_reason': ''
     }
     
-    print("✅ Sample live trading rejected signal logged")
     enhanced_system.log_rejected_signal(sample_live_signal, is_backtest=False)
     
-    print("✅ Sample backtest rejected signal logged")
     enhanced_system.log_rejected_signal(sample_backtest_signal, is_backtest=True, 
                                       backtest_run_id="test_backtest_001",
                                       backtest_parameters={"timeframe": "5min", "days": 5})
     
-    print("\n📊 Enhanced Rejected Signals System with Real Performance Data ready!")
-    print("✅ rejected_signals_live: For live trading rejected signals")
-    print("✅ rejected_signals_backtest: For backtesting rejected signals")
-    print("Use log_rejected_signal_live() and log_rejected_signal_backtest() functions.")

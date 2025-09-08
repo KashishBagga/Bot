@@ -19,7 +19,6 @@ class DatabaseViews:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        print("🔧 Creating comprehensive database views...")
         
         # 1. Strategy Performance Summary View
         cursor.execute("""
@@ -299,20 +298,6 @@ class DatabaseViews:
         conn.commit()
         conn.close()
         
-        print("✅ All database views created successfully!")
-        print("📊 Available views:")
-        print("  • strategy_performance_summary")
-        print("  • daily_performance")
-        print("  • monthly_performance")
-        print("  • confidence_analysis")
-        print("  • rejection_analysis")
-        print("  • recent_trades")
-        print("  • strategy_comparison")
-        print("  • symbol_performance")
-        print("  • market_condition_analysis")
-        print("  • risk_analysis")
-        print("  • comprehensive_strategy_summary")
-        print("  • strategy_optimization_recommendations")
     
     def get_view_data(self, view_name: str, limit: int = 10) -> List[Dict]:
         """Get data from a specific view"""
@@ -330,7 +315,6 @@ class DatabaseViews:
             
             return result
         except Exception as e:
-            print(f"Error fetching from view {view_name}: {e}")
             return []
         finally:
             conn.close()
@@ -340,16 +324,11 @@ class DatabaseViews:
         data = self.get_view_data(view_name, limit)
         
         if not data:
-            print(f"❌ No data found in view: {view_name}")
             return
         
-        print(f"\n📊 {view_name.upper()} SUMMARY")
-        print("-" * 50)
         
         for i, row in enumerate(data, 1):
-            print(f"{i}. {row}")
         
-        print(f"\n📈 Total records in {view_name}: {len(data)}")
 
 def main():
     """Create all database views"""
@@ -357,8 +336,6 @@ def main():
     views.create_all_views()
     
     # Print sample data from key views
-    print("\n🔍 SAMPLE DATA FROM KEY VIEWS")
-    print("=" * 60)
     
     views.print_view_summary("strategy_performance_summary", 3)
     views.print_view_summary("daily_performance", 3)

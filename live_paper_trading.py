@@ -1280,7 +1280,6 @@ class LivePaperTradingSystem:
             
             for signal in signals:
                 # Create comprehensive signal fingerprint
-                signal_fingerprint = self._create_signal_fingerprint(signal)
                 
                 # Check if signal is in cooldown period
                 if self._is_signal_in_cooldown(signal_fingerprint, current_time):
@@ -1974,36 +1973,16 @@ class LivePaperTradingSystem:
         try:
             report = self.get_dual_metrics_report()
             
-            print("\n" + "="*80)
-            print("📊 DUAL METRICS REPORT - CAPITAL RESTRICTED vs UNRESTRICTED")
-            print("="*80)
             
             # Capital Restricted Metrics
             restricted = report.get('capital_restricted_metrics', {})
-            print(f"\n🔒 CAPITAL RESTRICTED METRICS:")
-            print(f"   Total Trades Executed: {restricted.get('total_trades', 0)}")
-            print(f"   Capital Used: ₹{restricted.get('capital_used', 0):,.2f}")
-            print(f"   Remaining Capital: ₹{restricted.get('remaining_capital', 0):,.2f}")
-            print(f"   Capital Utilization: {restricted.get('capital_utilization', 0):.1f}%")
             
             # Unrestricted Metrics
             unrestricted = report.get('unrestricted_metrics', {})
-            print(f"\n🚀 UNRESTRICTED SIGNAL METRICS:")
-            print(f"   Total Signals Generated: {unrestricted.get('total_signals', 0)}")
-            print(f"   Signals That Would Trade: {unrestricted.get('signals_that_would_trade', 0)}")
-            print(f"   Missed Opportunities: {unrestricted.get('missed_opportunities', 0)}")
-            print(f"   Total Capital Needed: ₹{unrestricted.get('total_capital_needed', 0):,.2f}")
-            print(f"   Missed Capital: ₹{unrestricted.get('missed_capital', 0):,.2f}")
-            print(f"   Signal Conversion Rate: {unrestricted.get('signal_conversion_rate', 0):.1f}%")
             
             # Performance Analysis
             performance = report.get('performance_analysis', {})
-            print(f"\n📈 PERFORMANCE ANALYSIS:")
-            print(f"   Capital Efficiency: {performance.get('capital_efficiency', 0):.1f}%")
-            print(f"   Opportunity Cost: ₹{performance.get('opportunity_cost', 0):,.2f}")
-            print(f"   Recommendation: {performance.get('recommendation', 'N/A')}")
             
-            print("\n" + "="*80)
             
         except Exception as e:
             logger.error(f"❌ Error printing dual metrics report: {e}")
@@ -2413,7 +2392,6 @@ class LivePaperTradingSystem:
             logger.error(f"❌ Error validating data for {symbol}: {e}")
             return False
 
-    def _create_signal_fingerprint(self, signal):
         """Create a unique fingerprint for signal deduplication."""
         try:
             import hashlib

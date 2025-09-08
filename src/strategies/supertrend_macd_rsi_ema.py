@@ -386,7 +386,8 @@ class SupertrendMacdRsiEma(Strategy):
             else:
                 # Try to parse as datetime
                 return pd.to_datetime(val)
-        except:
+        except Exception as e:
+            logger.error(f"Error in supertrend strategy: {e}")
             # If all else fails, return current time
             return datetime.now()
 
@@ -403,7 +404,8 @@ class SupertrendMacdRsiEma(Strategy):
                     val = pytz.utc.localize(val)
                 ist_dt = val.astimezone(ist_tz)
                 return ist_dt.strftime("%Y-%m-%d %H:%M:%S")
-        except:
+        except Exception as e:
+            logger.error(f"Error in supertrend strategy: {e}")
             pass
         return None
 
@@ -601,10 +603,8 @@ class SupertrendMacdRsiEma(Strategy):
                 
                 # DEBUG: Print market condition info for first few signals
                 if len(df) % 100 == 0:  # Print every 100th candle
-                    print(f"DEBUG: Market condition: {market_condition}, Tradeable: {market_tradeable}, ADX: {adx}")
                 
                 # CRITICAL: Check if market is tradeable
-                if not market_tradeable:
                     return {'signal': 'NO TRADE', 'reason': f"market not tradeable: {df['market_reason'].iloc[-1] if 'market_reason' in df.columns else 'unknown'}"}
                 
                 # CRITICAL: Only trade in trending markets - REJECT RANGING MARKETS

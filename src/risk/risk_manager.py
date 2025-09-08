@@ -532,7 +532,6 @@ if __name__ == "__main__":
     
     # Add risk callback
     def risk_alert_callback(alert):
-        print(f"🚨 Risk Alert: {alert['message']} (Level: {alert['level'].value})")
     
     risk_manager.add_risk_callback(risk_alert_callback)
     
@@ -562,21 +561,16 @@ if __name__ == "__main__":
         contract, 50, OrderSide.BUY, 110
     )
     
-    print(f"Can place order: {can_place}")
     if not can_place:
-        print(f"Reason: {reason}")
     
     # Record a trade
     risk_manager.record_trade(contract, 50, OrderSide.BUY, 110)
     
     # Get risk metrics
     metrics = risk_manager.get_risk_metrics()
-    print(f"Risk Level: {metrics.risk_level.value}")
-    print(f"Daily P&L: ₹{metrics.daily_pnl:,.2f}")
     
     # Get risk report
     report = risk_manager.get_risk_report()
-    print(f"Total Positions: {report['positions']}")
     
     # Stop monitoring
     risk_manager.stop_monitoring() 

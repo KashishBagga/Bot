@@ -651,12 +651,9 @@ if __name__ == "__main__":
         order_type=OrderType.MARKET
     )
     
-    print(f"Order response: {response}")
     
     # Get positions
     positions = execution.get_positions()
-    print(f"Positions: {positions}")
     
     # Get slippage stats
     slippage_stats = execution.get_slippage_stats()
-    print(f"Slippage stats: {slippage_stats}") 

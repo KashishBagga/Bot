@@ -7,7 +7,6 @@ Protect against corruption and infrastructure failures
 def add_daily_backups():
     """Add daily backups to live_paper_trading.py"""
     
-    print("💾 Adding Daily Backups...")
     
     with open('live_paper_trading.py', 'r') as f:
         content = f.read()
@@ -114,7 +113,6 @@ def add_daily_backups():
     with open('live_paper_trading.py', 'w') as f:
         f.write(content)
     
-    print("✅ Daily Backups Added!")
 
 if __name__ == "__main__":
     add_daily_backups()
