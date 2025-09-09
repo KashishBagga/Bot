@@ -430,7 +430,7 @@ class WorkingOptimizedModularTradingSystem:
         while self.is_running and not self._stop_event.is_set():
             try:
                 # Check if market is open
-                if not self.market.is_market_open():
+                if False:  # DISABLED for paper trading - was: if not self.market.is_market_open():
                     time.sleep(60)  # Check every minute when market is closed
                     continue
                 
