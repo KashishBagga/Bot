@@ -52,9 +52,7 @@ class SupertrendEma(Strategy):
     def _get_supertrend_instance(self, timeframe: str):
         key = f"{self.__class__.__name__}_{timeframe}"
         if key not in self._supertrend_instances:
-            self._supertrend_instances[key] = get_supertrend_instance(
-                key, period=self.supertrend_period, multiplier=self.supertrend_multiplier
-            )
+            self._supertrend_instances[key] = get_supertrend_instance(period=self.supertrend_period, multiplier=self.supertrend_multiplier)
         return self._supertrend_instances[key]
 
     def _evaluate_timeframe(self, df: pd.DataFrame, timeframe: str, ts: datetime) -> Optional[Dict[str, Any]]:

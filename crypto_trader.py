@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
 # Import our enhanced systems
+from risk_config import risk_config
 from src.core.error_handler import error_handler, handle_errors, TradingError, APIError
 from src.core.connection_pool import initialize_connection_pools, get_db_connection, get_api_session
 from src.core.websocket_manager import WebSocketManager
@@ -21,8 +22,8 @@ from src.core.memory_monitor import memory_monitor, start_memory_monitoring, Mem
 # Import existing components
 from src.adapters.market_factory import MarketFactory
 from src.adapters.market_interface import MarketType
-from src.core.unified_strategy_engine import UnifiedStrategyEngine
-from src.models.unified_database_updated import UnifiedTradingDatabase
+from src.core.enhanced_strategy_engine import EnhancedStrategyEngine
+from src.models.consolidated_database import ConsolidatedTradingDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -64,15 +65,15 @@ class WorkingOptimizedModularTradingSystem:
         self.confidence_cutoff = confidence_cutoff
         self.exposure_limit = exposure_limit
         self.verbose = verbose
-        
-        # CRITICAL FIX: Risk management parameters
+        # CRITICAL FIX: Risk management parameters (configurable)
+        self.risk_config = risk_config
         self.stop_loss_percent = 0.03  # 3% stop loss
         self.take_profit_percent = 0.05  # 5% take profit
-        self.max_positions_per_symbol = 3  # Maximum 3 positions per symbol
-        self.max_total_positions = 15  # Maximum 15 total positions
-        self.trade_cooldown_minutes = 0.17  # 10-second cooldown between trades
-        self.daily_loss_limit = 1.0  # 100% daily loss limit (DISABLED for paper trading)
-        self.emergency_stop_loss = 0.20  # 20% emergency stop
+        self.max_positions_per_symbol = risk_config.get("max_positions_per_symbol", 3)
+        self.max_total_positions = risk_config.get("max_total_positions", 15)
+        self.trade_cooldown_minutes = risk_config.get("trade_cooldown_seconds", 300) / 60.0
+        self.daily_loss_limit = risk_config.get("daily_loss_limit", 1.0)
+        self.emergency_stop_loss = risk_config.get("emergency_stop_loss", 0.20)
         
         # Initialize enhanced systems
         self._initialize_systems()
@@ -90,10 +91,10 @@ class WorkingOptimizedModularTradingSystem:
         self.data_provider = self._create_data_provider()
         
         # Initialize strategy engine
-        self.strategy_engine = UnifiedStrategyEngine(symbols, confidence_cutoff)
+        self.strategy_engine = EnhancedStrategyEngine(symbols, confidence_cutoff)
         
         # Initialize database with connection pooling
-        self.db = UnifiedTradingDatabase("data/crypto/crypto_trading.db")
+        self.db = ConsolidatedTradingDatabase("data/trading.db")
         
         # Trading state
         self.is_running = False
@@ -184,10 +185,11 @@ class WorkingOptimizedModularTradingSystem:
     def _check_risk_limits(self, symbol: str) -> bool:
         """CRITICAL FIX: Check if we can open a new position with proper timezone handling."""
         try:
-            # Use timezone-aware datetime
-            current_time = datetime.now(self.tz)
+            # Check if risk management is enabled
+            if not self.risk_config.is_risk_management_enabled():
+                return True
             
-            # Check daily loss limit
+            # Use timezone-aware datetime            # Check daily loss limit
             current_equity = self.cash + sum(t.pnl for t in self.open_trades.values())
             daily_loss = (self.daily_start_capital - current_equity) / self.daily_start_capital
             if daily_loss > self.daily_loss_limit:
@@ -229,8 +231,35 @@ class WorkingOptimizedModularTradingSystem:
             
         except Exception as e:
             error_handler.handle_error(e, {'context': 'check_risk_limits', 'symbol': symbol})
-            return False
-    
+
+    def _get_rejection_reason(self, signal: Dict, entry_price: float) -> str:
+        """Get the reason why a signal was rejected."""
+        try:
+            symbol = signal["symbol"]
+            
+            # Check if risk management is enabled
+            if not self.risk_config.is_risk_management_enabled():
+                return "Risk management disabled - should not be rejected"
+            
+            # Check position limits
+            symbol_positions = sum(1 for trade in self.open_trades.values() if trade.symbol == symbol)
+            if symbol_positions >= self.max_positions_per_symbol:
+                return f"Max positions per symbol reached: {symbol_positions}/{self.max_positions_per_symbol}"
+            
+            # Check cooldown
+            if symbol in self.last_trade_time:
+                time_since_last = datetime.now(self.tz) - self.last_trade_time[symbol]
+                if time_since_last.total_seconds() < self.trade_cooldown_minutes * 60:
+                    return f"Trade cooldown active: {time_since_last.total_seconds():.1f}s remaining"
+            
+            # Check risk limits
+            if not self._check_risk_limits(symbol):
+                return "Risk limits exceeded"
+            
+            return "Unknown rejection reason"
+        except Exception as e:
+            return f"Error determining rejection reason: {e}"
+
     @handle_errors()
     def _calculate_position_size(self, signal: Dict, entry_price: float) -> float:
         """CRITICAL FIX: Calculate position size with proper risk management."""
@@ -326,10 +355,20 @@ class WorkingOptimizedModularTradingSystem:
                 self.last_trade_time[symbol] = timestamp  # This is already timezone-aware
                 self.total_trades_executed += 1
             
-            # Save to database with connection pooling
-            with get_db_connection() as conn:
-                # Implementation would save trade to database
-                pass
+            # Save to database
+            self.db.save_open_trade(
+                trade_id=trade_id,
+                market="crypto",
+                symbol=symbol,
+                strategy=signal["strategy"],
+                signal=signal["signal"],
+                entry_price=entry_price,
+                quantity=position_size,
+                entry_time=timestamp,
+                stop_loss_price=stop_loss_price,
+                take_profit_price=take_profit_price
+            )
+            
             
             logger.info(f"✅ Opened trade: {trade_id} - {symbol} {signal['signal']} "
                        f"@ {entry_price:.2f} (qty: {position_size:.2f})")
@@ -394,6 +433,25 @@ class WorkingOptimizedModularTradingSystem:
             error_handler.handle_error(e, {'context': 'close_trade', 'trade_id': trade_id})
             return False
     
+    def emergency_stop_loss(self, trade_id: str, current_price: float) -> bool:
+        """Emergency stop loss for a trade."""
+        try:
+            if trade_id not in self.open_trades:
+                return False
+            
+            trade = self.open_trades[trade_id]
+            
+            # Calculate emergency stop loss (e.g., 5% loss)
+            emergency_stop_price = trade.entry_price * 0.95  # 5% loss
+            
+            if current_price <= emergency_stop_price:
+                logger.warning(f"Emergency stop loss triggered for {trade_id} at {current_price}")
+                return self._close_trade(trade_id, current_price, "Emergency Stop Loss")
+            
+            return False
+        except Exception as e:
+            error_handler.handle_error(e, {"context": "emergency_stop_loss", "trade_id": trade_id})
+            return False
     @handle_errors()
     def start_trading(self):
         """Start the WORKING trading system."""
@@ -484,6 +542,23 @@ class WorkingOptimizedModularTradingSystem:
             # Generate signals
             signals = self.strategy_engine.generate_signals(historical_data, current_prices)
             
+            # Save all signals to database (both executed and rejected)
+            for signal in signals:
+                try:
+                    self.db.save_signal(
+                        market="crypto",
+                        symbol=signal["symbol"],
+                        strategy=signal["strategy"],
+                        signal=signal["signal"],
+                        confidence=signal["confidence"],
+                        price=signal["price"],
+                        timestamp=signal["timestamp"],
+                        timeframe=signal["timeframe"],
+                        strength=signal.get("strength"),
+                        confirmed=signal.get("confirmed", False)
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to save signal: {e}")
             # CRITICAL FIX: Limit signals to prevent over-trading
             max_signals_per_cycle = 3  # Maximum 3 signals per cycle
             signals = signals[:max_signals_per_cycle]

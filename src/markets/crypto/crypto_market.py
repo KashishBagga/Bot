@@ -113,3 +113,17 @@ class CryptoMarket(MarketInterface):
     def get_default_symbols(self):
         """Get default symbols for crypto trading."""
         return ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'SOLUSDT']
+
+    def get_current_price(self, symbol: str) -> Optional[float]:
+        """Get current price for a symbol."""
+        try:
+            data_provider = self.get_data_provider()
+            if data_provider:
+                # Get latest price from data provider
+                latest_data = data_provider.get_latest_data(symbol, limit=1)
+                if latest_data and len(latest_data) > 0:
+                    return float(latest_data[0].get("close", 0))
+            return None
+        except Exception as e:
+            print(f"Error getting current price for {symbol}: {e}")
+            return None

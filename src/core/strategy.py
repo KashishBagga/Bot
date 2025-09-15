@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 import logging
 from abc import ABC, abstractmethod
-from src.models.unified_database import UnifiedDatabase
+# from src.models.unified_database import UnifiedDatabase
 from src.core.indicators import add_technical_indicators
 import sqlite3
 
@@ -28,7 +28,7 @@ class Strategy(ABC):
         self.name = name
         self.params = params or {}
         self.signals = []
-        self.db = UnifiedDatabase()
+        # self.db = UnifiedDatabase()
     
     def validate_data(self, data: pd.DataFrame) -> bool:
         """Validate that data meets minimum requirements for analysis.
@@ -195,7 +195,7 @@ class Strategy(ABC):
                 'symbol': symbol,
                 **signal_data
             }
-            self.db.log_strategy_trade(self.name, signal_data_with_symbol)
+            # self.db.log_strategy_trade(self.name, signal_data_with_symbol)
         except Exception as e:
             logging.error(f"Error logging signal: {e}")
     
