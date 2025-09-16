@@ -293,3 +293,27 @@ class RiskManager:
             'risk_distribution': risk_counts,
             'correlation_matrix': portfolio_risk.correlation_matrix.to_dict() if not portfolio_risk.correlation_matrix.empty else {}
         }
+    def should_execute_signal(self, signal: Dict[str, Any], current_prices: Dict[str, float]) -> bool:
+        """Check if signal should be executed based on risk limits"""
+        try:
+            # Basic risk checks
+            confidence = signal.get('confidence', 0)
+            if confidence < 50:  # Minimum confidence threshold
+                return False
+            
+            # Check position size
+            position_size = signal.get('position_size', 0)
+            if position_size <= 0:
+                return False
+            
+            # Check if we have price data
+            symbol = signal.get('symbol')
+            if symbol not in current_prices:
+                return False
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking signal execution: {e}")
+            return False
+
