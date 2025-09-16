@@ -163,3 +163,12 @@ class EnhancedRealTimeDataManager:
                 "websocket_data_count": len(self._websocket_data),
                 "websocket_connection": self.websocket_manager.is_connected
             }
+
+    def get_current_prices(self) -> Dict[str, float]:
+        """Get current prices for all symbols."""
+        current_prices = {}
+        for symbol in self.symbols:
+            price = self.get_current_price(symbol)
+            if price is not None:
+                current_prices[symbol] = price
+        return current_prices

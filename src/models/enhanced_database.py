@@ -450,3 +450,135 @@ class EnhancedTradingDatabase:
         except Exception as e:
             logger.error(f"❌ Failed to get market statistics: {e}")
             return {}
+
+    def save_market_condition(self, market: str, symbol: str, condition: str, 
+                             volatility: float, trend_strength: float, volume_profile: str,
+                             support_levels: List[float] = None, resistance_levels: List[float] = None) -> bool:
+        """Save market condition"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO market_conditions 
+                    (date, market, symbol, condition, volatility, trend_strength, 
+                     volume_profile, support_levels, resistance_levels)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (datetime.now().strftime("%Y-%m-%d"), market, symbol, condition, 
+                      volatility, trend_strength, volume_profile,
+                      json.dumps(support_levels) if support_levels else None,
+                      json.dumps(resistance_levels) if resistance_levels else None))
+                
+                conn.commit()
+                return True
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to save market condition: {e}")
+            return False
+    
+    def get_entry_signals(self, market: str, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get entry signals for market and optionally symbol"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                if symbol:
+                    cursor.execute(f'''
+                        SELECT * FROM {market}_entry_signals 
+                        WHERE symbol = ? 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    ''', (symbol, limit))
+                else:
+                    cursor.execute(f'''
+                        SELECT * FROM {market}_entry_signals 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    ''', (limit,))
+                
+                results = cursor.fetchall()
+                columns = [description[0] for description in cursor.description]
+                return [dict(zip(columns, row)) for row in results]
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to get entry signals: {e}")
+            return []
+    
+    def get_exit_signals(self, market: str, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get exit signals for market and optionally symbol"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                if symbol:
+                    cursor.execute(f'''
+                        SELECT * FROM {market}_exit_signals 
+                        WHERE symbol = ? 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    ''', (symbol, limit))
+                else:
+                    cursor.execute(f'''
+                        SELECT * FROM {market}_exit_signals 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    ''', (limit,))
+                
+                results = cursor.fetchall()
+                columns = [description[0] for description in cursor.description]
+                return [dict(zip(columns, row)) for row in results]
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to get exit signals: {e}")
+            return []
+    
+    def get_rejected_signals(self, market: str, symbol: str = None, limit: int = 100) -> List[Dict]:
+        """Get rejected signals for market and optionally symbol"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                if symbol:
+                    cursor.execute(f'''
+                        SELECT * FROM {market}_rejected_signals 
+                        WHERE symbol = ? 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    ''', (symbol, limit))
+                else:
+                    cursor.execute(f'''
+                        SELECT * FROM {market}_rejected_signals 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    ''', (limit,))
+                
+                results = cursor.fetchall()
+                columns = [description[0] for description in cursor.description]
+                return [dict(zip(columns, row)) for row in results]
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to get rejected signals: {e}")
+            return []
+    
+    def update_daily_summary_kwargs(self, market: str, date: str, **kwargs) -> bool:
+        """Update daily summary with keyword arguments"""
+        try:
+            summary_data = {
+                'total_signals': kwargs.get('total_signals', 0),
+                'executed_signals': kwargs.get('executed_signals', 0),
+                'rejected_signals': kwargs.get('rejected_signals', 0),
+                'total_trades': kwargs.get('total_trades', 0),
+                'open_trades': kwargs.get('open_trades', 0),
+                'closed_trades': kwargs.get('closed_trades', 0),
+                'total_pnl': kwargs.get('total_pnl', 0.0),
+                'realized_pnl': kwargs.get('realized_pnl', 0.0),
+                'unrealized_pnl': kwargs.get('unrealized_pnl', 0.0),
+                'win_rate': kwargs.get('win_rate', 0.0),
+                'avg_trade_duration': kwargs.get('avg_trade_duration', 0.0),
+                'max_drawdown': kwargs.get('max_drawdown', 0.0),
+                'volatility': kwargs.get('volatility', 0.0)
+            }
+            return self.update_daily_summary(date, market, summary_data)
+        except Exception as e:
+            logger.error(f"❌ Failed to update daily summary: {e}")
+            return False
