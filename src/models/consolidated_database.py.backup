@@ -367,6 +367,11 @@ class ConsolidatedTradingDatabase:
         except Exception as e:
             logger.error(f"Failed to get strategy performance for market {market}: {e}")
             return []
+
+        def calculate_unrealized_pnl(self, market: str, current_prices: Dict[str, float]) -> float:
+            """Calculate unrealized P&L for open trades."""
+            try:
+                total_unrealized = 0.0
 def initialize_connection_pools():
     """Initialize database connection pools."""
     try:

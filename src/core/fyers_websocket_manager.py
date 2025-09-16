@@ -2,6 +2,7 @@
 Fyers WebSocket Manager for Real-Time Market Data
 ================================================
 Implements real-time market data streaming using Fyers WebSocket API v3
+with enhanced error handling, automatic reconnection, and health monitoring
 """
 
 import logging
@@ -40,6 +41,15 @@ class FyersWebSocketManager:
         self.is_running = False
         self._lock = threading.Lock()
         
+        # Enhanced error handling and reconnection
+        self.connection_attempts = 0
+        self.max_connection_attempts = 5
+        self.reconnect_delay = 5  # seconds
+        self.last_connection_time = None
+        self.last_data_time = None
+        self.health_check_interval = 30  # seconds
+        self.health_check_thread = None
+        
         # Initialize WebSocket
         self.fyers_socket = None
         self._initialize_socket()
@@ -49,34 +59,41 @@ class FyersWebSocketManager:
     def _get_access_token(self) -> str:
         """Get access token from environment."""
         try:
-            access_token = os.getenv("FYERS_ACCESS_TOKEN")
+            # Try to get from FyersClient first
+            from src.api.fyers import FyersClient
+            client = FyersClient()
+            if client.access_token:
+                logger.info("🔑 Access token loaded from FyersClient")
+                return client.access_token
+            
+            # Fallback to environment variable
+            access_token = os.getenv('FYERS_ACCESS_TOKEN')
             if access_token:
-                return f"{FYERS_CLIENT_ID}:{access_token}"
-            else:
-                logger.error("No FYERS_ACCESS_TOKEN in environment")
-                return None
+                logger.info("🔑 Access token loaded from environment")
+                return access_token
+            
+            logger.error("❌ No access token available")
+            raise ValueError("No access token available")
+            
         except Exception as e:
-            logger.error(f"Failed to get access token: {e}")
-            return None
+            logger.error(f"❌ Failed to get access token: {e}")
+            raise
     
     def _initialize_socket(self):
-        """Initialize Fyers WebSocket connection."""
+        """Initialize the Fyers WebSocket socket."""
         try:
-            if not self.access_token:
-                logger.error("No access token available for WebSocket")
-                return
-                
             self.fyers_socket = data_ws.FyersDataSocket(
                 access_token=self.access_token,
                 log_path="logs/websocket/",
-                litemode=True,  # Enable lite mode for faster LTP updates
-                write_to_file=False,
-                reconnect=True,
-                on_connect=self._on_connect,
-                on_close=self._on_close,
-                on_error=self._on_error,
-                on_message=self._on_message
+                
             )
+            
+            # Set up callbacks
+            self.fyers_socket.websocket_data = self._on_message
+            self.fyers_socket.on_connect = self._on_connect
+            self.fyers_socket.on_error = self._on_error
+            self.fyers_socket.on_close = self._on_close
+            
             logger.info("✅ Fyers WebSocket socket initialized")
         except Exception as e:
             logger.error(f"❌ Failed to initialize Fyers WebSocket: {e}")
@@ -86,6 +103,8 @@ class FyersWebSocketManager:
         """Callback when WebSocket connects."""
         logger.info("🔗 Fyers WebSocket connected")
         self.is_connected = True
+        self.connection_attempts = 0
+        self.last_connection_time = datetime.now()
         
         # Subscribe to symbols
         try:
@@ -99,104 +118,162 @@ class FyersWebSocketManager:
             self.fyers_socket.keep_running()
         except Exception as e:
             logger.error(f"❌ Failed to subscribe to symbols: {e}")
+            self._handle_connection_error()
     
     def _on_message(self, message):
         """Callback when WebSocket receives a message."""
         try:
-            if isinstance(message, list):
-                for data in message:
-                    self._process_market_data(data)
-            else:
-                self._process_market_data(message)
+            if isinstance(message, dict) and 'symbol' in message:
+                symbol = message['symbol']
+                ltp = float(message.get('ltp', 0))
+                volume = int(message.get('volume', 0))
+                timestamp = datetime.now()
+                
+                # Calculate change if we have previous data
+                change = 0.0
+                change_percent = 0.0
+                if symbol in self.live_data:
+                    prev_ltp = self.live_data[symbol].ltp
+                    if prev_ltp > 0:
+                        change = ltp - prev_ltp
+                        change_percent = (change / prev_ltp) * 100
+                
+                # Create market data object
+                market_data = MarketData(
+                    symbol=symbol,
+                    ltp=ltp,
+                    volume=volume,
+                    timestamp=timestamp,
+                    change=change,
+                    change_percent=change_percent
+                )
+                
+                # Thread-safe update
+                with self._lock:
+                    self.live_data[symbol] = market_data
+                    self.last_data_time = timestamp
+                
+                # Notify callbacks
+                for callback in self.data_callbacks:
+                    try:
+                        callback(market_data)
+                    except Exception as e:
+                        logger.error(f"❌ Error in data callback: {e}")
+                
+                logger.debug(f"📊 {symbol}: {ltp} ({change:+.2f}, {change_percent:+.2f}%)")
+                
         except Exception as e:
             logger.error(f"❌ Error processing WebSocket message: {e}")
     
-    def _process_market_data(self, data: Dict):
-        """Process incoming market data."""
-        try:
-            symbol = data.get('symbol', '')
-            ltp = float(data.get('ltp', 0))
-            volume = int(data.get('volume', 0))
-            timestamp = datetime.now()
-            
-            # Calculate change if we have previous data
-            change = 0.0
-            change_percent = 0.0
-            if symbol in self.live_data:
-                prev_ltp = self.live_data[symbol].ltp
-                if prev_ltp > 0:
-                    change = ltp - prev_ltp
-                    change_percent = (change / prev_ltp) * 100
-            
-            # Create market data object
-            market_data = MarketData(
-                symbol=symbol,
-                ltp=ltp,
-                volume=volume,
-                timestamp=timestamp,
-                change=change,
-                change_percent=change_percent
-            )
-            
-            # Update live data
-            with self._lock:
-                self.live_data[symbol] = market_data
-            
-            # Notify callbacks
-            for callback in self.data_callbacks:
-                try:
-                    callback(market_data)
-                except Exception as e:
-                    logger.error(f"❌ Error in data callback: {e}")
-            
-            logger.debug(f"📊 {symbol}: {ltp} ({change:+.2f}, {change_percent:+.2f}%)")
-            
-        except Exception as e:
-            logger.error(f"❌ Error processing market data: {e}")
-    
-    def _on_error(self, message):
+    def _on_error(self, error):
         """Callback when WebSocket encounters an error."""
-        logger.error(f"❌ Fyers WebSocket error: {message}")
+        logger.error(f"❌ Fyers WebSocket error: {error}")
         self.is_connected = False
+        self._handle_connection_error()
     
-    def _on_close(self, message):
+    def _on_close(self):
         """Callback when WebSocket connection closes."""
-        logger.warning(f"🔌 Fyers WebSocket closed: {message}")
+        logger.warning("🔌 Fyers WebSocket connection closed")
         self.is_connected = False
+        
+        # Attempt reconnection if we're still running
+        if self.is_running:
+            logger.info("🔄 Attempting to reconnect...")
+            self._attempt_reconnection()
+    
+    def _handle_connection_error(self):
+        """Handle connection errors with exponential backoff."""
+        self.connection_attempts += 1
+        
+        if self.connection_attempts <= self.max_connection_attempts:
+            delay = self.reconnect_delay * (2 ** (self.connection_attempts - 1))
+            logger.warning(f"🔄 Connection attempt {self.connection_attempts}/{self.max_connection_attempts}, retrying in {delay}s...")
+            
+            def delayed_reconnect():
+                time.sleep(delay)
+                if self.is_running:
+                    self._attempt_reconnection()
+            
+            threading.Thread(target=delayed_reconnect, daemon=True).start()
+        else:
+            logger.error(f"❌ Max connection attempts ({self.max_connection_attempts}) reached. Stopping reconnection.")
+            self.is_running = False
+    
+    def _attempt_reconnection(self):
+        """Attempt to reconnect the WebSocket."""
+        try:
+            logger.info("🔄 Attempting WebSocket reconnection...")
+            self._initialize_socket()
+            self.start()
+        except Exception as e:
+            logger.error(f"❌ Reconnection failed: {e}")
+            self._handle_connection_error()
+    
+    def _start_health_check(self):
+        """Start health check monitoring."""
+        def health_check_loop():
+            while self.is_running:
+                time.sleep(self.health_check_interval)
+                
+                if not self.is_connected:
+                    logger.warning("⚠️ WebSocket health check: Not connected")
+                    continue
+                
+                # Check if we're receiving data
+                if self.last_data_time:
+                    time_since_data = (datetime.now() - self.last_data_time).total_seconds()
+                    if time_since_data > 60:  # No data for 1 minute
+                        logger.warning(f"⚠️ WebSocket health check: No data for {time_since_data:.0f}s")
+                        self._handle_connection_error()
+                else:
+                    logger.warning("⚠️ WebSocket health check: No data received yet")
+        
+        self.health_check_thread = threading.Thread(target=health_check_loop, daemon=True)
+        self.health_check_thread.start()
+        logger.info("🏥 Health check monitoring started")
     
     def start(self):
         """Start the WebSocket connection."""
         if self.is_running:
-            logger.warning("WebSocket is already running")
+            logger.warning("⚠️ WebSocket is already running")
             return
         
+        self.is_running = True
+        self.connection_attempts = 0
+        
         try:
-            self.is_running = True
             # Start WebSocket in a separate thread
-            self.websocket_thread = threading.Thread(
-                target=self._run_websocket,
-                daemon=True
-            )
-            self.websocket_thread.start()
+            def run_websocket():
+                try:
+                    self.fyers_socket.websocket_data = self._on_message
+                    self.fyers_socket.on_connect = self._on_connect
+                    self.fyers_socket.on_error = self._on_error
+                    self.fyers_socket.on_close = self._on_close
+                    self.fyers_socket.keep_running()
+                except Exception as e:
+                    logger.error(f"❌ WebSocket thread error: {e}")
+                    self._handle_connection_error()
+            
+            websocket_thread = threading.Thread(target=run_websocket, daemon=True)
+            websocket_thread.start()
+            
+            # Start health check
+            self._start_health_check()
+            
             logger.info("🚀 Fyers WebSocket started")
+            
         except Exception as e:
             logger.error(f"❌ Failed to start WebSocket: {e}")
             self.is_running = False
-    
-    def _run_websocket(self):
-        """Run the WebSocket connection."""
-        try:
-            self.fyers_socket.connect()
-        except Exception as e:
-            logger.error(f"❌ WebSocket connection failed: {e}")
-            self.is_connected = False
+            raise
     
     def stop(self):
         """Stop the WebSocket connection."""
         self.is_running = False
         if self.fyers_socket:
             try:
-                self.fyers_socket.close()
+                # Fyers WebSocket auto-closes when is_running=False
+                pass
             except Exception as e:
                 logger.error(f"❌ Error closing WebSocket: {e}")
         logger.info("🛑 Fyers WebSocket stopped")
@@ -213,69 +290,39 @@ class FyersWebSocketManager:
                 return self.live_data[symbol].ltp
         return None
     
-    def get_live_data(self, symbol: str) -> Optional[MarketData]:
-        """Get complete live data for a symbol."""
-        with self._lock:
-            return self.live_data.get(symbol)
-    
     def get_all_live_data(self) -> Dict[str, MarketData]:
         """Get all live market data."""
         with self._lock:
             return self.live_data.copy()
     
-    def get_connection_status(self) -> Dict[str, any]:
-        """Get WebSocket connection status."""
+    def get_connection_status(self) -> Dict:
+        """Get detailed connection status."""
         return {
-            "is_connected": self.is_connected,
-            "is_running": self.is_running,
-            "symbols_count": len(self.symbols),
-            "live_data_count": len(self.live_data),
-            "callbacks_count": len(self.data_callbacks)
+            'is_connected': self.is_connected,
+            'is_running': self.is_running,
+            'connection_attempts': self.connection_attempts,
+            'last_connection_time': self.last_connection_time,
+            'last_data_time': self.last_data_time,
+            'live_data_count': len(self.live_data),
+            'symbols_subscribed': len(self.symbols)
         }
-    
-    def update_symbols(self, new_symbols: List[str]):
-        """Update the list of symbols to subscribe to."""
-        try:
-            self.symbols = new_symbols
-            if self.is_connected and self.fyers_socket:
-                # Unsubscribe from old symbols and subscribe to new ones
-                self.fyers_socket.subscribe(
-                    symbols=new_symbols,
-                    data_type="SymbolUpdate"
-                )
-                logger.info(f"🔄 Updated symbols subscription to {len(new_symbols)} symbols")
-        except Exception as e:
-            logger.error(f"❌ Failed to update symbols: {e}")
 
 # Global WebSocket manager instance
-_websocket_manager: Optional[FyersWebSocketManager] = None
+_websocket_manager = None
 
-def get_websocket_manager(symbols: List[str] = None) -> FyersWebSocketManager:
-    """Get or create the global WebSocket manager instance."""
+def get_websocket_manager(symbols: List[str]) -> FyersWebSocketManager:
+    """Get or create a global WebSocket manager instance."""
     global _websocket_manager
     
     if _websocket_manager is None:
-        if symbols is None:
-            symbols = [
-                "NSE:NIFTY50-INDEX",
-                "NSE:NIFTYBANK-INDEX", 
-                "NSE:FINNIFTY-INDEX",
-                "NSE:RELIANCE-EQ",
-                "NSE:HDFCBANK-EQ"
-            ]
         _websocket_manager = FyersWebSocketManager(symbols)
     
     return _websocket_manager
 
-def start_websocket(symbols: List[str] = None):
-    """Start the global WebSocket manager."""
-    manager = get_websocket_manager(symbols)
-    manager.start()
-    return manager
-
 def stop_websocket():
     """Stop the global WebSocket manager."""
     global _websocket_manager
+    
     if _websocket_manager:
         _websocket_manager.stop()
         _websocket_manager = None

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Trading Dashboard with Signal Execution Tracking
+Enhanced Trading Dashboard with Real-Time P&L and WebSocket Integration
 """
 
 import os
@@ -49,167 +49,192 @@ class EnhancedTradingDashboard:
                     dt = dt.replace(tzinfo=self.tz)
                 signal_time = dt.astimezone(self.tz).strftime('%H:%M:%S')
             except:
-                signal_time = "N/A"
+                signal_time = str(timestamp)[:8]
             
-            # Format strength
-            strength_emoji = {
-                'weak': '🔸',
-                'moderate': '🔹', 
-                'strong': '🔶',
-                'very_strong': '🔷'
-            }.get(strength, '🔸')
+            # Status indicators
+            status_icon = "✅" if executed else "⏳" if confirmed else "❌"
+            execution_status = "EXECUTED" if executed else "PENDING" if confirmed else "REJECTED"
             
-            # Format confirmation
-            confirmed_emoji = "✅" if confirmed else "⏳"
+            # Rejection reason
+            rejection_info = ""
+            if rejection_reason and not executed:
+                rejection_info = f" ({rejection_reason})"
             
-            # Format execution status
-            executed_emoji = "✅" if executed else "❌"
-            
-            # Format signal type
-            signal_emoji = "📈" if signal_type == "BUY CALL" else "📉"
-            
-            # Create base signal string
-            signal_str = f"{signal_emoji} {symbol} {signal_type} @ {price:.2f} | {confidence:.1f}% | {confirmed_emoji} {executed_emoji} | {signal_time}"
-            
-            # Add rejection reason if not executed
-            if not executed and rejection_reason:
-                signal_str += f" | Reason: {rejection_reason}"
-            
-            return signal_str
-        return "Invalid signal data"
+            return (f"{status_icon} {signal_time} | {symbol} | {strategy} | "
+                   f"{signal_type} @ {price} | Conf: {confidence}% | {execution_status}{rejection_info}")
+        else:
+            return str(signal_data)
     
-    def get_market_data(self, market: str) -> dict:
-        """Get comprehensive market data."""
+    def get_websocket_status(self) -> dict:
+        """Get WebSocket connection status."""
         try:
-            data = {}
+            from src.core.fyers_websocket_manager import get_websocket_manager
             
-            # Get market stats
-            stats = self.db.get_market_stats(market)
-            data.update(stats)
+            # Check if WebSocket manager exists
+            symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX", "NSE:FINNIFTY-INDEX"]
+            ws_manager = get_websocket_manager(symbols)
             
-            # Get recent trades
-            data['recent_trades'] = self.db.get_recent_trades(market, limit=5)
-            
-            # Get recent executed signals
-            data['recent_executed_signals'] = self.db.get_recent_signals_with_execution(market, executed=True, limit=5)
-            
-            # Get recent rejected signals
-            data['recent_rejected_signals'] = self.db.get_recent_signals_with_execution(market, executed=False, limit=5)
-            
-            return data
+            return {
+                'connected': ws_manager.is_connected,
+                'running': ws_manager.is_running,
+                'live_data_count': len(ws_manager.get_all_live_data()),
+                'symbols': len(symbols)
+            }
         except Exception as e:
-            print(f"Error getting market data for {market}: {e}")
-            return {}
+            return {
+                'connected': False,
+                'running': False,
+                'live_data_count': 0,
+                'symbols': 0,
+                'error': str(e)
+            }
     
-    def display_market_section(self, market: str, market_name: str, emoji: str):
-        """Display a complete market section."""
-        data = self.get_market_data(market)
+    def get_real_time_pnl(self, market: str) -> dict:
+        """Get real-time P&L calculation."""
+        try:
+            from src.core.fyers_websocket_manager import get_websocket_manager
+            
+            # Get current prices from WebSocket
+            symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX", "NSE:FINNIFTY-INDEX"]
+            ws_manager = get_websocket_manager(symbols)
+            
+            current_prices = {}
+            if ws_manager.is_connected:
+                all_live_data = ws_manager.get_all_live_data()
+                for symbol, market_data in all_live_data.items():
+                    current_prices[symbol] = market_data.ltp
+            
+            # Calculate unrealized P&L
+            unrealized_pnl = self.db.calculate_unrealized_pnl(market, current_prices)
+            
+            return {
+                'unrealized_pnl': unrealized_pnl,
+                'current_prices': current_prices,
+                'websocket_connected': ws_manager.is_connected,
+                'price_count': len(current_prices)
+            }
+        except Exception as e:
+            return {
+                'unrealized_pnl': 0.0,
+                'current_prices': {},
+                'websocket_connected': False,
+                'price_count': 0,
+                'error': str(e)
+            }
+    
+    def display_websocket_status(self):
+        """Display WebSocket connection status."""
+        ws_status = self.get_websocket_status()
         
-        print(f"{emoji} {market_name.upper()} TRADING")
+        print("🔌 WebSocket Status:")
+        if ws_status.get('error'):
+            print(f"   ❌ Error: {ws_status['error']}")
+        else:
+            connection_status = "🟢 Connected" if ws_status['connected'] else "🔴 Disconnected"
+            running_status = "🟢 Running" if ws_status['running'] else "🔴 Stopped"
+            
+            print(f"   Connection: {connection_status}")
+            print(f"   Status: {running_status}")
+            print(f"   Live Data: {ws_status['live_data_count']} symbols")
+            print(f"   Subscribed: {ws_status['symbols']} symbols")
+    
+    def display_real_time_pnl(self, market: str, market_name: str):
+        """Display real-time P&L for a market."""
+        pnl_data = self.get_real_time_pnl(market)
+        
+        print(f"💰 {market_name} Real-Time P&L:")
+        if pnl_data.get('error'):
+            print(f"   ❌ Error: {pnl_data['error']}")
+        else:
+            ws_status = "🟢 WebSocket" if pnl_data['websocket_connected'] else "🔴 REST API"
+            pnl_value = pnl_data['unrealized_pnl']
+            pnl_icon = "📈" if pnl_value > 0 else "📉" if pnl_value < 0 else "➖"
+            
+            print(f"   {pnl_icon} Unrealized P&L: {pnl_value:.2f}")
+            print(f"   Data Source: {ws_status}")
+            print(f"   Live Prices: {pnl_data['price_count']} symbols")
+            
+            # Show current prices if available
+            if pnl_data['current_prices']:
+                print("   Current Prices:")
+                for symbol, price in pnl_data['current_prices'].items():
+                    print(f"     {symbol}: {price}")
+    
+    def display_market_section(self, market: str, market_name: str, icon: str):
+        """Display comprehensive market information."""
+        print(f"\n{icon} {market_name} MARKET")
         print("=" * 50)
         
-        # P&L Section
-        print("💰 LIVE P&L:")
-        print(f"  Total P&L:    {data.get('total_pnl', 0):+.2f}")
-        print(f"  Unrealized:   {data.get('unrealized_pnl', 0):+.2f} (TODO: real-time prices)")
-        print(f"  Win Rate:     {data.get('win_rate', 0):.1f}%")
-        print(f"  Avg P&L:      {data.get('avg_pnl', 0):+.2f}")
-        print(f"  Best Trade:   {data.get('best_trade', 0):+.2f}")
-        print(f"  Worst Trade:  {data.get('worst_trade', 0):+.2f}")
-        print(f"  Open Trades:  {data.get('open_trades', 0)}")
-        print(f"  Closed:       {data.get('closed_trades', 0)}")
+        # Get market statistics
+        stats = self.db.get_market_statistics(market)
+        if stats:
+            total_trades, open_trades, closed_trades, total_pnl, win_rate = stats
+            
+            print(f"📊 Statistics:")
+            print(f"   Total Trades: {total_trades}")
+            print(f"   Open Trades: {open_trades}")
+            print(f"   Closed Trades: {closed_trades}")
+            print(f"   Total P&L: {total_pnl:.2f}")
+            print(f"   Win Rate: {win_rate:.1f}%")
         
-        # Trade Breakdown
-        print("📊 TRADE BREAKDOWN:")
-        print(f"  Winning:      {data.get('winning_trades', 0)}")
-        print(f"  Losing:       {data.get('losing_trades', 0)}")
-        print(f"  Target Hits:  {data.get('target_hits', 0)}")
-        print(f"  Stop Losses:  {data.get('stop_losses', 0)}")
-        print(f"  Time Exits:   {data.get('time_exits', 0)}")
+        # Display real-time P&L
+        self.display_real_time_pnl(market, market_name)
         
-        # Strategy Performance
+        # Get recent signals
+        recent_signals = self.db.get_recent_signals(market, limit=5)
+        if recent_signals:
+            print(f"\n📡 Recent Signals:")
+            for signal_data in recent_signals:
+                print(f"   {self.format_signal(signal_data)}")
+        
+        # Get strategy performance
         strategy_perf = self.db.get_strategy_performance(market)
         if strategy_perf:
-            print("🎯 STRATEGY PERFORMANCE:")
-            for strategy, total_trades, total_pnl, avg_pnl, wins, worst, best, targets, stops in strategy_perf[:3]:
-                print(f"  {strategy}: {total_trades} trades, P&L: {total_pnl:+.2f}, Win Rate: {(wins/total_trades*100):.1f}%")
-        else:
-            print("🎯 STRATEGY PERFORMANCE: No closed trades yet")
-        
-        # Recent Entries
-        print("📋 RECENT ENTRIES (Last 5):")
-        recent_trades = data.get('recent_trades', [])
-        if recent_trades:
-            for trade in recent_trades[:5]:
-                if len(trade) >= 10:
-                    (trade_id, market, symbol, strategy, signal, entry_price, position_size, 
-                     entry_time, stop_loss, take_profit) = trade[:10]
-                    signal_emoji = "📈" if signal == "BUY CALL" else "📉"
-                    try:
-                        if isinstance(entry_time, str):
-                            dt = datetime.fromisoformat(entry_time.replace('Z', '+00:00'))
-                        else:
-                            dt = entry_time
-                        if dt.tzinfo is None:
-                            dt = dt.replace(tzinfo=self.tz)
-                        entry_time_str = dt.astimezone(self.tz).strftime('%H:%M:%S')
-                    except:
-                        entry_time_str = "N/A"
-                    print(f"  {signal_emoji} {symbol} {signal} @ {entry_price:.2f} | SL: {stop_loss:.2f} | TP: {take_profit:.2f} | {entry_time_str}")
-        else:
-            print("  No recent entries")
-        
-        # Recent Exits
-        print("📊 RECENT EXITS: No closed trades yet")
-        
-        # Recent Executed Signals
-        print("📡 RECENT EXECUTED SIGNALS (Last 5):")
-        executed_signals = data.get('recent_executed_signals', [])
-        if executed_signals:
-            for signal_data in executed_signals:
-                print(f"  {self.format_signal(signal_data)}")
-        else:
-            print("  No executed signals yet")
-        
-        # Recent Rejected Signals
-        print("🚫 RECENT REJECTED SIGNALS (Last 5):")
-        rejected_signals = data.get('recent_rejected_signals', [])
-        if rejected_signals:
-            for signal_data in rejected_signals:
-                print(f"  {self.format_signal(signal_data)}")
-        else:
-            print("  No rejected signals yet")
-        
-        print()
+            print(f"\n🎯 Strategy Performance:")
+            for strategy_data in strategy_perf[:3]:  # Top 3 strategies
+                strategy, total_trades, total_pnl, avg_pnl, wins, worst, best, targets, stops = strategy_data
+                win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
+                print(f"   {strategy}: {total_trades} trades, P&L: {total_pnl:.2f}, Win: {win_rate:.1f}%")
     
     def display_dashboard(self):
-        """Display the complete dashboard."""
+        """Display the main dashboard."""
         self.clear_screen()
         
-        print("🚀 ENHANCED TRADING DASHBOARD")
+        # Header
+        current_time = datetime.now(self.tz).strftime('%Y-%m-%d %H:%M:%S IST')
+        print(f"🚀 Enhanced Trading Dashboard - {current_time}")
         print("=" * 80)
-        print(f"⏰ Last Updated: {datetime.now(self.tz).strftime('%Y-%m-%d %H:%M:%S IST')}")
         
-        # System Status
-        print("📊 SYSTEM STATUS:")
-        print("-" * 20)
+        # WebSocket Status
+        self.display_websocket_status()
+        print()
         
-        # Check if traders are running (simplified check)
-        crypto_running = "🟢 RUNNING"  # This would be enhanced with actual process checking
-        indian_running = "🟢 RUNNING"
+        # Check if traders are running
+        crypto_running = self._is_trader_running("crypto_trader.py")
+        indian_running = self._is_trader_running("indian_trader.py")
         
-        print(f"Crypto Trader:  {crypto_running}")
-        print(f"Indian Trader:  {indian_running}")
-        
+        print("🤖 Trader Status:")
+        print(f"Crypto Trader:  {'🟢 Running' if crypto_running else '🔴 Stopped'}")
+        print(f"Indian Trader:  {'🟢 Running' if indian_running else '🔴 Stopped'}")
         print()
         
         # Display both markets
         self.display_market_section("crypto", "CRYPTO", "📈")
         self.display_market_section("indian", "INDIAN", "📊")
         
-        print("🔄 Auto-refresh every 10 seconds... (Ctrl+C to exit)")
-        print("💡 Using consolidated database with comprehensive metrics")
-        print("⚠️  Unrealized P&L shows 0 (needs real-time price integration)")
+        print("\n🔄 Auto-refresh every 10 seconds... (Ctrl+C to exit)")
+        print("💡 Real-time P&L with WebSocket integration")
+        print("📡 Live market data streaming enabled")
+    
+    def _is_trader_running(self, trader_name: str) -> bool:
+        """Check if a trader process is running."""
+        try:
+            import subprocess
+            result = subprocess.run(['pgrep', '-f', trader_name], 
+                                  capture_output=True, text=True)
+            return bool(result.stdout.strip())
+        except:
+            return False
     
     def run(self):
         """Main dashboard loop."""
