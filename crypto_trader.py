@@ -693,8 +693,14 @@ if __name__ == "__main__":
     
     # Set up logging
     logging.basicConfig(filename=f"logs/{args.market}/{args.market}_trading.log", 
-        level=logging.INFO if args.verbose else logging.WARNING,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    # Suppress urllib3 debug logs
+    logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    # Suppress fyers API debug logs
+    logging.getLogger("src.api.fyers").setLevel(logging.WARNING)
     )
     
     # Create and start the WORKING system

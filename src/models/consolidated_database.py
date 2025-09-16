@@ -342,7 +342,36 @@ class ConsolidatedTradingDatabase:
         except Exception as e:
             logger.error(f"Failed to get recent trades for market {market}: {e}")
             return []
+    def get_strategy_performance(self, market: str) -> List[Tuple]:
+        """Get strategy performance statistics for a market"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT 
+                        strategy,
+                        COUNT(*) as total_trades,
+                        SUM(pnl) as total_pnl,
+                        AVG(pnl) as avg_pnl,
+                        SUM(CASE WHEN pnl > 0 THEN 1 ELSE 0 END) as wins,
+                        MIN(pnl) as worst_trade,
+                        MAX(pnl) as best_trade,
+                        SUM(CASE WHEN exit_reason = 'TARGET_HIT' THEN 1 ELSE 0 END) as targets,
+                        SUM(CASE WHEN exit_reason = 'STOP_LOSS' THEN 1 ELSE 0 END) as stops
+                    FROM closed_trades 
+                    WHERE market = ? AND pnl IS NOT NULL
+                    GROUP BY strategy
+                    ORDER BY total_pnl DESC
+                ''', (market,))
+                return cursor.fetchall()
+        except Exception as e:
+            logger.error(f"Failed to get strategy performance for market {market}: {e}")
+            return []
 
+        def calculate_unrealized_pnl(self, market: str, current_prices: Dict[str, float]) -> float:
+            """Calculate unrealized P&L for open trades."""
+            try:
+                total_unrealized = 0.0
 def initialize_connection_pools():
     """Initialize database connection pools."""
     try:
@@ -354,3 +383,89 @@ def initialize_connection_pools():
         logger.error(f"Failed to initialize connection pools: {e}")
         return False
 
+
+
+    def get_trade_by_id(self, trade_id: str) -> Optional[Tuple]:
+        """Get trade data by ID."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT trade_id, market, symbol, strategy, signal, entry_price, quantity, 
+                           entry_time, stop_loss_price, take_profit_price, status
+                    FROM open_trades 
+                    WHERE trade_id = ? AND status = 'OPEN'
+                ''', (trade_id,))
+                return cursor.fetchone()
+        except Exception as e:
+            logger.error(f"Failed to get trade by ID {trade_id}: {e}")
+            return None
+    
+    def close_trade(self, trade_id: str, exit_price: float, exit_reason: str, pnl: float):
+        """Close a trade and move it to closed_trades."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Get trade data
+                trade_data = self.get_trade_by_id(trade_id)
+                if not trade_data:
+                    logger.error(f"Trade {trade_id} not found")
+                    return False
+                
+                # Insert into closed_trades
+                cursor.execute('''
+                    INSERT INTO closed_trades (
+                        trade_id, market, symbol, strategy, signal, entry_price, exit_price,
+                        quantity, entry_time, exit_time, pnl, exit_reason
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    trade_data[0], trade_data[1], trade_data[2], trade_data[3], trade_data[4],
+                    trade_data[5], exit_price, trade_data[6], trade_data[7], 
+                    datetime.now().isoformat(), pnl, exit_reason
+                ))
+                
+                # Remove from open_trades
+                cursor.execute('''
+                    DELETE FROM open_trades WHERE trade_id = ?
+                ''', (trade_id,))
+                
+                conn.commit()
+                logger.info(f"Trade {trade_id} closed successfully")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to close trade {trade_id}: {e}")
+            return False
+
+    def calculate_unrealized_pnl(self, market: str, current_prices: Dict[str, float]) -> float:
+        """Calculate unrealized P&L for open trades."""
+        try:
+            total_unrealized = 0.0
+            
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT trade_id, symbol, signal, entry_price, quantity
+                    FROM open_trades 
+                    WHERE market = ? AND status = 'OPEN'
+                ''', (market,))
+                
+                for trade in cursor.fetchall():
+                    trade_id, symbol, signal, entry_price, quantity = trade
+                    
+                    if symbol in current_prices:
+                        current_price = current_prices[symbol]
+                        
+                        if signal == 'BUY CALL':
+                            unrealized = (current_price - entry_price) * quantity
+                        else:  # BUY PUT
+                            unrealized = (entry_price - current_price) * quantity
+                        
+                        total_unrealized += unrealized
+                
+                return total_unrealized
+                
+        except Exception as e:
+            logger.error(f"Failed to calculate unrealized P&L for {market}: {e}")
+            return 0.0
