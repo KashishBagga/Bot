@@ -20,18 +20,24 @@ from src.adapters.market_factory import MarketFactory
 from src.adapters.market_interface import MarketType
 from src.models.consolidated_database import ConsolidatedTradingDatabase, initialize_connection_pools
 from src.core.error_handler import error_handler, handle_errors
+from src.core.enhanced_real_time_manager import EnhancedRealTimeDataManager
 from risk_config import risk_config
 
 # Configure logging
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler('logs/indian/indian_trading.log'),
+        logging.FileHandler("logs/indian/indian_trading.log"),
         logging.StreamHandler()
     ]
 )
+# Suppress urllib3 debug logs
+logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+# Suppress fyers API debug logs
+logging.getLogger("src.api.fyers").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 class EnhancedIndianTrader:
@@ -79,10 +85,17 @@ class EnhancedIndianTrader:
             self.data_provider = MarketFactory.create_market(MarketType.INDIAN_STOCKS)
             
             # Initialize strategy engine
+            
+            # Initialize enhanced real-time data manager
+            self.real_time_data = EnhancedRealTimeDataManager(self.data_provider, self.symbols)
             self.strategy_engine = EnhancedStrategyEngine(self.symbols)
             
             
             logger.info("✅ All systems initialized successfully")
+            
+            # Start WebSocket for real-time data
+            self.real_time_data.start_websocket()
+            logger.info("📡 WebSocket started for real-time market data")
             
         except Exception as e:
             logger.error(f"❌ Failed to initialize systems: {e}")
@@ -92,6 +105,10 @@ class EnhancedIndianTrader:
         """Handle shutdown signals."""
         logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
         self._stop_event.set()
+        # Stop WebSocket
+        self.real_time_data.stop_websocket()
+        # Stop WebSocket
+        self.real_time_data.stop_websocket()
     
     def get_current_price(self, symbol: str) -> Optional[float]:
         """Get current price for a symbol."""
@@ -430,6 +447,8 @@ class EnhancedIndianTrader:
             logger.error(f"❌ Trading error: {e}")
         finally:
             self._stop_event.set()
+            # Stop WebSocket
+            self.real_time_data.stop_websocket()
             logger.info("🏁 Trading system shutdown complete")
 
 def main():

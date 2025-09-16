@@ -268,7 +268,7 @@ class FyersClient:
                 symbols_str = symbols
                 
             response = self.fyers.quotes({"symbols": symbols_str})
-            logger.info(f"Quotes fetched for {len(symbols) if isinstance(symbols, list) else 1} symbols")
+            logger.debug(f"Quotes fetched for {len(symbols) if isinstance(symbols, list) else 1} symbols")
             return response
         except Exception as e:
             logger.error(f"Error fetching quotes: {e}")
@@ -585,7 +585,7 @@ class FyersClient:
             
             if response and 'code' in response and response['code'] == 200:
                 if 'candles' in response:
-                    logger.info(f"Historical data fetched for {symbol}: {len(response['candles'])} candles")
+                    logger.debug("Historical data fetched for " + symbol + ": " + str(len(response["candles"])) + " candles")
                     return response
                 else:
                     logger.warning(f"No candles in response for {symbol}")

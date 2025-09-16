@@ -148,7 +148,7 @@ class EnhancedStrategyEngine:
             
             # Use all confirmed signals instead of limited signals
             limited_signals = confirmed_signals
-            logger.info(f"📊 Generated {len(all_signals)} total signals, {len(confirmed_signals)} confirmed, {len(limited_signals)} final (NO LIMITS)")
+            logger.debug(f"📊 Generated {len(all_signals)} total signals, {len(confirmed_signals)} confirmed, {len(limited_signals)} final (NO LIMITS)")
             
             return limited_signals
             
@@ -170,13 +170,12 @@ class EnhancedStrategyEngine:
                 if confirmation_result['confirmed']:
                     signal['timeframe_confirmation'] = confirmation_result
                     signal['signal_strength'] = confirmation_result['strength']
-                    signal['confirming_timeframes'] = confirmation_result['timeframes']
+                    signal['confirming_timeframes'] = confirmation_result["timeframes"]
                     confirmed_signals.append(signal)
-                    
-                    logger.info(f"✅ {symbol} {signal['signal']} confirmed across {len(confirmation_result['timeframes'])} timeframes")
+                    # logger.debug(f"✅ {symbol} {signal["signal"]} confirmed across {len(confirmation_result["timeframes"])} timeframes")
                 else:
-                    logger.info(f"❌ {symbol} {signal['signal']} rejected: insufficient timeframe confirmation")
-            
+                    # logger.info(f"❌ {symbol} {signal["signal"]} rejected: insufficient timeframe confirmation")
+                    pass
             return confirmed_signals
             
         except Exception as e:
