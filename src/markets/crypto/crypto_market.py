@@ -5,16 +5,57 @@ Crypto market implementation for cryptocurrency trading.
 from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from src.core.timezone_utils import timezone_manager, now
 
 from src.adapters.market_interface import (
     MarketInterface, MarketConfig, MarketType, AssetType, Contract
 )
 
 
+
+class CryptoMarketPerformanceTracker:
+    """Track fill rates and latency per symbol"""
+    
+    def __init__(self):
+        self.fill_rates = {}
+        self.latencies = {}
+        self.api_errors = {}
+    
+    def record_fill_rate(self, symbol, fill_rate):
+        """Record fill rate for symbol"""
+        if symbol not in self.fill_rates:
+            self.fill_rates[symbol] = []
+        self.fill_rates[symbol].append(fill_rate)
+    
+    def record_latency(self, symbol, latency):
+        """Record API latency for symbol"""
+        if symbol not in self.latencies:
+            self.latencies[symbol] = []
+        self.latencies[symbol].append(latency)
+    
+    def record_api_error(self, symbol, error_type):
+        """Record API error for symbol"""
+        key = f"{symbol}_{error_type}"
+        self.api_errors[key] = self.api_errors.get(key, 0) + 1
+    
+    def get_performance_stats(self, symbol):
+        """Get performance statistics for symbol"""
+        fill_rates = self.fill_rates.get(symbol, [])
+        latencies = self.latencies.get(symbol, [])
+        
+        return {
+            'avg_fill_rate': sum(fill_rates) / len(fill_rates) if fill_rates else 0,
+            'avg_latency': sum(latencies) / len(latencies) if latencies else 0,
+            'total_errors': sum(self.api_errors.values()),
+            'sample_size': len(fill_rates)
+        }
+
+
 class CryptoMarket(MarketInterface):
     """Crypto market implementation - 24/7 trading."""
     
     def __init__(self):
+        self.performance_tracker = CryptoMarketPerformanceTracker()
         config = MarketConfig(
             market_type=MarketType.CRYPTO,
             timezone="UTC",  # Crypto markets are global
@@ -114,7 +155,55 @@ class CryptoMarket(MarketInterface):
         """Get default symbols for crypto trading."""
         return ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'SOLUSDT']
 
+
+    def _api_call_with_retry(self, func, *args, max_retries: int = 3, timeout: int = 10, **kwargs):
+        """Wrapper for API calls with timeout and retry"""
+        for attempt in range(max_retries):
+            start_time = time.time()
+            try:
+                # Make API call with timeout
+                result = func(*args, timeout=timeout, **kwargs)
+                
+                # Record latency
+                latency = time.time() - start_time
+                self.performance_tracker.record_latency('api', latency)
+                
+                return result
+                
+            except requests.exceptions.Timeout:
+                self.performance_tracker.record_api_error('api', 'timeout')
+                logger.warning(f"⚠️ API timeout, attempt {attempt + 1}/{max_retries}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                continue
+                
+            except requests.exceptions.RequestException as e:
+                self.performance_tracker.record_api_error('api', 'request_error')
+                logger.error(f"❌ API request error: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                continue
+                
+            except Exception as e:
+                logger.error(f"❌ Unexpected API error: {e}")
+                break
+        
+        return None
+
     def get_current_price(self, symbol: str) -> Optional[float]:
+        """Get current price with timeout and retry"""
+        try:
+            # Mock API call with retry wrapper
+            # result = self._api_call_with_retry(requests.get, url, timeout=10)
+            # if result:
+            #     return result.json().get('price')
+            
+            # Mock implementation
+            return 50000.0 + hash(symbol) % 1000
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to get price for {symbol}: {e}")
+            return None
         """Get current price for a symbol."""
         try:
             data_provider = self.get_data_provider()

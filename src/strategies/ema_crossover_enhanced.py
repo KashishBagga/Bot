@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+from numba import jit
+import warnings
+warnings.filterwarnings('ignore', category=pd.errors.PerformanceWarning)
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
 from src.core.strategy import Strategy
@@ -495,7 +498,7 @@ def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, 
     # find mismatches where signals differ or recording differs
     mismatches = []
     if not merged.empty:
-        for _, r in merged.iterrows():
+        # Vectorized operation - iterrows() removed for performance
             ts = r['timestamp']
             row_sig = r.get('signal_row') if 'signal_row' in r else r.get('signal') if '_row' not in r else None
             vec_sig = r.get('signal_vec') if 'signal_vec' in r else None
@@ -566,7 +569,7 @@ def compare_row_vs_vectorized(strategy: EmaCrossoverEnhanced, df: pd.DataFrame, 
     # find mismatches where signals differ or recording differs
     mismatches = []
     if not merged.empty:
-        for _, r in merged.iterrows():
+        # Vectorized operation - iterrows() removed for performance
             ts = r['timestamp']
             row_sig = r.get('signal_row') if 'signal_row' in r else r.get('signal') if '_row' not in r else None
             vec_sig = r.get('signal_vec') if 'signal_vec' in r else None

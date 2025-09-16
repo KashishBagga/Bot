@@ -12,10 +12,13 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Tuple
+from src.core.timezone_utils import timezone_manager, now, now_kolkata
 from dataclasses import dataclass
 from enum import Enum
 import json
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+import threading
+from zoneinfo import ZoneInfo
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -72,6 +75,9 @@ class AdvancedRiskManager:
     """Advanced risk management system with portfolio-level controls"""
     
     def __init__(self, risk_limits: RiskLimits = None):
+        # Thread safety
+        self._lock = threading.RLock()
+        self.tz = ZoneInfo('Asia/Kolkata')
         self.risk_limits = risk_limits or RiskLimits()
         self.positions = {}
         self.trade_history = []
@@ -80,11 +86,54 @@ class AdvancedRiskManager:
         self.consecutive_losses = 0
         self.circuit_breaker_active = False
         self.risk_alerts = []
+        self.alert_timestamps = {}  # For rate limiting
+        self.alert_cooldown = 300  # 5 minutes
         
         # Risk monitoring
-        self.last_risk_check = datetime.now()
-        self.risk_check_interval = 60  # 1 minute
+        self.last_risk_check = now()
+        self.risk_check_interval = int(os.getenv('RISK_CHECK_INTERVAL', '60'))  # 1 minute
+        self.max_daily_loss = float(os.getenv('MAX_DAILY_LOSS', '0.05'))
+        self.max_portfolio_exposure = float(os.getenv('MAX_PORTFOLIO_EXPOSURE', '0.8'))
+        self.max_single_position = float(os.getenv('MAX_SINGLE_POSITION', '0.2'))
         
+
+    def _should_send_alert(self, alert_type: str) -> bool:
+        """Check if alert should be sent (rate limiting)"""
+        current_time = now()
+        last_alert = self.alert_timestamps.get(alert_type)
+        
+        if last_alert is None:
+            self.alert_timestamps[alert_type] = current_time
+            return True
+        
+        time_diff = (current_time - last_alert).total_seconds()
+        if time_diff >= self.alert_cooldown:
+            self.alert_timestamps[alert_type] = current_time
+            return True
+        
+        return False
+    
+    def _add_risk_alert(self, alert_type: str, message: str, level: RiskLevel):
+        """Add risk alert with rate limiting"""
+        if self._should_send_alert(alert_type):
+            alert = {
+                'timestamp': now(),
+                'type': alert_type,
+                'message': message,
+                'level': level.value
+            }
+            self.risk_alerts.append(alert)
+            logger.warning(f"🚨 Risk Alert: {message}")
+    
+    def _persist_risk_event(self, event_type: str, data: dict):
+        """Persist critical risk events to logs"""
+        event = {
+            'timestamp': now().isoformat(),
+            'event_type': event_type,
+            'data': data
+        }
+        logger.critical(f"RISK_EVENT: {json.dumps(event)}")
+
     def add_position(self, symbol: str, quantity: float, price: float, timestamp: datetime):
         """Add position to risk tracking"""
         self.positions[symbol] = {
@@ -449,7 +498,7 @@ class AdvancedRiskManager:
             if self.daily_pnl < -self.risk_limits.circuit_breaker_threshold * self.peak_portfolio_value:
                 self.circuit_breaker_active = True
                 self.risk_alerts.append({
-                    'timestamp': datetime.now(),
+                    'timestamp': now(),
                     'type': 'CIRCUIT_BREAKER',
                     'message': f'Circuit breaker activated: Daily loss {self.daily_pnl:,.2f}'
                 })
@@ -460,7 +509,7 @@ class AdvancedRiskManager:
             if self.consecutive_losses >= self.risk_limits.max_consecutive_losses:
                 self.circuit_breaker_active = True
                 self.risk_alerts.append({
-                    'timestamp': datetime.now(),
+                    'timestamp': now(),
                     'type': 'CIRCUIT_BREAKER',
                     'message': f'Circuit breaker activated: {self.consecutive_losses} consecutive losses'
                 })
@@ -479,6 +528,8 @@ class AdvancedRiskManager:
         self.consecutive_losses = 0
         self.circuit_breaker_active = False
         self.risk_alerts = []
+        self.alert_timestamps = {}  # For rate limiting
+        self.alert_cooldown = 300  # 5 minutes
         logger.info("🔄 Daily risk metrics reset")
     
     def get_risk_report(self, current_prices: Dict[str, float]) -> Dict[str, Any]:
@@ -487,7 +538,7 @@ class AdvancedRiskManager:
             portfolio_risk = self.calculate_portfolio_risk(current_prices)
             
             report = {
-                'timestamp': datetime.now().isoformat(),
+                'timestamp': now().isoformat(),
                 'portfolio_risk': {
                     'total_value': portfolio_risk.total_value,
                     'total_exposure': portfolio_risk.total_exposure,
@@ -536,8 +587,8 @@ def main():
     risk_manager = AdvancedRiskManager(risk_limits)
     
     # Add some positions
-    risk_manager.add_position("NSE:NIFTY50-INDEX", 100, 19500, datetime.now())
-    risk_manager.add_position("NSE:NIFTYBANK-INDEX", 50, 45000, datetime.now())
+    risk_manager.add_position("NSE:NIFTY50-INDEX", 100, 19500, now())
+    risk_manager.add_position("NSE:NIFTYBANK-INDEX", 50, 45000, now())
     
     # Update prices
     current_prices = {

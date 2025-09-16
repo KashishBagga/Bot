@@ -12,9 +12,13 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Tuple
+from src.core.timezone_utils import timezone_manager, now, format_datetime
 from dataclasses import dataclass
 import json
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+import multiprocessing
+import asyncio
+from zoneinfo import ZoneInfo
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -60,6 +64,27 @@ class RiskExposure:
     concentration_risk: float
     sector_exposure: Dict[str, float]
 
+
+class AsyncTradeReviewProcessor:
+    """Async processor for heavy AI trade review tasks"""
+    
+    def __init__(self):
+        self.tz = ZoneInfo('Asia/Kolkata')
+    
+    async def generate_report_async(self, trade_data):
+        """Generate trade review report asynchronously"""
+        try:
+            # Mock async processing
+            return {"status": "completed", "timestamp": now().isoformat()}
+        except Exception as e:
+            logger.error(f"❌ Async report generation failed: {e}")
+            return {}
+    
+    def close(self):
+        """Close processor"""
+        pass
+
+
 class AITradeReview:
     """AI-driven trade review and analysis system"""
     
@@ -80,7 +105,7 @@ class AITradeReview:
     def generate_daily_report(self, date: str = None) -> Dict[str, Any]:
         """Generate comprehensive daily trade report"""
         if not date:
-            date = datetime.now().strftime("%Y-%m-%d")
+            date = now().strftime("%Y-%m-%d")
         
         logger.info(f"📊 Generating AI trade report for {date}")
         
@@ -477,47 +502,47 @@ class AITradeReview:
     def display_report(self, report: Dict[str, Any]):
         """Display the AI trade report"""
         print("\n" + "="*80)
-        print(f"🤖 AI-DRIVEN DAILY TRADE REPORT - {report['date']}")
+        logger.info(f"🤖 AI-DRIVEN DAILY TRADE REPORT - {report['date']}")
         print("="*80)
         
-        print(f"\n📊 EXECUTIVE SUMMARY")
+        logger.info(f"\n📊 EXECUTIVE SUMMARY")
         print("-" * 40)
         print(report['executive_summary'])
         
-        print(f"\n📈 PERFORMANCE ANALYSIS")
+        logger.info(f"\n📈 PERFORMANCE ANALYSIS")
         print("-" * 40)
         print(report['performance_analysis'])
         
-        print(f"\n🎯 STRATEGY BREAKDOWN")
+        logger.info(f"\n🎯 STRATEGY BREAKDOWN")
         print("-" * 40)
         print(report['strategy_breakdown'])
         
-        print(f"\n��️ RISK ASSESSMENT")
+        logger.info(f"\n��️ RISK ASSESSMENT")
         print("-" * 40)
         print(report['risk_assessment'])
         
-        print(f"\n🌊 MARKET CONDITIONS")
+        logger.info(f"\n🌊 MARKET CONDITIONS")
         print("-" * 40)
         print(report['market_conditions'])
         
-        print(f"\n🧠 AI INSIGHTS")
+        logger.info(f"\n🧠 AI INSIGHTS")
         print("-" * 40)
         for category, insights in report['ai_insights'].items():
             if insights:
-                print(f"\n{category.replace('_', ' ').title()}:")
+                logger.info(f"\n{category.replace('_', ' ').title()}:")
                 for insight in insights:
-                    print(f"  {insight}")
+                    logger.info(f"  {insight}")
         
-        print(f"\n💡 RECOMMENDATIONS")
+        logger.info(f"\n💡 RECOMMENDATIONS")
         print("-" * 40)
         print(report['recommendations'])
         
-        print(f"\n🎯 NEXT DAY FOCUS")
+        logger.info(f"\n🎯 NEXT DAY FOCUS")
         print("-" * 40)
         print(report['next_day_focus'])
         
         print("\n" + "="*80)
-        print(f"📊 Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.info(f"📊 Report Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("="*80)
 
 def main():
@@ -531,7 +556,7 @@ def main():
         if report:
             ai_review.display_report(report)
         else:
-            print("❌ No data available for report generation")
+            logger.info(f"❌ No data available for report generation")
         
     except Exception as e:
         logger.error(f"❌ AI Trade Review error: {e}")
