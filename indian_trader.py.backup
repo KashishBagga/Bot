@@ -85,7 +85,6 @@ class EnhancedIndianTrader:
             self.data_provider = MarketFactory.create_market(MarketType.INDIAN_STOCKS)
             
             # Initialize strategy engine
-            self.strategy_engine = EnhancedStrategyEngine(self.symbols)
             
             # Initialize enhanced real-time data manager
             self.real_time_data = EnhancedRealTimeDataManager(self.data_provider, self.symbols)
@@ -106,6 +105,8 @@ class EnhancedIndianTrader:
         """Handle shutdown signals."""
         logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
         self._stop_event.set()
+        # Stop WebSocket
+        self.real_time_data.stop_websocket()
         # Stop WebSocket
         self.real_time_data.stop_websocket()
     
@@ -291,7 +292,7 @@ class EnhancedIndianTrader:
                 return
             
             # Generate signals
-            signals = self.strategy_engine.generate_signals_for_all_symbols(historical_data, current_prices)
+            signals = self.strategy_engine.generate_signals(historical_data, current_prices)
             
             # Save all signals to database and track their IDs
             for signal in signals:

@@ -181,7 +181,7 @@ class ConsolidatedTradingDatabase:
             return False
     
     def save_signal(self, market: str, symbol: str, strategy: str, signal: str, 
-                   confidence: float, price: float, timestamp: datetime, 
+                   confidence: float, price: float, timestamp, 
                    timeframe: str, strength: str = None, confirmed: bool = False, 
                    rejection_reason: str = None) -> int:
         """Save a trading signal"""
@@ -194,7 +194,7 @@ class ConsolidatedTradingDatabase:
                      timeframe, strength, confirmed, executed, rejection_reason)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (market, symbol, strategy, signal, confidence, price, 
-                     timestamp.isoformat(), timeframe, strength, confirmed, False, rejection_reason))
+                     timestamp if isinstance(timestamp, str) else timestamp.isoformat(), timeframe, strength, confirmed, False, rejection_reason))
                 conn.commit()
                 return cursor.lastrowid
         except Exception as e:

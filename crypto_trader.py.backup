@@ -701,7 +701,7 @@ if __name__ == "__main__":
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     # Suppress fyers API debug logs
     logging.getLogger("src.api.fyers").setLevel(logging.WARNING)
-     
+    )
     
     # Create and start the WORKING system
     market_type = MarketType.CRYPTO if args.market == "crypto" else MarketType.INDIAN_STOCKS

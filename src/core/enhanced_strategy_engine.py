@@ -218,6 +218,92 @@ class EnhancedStrategyEngine:
         
         return filtered_signals
     
+
+    def generate_signals_for_all_symbols(self, historical_data: Dict[str, pd.DataFrame], 
+                                       current_prices: Dict[str, float]) -> List[Dict]:
+        """Generate signals for all symbols with the expected signature."""
+        all_signals = []
+        
+        for symbol in self.symbols:
+            if symbol in historical_data and symbol in current_prices:
+                # Get data for this symbol
+                data = historical_data[symbol]
+                current_price = current_prices[symbol]
+                
+                if data is not None and len(data) > 50:
+                    # Generate signals for this symbol
+                    symbol_signals = self._generate_symbol_signals(symbol, data, current_price)
+                    all_signals.extend(symbol_signals)
+                else:
+                    logger.warning(f"⚠️ Insufficient data for {symbol}: {len(data) if data is not None else 0} candles")
+        
+        # Sort by confidence
+        all_signals.sort(key=lambda x: x['confidence'], reverse=True)
+        
+        logger.info(f"📊 Generated {len(all_signals)} total signals")
+        return all_signals
+
+
+    def _generate_symbol_signals(self, symbol: str, data: pd.DataFrame, 
+                               current_price: float) -> List[Dict]:
+        """Generate signals for a single symbol."""
+        signals = []
+        
+        for strategy_name, strategy in self.strategies.items():
+            try:
+                # Generate signal using strategy
+                signal_result = strategy.analyze(data)
+                
+                if not signal_result or signal_result.get('signal') in ['NO TRADE', 'ERROR']:
+                    continue
+                
+                signal_type = signal_result.get('signal')
+                confidence = signal_result.get('confidence', signal_result.get('confidence_score', 0))
+                
+                # Check confidence threshold
+                if confidence < self.confidence_cutoff:
+                    logger.debug(f"⚠️ {strategy_name} signal for {symbol} rejected: confidence {confidence} < {self.confidence_cutoff}")
+                    continue
+                
+                # Calculate position size and risk parameters
+                position_size = self._calculate_position_size(confidence)
+                stop_loss_price = self._calculate_stop_loss(current_price, signal_type)
+                take_profit_price = self._calculate_take_profit(current_price, signal_type)
+                
+                # Create signal
+                signal = {
+                    'symbol': symbol,
+                    'strategy': strategy_name,
+                    'signal': signal_type,
+                    'confidence': confidence,
+                    'price': current_price,
+                    'timestamp': datetime.now(self.tz).isoformat(),
+                    'timeframe': '5m',  # Default timeframe
+                    'strength': 'moderate',  # Default strength
+                    'confirmed': True,
+                    'position_size': position_size,
+                    'stop_loss_price': stop_loss_price,
+                    'take_profit_price': take_profit_price,
+                    'indicator_values': {
+                        'ema_12': signal_result.get('ema_12'),
+                        'ema_26': signal_result.get('ema_26'),
+                        'rsi': signal_result.get('rsi'),
+                        'macd': signal_result.get('macd'),
+                        'supertrend': signal_result.get('supertrend')
+                    },
+                    'market_condition': 'trending',  # Default
+                    'volatility': 0.2  # Default
+                }
+                
+                signals.append(signal)
+                logger.info(f"✅ {strategy_name} signal for {symbol}: {signal_type} (confidence: {confidence})")
+                
+            except Exception as e:
+                logger.error(f"❌ Error generating {strategy_name} signal for {symbol}: {e}")
+                continue
+        
+        return signals
+
     def generate_signals(self, symbol: str, historical_data: Dict[str, pd.DataFrame]) -> List[Dict]:
         """Generate signals for a symbol using all strategies."""
         signals = []
@@ -351,6 +437,37 @@ class EnhancedStrategyEngine:
             logger.error(f"❌ Error processing symbol {symbol}: {e}")
             return []
     
+
+    def _calculate_position_size(self, confidence: float) -> float:
+        """Calculate position size based on confidence."""
+        # Base position size
+        base_size = 5000.0  # Base position size
+        
+        # Adjust for confidence
+        confidence_multiplier = confidence / 100.0
+        
+        # Calculate final position size
+        position_size = base_size * confidence_multiplier
+        
+        # Ensure within bounds
+        position_size = max(1000, min(position_size, 10000))
+        
+        return round(position_size, 2)
+    
+    def _calculate_stop_loss(self, entry_price: float, signal_type: str) -> float:
+        """Calculate stop loss price."""
+        if signal_type == 'BUY CALL':
+            return entry_price * (1 - self.base_stop_loss)
+        else:  # BUY PUT
+            return entry_price * (1 + self.base_stop_loss)
+    
+    def _calculate_take_profit(self, entry_price: float, signal_type: str) -> float:
+        """Calculate take profit price."""
+        if signal_type == 'BUY CALL':
+            return entry_price * (1 + 0.05)  # 5% take profit
+        else:  # BUY PUT
+            return entry_price * (1 - 0.05)  # 5% take profit
+
     def run_analysis(self, historical_data: Dict[str, Dict[str, pd.DataFrame]]) -> List[Dict]:
         """Run enhanced analysis on all symbols."""
         all_signals = []
