@@ -11,9 +11,11 @@ import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Tuple
+from typing import Any
 from dataclasses import dataclass
 import json
+import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Configure logging

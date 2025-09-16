@@ -10,7 +10,8 @@ import time
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Protocol
+from typing import Dict, List, Optional, Tuple
+from typing import Any, Protocol
 from dataclasses import dataclass
 from enum import Enum
 import json
