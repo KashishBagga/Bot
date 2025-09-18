@@ -1,5 +1,5 @@
 """
-Fyers API client module with fixed methods.
+Fyers API client module.
 Handles authentication and API requests to the Fyers trading platform.
 """
 import webbrowser
@@ -18,7 +18,7 @@ from src.config.settings import (
 )
 from datetime import datetime, timedelta
 import re
-from typing import Optional
+from typing import Optional, List, Dict
 
 # Set up logger
 logger = logging.getLogger(__name__)
@@ -38,7 +38,13 @@ class FyersClient:
         self.access_token = None
         self.fyers = None
         
-        # Rate limiting
+        # Load access token from environment
+        import os
+        self.access_token = os.getenv("FYERS_ACCESS_TOKEN")
+        if self.access_token:
+            logger.info("🔑 Access token loaded from environment")
+        else:
+            logger.warning("⚠️ No access token found in environment")        # Rate limiting
         self.last_api_call = 0
         self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls to avoid rate limits
         
@@ -51,163 +57,157 @@ class FyersClient:
             secret_key=self.secret_key,
             grant_type=self.grant_type
         )
-        
-        # Try to get access token from environment
-        self._load_access_token()
-        
-        # Initialize Fyers model if we have access token
-        if self.access_token:
-            self._initialize_fyers()
     
-    def _load_access_token(self):
-        """Load access token from environment variables."""
+    def _rate_limit(self):
+        """Implement rate limiting to prevent 429 errors."""
+        current_time = time.time()
+        time_since_last_call = current_time - self.last_api_call
+        
+        # Increased minimum interval to reduce API pressure
+        min_interval = max(self.min_call_interval, 0.5)  # At least 500ms between calls
+        
+        if time_since_last_call < min_interval:
+            sleep_time = min_interval - time_since_last_call
+            time.sleep(sleep_time)
+        
+        self.last_api_call = time.time()
+    
+    def generate_auth_url(self):
+        """Generate the authorization URL for authentication.
+        
+        Returns:
+            str: Authorization URL
+        """
+        return self.session.generate_authcode()
+    
+    def open_auth_url(self):
+        """Open the authorization URL in the default web browser."""
+        auth_url = self.generate_auth_url()
+        logger.info(f"Opening auth URL: {auth_url}")
+        webbrowser.open(auth_url, new=1)
+    
+    def set_auth_code(self, auth_code):
+        """Set the authentication code received after user authorization.
+        
+        Args:
+            auth_code: Authorization code from the redirect URL
+        """
+        self.auth_code = auth_code
+        self.session.set_token(auth_code)
+    
+    def generate_access_token(self):
+        """Generate and set the access token using the authentication code.
+        
+        Returns:
+            bool: True if token generation was successful, False otherwise
+        """
         try:
-            import os
-            from dotenv import load_dotenv
-            load_dotenv()
+            self.session.set_token(self.auth_code)
+            response = self.session.generate_token()
             
-            access_token = os.getenv('FYERS_ACCESS_TOKEN')
-            if access_token:
-                self.access_token = access_token
-                logger.info("🔑 Access token loaded from environment")
+            if 'access_token' in response:
+                self.access_token = response['access_token']
+                logger.info("Access token generated successfully")
+                return True
             else:
-                logger.warning("⚠️ No access token found in environment")
+                logger.error(f"Failed to generate access token: {response}")
+                return False
+                
         except Exception as e:
-            logger.error(f"❌ Error loading access token: {e}")
+            logger.error(f"Error generating access token: {e}")
+            return False
     
-    def _initialize_fyers(self):
-        """Initialize Fyers model with access token."""
+
+    def initialize_client(self):
+        """Initialize the Fyers client with the access token.
+        
+        Returns:
+            bool: True if initialization was successful, False otherwise
+        """
+        if not self.access_token:
+            logger.warning("No access token available for initialization")
+            return False
+        
         try:
             self.fyers = fyersModel.FyersModel(
                 client_id=self.client_id,
                 token=self.access_token,
                 log_path="logs/"
             )
-            logger.info("✅ Fyers model initialized")
-        except Exception as e:
-            logger.error(f"❌ Failed to initialize Fyers model: {e}")
-    
-    def _rate_limit(self):
-        """Apply rate limiting to API calls."""
-        current_time = time.time()
-        time_since_last_call = current_time - self.last_api_call
-        
-        if time_since_last_call < self.min_call_interval:
-            sleep_time = self.min_call_interval - time_since_last_call
-            time.sleep(sleep_time)
-        
-        self.last_api_call = time.time()
-    
-    def get_current_price(self, symbol: str):
-        """Get current price for a single symbol.
-        
-        Args:
-            symbol: Trading symbol (e.g., "NSE:NIFTY50-INDEX")
             
-        Returns:
-            float: Current price or None if error
-        """
-        if not self.fyers:
-            logger.error("Fyers client not initialized")
-            return None
-        
-        # Apply rate limiting
-        self._rate_limit()
-        
-        try:
-            response = self.fyers.quotes({"symbols": symbol})
-            
-            if response and response.get("code") == 200:
-                data = response.get("data", {})
-                if symbol in data:
-                    symbol_data = data[symbol]
-                    # Try different price fields
-                    price = (symbol_data.get("v") or  # Last traded price
-                            symbol_data.get("lp") or  # Last price
-                            symbol_data.get("c") or   # Close price
-                            symbol_data.get("o"))     # Open price
-                    
-                    if price:
-                        return float(price)
-            
-            logger.warning(f"No price data available for {symbol}")
-            return None
-            
-        except Exception as e:
-            logger.error(f"Error fetching current price for {symbol}: {e}")
-            return None
-    
-    def get_historical_data(self, symbol: str, start_date, end_date, interval: str = "1h"):
-        """Get historical data for a symbol.
-        
-        Args:
-            symbol: Trading symbol
-            start_date: Start date
-            end_date: End date
-            interval: Data interval (1m, 5m, 15m, 30m, 1h, 1d)
-            
-        Returns:
-            dict: Historical data or None if error
-        """
-        if not self.fyers:
-            logger.error("Fyers client not initialized")
-            return None
-        
-        # Apply rate limiting
-        self._rate_limit()
-        
-        try:
-            # Format dates for Fyers API
-            start_str = start_date.strftime("%Y-%m-%d")
-            end_str = end_date.strftime("%Y-%m-%d")
-            
-            data = {
-                "symbol": symbol,
-                "resolution": interval,
-                "date_format": "1",
-                "range_from": start_str,
-                "range_to": end_str,
-                "cont_flag": "1"
-            }
-            
-            response = self.fyers.history(data)
-            
-            if response and response.get("code") == 200:
-                return response.get("data", {})
+            # Test the connection by getting the profile
+            profile = self.fyers.get_profile()
+            if 'code' in profile and profile['code'] == 200:
+                logger.info("✅ Fyers client initialized successfully")
+                return True
             else:
-                logger.warning(f"No historical data available for {symbol}")
+                logger.error(f"❌ Failed to initialize Fyers client: {profile}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"❌ Error initializing Fyers client: {e}")
+            return False
+
+    def get_profile(self):
+        """Get the user profile.
+        
+        Returns:
+            dict: User profile data
+        """
+        if not self.fyers:
+            logger.error("Fyers client not initialized")
+            return None
+        
+        # Apply rate limiting
+        self._rate_limit()
+        
+        try:
+            response = self.fyers.get_profile()
+            return response
+        except Exception as e:
+            logger.error(f"Error fetching profile: {e}")
+    def get_quotes(self, symbols: List[str]) -> Optional[Dict]:
+        """Get quotes for multiple symbols.
+        
+        Args:
+            symbols: List of trading symbols
+            
+        Returns:
+            dict: Quotes data or None if error
+        """
+        if not self.fyers:
+            logger.error("Fyers client not initialized")
+            return None
+        
+        # Apply rate limiting
+        self._rate_limit()
+        
+        try:
+            # Format symbols for Fyers API
+            formatted_symbols = []
+            for symbol in symbols:
+                # Convert NSE:SYMBOL-EQ to NSE:SYMBOL
+                if "-EQ" in symbol:
+                    formatted_symbol = symbol.replace("-EQ", "")
+                elif "-INDEX" in symbol:
+                    formatted_symbol = symbol
+                else:
+                    formatted_symbol = symbol
+                formatted_symbols.append(formatted_symbol)
+            
+            data = {"symbols": ",".join(formatted_symbols)}
+            response = self.fyers.quotes(data)
+            
+            if response and response.get("code") == 200:
+                return response.get("d", {})
+            else:
+                logger.warning(f"No quotes data available for {symbols}")
                 return None
                 
         except Exception as e:
-            logger.error(f"Error fetching historical data for {symbol}: {e}")
+            logger.error(f"Error fetching quotes for {symbols}: {e}")
             return None
-    
-    def get_quotes(self, symbols):
-        """Get live quotes for symbols.
-        
-        Args:
-            symbols: List of symbols (e.g., ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"])
-            
-        Returns:
-            dict: Quotes data
-        """
-        if not self.fyers:
-            logger.error("Fyers client not initialized")
-            return None
-        
-        # Apply rate limiting
-        self._rate_limit()
-        
-        try:
-            # Convert list to comma-separated string for Fyers API
-            if isinstance(symbols, list):
-                symbols_str = ','.join(symbols)
-            else:
-                symbols_str = symbols
-                
-            response = self.fyers.quotes({"symbols": symbols_str})
-            logger.debug(f"Quotes fetched for {len(symbols) if isinstance(symbols, list) else 1} symbols")
-            return response
-        except Exception as e:
-            logger.error(f"Error fetching quotes: {e}")
-            return None
+
+
+# Create an instance for direct imports
+fyers_client = FyersClient()

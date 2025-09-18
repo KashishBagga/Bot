@@ -146,18 +146,24 @@ class IndianMarket(MarketInterface):
     
     def get_data_provider(self):
         """Get the data provider for this market (singleton pattern)."""
+    def get_data_provider(self):
+        """Get the data provider for this market (singleton pattern)."""
         if self._data_provider is None:
-            from src.adapters.data.fyers_data_provider import FyersDataProvider
-            self._data_provider = FyersDataProvider()
+            import os
+            if os.getenv("DEMO_MODE") == "true":
+                from src.adapters.data.mock_data_provider import MockDataProvider
+                self._data_provider = MockDataProvider()
+            else:
+                from src.adapters.data.fyers_data_provider import FyersDataProvider
+                self._data_provider = FyersDataProvider()
         return self._data_provider
-    
     def get_current_price(self, symbol: str) -> Optional[float]:
-        """Get current price with timeout and retry"""
+        """Get current price for a symbol."""
         try:
-            return self._get_price_with_retry(symbol)
+            data_provider = self.get_data_provider()
+            return data_provider.get_current_price(symbol)
         except Exception as e:
-            logger.error(f"❌ Failed to get price for {symbol}: {e}")
-            return None
+            print(f"Error getting current price for {symbol}: {e}")
     
     def _get_price_with_retry(self, symbol: str, max_retries: int = 3) -> Optional[float]:
         """Get price with retry logic"""

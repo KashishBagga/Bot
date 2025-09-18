@@ -84,7 +84,7 @@ class FyersWebSocketManager:
         try:
             self.fyers_socket = data_ws.FyersDataSocket(
                 access_token=self.access_token,
-                log_path="logs/websocket/",
+                log_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "logs/websocket/"),
                 
             )
             

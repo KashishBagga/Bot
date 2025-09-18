@@ -12,8 +12,10 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import pytz
 
-# Add src to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+from dotenv import load_dotenv
+load_dotenv()# Add project root to path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, project_root)
 
 from src.core.enhanced_strategy_engine import EnhancedStrategyEngine
 from src.adapters.market_factory import MarketFactory
@@ -23,23 +25,29 @@ from src.core.error_handler import error_handler, handle_errors
 from src.core.enhanced_real_time_manager import EnhancedRealTimeDataManager
 from risk_config import risk_config
 
-# Configure logging
+# Configure logging with absolute path
 import logging
+# Configure logging with absolute path
+import logging
+
+# Clear any existing handlers
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("logs/indian/indian_trading.log"),
+        logging.FileHandler(os.path.join(project_root, "logs/indian/indian_trading.log")),
         logging.StreamHandler()
-    ]
-)
-# Suppress urllib3 debug logs
+    ],
+    force=True
+)# Suppress urllib3 debug logs
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 # Suppress fyers API debug logs
 logging.getLogger("src.api.fyers").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
-
 class EnhancedIndianTrader:
     def __init__(self, capital: float = 50000):
         self.capital = capital
