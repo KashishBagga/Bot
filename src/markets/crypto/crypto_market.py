@@ -5,6 +5,7 @@ Crypto market implementation for cryptocurrency trading.
 from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+import pandas as pd
 from src.core.timezone_utils import timezone_manager, now
 
 from src.adapters.market_interface import (
@@ -191,28 +192,32 @@ class CryptoMarket(MarketInterface):
         return None
 
     def get_current_price(self, symbol: str) -> Optional[float]:
-        """Get current price with timeout and retry"""
-        try:
-            # Mock API call with retry wrapper
-            # result = self._api_call_with_retry(requests.get, url, timeout=10)
-            # if result:
-            #     return result.json().get('price')
-            
-            # Mock implementation
-            return 50000.0 + hash(symbol) % 1000
-            
-        except Exception as e:
-            logger.error(f"❌ Failed to get price for {symbol}: {e}")
-            return None
         """Get current price for a symbol."""
         try:
             data_provider = self.get_data_provider()
             if data_provider:
-                # Get latest price from data provider
-                latest_data = data_provider.get_latest_data(symbol, limit=1)
-                if latest_data and len(latest_data) > 0:
-                    return float(latest_data[0].get("close", 0))
+                # Use direct price API call instead of latest_data
+                return data_provider.get_current_price(symbol)
             return None
         except Exception as e:
             print(f"Error getting current price for {symbol}: {e}")
             return None
+
+    def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, interval: str) -> Optional[pd.DataFrame]:
+        """Get historical data for a symbol."""
+        try:
+            data_provider = self.get_data_provider()
+            if data_provider:
+                return data_provider.get_historical_data(symbol, start_date, end_date, interval)
+            return None
+        except Exception as e:
+            print(f"Error getting historical data for {symbol}: {e}")
+            return None
+
+    def get_current_prices_batch(self, symbols):
+        """Get current prices for multiple symbols."""
+        try:
+            return self.data_provider.get_current_prices_batch(symbols)
+        except Exception as e:
+            logger.error(f"Error getting batch prices: {e}")
+            return {}

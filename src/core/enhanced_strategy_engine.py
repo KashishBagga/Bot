@@ -47,6 +47,18 @@ class MarketCondition(Enum):
     CALM = "calm"
 
 class EnhancedStrategyEngine:
+    def _filter_low_quality_signals(self, signals):
+        """Filter out low-quality signals."""
+        filtered_signals = []
+        
+        for signal in signals:
+            # Only accept signals with confidence >= 50
+            if signal.get('confidence', 0) >= 50:
+                filtered_signals.append(signal)
+            else:
+                logger.debug(f"Filtered low-confidence signal: {signal['strategy']} {signal['signal']} (confidence: {signal.get('confidence', 0)})")
+        
+        return filtered_signals
     """Enhanced strategy engine with multi-timeframe confirmation"""
     
     def __init__(self, symbols: List[str], confidence_cutoff: float = 25.0):
@@ -302,7 +314,7 @@ class EnhancedStrategyEngine:
                 logger.error(f"❌ Error generating {strategy_name} signal for {symbol}: {e}")
                 continue
         
-        return signals
+        return self._filter_low_quality_signals(signals)
 
     def generate_signals(self, symbol: str, historical_data: Dict[str, pd.DataFrame]) -> List[Dict]:
         """Generate signals for a symbol using all strategies."""
@@ -325,7 +337,7 @@ class EnhancedStrategyEngine:
             except Exception as e:
                 logger.error(f"❌ Error generating signal for {symbol} with {strategy_name}: {e}")
         
-        return signals
+        return self._filter_low_quality_signals(signals)
     
     def confirm_signal_across_timeframes(self, symbol: str, signal: Dict, 
                                        historical_data: Dict[str, pd.DataFrame]) -> Dict:

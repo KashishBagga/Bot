@@ -31,14 +31,40 @@ class SupertrendEma(Strategy):
 
     def add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
-        df["ema"] = df["close"].ewm(span=self.ema_period).mean()
+        
+        # Use pre-calculated indicators if available, otherwise calculate them
+        if 'ema_9' in df.columns:
+            df["ema"] = df['ema_9']  # Use pre-calculated EMA 9
+        else:
+            df["ema"] = df["close"].ewm(span=self.ema_period).mean()
+        
         df["price_to_ema_ratio"] = (df["close"] / df["ema"] - 1) * 100
         
-        # Add enhanced indicators
-        from src.core.indicators import indicators
-        df['atr'] = indicators.atr(df, period=self.atr_period)
-        df['adx'] = indicators.adx(df, period=self.adx_period)
-        df['rsi'] = indicators.rsi(df, period=14)
+        # Use pre-calculated indicators if available
+        if 'atr' not in df.columns:
+            # Calculate ATR if not available
+            high_low = df['high'] - df['low']
+            high_close = abs(df['high'] - df['close'].shift())
+            low_close = abs(df['low'] - df['close'].shift())
+            ranges = pd.concat([high_low, high_close, low_close], axis=1)
+            true_range = np.max(ranges, axis=1)
+            df['atr'] = true_range.rolling(14, min_periods=1).mean()
+        
+        if 'rsi' not in df.columns:
+            # Calculate RSI if not available
+            delta = df['close'].diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=14, min_periods=1).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=14, min_periods=1).mean()
+            rs = gain / loss.replace(0, np.inf)
+            df['rsi'] = 100 - (100 / (1 + rs))
+            df['rsi'] = df['rsi'].fillna(50)
+        
+        if 'macd' not in df.columns:
+            # Calculate MACD if not available
+            ema_12 = df['close'].ewm(span=12).mean()
+            ema_26 = df['close'].ewm(span=26).mean()
+            df['macd'] = ema_12 - ema_26
+            df['macd_signal'] = df['macd'].ewm(span=9).mean()
         
         # Add volume analysis
         df['volume_ma'] = df['volume'].rolling(window=20).mean().fillna(0)
@@ -218,8 +244,8 @@ class SupertrendEma(Strategy):
                 st_values.append(candle['close'])
                 st_directions.append(0)
         
-        df['supertrend_direction'] = st_directions
-        df['supertrend_value'] = st_values
+        df['supertrend_direction'] = pd.Series(st_directions, index=df.index)
+        df['supertrend_value'] = pd.Series(st_values, index=df.index)
         
         # look-ahead safe crossover detection
         buy_mask = (df['close'] > df['supertrend_value']) & (
@@ -347,16 +373,17 @@ class SupertrendEma(Strategy):
             candle = self.get_closed_candle(data)
             
             # Add indicators
-            df = self.calculate_indicators(data)
+            df = self.add_indicators(data)
             
-            # Get SuperTrend data
+            # Get SuperTrend data using full dataset
             st_instance = self._get_supertrend_instance("5min")
-            st_data = st_instance.update(candle)
+            st_result = st_instance.calculate(df)
             
-            if st_data is None or st_data[1] is None:
+            if st_result is None or 'direction' not in st_result:
                 return {'signal': 'NO TRADE', 'reason': 'insufficient supertrend data'}
             
-            supertrend_direction = st_data[1]
+            # Get the last Supertrend direction
+            supertrend_direction = st_result['direction'].iloc[-1]
             
             # Get EMAs and other indicators
             ema_9 = df['ema_9'].iloc[-1]

@@ -146,16 +146,19 @@ class IndianMarket(MarketInterface):
     
     def get_data_provider(self):
         """Get the data provider for this market (singleton pattern)."""
-    def get_data_provider(self):
-        """Get the data provider for this market (singleton pattern)."""
         if self._data_provider is None:
             import os
-            if os.getenv("DEMO_MODE") == "true":
+            demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+            print(f"🔧 Data provider mode: {'Demo' if demo_mode else 'Live'}")
+            
+            if demo_mode:
                 from src.adapters.data.mock_data_provider import MockDataProvider
                 self._data_provider = MockDataProvider()
+                print("🎭 Using Mock Data Provider")
             else:
                 from src.adapters.data.fyers_data_provider import FyersDataProvider
                 self._data_provider = FyersDataProvider()
+                print("🔐 Using Fyers Data Provider")
         return self._data_provider
     def get_current_price(self, symbol: str) -> Optional[float]:
         """Get current price for a symbol."""
@@ -164,6 +167,15 @@ class IndianMarket(MarketInterface):
             return data_provider.get_current_price(symbol)
         except Exception as e:
             print(f"Error getting current price for {symbol}: {e}")
+    
+    def get_current_prices_batch(self, symbols: List[str]) -> Dict[str, Optional[float]]:
+        """Get current prices for multiple symbols in a single request."""
+        try:
+            data_provider = self.get_data_provider()
+            return data_provider.get_current_prices_batch(symbols)
+        except Exception as e:
+            print(f"Error getting batch prices: {e}")
+            return {symbol: None for symbol in symbols}
     
     def _get_price_with_retry(self, symbol: str, max_retries: int = 3) -> Optional[float]:
         """Get price with retry logic"""
@@ -201,12 +213,12 @@ class IndianMarket(MarketInterface):
         """Get default symbols for Indian trading."""
         return ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX', 'NSE:FINNIFTY-INDEX', 'NSE:RELIANCE-EQ', 'NSE:HDFCBANK-EQ']
 
-    def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, resolution: str) -> Optional[pd.DataFrame]:
+    def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, interval: str) -> Optional[pd.DataFrame]:
         """Get historical data for a symbol."""
         try:
             data_provider = self.get_data_provider()
             if data_provider:
-                return data_provider.get_historical_data(symbol, start_date, end_date, resolution)
+                return data_provider.get_historical_data(symbol, start_date, end_date, interval)
             return None
         except Exception as e:
             print(f"Error getting historical data for {symbol}: {e}")

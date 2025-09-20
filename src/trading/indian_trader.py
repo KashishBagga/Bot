@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced Indian Trading System with Signal Execution Tracking
+FIXED VERSION: Removed cooldown logic, signal limiting, and optimized WebSocket
 """
 
 import sys
@@ -13,7 +14,9 @@ from typing import Dict, List, Optional
 import pytz
 
 from dotenv import load_dotenv
-load_dotenv()# Add project root to path
+load_dotenv()
+
+# Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 sys.path.insert(0, project_root)
 
@@ -22,11 +25,9 @@ from src.adapters.market_factory import MarketFactory
 from src.adapters.market_interface import MarketType
 from src.models.consolidated_database import ConsolidatedTradingDatabase, initialize_connection_pools
 from src.core.error_handler import error_handler, handle_errors
-from src.core.enhanced_real_time_manager import EnhancedRealTimeDataManager
+from src.core.technical_indicators import calculate_all_indicators, validate_indicators
 from risk_config import risk_config
 
-# Configure logging with absolute path
-import logging
 # Configure logging with absolute path
 import logging
 
@@ -42,30 +43,30 @@ logging.basicConfig(
         logging.StreamHandler()
     ],
     force=True
-)# Suppress urllib3 debug logs
+)
+
+# Suppress urllib3 debug logs
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 # Suppress fyers API debug logs
 logging.getLogger("src.api.fyers").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
+
 class EnhancedIndianTrader:
     def __init__(self, capital: float = 50000):
         self.capital = capital
         self.tz = pytz.timezone('Asia/Kolkata')
         
-        # Risk management from config
-        # Risk configuration
+        # Risk management from config (COOLDOWN REMOVED)
         self.risk_config = risk_config
         self.max_positions_per_symbol = risk_config.get("max_positions_per_symbol", 3)
         self.max_total_positions = risk_config.get("max_total_positions", 15)
-        self.trade_cooldown_minutes = 0.17  # 10 seconds
-        self.trade_cooldown = self.trade_cooldown_minutes * 60  # Convert to seconds
         self.daily_loss_limit = 0.15  # 15%
         self.emergency_stop_loss = risk_config.get_emergency_stop_loss()
         
-        # Trading state
+        # Trading state (LAST_TRADE_TIME REMOVED)
         self.open_trades = {}
-        self.last_trade_time = {}
         self.daily_pnl = 0.0
         self.start_time = datetime.now(self.tz)
         
@@ -92,20 +93,17 @@ class EnhancedIndianTrader:
             # Initialize market data provider
             self.data_provider = MarketFactory.create_market(MarketType.INDIAN_STOCKS)
             
+            
+            # Load existing open trades from database
+            self._load_open_trades_from_db()
+            
+            logger.info("✅ All systems initialized successfully")
+            logger.info("📡 WebSocket disabled for optimal performance - using REST API for real-time data")
+            
             # Initialize strategy engine
             self.strategy_engine = EnhancedStrategyEngine(self.symbols)
             
-            # Initialize enhanced real-time data manager
-            self.real_time_data = EnhancedRealTimeDataManager(self.data_provider, self.symbols)
-            self.strategy_engine = EnhancedStrategyEngine(self.symbols)
-            
-            
             logger.info("✅ All systems initialized successfully")
-            
-            # Start WebSocket for real-time data
-            self.real_time_data.start_websocket()
-            logger.info("📡 WebSocket started for real-time market data")
-            
         except Exception as e:
             logger.error(f"❌ Failed to initialize systems: {e}")
             raise
@@ -114,8 +112,6 @@ class EnhancedIndianTrader:
         """Handle shutdown signals."""
         logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
         self._stop_event.set()
-        # Stop WebSocket
-        self.real_time_data.stop_websocket()
     
     def get_current_price(self, symbol: str) -> Optional[float]:
         """Get current price for a symbol."""
@@ -136,13 +132,13 @@ class EnhancedIndianTrader:
             return None
     
     def _check_risk_limits(self, symbol: str, signal: Dict) -> tuple[bool, str]:
-        """Check risk management limits and return (allowed, reason)."""
+        """Check risk management limits and return (allowed, reason). COOLDOWN LOGIC REMOVED."""
         try:
             # Check if risk management is enabled
             if not self.risk_config.is_risk_management_enabled():
                 return True, "Risk management disabled"
             
-            current_time = datetime.now(self.tz)            # Check daily loss limit
+            # Check daily loss limit
             if self.daily_pnl <= -self.capital * self.daily_loss_limit:
                 return False, f"Daily loss limit reached: {self.daily_pnl:.2f}"
             
@@ -159,16 +155,6 @@ class EnhancedIndianTrader:
             if len(self.open_trades) >= self.max_total_positions:
                 return False, f"Max total positions reached: {len(self.open_trades)}/{self.max_total_positions}"
             
-            # Check cooldown period
-            if symbol in self.last_trade_time:
-                last_trade_time = self.last_trade_time[symbol]
-                if last_trade_time.tzinfo is None:
-                    last_trade_time = last_trade_time.replace(tzinfo=self.tz)
-                
-                time_since_last_trade = (current_time - last_trade_time).total_seconds()
-                if time_since_last_trade < self.trade_cooldown:
-                    return False, f"Trade cooldown active: {time_since_last_trade:.0f}s < {self.trade_cooldown}s"
-            
             # Check capital availability
             available_capital = self.capital - sum(trade.position_size for trade in self.open_trades.values())
             if available_capital <= 0:
@@ -181,7 +167,7 @@ class EnhancedIndianTrader:
             return False, f"Risk check error: {e}"
 
     def _get_rejection_reason(self, signal: Dict, entry_price: float) -> str:
-        """Get the reason why a signal was rejected."""
+        """Get the reason why a signal was rejected. COOLDOWN LOGIC REMOVED."""
         try:
             symbol = signal["symbol"]
             
@@ -194,12 +180,6 @@ class EnhancedIndianTrader:
             if symbol_positions >= self.max_positions_per_symbol:
                 return f"Max positions per symbol reached: {symbol_positions}/{self.max_positions_per_symbol}"
             
-            # Check cooldown
-            if symbol in self.last_trade_time:
-                time_since_last = datetime.now(self.tz) - self.last_trade_time[symbol]
-                if time_since_last.total_seconds() < self.trade_cooldown:
-                    return f"Trade cooldown active: {time_since_last.total_seconds():.1f}s remaining"
-            
             # Check risk limits
             allowed, reason = self._check_risk_limits(symbol, signal)
             if not allowed:
@@ -207,9 +187,10 @@ class EnhancedIndianTrader:
             
             return "Unknown rejection reason"
         except Exception as e:
-            return f"Error determining rejection reason: {e}"    
+            return f"Error determining rejection reason: {e}"
+    
     def _open_trade(self, signal: Dict, entry_price: float, timestamp: datetime) -> Optional[str]:
-        """Open a new trade with comprehensive risk checks."""
+        """Open a new trade with comprehensive risk checks. LAST_TRADE_TIME TRACKING REMOVED."""
         try:
             symbol = signal['symbol']
             
@@ -252,7 +233,6 @@ class EnhancedIndianTrader:
             
             # Store trade
             self.open_trades[trade_id] = trade
-            self.last_trade_time[symbol] = timestamp
             
             # Save to database
             self.db.save_open_trade(trade_id, "indian", symbol, signal["strategy"], signal["signal"], 
@@ -274,28 +254,43 @@ class EnhancedIndianTrader:
             return None
     
     def _process_signals(self):
-        """Process trading signals with execution tracking."""
+        """Process trading signals with execution tracking. SIGNAL LIMITING REMOVED."""
         try:
-            # Get current prices
-            current_prices = {}
-            for symbol in self.symbols:
-                price = self.get_current_price(symbol)
-                if price:
-                    current_prices[symbol] = price
-            
-            if not current_prices:
-                logger.warning("No current prices available")
+            # Get current prices using batch request
+            try:
+                current_prices = self.data_provider.get_current_prices_batch(self.symbols)
+                # Filter out None values
+                current_prices = {symbol: price for symbol, price in current_prices.items() if price is not None}
+                
+                if not current_prices:
+                    logger.warning("No current prices available")
+                    return
+                    
+                logger.debug(f"✅ Got prices for {len(current_prices)} symbols: {list(current_prices.keys())}")
+                
+            except Exception as e:
+                logger.error(f"Error getting batch prices: {e}")
                 return
             
-            # Get historical data
+            # Get historical data and calculate indicators
             historical_data = {}
             for symbol in self.symbols:
                 data = self.get_historical_data(symbol, 30)
-                if data is not None:
-                    historical_data[symbol] = data
+                if data is not None and len(data) > 50:
+                    # Calculate technical indicators
+                    data_with_indicators = calculate_all_indicators(data)
+                    
+                    # Validate indicators
+                    if validate_indicators(data_with_indicators):
+                        historical_data[symbol] = data_with_indicators
+                        logger.debug(f"✅ Calculated indicators for {symbol}")
+                    else:
+                        logger.warning(f"⚠️ Invalid indicators for {symbol}")
+                else:
+                    logger.warning(f"⚠️ Insufficient data for {symbol}: {len(data) if data is not None else 0} candles")
             
             if not historical_data:
-                logger.warning("No historical data available")
+                logger.warning("No historical data with valid indicators available")
                 return
             
             # Generate signals
@@ -322,11 +317,8 @@ class EnhancedIndianTrader:
                     logger.error(f"Failed to save signal: {e}")
                     signal["signal_id"] = None
             
-            # Limit signals to prevent over-trading
-            max_signals_per_cycle = 3
-            signals = signals[:max_signals_per_cycle]
-            
-            # Process signals
+            # Process ALL signals (signal limiting removed)
+            logger.info(f"🎯 Processing {len(signals)} signals (no artificial limits)")
             for signal in signals:
                 if self._stop_event.is_set():
                     break
@@ -358,28 +350,64 @@ class EnhancedIndianTrader:
         except Exception as e:
             error_handler.handle_error(e, {'context': 'process_signal', 'signal': signal})
     
+    
     def _update_open_trades(self):
-        """Update open trades with proper exit logic."""
+        """Update open trades with current prices and check exit conditions."""
+        if not self.open_trades:
+            return
+        
         try:
-            current_time = datetime.now(self.tz)
+            # Get current prices for all open trade symbols
+            symbols = list(self.open_trades.keys())
+            current_prices = self.data_provider.get_current_prices_batch(symbols)
             
-            for trade_id, trade in list(self.open_trades.items()):
-                if self._stop_event.is_set():
-                    break
-                
-                # Get current price
-                current_price = self.get_current_price(trade.symbol)
-                if not current_price:
+            if not current_prices:
+                logger.warning("No current prices available for trade monitoring")
+                return
+            
+            trades_to_close = []
+            
+            for trade_id, trade in self.open_trades.items():
+                symbol = trade.symbol
+                if symbol not in current_prices:
                     continue
                 
+                current_price = current_prices[symbol]
+                entry_price = trade.entry_price
+                position_size = trade.quantity
+                
+                # Calculate P&L
+                if trade.signal == 'BUY CALL':
+                    pnl = (current_price - entry_price) * position_size
+                else:  # BUY PUT
+                    pnl = (entry_price - current_price) * position_size
+                
                 # Check exit conditions
-                exit_reason = self._check_exit_conditions(trade, current_price, current_time)
+                exit_reason = None
+                exit_price = current_price
+                
+                # Stop-loss: 2% loss
+                if pnl <= -abs(entry_price * position_size * 0.02):
+                    exit_reason = "STOP_LOSS"
+                
+                # Take-profit: 3% gain
+                elif pnl >= abs(entry_price * position_size * 0.03):
+                    exit_reason = "TAKE_PROFIT"
+                
+                # Time-based exit: 1 hour
+                elif (datetime.now(self.tz) - trade.entry_time).total_seconds() > 3600:
+                    exit_reason = "TIME_EXIT"
+                
                 if exit_reason:
-                    self._close_trade(trade_id, current_price, exit_reason)
+                    trades_to_close.append((trade_id, trade, exit_price, exit_reason, pnl))
+            
+            # Close trades that met exit conditions
+            for trade_id, trade, exit_price, exit_reason, pnl in trades_to_close:
+                self._close_trade(trade_id, exit_price, exit_reason, pnl)
                 
         except Exception as e:
-            error_handler.handle_error(e, {'context': 'update_open_trades'})
-    
+            logger.error(f"Error updating open trades: {e}")
+
     def _check_exit_conditions(self, trade, current_price: float, current_time: datetime) -> Optional[str]:
         """Check if trade should be closed."""
         try:
@@ -422,11 +450,7 @@ class EnhancedIndianTrader:
             self.daily_pnl += pnl
             
             # Save to database
-            self.db.save_closed_trade(
-                trade_id, "indian", trade.symbol, trade.strategy, trade.signal,
-                trade.entry_price, exit_price, trade.position_size,
-                trade.entry_time, datetime.now(self.tz), pnl, exit_reason
-            )
+            self.db.close_trade(trade_id, "indian", exit_price, datetime.now(self.tz), exit_reason, pnl)
             
             logger.info(f"🔒 Closed trade: {trade_id} - {trade.symbol} @ {exit_price:.2f} | P&L: {pnl:.2f} | Reason: {exit_reason}")
             
@@ -436,6 +460,7 @@ class EnhancedIndianTrader:
     def run(self):
         """Main trading loop."""
         logger.info(f"🚀 Starting Enhanced Indian Trader with ₹{self.capital:,.2f} capital")
+        logger.info("🔧 OPTIMIZATIONS: Cooldown removed, Signal limiting removed, WebSocket disabled")
         
         try:
             while not self._stop_event.is_set():
@@ -454,10 +479,43 @@ class EnhancedIndianTrader:
             logger.error(f"❌ Trading error: {e}")
         finally:
             self._stop_event.set()
-            # Stop WebSocket
-            self.real_time_data.stop_websocket()
             logger.info("🏁 Trading system shutdown complete")
 
+    def _load_open_trades_from_db(self):
+        """Load existing open trades from database."""
+        try:
+            open_trades = self.db.get_open_trades("indian")
+            for trade in open_trades:
+                trade_id = trade[1]  # trade_id is at index 1
+                symbol = trade[3]    # symbol is at index 3
+                strategy = trade[4]  # strategy is at index 4
+                signal = trade[5]    # signal is at index 5
+                entry_price = trade[6]  # entry_price is at index 6
+                quantity = trade[7]  # quantity is at index 7
+                entry_time = datetime.fromisoformat(trade[8])  # entry_time is at index 8
+                stop_loss_price = trade[9]  # stop_loss_price is at index 9
+                take_profit_price = trade[10]  # take_profit_price is at index 10
+                
+                # Create trade object
+                trade_obj = type("Trade", (), {
+                    "trade_id": trade_id,
+                    "symbol": symbol,
+                    "strategy": strategy,
+                    "signal": signal,
+                    "entry_price": entry_price,
+                    "position_size": quantity,
+                    "entry_time": entry_time,
+                    "stop_loss_price": stop_loss_price,
+                    "take_profit_price": take_profit_price,
+                    "status": "open"
+                })()
+                
+                self.open_trades[trade_id] = trade_obj
+            
+            logger.info(f"📊 Loaded {len(self.open_trades)} open trades from database")
+            
+        except Exception as e:
+            logger.error(f"Error loading open trades from database: {e}")
 def main():
     """Main entry point."""
     import argparse
@@ -478,3 +536,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

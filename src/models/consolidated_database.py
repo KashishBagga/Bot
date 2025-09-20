@@ -464,3 +464,94 @@ def initialize_connection_pools():
         except Exception as e:
             logger.error(f"Failed to calculate unrealized P&L for {market}: {e}")
             return 0.0
+
+    def get_market_statistics(self, market: str) -> Dict[str, Any]:
+        """Get comprehensive market statistics for dashboard."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Get basic counts
+                cursor.execute("SELECT COUNT(*) FROM open_trades WHERE market = ?", (market,))
+                open_trades_count = cursor.fetchone()[0]
+                
+                cursor.execute("SELECT COUNT(*) FROM closed_trades WHERE market = ?", (market,))
+                closed_trades_count = cursor.fetchone()[0]
+                
+                cursor.execute("SELECT COUNT(*) FROM signals WHERE market = ?", (market,))
+                total_signals = cursor.fetchone()[0]
+                
+                # Get P&L statistics
+                cursor.execute("SELECT SUM(pnl) FROM closed_trades WHERE market = ?", (market,))
+                total_pnl = cursor.fetchone()[0] or 0.0
+                
+                cursor.execute("SELECT AVG(pnl) FROM closed_trades WHERE market = ? AND pnl > 0", (market,))
+                avg_win = cursor.fetchone()[0] or 0.0
+                
+                cursor.execute("SELECT AVG(pnl) FROM closed_trades WHERE market = ? AND pnl < 0", (market,))
+                avg_loss = cursor.fetchone()[0] or 0.0
+                
+                cursor.execute("SELECT COUNT(*) FROM closed_trades WHERE market = ? AND pnl > 0", (market,))
+                winning_trades = cursor.fetchone()[0]
+                
+                cursor.execute("SELECT COUNT(*) FROM closed_trades WHERE market = ? AND pnl < 0", (market,))
+                losing_trades = cursor.fetchone()[0]
+                
+                # Calculate win rate
+                win_rate = (winning_trades / max(1, closed_trades_count)) * 100
+                
+                # Get recent performance (last 7 days)
+                cursor.execute("""
+                    SELECT SUM(pnl) FROM closed_trades 
+                    WHERE market = ? AND date(exit_time) >= date('now', '-7 days')
+                """, (market,))
+                weekly_pnl = cursor.fetchone()[0] or 0.0
+                
+                # Get strategy performance
+                cursor.execute("""
+                    SELECT strategy, COUNT(*), SUM(pnl), AVG(pnl)
+                    FROM closed_trades 
+                    WHERE market = ? 
+                    GROUP BY strategy
+                """, (market,))
+                strategy_stats = cursor.fetchall()
+                
+                return {
+                    'market': market,
+                    'open_trades': open_trades_count,
+                    'closed_trades': closed_trades_count,
+                    'total_signals': total_signals,
+                    'total_pnl': round(total_pnl, 2),
+                    'avg_win': round(avg_win, 2),
+                    'avg_loss': round(avg_loss, 2),
+                    'winning_trades': winning_trades,
+                    'losing_trades': losing_trades,
+                    'win_rate': round(win_rate, 2),
+                    'weekly_pnl': round(weekly_pnl, 2),
+                    'strategy_performance': [
+                        {
+                            'strategy': row[0],
+                            'trades': row[1],
+                            'total_pnl': round(row[2] or 0, 2),
+                            'avg_pnl': round(row[3] or 0, 2)
+                        }
+                        for row in strategy_stats
+                    ]
+                }
+                
+        except Exception as e:
+            logger.error(f"Failed to get market statistics for {market}: {e}")
+            return {
+                'market': market,
+                'open_trades': 0,
+                'closed_trades': 0,
+                'total_signals': 0,
+                'total_pnl': 0.0,
+                'avg_win': 0.0,
+                'avg_loss': 0.0,
+                'winning_trades': 0,
+                'losing_trades': 0,
+                'win_rate': 0.0,
+                'weekly_pnl': 0.0,
+                'strategy_performance': []
+            }

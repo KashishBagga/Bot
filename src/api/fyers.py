@@ -209,5 +209,63 @@ class FyersClient:
             return None
 
 
+    def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, interval: str) -> Optional[Dict]:
+        """Get historical data for a symbol."""
+        try:
+            if not self.fyers:
+                logger.error("❌ Fyers client not initialized")
+                return None
+            
+            # Convert dates to YYYY-MM-DD format
+            start_date_str = start_date.strftime("%Y-%m-%d")
+            end_date_str = end_date.strftime("%Y-%m-%d")
+            
+            # Map interval to Fyers format
+            interval_map = {
+                "1m": "1",
+                "5m": "5", 
+                "15m": "15",
+                "30m": "30",
+                "1h": "60",
+                "1d": "D"
+            }
+            
+            fyers_interval = interval_map.get(interval, "60")
+            
+            # Make API call
+            data = {
+                "symbol": symbol,
+                "resolution": fyers_interval,
+                "date_format": "1",
+                "range_from": start_date_str,
+                "range_to": end_date_str,
+                "cont_flag": "1"
+            }
+            
+            # Try the correct Fyers API method
+            try:
+                response = self.fyers.history(data)
+                
+                if response and response.get("s") == "ok":
+                    return response
+                else:
+                    logger.error(f"❌ Historical data request failed: {response}")
+                    return None
+            except Exception as api_error:
+                logger.error(f"❌ Fyers API error: {api_error}")
+                # Try alternative method
+                try:
+                    # Alternative: use the quotes method with historical data
+                    alt_response = self.fyers.quotes(data)
+                    return alt_response
+                except Exception as alt_error:
+                    logger.error(f"❌ Alternative method also failed: {alt_error}")
+                    return None
+                
+        except Exception as e:
+            logger.error(f"❌ Error getting historical data: {e}")
+            return None
+
+
 # Create an instance for direct imports
 fyers_client = FyersClient()

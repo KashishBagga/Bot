@@ -17,8 +17,17 @@ class MarketFactory:
     }
     
     @classmethod
-    def create_market(cls, market_type: MarketType) -> MarketInterface:
+    def create_market(cls, market_type) -> MarketInterface:
         """Create a market instance."""
+        # Handle string market types
+        if isinstance(market_type, str):
+            if market_type.lower() == 'crypto':
+                market_type = MarketType.CRYPTO
+            elif market_type.lower() in ['indian', 'indian_stocks']:
+                market_type = MarketType.INDIAN_STOCKS
+            else:
+                raise ValueError(f"Unsupported market type: {market_type}")
+        
         if market_type not in cls._markets:
             raise ValueError(f"Unsupported market type: {market_type}")
         

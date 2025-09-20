@@ -5,7 +5,7 @@ Supertrend indicator implementation
 import pandas as pd
 import numpy as np
 
-def get_supertrend_instance(period=10, multiplier=3.0):
+def get_supertrend_instance(timeframe="5min", period=10, multiplier=3.0):
     """Get supertrend indicator instance."""
     return SupertrendIndicator(period, multiplier)
 
@@ -90,4 +90,15 @@ class SupertrendIndicator:
 
     def update(self, data):
         """Update method for compatibility with strategies."""
-        return self.calculate(data)
+        # Handle single candle (pandas Series) by converting to DataFrame
+        if hasattr(data, 'name') and hasattr(data, 'index'):
+            # It's a pandas Series (single candle)
+            df = pd.DataFrame([data])
+            result = self.calculate(df)
+            if result is not None:
+                # Return the last values from the calculation
+                return (result['supertrend'].iloc[-1], result['direction'].iloc[-1])
+            return None
+        else:
+            # It's already a DataFrame
+            return self.calculate(data)

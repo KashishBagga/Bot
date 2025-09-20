@@ -1,3 +1,11 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Check if demo mode is enabled
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
 """
 Fyers WebSocket Manager for Real-Time Market Data
 ================================================

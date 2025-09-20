@@ -10,8 +10,9 @@ import signal
 from datetime import datetime
 import pytz
 
-# Add src to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+# Add project root to path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, project_root)
 
 from src.models.consolidated_database import ConsolidatedTradingDatabase
 
@@ -105,7 +106,10 @@ class EnhancedTradingDashboard:
                     current_prices[symbol] = market_data.ltp
             
             # Calculate unrealized P&L
-            unrealized_pnl = self.db.calculate_unrealized_pnl(market, current_prices)
+            if hasattr(self.db, 'calculate_unrealized_pnl'):
+                unrealized_pnl = self.db.calculate_unrealized_pnl(market, current_prices)
+            else:
+                unrealized_pnl = 0.0  # Method not available
             
             return {
                 'unrealized_pnl': unrealized_pnl,
@@ -166,22 +170,26 @@ class EnhancedTradingDashboard:
         print("=" * 50)
         
         # Get market statistics
-        stats = self.db.get_market_statistics(market)
+        stats = self.db.get_market_stats(market)
         if stats:
-            total_trades, open_trades, closed_trades, total_pnl, win_rate = stats
+            total_trades = stats.get('closed_trades', 0) + stats.get('open_trades', 0)
+            open_trades = stats.get('open_trades', 0)
+            closed_trades = stats.get('closed_trades', 0)
+            total_pnl = stats.get('total_pnl', 0)
+            win_rate = stats.get('win_rate', 0)
             
             print(f"📊 Statistics:")
             print(f"   Total Trades: {total_trades}")
             print(f"   Open Trades: {open_trades}")
             print(f"   Closed Trades: {closed_trades}")
-            print(f"   Total P&L: {total_pnl:.2f}")
+            print(f"   Total P&L: ${total_pnl:.2f}")
             print(f"   Win Rate: {win_rate:.1f}%")
         
         # Display real-time P&L
         self.display_real_time_pnl(market, market_name)
         
         # Get recent signals
-        recent_signals = self.db.get_recent_signals(market, limit=5)
+        recent_signals = self.db.get_recent_signals_with_execution(market, limit=5)
         if recent_signals:
             print(f"\n📡 Recent Signals:")
             for signal_data in recent_signals:
