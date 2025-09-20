@@ -75,3 +75,5 @@ tmp/
 
 # Analysis outputs
 rejected_signals*.csv
+trading.db-shm
+trading.db-wal
