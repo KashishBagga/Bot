@@ -85,7 +85,7 @@ class EnhancedIndianTrader:
             initialize_connection_pools()
             
             # Initialize database
-            self.db = ConsolidatedTradingDatabase("data/trading.db")
+            self.db = ConsolidatedTradingDatabase("data/indian_trading.db")
             
             # Initialize symbols
             self.symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX", "NSE:FINNIFTY-INDEX", "NSE:RELIANCE-EQ", "NSE:HDFCBANK-EQ"]

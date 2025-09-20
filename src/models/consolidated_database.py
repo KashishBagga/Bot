@@ -555,3 +555,38 @@ def initialize_connection_pools():
                 'weekly_pnl': 0.0,
                 'strategy_performance': []
             }
+
+        """Update signal execution status by symbol and strategy."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    UPDATE signals 
+                    SET executed = ?, rejection_reason = ?
+                    WHERE symbol = ? AND strategy = ? AND executed = 0
+                    ORDER BY timestamp DESC LIMIT 1
+                """, (1 if executed else 0, rejection_reason, symbol, strategy))
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Failed to update signal execution: {e}")
+            return False
+
+
+    def update_signal_execution(self, symbol: str, strategy: str, executed: bool, rejection_reason: str = None) -> bool:
+        """Update signal execution status by symbol and strategy."""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    UPDATE signals 
+                    SET executed = ?, rejection_reason = ?
+                    WHERE symbol = ? AND strategy = ? AND executed = 0
+                    ORDER BY timestamp DESC LIMIT 1
+                """, (1 if executed else 0, rejection_reason, symbol, strategy))
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Failed to update signal execution: {e}")
+            return False
+
