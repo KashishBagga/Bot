@@ -52,32 +52,39 @@ class IndianMarket(MarketInterface):
             trading_hours={"start": "09:15", "end": "15:30"},
             trading_days=[0, 1, 2, 3, 4],  # Monday to Friday
             lot_sizes={
+                # Index underlyings (for signal generation)
                 "NSE:NIFTY50-INDEX": 50,
                 "NSE:NIFTYBANK-INDEX": 25,
                 "NSE:FINNIFTY-INDEX": 40,
+                # Equity
                 "NSE:RELIANCE-EQ": 1,
-                "NSE:HDFCBANK-EQ": 1
+                "NSE:HDFCBANK-EQ": 1,
+                # Nifty ETF
+                "NSE:NIFTYBEES-EQ": 1,
             },
             tick_sizes={
                 "NSE:NIFTY50-INDEX": 0.05,
                 "NSE:NIFTYBANK-INDEX": 0.05,
                 "NSE:FINNIFTY-INDEX": 0.05,
                 "NSE:RELIANCE-EQ": 0.05,
-                "NSE:HDFCBANK-EQ": 0.05
+                "NSE:HDFCBANK-EQ": 0.05,
+                "NSE:NIFTYBEES-EQ": 0.01,
             },
             commission_rates={
                 "NSE:NIFTY50-INDEX": 0.0001,
                 "NSE:NIFTYBANK-INDEX": 0.0001,
                 "NSE:FINNIFTY-INDEX": 0.0001,
                 "NSE:RELIANCE-EQ": 0.0003,
-                "NSE:HDFCBANK-EQ": 0.0003
+                "NSE:HDFCBANK-EQ": 0.0003,
+                "NSE:NIFTYBEES-EQ": 0.0003,
             },
             margin_requirements={
-                "NSE:NIFTY50-INDEX": 0.1,
-                "NSE:NIFTYBANK-INDEX": 0.1,
-                "NSE:FINNIFTY-INDEX": 0.1,
-                "NSE:RELIANCE-EQ": 0.2,
-                "NSE:HDFCBANK-EQ": 0.2
+                "NSE:NIFTY50-INDEX": 0.10,   # ~10% margin for F&O
+                "NSE:NIFTYBANK-INDEX": 0.10,
+                "NSE:FINNIFTY-INDEX": 0.10,
+                "NSE:RELIANCE-EQ": 0.20,
+                "NSE:HDFCBANK-EQ": 0.20,
+                "NSE:NIFTYBEES-EQ": 0.20,
             },
             currency="INR"
         )
@@ -106,16 +113,32 @@ class IndianMarket(MarketInterface):
     
     def get_contract_info(self, symbol: str) -> Optional[Contract]:
         # Parse symbol to determine asset type
-        if "INDEX" in symbol:
-            asset_type = AssetType.STOCK  # Index treated as stock
+        if "FUT" in symbol:
+            asset_type = AssetType.STOCK  # Futures
+        elif "CE" in symbol or "PE" in symbol:
+            asset_type = AssetType.STOCK  # Options
+        elif "INDEX" in symbol:
+            asset_type = AssetType.STOCK  # Index (used for signal generation)
         elif "EQ" in symbol:
             asset_type = AssetType.STOCK
         else:
             asset_type = AssetType.STOCK  # Default
         
+        # For futures/options symbols, try to map to the underlying for lot sizes
+        underlying = symbol
+        for base in ["NIFTY50", "NIFTYBANK", "FINNIFTY", "RELIANCE", "HDFCBANK"]:
+            if base in symbol:
+                if "NIFTY50" in symbol and "NIFTYBANK" not in symbol:
+                    underlying = "NSE:NIFTY50-INDEX"
+                elif "NIFTYBANK" in symbol:
+                    underlying = "NSE:NIFTYBANK-INDEX"
+                elif "FINNIFTY" in symbol:
+                    underlying = "NSE:FINNIFTY-INDEX"
+                break
+        
         return Contract(
             symbol=symbol,
-            underlying=symbol,
+            underlying=underlying,
             asset_type=asset_type,
             lot_size=self.get_lot_size(symbol),
             tick_size=self.get_tick_size(symbol),
@@ -123,17 +146,34 @@ class IndianMarket(MarketInterface):
             commission_rate=self.get_commission_rate(symbol)
         )
     
+    def _resolve_underlying(self, symbol: str) -> str:
+        """Try to find the underlying index/equity symbol for a futures/options contract."""
+        if symbol in self.config.lot_sizes:
+            return symbol
+        # Map common Nifty/BankNifty/FinNifty derivatives to their index
+        if "NIFTYBANK" in symbol:
+            return "NSE:NIFTYBANK-INDEX"
+        if "FINNIFTY" in symbol:
+            return "NSE:FINNIFTY-INDEX"
+        if "NIFTY" in symbol:  # must come after NIFTYBANK/FINNIFTY checks
+            return "NSE:NIFTY50-INDEX"
+        return symbol
+
     def get_lot_size(self, symbol: str) -> int:
-        return self.config.lot_sizes.get(symbol, 1)
+        resolved = self._resolve_underlying(symbol)
+        return self.config.lot_sizes.get(resolved, 1)
     
     def get_tick_size(self, symbol: str) -> float:
-        return self.config.tick_sizes.get(symbol, 0.05)
+        resolved = self._resolve_underlying(symbol)
+        return self.config.tick_sizes.get(resolved, 0.05)
     
     def get_commission_rate(self, symbol: str) -> float:
-        return self.config.commission_rates.get(symbol, 0.0003)
+        resolved = self._resolve_underlying(symbol)
+        return self.config.commission_rates.get(resolved, 0.0003)
     
     def get_margin_requirement(self, symbol: str) -> float:
-        return self.config.margin_requirements.get(symbol, 0.2)
+        resolved = self._resolve_underlying(symbol)
+        return self.config.margin_requirements.get(resolved, 0.2)
     
     def normalize_symbol(self, symbol: str) -> str:
         # Ensure proper NSE format
@@ -142,7 +182,8 @@ class IndianMarket(MarketInterface):
         return symbol
     
     def validate_symbol(self, symbol: str) -> bool:
-        return symbol in self.config.lot_sizes
+        # Accept any NSE symbol — lot_sizes are only for known underlyings
+        return symbol.startswith("NSE:")
     
     def get_data_provider(self):
         """Get the data provider for this market (singleton pattern)."""
@@ -181,37 +222,28 @@ class IndianMarket(MarketInterface):
         """Get price with retry logic"""
         for attempt in range(max_retries):
             try:
-                # Mock API call with timeout
-                # response = requests.get(url, timeout=10)
-                # return response.json().get('price')
-                
-                # Mock implementation
-                return 19500.0 + (attempt * 100)
-                
-            except requests.exceptions.Timeout:
-                logger.warning(f"⚠️ API timeout for {symbol}, attempt {attempt + 1}")
+                data_provider = self.get_data_provider()
+                price = data_provider.get_current_price(symbol)
+                if price is not None:
+                    return price
+            except Exception as e:
+                logger.warning(f"⚠️ Price fetch failed for {symbol}, attempt {attempt + 1}: {e}")
                 if attempt < max_retries - 1:
+                    import time
                     time.sleep(2 ** attempt)  # Exponential backoff
                 continue
-            except Exception as e:
-                logger.error(f"❌ API error for {symbol}: {e}")
-                break
-        
         return None
-        """Get current price for a symbol."""
-        try:
-            data_provider = self.get_data_provider()
-            quotes = data_provider.get_current_price(symbol)
-            if quotes is not None:
-                return quotes
-            return None
-        except Exception as e:
-            print(f"Error getting current price for {symbol}: {e}")
-            return None
     
     def get_default_symbols(self):
         """Get default symbols for Indian trading."""
-        return ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX', 'NSE:FINNIFTY-INDEX', 'NSE:RELIANCE-EQ', 'NSE:HDFCBANK-EQ']
+        return [
+            'NSE:NIFTY50-INDEX',
+            'NSE:NIFTYBANK-INDEX',
+            'NSE:FINNIFTY-INDEX',
+            'NSE:RELIANCE-EQ',
+            'NSE:HDFCBANK-EQ',
+            'NSE:NIFTYBEES-EQ',
+        ]
 
     def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, interval: str) -> Optional[pd.DataFrame]:
         """Get historical data for a symbol."""

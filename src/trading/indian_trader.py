@@ -27,6 +27,10 @@ from src.models.consolidated_database import ConsolidatedTradingDatabase, initia
 from src.core.error_handler import error_handler, handle_errors
 from src.core.technical_indicators import calculate_all_indicators, validate_indicators
 from risk_config import risk_config
+# ── New intelligence modules ──────────────────────────────────────────────────
+from src.core.atr_risk_manager import ATRRiskManager
+from src.core.position_sizer import PositionSizer
+from src.core.expiry_blackout import ExpiryBlackoutManager
 
 # Configure logging with absolute path
 import logging
@@ -53,20 +57,41 @@ logging.getLogger("src.api.fyers").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
+# ── Brokerage & charges constants (Indian F&O) ────────────────────────────────
+BROKERAGE_PER_ORDER = 20.0        # Flat ₹20 per order (buy + sell = ₹40 round trip)
+STT_RATE            = 0.000625    # 0.0625% on sell side for F&O (options)
+EXCHANGE_TXN_RATE   = 0.0000345   # NSE transaction charges
+GST_RATE            = 0.18        # 18% GST on brokerage + txn charges
+SEBI_RATE            = 0.000001    # SEBI turnover fee
+STAMP_DUTY_RATE      = 0.00003     # Stamp duty on buy side
+
+def calculate_trade_charges(entry_price: float, exit_price: float, quantity: float) -> float:
+    """Calculate total brokerage and statutory charges for an F&O round trip."""
+    turnover = (entry_price + exit_price) * quantity
+    brokerage = BROKERAGE_PER_ORDER * 2  # buy + sell
+    stt = exit_price * quantity * STT_RATE
+    exchange_txn = turnover * EXCHANGE_TXN_RATE
+    sebi = turnover * SEBI_RATE
+    stamp = entry_price * quantity * STAMP_DUTY_RATE
+    gst = (brokerage + exchange_txn) * GST_RATE
+    return round(brokerage + stt + exchange_txn + sebi + stamp + gst, 2)
+
+
 class EnhancedIndianTrader:
     def __init__(self, capital: float = 50000):
         self.capital = capital
         self.tz = pytz.timezone('Asia/Kolkata')
         
-        # Risk management from config (COOLDOWN REMOVED)
+        # Risk management from config
         self.risk_config = risk_config
-        self.max_positions_per_symbol = risk_config.get("max_positions_per_symbol", 3)
-        self.max_total_positions = risk_config.get("max_total_positions", 15)
-        self.daily_loss_limit = 0.15  # 15%
-        self.emergency_stop_loss = risk_config.get_emergency_stop_loss()
+        self.max_positions_per_symbol = risk_config.get("max_positions_per_symbol", 2)
+        self.max_total_positions = risk_config.get("max_total_positions", 6)
+        self.daily_loss_limit = 0.15  # 15% (can be dynamically lowered)
+        self.emergency_stop_loss = 0.10 # 10%
         
-        # Trading state (LAST_TRADE_TIME REMOVED)
+        # Trading state
         self.open_trades = {}
+        self.last_trade_times = {} # Symbol -> datetime (Cooldown logic)
         self.daily_pnl = 0.0
         self.start_time = datetime.now(self.tz)
         
@@ -85,10 +110,25 @@ class EnhancedIndianTrader:
             initialize_connection_pools()
             
             # Initialize database
-            self.db = ConsolidatedTradingDatabase("data/indian_trading.db")
+            self.db = ConsolidatedTradingDatabase("data/trading.db")
+
+            # ── New intelligence modules ────────────────────────────────────
+            self.atr_risk      = ATRRiskManager()
+            self.position_sizer = PositionSizer(capital=self.capital)
+            self.blackout      = ExpiryBlackoutManager()
+            # Cache of last historical data keyed by symbol (for ATR fallback)
+            self._last_hist: dict = {}
             
-            # Initialize symbols
-            self.symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX", "NSE:FINNIFTY-INDEX", "NSE:RELIANCE-EQ", "NSE:HDFCBANK-EQ"]
+            # Initialize symbols — indexes for signal generation, futures for trading
+            # We use INDEX symbols for technical analysis (clean price, no roll-over noise)
+            # and map them to futures/options for actual position tracking.
+            self.symbols = [
+                "NSE:NIFTY50-INDEX",
+                "NSE:NIFTYBANK-INDEX",
+                "NSE:FINNIFTY-INDEX",
+                "NSE:RELIANCE-EQ",
+                "NSE:HDFCBANK-EQ",
+            ]
             
             # Initialize market data provider
             self.data_provider = MarketFactory.create_market(MarketType.INDIAN_STOCKS)
@@ -103,7 +143,7 @@ class EnhancedIndianTrader:
             # Initialize strategy engine
             self.strategy_engine = EnhancedStrategyEngine(self.symbols)
             
-            logger.info("✅ All systems initialized successfully")
+            logger.info("✅ Enhanced systems initialized")
         except Exception as e:
             logger.error(f"❌ Failed to initialize systems: {e}")
             raise
@@ -132,21 +172,39 @@ class EnhancedIndianTrader:
             return None
     
     def _check_risk_limits(self, symbol: str, signal: Dict) -> tuple[bool, str]:
-        """Check risk management limits and return (allowed, reason). COOLDOWN LOGIC REMOVED."""
+        """
+        Check risk management limits. 
+        Includes:
+          1. Daily Loss Limit (Volatility-Adjusted)
+          2. Emergency Stop
+          3. Max Positions (Symbol/Total)
+          4. Symbol Cooldown (30 mins)
+        """
         try:
             # Check if risk management is enabled
             if not self.risk_config.is_risk_management_enabled():
                 return True, "Risk management disabled"
             
-            # Check daily loss limit
-            if self.daily_pnl <= -self.capital * self.daily_loss_limit:
-                return False, f"Daily loss limit reached: {self.daily_pnl:.2f}"
+            # ── 1. Volatility-Adjusted Daily Loss ────────────────────────
+            # If market is high vol (regime-based), tighten the belt
+            limit_multiplier = 0.67 if signal.get('regime') == 'HIGH_VOLATILITY' else 1.0
+            effective_limit = self.daily_loss_limit * limit_multiplier
+            
+            if self.daily_pnl <= -self.capital * effective_limit:
+                return False, f"Daily loss limit reached ({effective_limit*100:.1f}%): {self.daily_pnl:.2f}"
             
             # Check emergency stop loss
             if self.daily_pnl <= -self.capital * self.emergency_stop_loss:
                 return False, f"Emergency stop loss triggered: {self.daily_pnl:.2f}"
             
-            # Check position limits per symbol
+            # ── 2. Trade Frequency (Cooldown) ──────────────────────────
+            last_trade = self.last_trade_times.get(symbol)
+            if last_trade:
+                elapsed = (datetime.now(self.tz) - last_trade).total_seconds() / 60
+                if elapsed < 30:
+                    return False, f"Symbol cooldown active: {30 - elapsed:.1f} mins remaining"
+
+            # ── 3. Position Limits ─────────────────────────────────────
             symbol_positions = sum(1 for trade in self.open_trades.values() if trade.symbol == symbol)
             if symbol_positions >= self.max_positions_per_symbol:
                 return False, f"Max positions per symbol reached: {symbol_positions}/{self.max_positions_per_symbol}"
@@ -156,7 +214,7 @@ class EnhancedIndianTrader:
                 return False, f"Max total positions reached: {len(self.open_trades)}/{self.max_total_positions}"
             
             # Check capital availability
-            available_capital = self.capital - sum(trade.position_size for trade in self.open_trades.values())
+            available_capital = self.capital - sum(getattr(trade, 'position_size', 0) for trade in self.open_trades.values())
             if available_capital <= 0:
                 return False, f"Insufficient capital: {available_capital:.2f}"
             
@@ -203,32 +261,57 @@ class EnhancedIndianTrader:
                 logger.debug(f"❌ Trade rejected for {symbol}: {reason}")
                 return None
             
-            # Calculate position size
-            position_size = min(self.capital * 0.1, 5000)  # 10% of capital or max 5000
+            # ── ATR-based SL / TP (replaces fixed 3% / 5%) ───────────────
+            symbol_data = self._last_hist.get(symbol)
+            atr = float(signal.get('atr', 0))
+            if atr == 0 and symbol_data is not None:
+                atr = self.atr_risk.compute_atr(symbol_data)
+            if atr == 0:
+                atr = entry_price * 0.01  # last-resort 1% fallback
+
+            atr_levels = self.atr_risk.register_trade(
+                trade_id=f"{symbol}_{int(timestamp.timestamp())}",
+                direction=signal['signal'],
+                entry_price=entry_price,
+                atr=atr,
+            )
+            stop_loss_price   = atr_levels.stop_loss
+            take_profit_price = atr_levels.take_profit_1
+
+            # ── Risk-based position sizing (Kelly + regime multiplier) ──────
+            deployed = sum(getattr(t, 'position_size', 0) for t in self.open_trades.values())
+            position_size = self.position_sizer.get_position_size(
+                entry_price=entry_price,
+                stop_loss_price=stop_loss_price,
+                strategy=signal['strategy'],
+                confidence=signal.get('confidence', 70.0),
+                regime=signal.get('regime', 'UNKNOWN'),
+                deployed_capital=deployed,
+            )
+            if position_size <= 0:
+                logger.debug(f"❌ Position size 0 for {symbol} — capital limit reached")
+                return None
             
-            # Calculate stop loss and take profit
-            if signal['signal'] == 'BUY CALL':
-                stop_loss_price = entry_price * (1 - 0.03)  # 3% stop loss
-                take_profit_price = entry_price * (1 + 0.05)  # 5% take profit
-            else:  # BUY PUT
-                stop_loss_price = entry_price * (1 + 0.03)  # 3% stop loss
-                take_profit_price = entry_price * (1 - 0.05)  # 5% take profit
-            
-            # Generate trade ID
+            # Update last trade time for cooldown
+            self.last_trade_times[symbol] = timestamp
+
+            # Use the pre-registered trade_id so ATR entry matches DB
             trade_id = f"{symbol}_{int(timestamp.timestamp())}"
-            
+
             # Create trade object
             trade = type('Trade', (), {
-                'trade_id': trade_id,
-                'symbol': symbol,
-                'strategy': signal['strategy'],
-                'signal': signal['signal'],
-                'entry_price': entry_price,
-                'position_size': position_size,
-                'entry_time': timestamp,
+                'trade_id':        trade_id,
+                'symbol':          symbol,
+                'strategy':        signal['strategy'],
+                'signal':          signal['signal'],
+                'entry_price':     entry_price,
+                'position_size':   position_size,
+                'entry_time':      timestamp,
                 'stop_loss_price': stop_loss_price,
                 'take_profit_price': take_profit_price,
-                'status': 'open'
+                'atr':             atr,
+                'regime':          signal.get('regime', 'UNKNOWN'),
+                'status':          'open',
             })()
             
             # Store trade
@@ -237,8 +320,17 @@ class EnhancedIndianTrader:
             # Save to database
             self.db.save_open_trade(trade_id, "indian", symbol, signal["strategy"], signal["signal"], 
                                    entry_price, position_size, timestamp, 
-                                   stop_loss_price, take_profit_price)
+                                   stop_loss_price, take_profit_price,
+                                   confidence=signal.get('confidence'),
+                                   regime=signal.get('regime'))
             
+            # Save research log for future optimization
+            self.db.save_research_log(
+                trade_id=trade_id,
+                indicators=signal.get('indicator_values', {}),
+                regime_data={'regime': signal.get('regime'), 'sentiment': signal.get('market_sentiment')}
+            )
+
             # Update signal as executed
             if signal.get("signal_id"):
                 self.db.update_signal_execution_status(signal["signal_id"], True, "Trade executed successfully")
@@ -253,8 +345,28 @@ class EnhancedIndianTrader:
                 self.db.update_signal_execution_status(signal["signal_id"], False, f"Trade opening error: {e}")
             return None
     
+    # ── Market hours guard ─────────────────────────────────────────────────────
+    def _is_market_open(self) -> bool:
+        """Check if NSE is currently open (9:15 AM – 3:30 PM IST, Mon–Fri)."""
+        now = datetime.now(self.tz)
+        if now.weekday() >= 5:  # Saturday / Sunday
+            return False
+        market_open  = now.replace(hour=9, minute=15, second=0, microsecond=0)
+        market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
+        return market_open <= now <= market_close
+
     def _process_signals(self):
-        """Process trading signals with execution tracking. SIGNAL LIMITING REMOVED."""
+        """Process trading signals."""
+        # ── Market hours check ────────────────────────────────────
+        if not self._is_market_open():
+            logger.debug("⏸️ Market closed — skipping signal generation")
+            return
+
+        # ── Expiry / event blackout check ──────────────────────────
+        is_blocked, block_reason = self.blackout.is_blackout()
+        if is_blocked:
+            logger.info(f"🚫 Blackout active — skipping signals: {block_reason}")
+            return
         try:
             # Get current prices using batch request
             try:
@@ -292,6 +404,9 @@ class EnhancedIndianTrader:
             if not historical_data:
                 logger.warning("No historical data with valid indicators available")
                 return
+
+            # Cache for ATR fallback inside _open_trade
+            self._last_hist = historical_data
             
             # Generate signals
             signals = self.strategy_engine.generate_signals_for_all_symbols(historical_data, current_prices)
@@ -357,9 +472,9 @@ class EnhancedIndianTrader:
             return
         
         try:
-            # Get current prices for all open trade symbols
-            symbols = list(self.open_trades.keys())
-            current_prices = self.data_provider.get_current_prices_batch(symbols)
+            # FIX: Extract actual symbols from trade objects, NOT trade IDs
+            trade_symbols = list({trade.symbol for trade in self.open_trades.values()})
+            current_prices = self.data_provider.get_current_prices_batch(trade_symbols)
             
             if not current_prices:
                 logger.warning("No current prices available for trade monitoring")
@@ -367,39 +482,35 @@ class EnhancedIndianTrader:
             
             trades_to_close = []
             
-            for trade_id, trade in self.open_trades.items():
+            for trade_id, trade in list(self.open_trades.items()):
                 symbol = trade.symbol
-                if symbol not in current_prices:
+                if symbol not in current_prices or current_prices[symbol] is None:
                     continue
                 
                 current_price = current_prices[symbol]
                 entry_price = trade.entry_price
-                position_size = trade.quantity
+                position_size = trade.position_size
                 
-                # Calculate P&L
-                if trade.signal == 'BUY CALL':
-                    pnl = (current_price - entry_price) * position_size
-                else:  # BUY PUT
-                    pnl = (entry_price - current_price) * position_size
-                
-                # Check exit conditions
-                exit_reason = None
-                exit_price = current_price
-                
-                # Stop-loss: 2% loss
-                if pnl <= -abs(entry_price * position_size * 0.02):
-                    exit_reason = "STOP_LOSS"
-                
-                # Take-profit: 3% gain
-                elif pnl >= abs(entry_price * position_size * 0.03):
-                    exit_reason = "TAKE_PROFIT"
-                
-                # Time-based exit: 1 hour
-                elif (datetime.now(self.tz) - trade.entry_time).total_seconds() > 3600:
-                    exit_reason = "TIME_EXIT"
-                
+                # ── ATR trailing stop exit check (replaces flat-% logic) ────
+                exit_reason = self.atr_risk.check_exit(trade_id, current_price)
+
+                # Time-based exit: 4 hours (increased to give trailing room)
+                if exit_reason is None:
+                    elapsed = (datetime.now(self.tz) - trade.entry_time).total_seconds()
+                    if elapsed > 4 * 3600:
+                        exit_reason = "TIME_EXIT"
+
                 if exit_reason:
-                    trades_to_close.append((trade_id, trade, exit_price, exit_reason, pnl))
+                    # P&L calculation (quantity = position_size / entry_price)
+                    quantity = position_size / entry_price
+                    if trade.signal in ['BUY', 'BUY CALL']:
+                        raw_pnl = (current_price - entry_price) * quantity
+                    else:
+                        raw_pnl = (entry_price - current_price) * quantity
+                    # Deduct brokerage + statutory charges
+                    charges = calculate_trade_charges(entry_price, current_price, quantity)
+                    pnl = raw_pnl - charges
+                    trades_to_close.append((trade_id, trade, current_price, exit_reason, pnl))
             
             # Close trades that met exit conditions
             for trade_id, trade, exit_price, exit_reason, pnl in trades_to_close:
@@ -408,52 +519,48 @@ class EnhancedIndianTrader:
         except Exception as e:
             logger.error(f"Error updating open trades: {e}")
 
-    def _check_exit_conditions(self, trade, current_price: float, current_time: datetime) -> Optional[str]:
-        """Check if trade should be closed."""
-        try:
-            # Time-based exit (24 hours)
-            if (current_time - trade.entry_time).total_seconds() > 86400:
-                return "TIME_EXIT"
-            
-            # Stop loss
-            if trade.signal == 'BUY CALL' and current_price <= trade.stop_loss_price:
-                return "STOP_LOSS"
-            elif trade.signal == 'BUY PUT' and current_price >= trade.stop_loss_price:
-                return "STOP_LOSS"
-            
-            # Take profit
-            if trade.signal == 'BUY CALL' and current_price >= trade.take_profit_price:
-                return "TARGET_HIT"
-            elif trade.signal == 'BUY PUT' and current_price <= trade.take_profit_price:
-                return "TARGET_HIT"
-            
-            return None
-            
-        except Exception as e:
-            logger.error(f"Error checking exit conditions: {e}")
-            return None
+    # NOTE: _check_exit_conditions removed — ATRRiskManager.check_exit() handles all SL/TP/trailing logic
     
-    def _close_trade(self, trade_id: str, exit_price: float, exit_reason: str):
-        """Close a trade and calculate P&L."""
+    def _close_trade(self, trade_id: str, exit_price: float, exit_reason: str, pnl: float = None):
+        """Close a trade, update P&L, Kelly model, and ATR registry."""
         try:
             trade = self.open_trades.pop(trade_id, None)
             if not trade:
                 return
-            
-            # Calculate P&L
-            if trade.signal == 'BUY CALL':
-                pnl = (exit_price - trade.entry_price) * (trade.position_size / trade.entry_price)
-            else:  # BUY PUT
-                pnl = (trade.entry_price - exit_price) * (trade.position_size / trade.entry_price)
-            
-            # Update daily P&L
+
+            # Re-calculate P&L if not supplied (e.g. called from outside _update_open_trades)
+            if pnl is None:
+                quantity = trade.position_size / trade.entry_price
+                if trade.signal in ['BUY', 'BUY CALL']:
+                    raw_pnl = (exit_price - trade.entry_price) * quantity
+                else:
+                    raw_pnl = (trade.entry_price - exit_price) * quantity
+                charges = calculate_trade_charges(trade.entry_price, exit_price, quantity)
+                pnl = raw_pnl - charges
+
             self.daily_pnl += pnl
-            
+
+            # ── Feed result into Kelly / position sizer ─────────────────
+            self.position_sizer.record_trade_result(trade.strategy, pnl)
+
+            # ── Remove from ATR trailing-stop registry ─────────────────
+            self.atr_risk.remove_trade(trade_id)
+
             # Save to database
-            self.db.close_trade(trade_id, "indian", exit_price, datetime.now(self.tz), exit_reason, pnl)
-            
-            logger.info(f"🔒 Closed trade: {trade_id} - {trade.symbol} @ {exit_price:.2f} | P&L: {pnl:.2f} | Reason: {exit_reason}")
-            
+            self.db.close_trade(
+                trade_id, "indian", exit_price,
+                datetime.now(self.tz), exit_reason, pnl
+            )
+
+            # FIX: Icons were swapped — 💰 for profit, 📉 for loss
+            icon = "💰" if pnl > 0 else "📉"
+            logger.info(
+                f"{icon} Closed [{exit_reason}]: {trade_id} — "
+                f"{trade.symbol} @ ₹{exit_price:.2f} | P&L: ₹{pnl:.2f} | "
+                f"regime={getattr(trade, 'regime', '-')} | "
+                f"kelly={self.position_sizer.get_kelly_report().get(trade.strategy, {}).get('kelly_fraction', 'N/A')}"
+            )
+
         except Exception as e:
             logger.error(f"Error closing trade {trade_id}: {e}")
     
@@ -461,13 +568,15 @@ class EnhancedIndianTrader:
         """Main trading loop."""
         logger.info(f"🚀 Starting Enhanced Indian Trader with ₹{self.capital:,.2f} capital")
         logger.info("🔧 OPTIMIZATIONS: Cooldown removed, Signal limiting removed, WebSocket disabled")
+        logger.info("📋 Market hours guard ACTIVE (9:15–15:30 IST, Mon–Fri)")
+        logger.info("💳 Brokerage & charges deduction ACTIVE")
         
         try:
             while not self._stop_event.is_set():
-                # Process signals
+                # Process signals (market hours checked inside)
                 self._process_signals()
                 
-                # Update open trades
+                # Update open trades (always — so SL/TP triggers even if we stop opening new ones)
                 self._update_open_trades()
                 
                 # Wait before next cycle
@@ -482,37 +591,55 @@ class EnhancedIndianTrader:
             logger.info("🏁 Trading system shutdown complete")
 
     def _load_open_trades_from_db(self):
-        """Load existing open trades from database."""
+        """Load existing open trades from database and re-register ATR levels."""
         try:
             open_trades = self.db.get_open_trades("indian")
             for trade in open_trades:
                 trade_id = trade[1]  # trade_id is at index 1
                 symbol = trade[3]    # symbol is at index 3
                 strategy = trade[4]  # strategy is at index 4
-                signal = trade[5]    # signal is at index 5
+                signal_dir = trade[5]    # signal is at index 5
                 entry_price = trade[6]  # entry_price is at index 6
                 quantity = trade[7]  # quantity is at index 7
                 entry_time = datetime.fromisoformat(trade[8])  # entry_time is at index 8
                 stop_loss_price = trade[9]  # stop_loss_price is at index 9
                 take_profit_price = trade[10]  # take_profit_price is at index 10
                 
+                # Estimate ATR from SL distance (best we can do without historical data)
+                if signal_dir in ['BUY', 'BUY CALL']:
+                    estimated_atr = (entry_price - stop_loss_price) / 1.5 if stop_loss_price else entry_price * 0.01
+                else:
+                    estimated_atr = (stop_loss_price - entry_price) / 1.5 if stop_loss_price else entry_price * 0.01
+                estimated_atr = max(estimated_atr, entry_price * 0.001)  # floor
+
                 # Create trade object
                 trade_obj = type("Trade", (), {
                     "trade_id": trade_id,
                     "symbol": symbol,
                     "strategy": strategy,
-                    "signal": signal,
+                    "signal": signal_dir,
                     "entry_price": entry_price,
                     "position_size": quantity,
                     "entry_time": entry_time,
                     "stop_loss_price": stop_loss_price,
                     "take_profit_price": take_profit_price,
+                    "atr": estimated_atr,
+                    "regime": "UNKNOWN",
                     "status": "open"
                 })()
                 
                 self.open_trades[trade_id] = trade_obj
+
+                # FIX: Re-register with ATRRiskManager so trailing stops work after restart
+                self.atr_risk.register_trade(
+                    trade_id=trade_id,
+                    direction=signal_dir,
+                    entry_price=entry_price,
+                    atr=estimated_atr,
+                )
+                logger.debug(f"🔄 Re-registered ATR levels for {trade_id}")
             
-            logger.info(f"📊 Loaded {len(self.open_trades)} open trades from database")
+            logger.info(f"📊 Loaded {len(self.open_trades)} open trades from database (ATR levels re-registered)")
             
         except Exception as e:
             logger.error(f"Error loading open trades from database: {e}")

@@ -64,9 +64,52 @@ def calculate_all_indicators(data: pd.DataFrame) -> pd.DataFrame:
     df['bb_upper'] = df['bb_upper'].fillna(df['close'])
     df['bb_lower'] = df['bb_lower'].fillna(df['close'])
     
-    # Calculate SuperTrend (simplified)
+    # Calculate SuperTrend (proper implementation with direction tracking)
     hl2 = (df['high'] + df['low']) / 2
-    df['supertrend'] = hl2 + (df['atr'] * 3)
+    multiplier = 3
+    basic_upper = hl2 + (df['atr'] * multiplier)
+    basic_lower = hl2 - (df['atr'] * multiplier)
+
+    final_upper = basic_upper.copy()
+    final_lower = basic_lower.copy()
+    supertrend = pd.Series(index=df.index, data=0.0, dtype=float)
+    st_direction = pd.Series(index=df.index, data=1, dtype=int)  # 1=up, -1=down
+
+    supertrend.iloc[0] = basic_upper.iloc[0]
+
+    for i in range(1, len(df)):
+        # Track upper / lower bands
+        if df['close'].iloc[i - 1] <= final_upper.iloc[i - 1]:
+            final_upper.iloc[i] = min(basic_upper.iloc[i], final_upper.iloc[i - 1])
+        else:
+            final_upper.iloc[i] = basic_upper.iloc[i]
+
+        if df['close'].iloc[i - 1] >= final_lower.iloc[i - 1]:
+            final_lower.iloc[i] = max(basic_lower.iloc[i], final_lower.iloc[i - 1])
+        else:
+            final_lower.iloc[i] = basic_lower.iloc[i]
+
+        # Direction logic
+        if supertrend.iloc[i - 1] == final_upper.iloc[i - 1]:
+            if df['close'].iloc[i] <= final_upper.iloc[i]:
+                supertrend.iloc[i] = final_upper.iloc[i]
+                st_direction.iloc[i] = -1
+            else:
+                supertrend.iloc[i] = final_lower.iloc[i]
+                st_direction.iloc[i] = 1
+        elif supertrend.iloc[i - 1] == final_lower.iloc[i - 1]:
+            if df['close'].iloc[i] >= final_lower.iloc[i]:
+                supertrend.iloc[i] = final_lower.iloc[i]
+                st_direction.iloc[i] = 1
+            else:
+                supertrend.iloc[i] = final_upper.iloc[i]
+                st_direction.iloc[i] = -1
+        else:
+            supertrend.iloc[i] = supertrend.iloc[i - 1]
+            st_direction.iloc[i] = st_direction.iloc[i - 1]
+
+    df['supertrend'] = supertrend
+    df['supertrend_direction'] = st_direction  # 1 = bullish (price above ST), -1 = bearish
     
     # Calculate Stochastic
     low_14 = df['low'].rolling(14, min_periods=1).min()
@@ -101,6 +144,18 @@ def calculate_all_indicators(data: pd.DataFrame) -> pd.DataFrame:
     dm_minus = np.where((df['low'].shift() - df['low']) > (df['high'] - df['high'].shift()), 
                         np.maximum(df['low'].shift() - df['low'], 0), 0)
     
+    # Calculate Choppiness Index (CHOP)
+    # 100 * LOG10( SUM(ATR(1), n) / ( MaxHi(n) - MinLo(n) ) ) / LOG10(n)
+    chop_period = 14
+    tr_sum = true_range.rolling(chop_period).sum()
+    hh = df['high'].rolling(chop_period).max()
+    ll = df['low'].rolling(chop_period).min()
+    df['chop'] = 100 * np.log10(tr_sum / (hh - ll).replace(0, np.inf)) / np.log10(chop_period)
+    df['chop'] = df['chop'].fillna(50)  # Neutral chop
+
+    # Trend Intensity (Custom)
+    df['trend_intensity'] = (df['close'] - df['ema_50']).abs() / df['atr'].replace(0, np.inf)
+    
     # Calculate smoothed values
     period = 14
     tr_smooth = tr.rolling(period, min_periods=1).mean()
@@ -125,7 +180,7 @@ def validate_indicators(data: pd.DataFrame) -> bool:
     required_indicators = [
         'ema_9', 'ema_12', 'ema_21', 'ema_26', 'ema_50',
         'rsi', 'atr', 'macd', 'macd_signal', 'macd_histogram',
-        'bb_middle', 'bb_upper', 'bb_lower', 'supertrend', 'adx'
+        'bb_middle', 'bb_upper', 'bb_lower', 'supertrend', 'supertrend_direction', 'adx'
     ]
     
     missing_indicators = [ind for ind in required_indicators if ind not in data.columns]

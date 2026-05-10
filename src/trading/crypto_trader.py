@@ -28,6 +28,10 @@ from src.models.consolidated_database import ConsolidatedTradingDatabase, initia
 from src.core.error_handler import error_handler
 from src.core.technical_indicators import calculate_all_indicators, validate_indicators
 from risk_config import risk_config
+# ── New intelligence modules ──────────────────────────────────────────────────
+from src.core.atr_risk_manager import ATRRiskManager
+from src.core.position_sizer import PositionSizer
+from src.core.expiry_blackout import ExpiryBlackoutManager
 
 # Configure logging with absolute path
 import logging
@@ -136,12 +140,18 @@ class WorkingOptimizedModularTradingSystem:
             
             # Initialize database
             self.db = ConsolidatedTradingDatabase("data/trading.db")
-            
+
+            # ── New intelligence modules ───────────────────────────────
+            self.atr_risk       = ATRRiskManager()
+            self.position_sizer = PositionSizer(capital=self.initial_capital)
+            self.blackout       = ExpiryBlackoutManager()
+            self._last_hist: dict = {}  # historical data cache for ATR fallback
+
             logger.info("✅ Enhanced systems initialized")
-            
+
             # Load existing open trades from database
             self._load_open_trades_from_db()
-            
+
             logger.info("✅ Enhanced systems initialized")
             
         except Exception as e:
@@ -255,20 +265,40 @@ class WorkingOptimizedModularTradingSystem:
                 logger.debug(f"❌ Trade rejected for {symbol}: Risk limits exceeded")
                 return None
             
-            # Calculate position size
-            position_size = min(self.initial_capital * 0.1, 5000)  # 10% of capital or max 5000
-            
-            # Calculate stop loss and take profit
-            if signal['signal'] in ['BUY', 'BUY CALL']:
-                stop_loss_price = entry_price * (1 - self.stop_loss_percent)
-                take_profit_price = entry_price * (1 + self.take_profit_percent)
-            else:  # SELL or BUY PUT
-                stop_loss_price = entry_price * (1 + self.stop_loss_percent)
-                take_profit_price = entry_price * (1 - self.take_profit_percent)
-            
-            # Generate trade ID
+            # ── ATR-based SL / TP ───────────────────────────────────────
+            symbol_data = self._last_hist.get(symbol)
+            atr = float(signal.get('atr', 0))
+            if atr == 0 and symbol_data is not None:
+                atr = self.atr_risk.compute_atr(symbol_data)
+            if atr == 0:
+                atr = entry_price * 0.01
+
+            # Generate stable trade_id before ATR registration
             timestamp = datetime.now(self.tz)
-            trade_id = f"{symbol}_{int(timestamp.timestamp())}"
+            trade_id  = f"{symbol}_{int(timestamp.timestamp())}"
+
+            atr_levels = self.atr_risk.register_trade(
+                trade_id=trade_id,
+                direction=signal['signal'],
+                entry_price=entry_price,
+                atr=atr,
+            )
+            stop_loss_price   = atr_levels.stop_loss
+            take_profit_price = atr_levels.take_profit_1
+
+            # ── Risk-based position sizing (Kelly + regime) ─────────────
+            deployed = sum(getattr(t, 'position_size', 0) for t in self.open_trades.values())
+            position_size = self.position_sizer.get_position_size(
+                entry_price=entry_price,
+                stop_loss_price=stop_loss_price,
+                strategy=signal['strategy'],
+                confidence=signal.get('confidence', 70.0),
+                regime=signal.get('regime', 'UNKNOWN'),
+                deployed_capital=deployed,
+            )
+            if position_size <= 0:
+                logger.debug(f"❌ Position size 0 for {symbol} — capital limit")
+                return None
             
             # Create trade object
             trade = OptimizedTrade(
@@ -280,7 +310,7 @@ class WorkingOptimizedModularTradingSystem:
                 position_size=position_size,
                 entry_time=timestamp,
                 stop_loss_price=stop_loss_price,
-                take_profit_price=take_profit_price
+                take_profit_price=take_profit_price,
             )
             
             # Store trade
@@ -299,8 +329,13 @@ class WorkingOptimizedModularTradingSystem:
             return None
     
     def _process_signals(self):
-        """Process trading signals. SIGNAL LIMITING REMOVED."""
+        """Process trading signals."""
         try:
+            # ── Expiry / event blackout ───────────────────────────────
+            is_blocked, block_reason = self.blackout.is_blackout()
+            if is_blocked:
+                logger.info(f"🚫 Blackout active — skipping: {block_reason}")
+                return
             # Get current prices
             current_prices = {}
             for symbol in self.symbols:
@@ -334,6 +369,9 @@ class WorkingOptimizedModularTradingSystem:
             if not historical_data:
                 logger.warning("No historical data with valid indicators available")
                 return
+
+            # Cache for ATR fallback inside _open_trade
+            self._last_hist = historical_data
             
             # Generate signals
             signals = self.strategy_engine.generate_signals_for_all_symbols(historical_data, current_prices)
@@ -385,39 +423,29 @@ class WorkingOptimizedModularTradingSystem:
             
             trades_to_close = []
             
-            for trade_id, trade in self.open_trades.items():
+            for trade_id, trade in list(self.open_trades.items()):
                 symbol = trade.symbol
                 if symbol not in current_prices:
                     continue
-                
+
                 current_price = current_prices[symbol]
-                entry_price = trade.entry_price
-                position_size = trade.quantity
-                
-                # Calculate P&L
-                if trade.signal == 'BUY CALL':
-                    pnl = (current_price - entry_price) * position_size
-                else:  # BUY PUT
-                    pnl = (entry_price - current_price) * position_size
-                
-                # Check exit conditions
-                exit_reason = None
-                exit_price = current_price
-                
-                # Stop-loss: 2% loss
-                if pnl <= -abs(entry_price * position_size * 0.02):
-                    exit_reason = "STOP_LOSS"
-                
-                # Take-profit: 3% gain
-                elif pnl >= abs(entry_price * position_size * 0.03):
-                    exit_reason = "TAKE_PROFIT"
-                
-                # Time-based exit: 1 hour
-                elif (datetime.now(self.tz) - trade.entry_time).total_seconds() > 3600:
-                    exit_reason = "TIME_EXIT"
-                
+                entry_price   = trade.entry_price
+                position_size = getattr(trade, 'position_size', 1000.0)
+
+                # ── ATR trailing stop (replaces flat 2%/3% logic) ────────
+                exit_reason = self.atr_risk.check_exit(trade_id, current_price)
+
+                if exit_reason is None:
+                    elapsed = (datetime.now(self.tz) - trade.entry_time).total_seconds()
+                    if elapsed > 4 * 3600:
+                        exit_reason = "TIME_EXIT"
+
                 if exit_reason:
-                    trades_to_close.append((trade_id, trade, exit_price, exit_reason, pnl))
+                    if trade.signal in ['BUY', 'BUY CALL']:
+                        pnl = (current_price - entry_price) * (position_size / entry_price)
+                    else:
+                        pnl = (entry_price - current_price) * (position_size / entry_price)
+                    trades_to_close.append((trade_id, trade, current_price, exit_reason, pnl))
             
             # Close trades that met exit conditions
             for trade_id, trade, exit_price, exit_reason, pnl in trades_to_close:
@@ -451,27 +479,34 @@ class WorkingOptimizedModularTradingSystem:
             logger.error(f"Error checking exit conditions: {e}")
             return None
     
-    def _close_trade(self, trade_id: str, exit_price: float, exit_reason: str):
-        """Close a trade and calculate P&L."""
+    def _close_trade(self, trade_id: str, exit_price: float, exit_reason: str, pnl: float = None):
+        """Close a trade — updates Kelly model and ATR registry."""
         try:
             trade = self.open_trades.pop(trade_id, None)
             if not trade:
                 return
-            
-            # Calculate P&L
-            if trade.signal in ['BUY', 'BUY CALL']:
-                pnl = (exit_price - trade.entry_price) * (trade.position_size / trade.entry_price)
-            else:  # SELL or BUY PUT
-                pnl = (trade.entry_price - exit_price) * (trade.position_size / trade.entry_price)
-            
-            # Update daily P&L
+
+            if pnl is None:
+                if trade.signal in ['BUY', 'BUY CALL']:
+                    pnl = (exit_price - trade.entry_price) * (trade.position_size / trade.entry_price)
+                else:
+                    pnl = (trade.entry_price - exit_price) * (trade.position_size / trade.entry_price)
+
             self.daily_pnl += pnl
-            
-            # Save to database - FIXED SYNTAX
+
+            # Feed into Kelly position sizer
+            self.position_sizer.record_trade_result(trade.strategy, pnl)
+            # Purge ATR registry
+            self.atr_risk.remove_trade(trade_id)
+
             self.db.close_trade(trade_id, "crypto", exit_price, datetime.now(self.tz), exit_reason, pnl)
-            
-            logger.info(f"🔒 Closed trade: {trade_id} - {trade.symbol} @ ${exit_price:.2f} | P&L: ${pnl:.2f} | Reason: {exit_reason}")
-            
+
+            icon = "💹" if pnl < 0 else "💸"
+            logger.info(
+                f"{icon} Closed [{exit_reason}]: {trade_id} — "
+                f"{trade.symbol} @ ${exit_price:.2f} | P&L: ${pnl:.2f}"
+            )
+
         except Exception as e:
             logger.error(f"Error closing trade {trade_id}: {e}")
     

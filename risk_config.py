@@ -6,9 +6,9 @@ Simple Risk Configuration Module
 class RiskConfig:
     def __init__(self):
         self.config = {
-            "max_positions_per_symbol": 10,
-            "max_total_positions": 50,
-            "emergency_stop_loss": 0.20,  # 20%
+            "max_positions_per_symbol": 2,
+            "max_total_positions": 6,
+            "emergency_stop_loss": 0.10,  # 10% of capital — tighter for small accounts
             "risk_management_enabled": True
         }
     

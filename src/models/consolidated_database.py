@@ -61,6 +61,8 @@ class ConsolidatedTradingDatabase:
                         entry_time TEXT NOT NULL,
                         stop_loss_price REAL,
                         take_profit_price REAL,
+                        confidence REAL,
+                        regime TEXT,
                         status TEXT DEFAULT 'OPEN',
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP
                     )
@@ -84,7 +86,21 @@ class ConsolidatedTradingDatabase:
                         pnl REAL,
                         commission REAL DEFAULT 0.0,
                         duration_minutes INTEGER,
+                        confidence REAL,
+                        regime TEXT,
+                        market_sentiment REAL,
                         status TEXT DEFAULT 'CLOSED',
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+
+                # Create research_logs table for deep analysis
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS research_logs (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        trade_id TEXT UNIQUE NOT NULL,
+                        indicators_json TEXT,
+                        market_regime_json TEXT,
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP
                     )
                 ''')
@@ -118,7 +134,8 @@ class ConsolidatedTradingDatabase:
     def save_open_trade(self, trade_id: str, market: str, symbol: str, strategy: str, 
                        signal: str, entry_price: float, quantity: float, 
                        entry_time: datetime, stop_loss_price: float, 
-                       take_profit_price: float) -> bool:
+                       take_profit_price: float, confidence: float = None, 
+                       regime: str = None) -> bool:
         """Save an open trade"""
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -126,10 +143,10 @@ class ConsolidatedTradingDatabase:
                 cursor.execute('''
                     INSERT INTO open_trades 
                     (trade_id, market, symbol, strategy, signal, entry_price, quantity, 
-                     entry_time, stop_loss_price, take_profit_price)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     entry_time, stop_loss_price, take_profit_price, confidence, regime)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (trade_id, market, symbol, strategy, signal, entry_price, quantity,
-                      entry_time.isoformat(), stop_loss_price, take_profit_price))
+                      entry_time.isoformat(), stop_loss_price, take_profit_price, confidence, regime))
                 conn.commit()
                 return True
         except Exception as e:
@@ -138,7 +155,7 @@ class ConsolidatedTradingDatabase:
     
     def close_trade(self, trade_id: str, market: str, exit_price: float, 
                    exit_time: datetime, exit_reason: str, pnl: float, 
-                   commission: float = 0.0) -> bool:
+                   commission: float = 0.0, market_sentiment: float = None) -> bool:
         """Close a trade and move to closed_trades"""
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -158,16 +175,21 @@ class ConsolidatedTradingDatabase:
                 entry_time = datetime.fromisoformat(trade[8])  # entry_time is at index 8
                 duration_minutes = int((exit_time - entry_time).total_seconds() / 60)
                 
+                # confidence and regime are at indices 11 and 12 (approx, check schema)
+                # Schema: id(0), trade_id(1), market(2), symbol(3), strategy(4), signal(5), entry_price(6), quantity(7), entry_time(8), sl(9), tp(10), confidence(11), regime(12)
+                confidence = trade[11] if len(trade) > 11 else None
+                regime = trade[12] if len(trade) > 12 else None
+
                 # Insert into closed_trades
                 cursor.execute('''
                     INSERT INTO closed_trades 
                     (trade_id, market, symbol, strategy, signal, entry_price, exit_price, 
                      quantity, entry_time, exit_time, exit_reason, pnl, commission, 
-                     duration_minutes)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     duration_minutes, confidence, regime, market_sentiment)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (trade_id, market, trade[3], trade[4], trade[5], trade[6], exit_price,
                       trade[7], trade[8], exit_time.isoformat(), exit_reason, pnl, 
-                      commission, duration_minutes))
+                      commission, duration_minutes, confidence, regime, market_sentiment))
                 
                 # Remove from open_trades
                 cursor.execute('''
@@ -178,6 +200,22 @@ class ConsolidatedTradingDatabase:
                 return True
         except Exception as e:
             logger.error(f"Failed to close trade: {e}")
+            return False
+
+    def save_research_log(self, trade_id: str, indicators: dict, regime_data: dict) -> bool:
+        """Save raw indicator and regime data for future research."""
+        import json
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO research_logs (trade_id, indicators_json, market_regime_json)
+                    VALUES (?, ?, ?)
+                ''', (trade_id, json.dumps(indicators, default=str), json.dumps(regime_data, default=str)))
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to save research log for {trade_id}: {e}")
             return False
     
     def save_signal(self, market: str, symbol: str, strategy: str, signal: str, 
@@ -367,18 +405,6 @@ class ConsolidatedTradingDatabase:
         except Exception as e:
             logger.error(f"Failed to get strategy performance for market {market}: {e}")
             return []
-def initialize_connection_pools():
-    """Initialize database connection pools."""
-    try:
-        # This is a placeholder for connection pool initialization
-        # In a production system, you would initialize actual connection pools here
-        logger.info("Database connection pools initialized")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to initialize connection pools: {e}")
-        return False
-
-
 
     def get_trade_by_id(self, trade_id: str) -> Optional[Tuple]:
         """Get trade data by ID."""
@@ -395,43 +421,6 @@ def initialize_connection_pools():
         except Exception as e:
             logger.error(f"Failed to get trade by ID {trade_id}: {e}")
             return None
-    
-    def close_trade(self, trade_id: str, exit_price: float, exit_reason: str, pnl: float):
-        """Close a trade and move it to closed_trades."""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                
-                # Get trade data
-                trade_data = self.get_trade_by_id(trade_id)
-                if not trade_data:
-                    logger.error(f"Trade {trade_id} not found")
-                    return False
-                
-                # Insert into closed_trades
-                cursor.execute('''
-                    INSERT INTO closed_trades (
-                        trade_id, market, symbol, strategy, signal, entry_price, exit_price,
-                        quantity, entry_time, exit_time, pnl, exit_reason
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    trade_data[0], trade_data[1], trade_data[2], trade_data[3], trade_data[4],
-                    trade_data[5], exit_price, trade_data[6], trade_data[7], 
-                    datetime.now().isoformat(), pnl, exit_reason
-                ))
-                
-                # Remove from open_trades
-                cursor.execute('''
-                    DELETE FROM open_trades WHERE trade_id = ?
-                ''', (trade_id,))
-                
-                conn.commit()
-                logger.info(f"Trade {trade_id} closed successfully")
-                return True
-                
-        except Exception as e:
-            logger.error(f"Failed to close trade {trade_id}: {e}")
-            return False
 
     def calculate_unrealized_pnl(self, market: str, current_prices: Dict[str, float]) -> float:
         """Calculate unrealized P&L for open trades."""
@@ -556,23 +545,6 @@ def initialize_connection_pools():
                 'strategy_performance': []
             }
 
-        """Update signal execution status by symbol and strategy."""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    UPDATE signals 
-                    SET executed = ?, rejection_reason = ?
-                    WHERE symbol = ? AND strategy = ? AND executed = 0
-                    ORDER BY timestamp DESC LIMIT 1
-                """, (1 if executed else 0, rejection_reason, symbol, strategy))
-                conn.commit()
-                return cursor.rowcount > 0
-        except Exception as e:
-            logger.error(f"Failed to update signal execution: {e}")
-            return False
-
-
     def update_signal_execution(self, symbol: str, strategy: str, executed: bool, rejection_reason: str = None) -> bool:
         """Update signal execution status by symbol and strategy."""
         try:
@@ -590,3 +562,12 @@ def initialize_connection_pools():
             logger.error(f"Failed to update signal execution: {e}")
             return False
 
+
+def initialize_connection_pools():
+    """Initialize database connection pools."""
+    try:
+        logger.info("Database connection pools initialized")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to initialize connection pools: {e}")
+        return False
