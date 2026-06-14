@@ -37,55 +37,57 @@ class SupertrendIndicator:
         upper_band = hl2 + (self.multiplier * atr)
         lower_band = hl2 - (self.multiplier * atr)
         
-        # Calculate final bands
-        final_upper_band = pd.Series(index=data.index, dtype=float)
-        final_lower_band = pd.Series(index=data.index, dtype=float)
+        # Convert to numpy for fast looping
+        close_arr = close.values
+        ub_arr = upper_band.values
+        lb_arr = lower_band.values
         
-        for i in range(len(data)):
-            if i == 0:
-                final_upper_band.iloc[i] = upper_band.iloc[i]
-                final_lower_band.iloc[i] = lower_band.iloc[i]
+        n = len(data)
+        final_ub = np.zeros(n)
+        final_lb = np.zeros(n)
+        
+        final_ub[0] = ub_arr[0]
+        final_lb[0] = lb_arr[0]
+        
+        for i in range(1, n):
+            if ub_arr[i] < final_ub[i-1] or close_arr[i-1] > final_ub[i-1]:
+                final_ub[i] = ub_arr[i]
             else:
-                if upper_band.iloc[i] < final_upper_band.iloc[i-1] or close.iloc[i-1] > final_upper_band.iloc[i-1]:
-                    final_upper_band.iloc[i] = upper_band.iloc[i]
-                else:
-                    final_upper_band.iloc[i] = final_upper_band.iloc[i-1]
+                final_ub[i] = final_ub[i-1]
                 
-                if lower_band.iloc[i] > final_lower_band.iloc[i-1] or close.iloc[i-1] < final_lower_band.iloc[i-1]:
-                    final_lower_band.iloc[i] = lower_band.iloc[i]
-                else:
-                    final_lower_band.iloc[i] = final_lower_band.iloc[i-1]
-        
-        # Calculate supertrend
-        supertrend = pd.Series(index=data.index, dtype=float)
-        direction = pd.Series(index=data.index, dtype=int)
-        
-        for i in range(len(data)):
-            if i == 0:
-                supertrend.iloc[i] = final_lower_band.iloc[i]
-                direction.iloc[i] = 1
+            if lb_arr[i] > final_lb[i-1] or close_arr[i-1] < final_lb[i-1]:
+                final_lb[i] = lb_arr[i]
             else:
-                if supertrend.iloc[i-1] == final_upper_band.iloc[i-1] and close.iloc[i] <= final_upper_band.iloc[i]:
-                    supertrend.iloc[i] = final_upper_band.iloc[i]
-                    direction.iloc[i] = -1
-                elif supertrend.iloc[i-1] == final_upper_band.iloc[i-1] and close.iloc[i] > final_upper_band.iloc[i]:
-                    supertrend.iloc[i] = final_lower_band.iloc[i]
-                    direction.iloc[i] = 1
-                elif supertrend.iloc[i-1] == final_lower_band.iloc[i-1] and close.iloc[i] >= final_lower_band.iloc[i]:
-                    supertrend.iloc[i] = final_lower_band.iloc[i]
-                    direction.iloc[i] = 1
-                elif supertrend.iloc[i-1] == final_lower_band.iloc[i-1] and close.iloc[i] < final_lower_band.iloc[i]:
-                    supertrend.iloc[i] = final_upper_band.iloc[i]
-                    direction.iloc[i] = -1
-                else:
-                    supertrend.iloc[i] = supertrend.iloc[i-1]
-                    direction.iloc[i] = direction.iloc[i-1]
+                final_lb[i] = final_lb[i-1]
+        
+        st_arr = np.zeros(n)
+        dir_arr = np.zeros(n, dtype=int)
+        
+        st_arr[0] = final_lb[0]
+        dir_arr[0] = 1
+        
+        for i in range(1, n):
+            if st_arr[i-1] == final_ub[i-1] and close_arr[i] <= final_ub[i]:
+                st_arr[i] = final_ub[i]
+                dir_arr[i] = -1
+            elif st_arr[i-1] == final_ub[i-1] and close_arr[i] > final_ub[i]:
+                st_arr[i] = final_lb[i]
+                dir_arr[i] = 1
+            elif st_arr[i-1] == final_lb[i-1] and close_arr[i] >= final_lb[i]:
+                st_arr[i] = final_lb[i]
+                dir_arr[i] = 1
+            elif st_arr[i-1] == final_lb[i-1] and close_arr[i] < final_lb[i]:
+                st_arr[i] = final_ub[i]
+                dir_arr[i] = -1
+            else:
+                st_arr[i] = st_arr[i-1]
+                dir_arr[i] = dir_arr[i-1]
         
         return {
-            'supertrend': supertrend,
-            'direction': direction,
-            'upper_band': final_upper_band,
-            'lower_band': final_lower_band
+            'supertrend': pd.Series(st_arr, index=data.index),
+            'direction': pd.Series(dir_arr, index=data.index),
+            'upper_band': pd.Series(final_ub, index=data.index),
+            'lower_band': pd.Series(final_lb, index=data.index)
         }
 
     def update(self, data):

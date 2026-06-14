@@ -25,12 +25,12 @@ from dataclasses import dataclass, field
 logger = logging.getLogger(__name__)
 
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-RISK_FRACTION        = 0.01   # Risk 1% of capital per trade (fixed-fraction baseline)
+# ── Configuration (Tighter for Phase 2/3) ──────────────────────────────
+RISK_FRACTION        = 0.0075 # Risk 0.75% per trade
 KELLY_HALF           = True   # Use half-Kelly for safety
 MIN_POSITION_AMOUNT  = 500    # Minimum position size in INR
-MAX_POSITION_AMOUNT  = 10_000 # Hard cap per position in INR
-MAX_PORTFOLIO_EXPOSURE = 0.60 # Never deploy more than 60% of capital at once
+MAX_POSITION_AMOUNT  = 5_000  # Hard cap ₹5,000 per position (reduced from 10k)
+MAX_PORTFOLIO_EXPOSURE = 0.40 # Max 40% capital deployment (reduced from 60%)
 
 
 @dataclass
@@ -145,6 +145,19 @@ class PositionSizer:
         Returns: position size in INR (notional)
         """
         try:
+            # ── 0. High Water Mark & Drawdown Check ──────────────────
+            if not hasattr(self, 'high_water_mark'):
+                self.high_water_mark = self.capital
+            
+            if self.capital > self.high_water_mark:
+                self.high_water_mark = self.capital
+            
+            drawdown = (self.high_water_mark - self.capital) / self.high_water_mark
+            drawdown_multiplier = 1.0
+            if drawdown > 0.10:
+                drawdown_multiplier = 0.5
+                logger.warning(f"📉 Drawdown protection active ({drawdown*100:.1f}%): Scaling size by 50%")
+
             risk_per_unit = abs(entry_price - stop_loss_price) / entry_price
             if risk_per_unit <= 0:
                 logger.warning("SL == entry price, using minimum position size")
@@ -159,11 +172,7 @@ class PositionSizer:
 
             # --- Effective risk fraction ---
             stats             = self._get_or_create_stats(strategy)
-            kelly_frac        = stats.kelly_fraction or RISK_FRACTION
-            # Start with kelly, but never exceed RISK_FRACTION × 2 per trade
-            effective_fraction = min(kelly_frac, RISK_FRACTION * 2)
-            effective_fraction = max(effective_fraction, RISK_FRACTION * 0.25)  # floor
-
+            
             # Regime multiplier
             regime_mult = REGIME_MULTIPLIERS.get(regime.upper(), REGIME_MULTIPLIERS["UNKNOWN"])
 

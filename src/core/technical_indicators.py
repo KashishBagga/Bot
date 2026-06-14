@@ -159,8 +159,8 @@ def calculate_all_indicators(data: pd.DataFrame) -> pd.DataFrame:
     # Calculate smoothed values
     period = 14
     tr_smooth = tr.rolling(period, min_periods=1).mean()
-    dm_plus_smooth = pd.Series(dm_plus).rolling(period, min_periods=1).mean()
-    dm_minus_smooth = pd.Series(dm_minus).rolling(period, min_periods=1).mean()
+    dm_plus_smooth = pd.Series(dm_plus, index=df.index).rolling(period, min_periods=1).mean()
+    dm_minus_smooth = pd.Series(dm_minus, index=df.index).rolling(period, min_periods=1).mean()
     
     # Calculate DI+ and DI-
     di_plus = 100 * (dm_plus_smooth / tr_smooth.replace(0, np.inf))

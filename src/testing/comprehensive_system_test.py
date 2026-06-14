@@ -14,6 +14,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -29,6 +30,7 @@ class SystemLoadTester:
     def test_websocket_connections(self) -> bool:
         """Test WebSocket connections under load"""
         try:
+            os.makedirs(os.path.join(os.path.dirname(__file__), '..', '..', 'logs', 'websocket'), exist_ok=True)
             from src.core.fyers_websocket_manager import get_websocket_manager
             
             symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX", "NSE:FINNIFTY-INDEX"]
@@ -83,7 +85,7 @@ class SystemLoadTester:
             
             # Test performance
             start_time = time.time()
-            result = strategy.analyze_vectorized('TEST', data)
+            result = strategy.analyze_vectorized(data)
             duration = time.time() - start_time
             
             # Performance metrics
@@ -128,7 +130,7 @@ class SystemLoadTester:
                     'stop_loss_price': 19400.0,
                     'take_profit_price': 19600.0
                 }
-                db.save_entry_signal('indian', signal_data)
+                db.save_entry_signal('indian', **signal_data)
             
             duration = time.time() - start_time
             
@@ -158,9 +160,12 @@ class SystemLoadTester:
             start_time = time.time()
             
             for i in range(100):
-                risk_manager.add_position(f'SYMBOL_{i}', 100.0, 19500.0, datetime.now())
-                risk_manager.update_position_price(f'SYMBOL_{i}', 19500.0 + i)
-                risk_manager.check_risk_limits()
+                symbol = f'SYMBOL_{i}'
+                risk_manager.add_position(symbol, 100.0, 19500.0, datetime.now())
+                risk_manager.update_position_price(symbol, 19500.0 + i)
+                new_signal = {'symbol': symbol, 'position_size': 100.0}
+                current_prices = {symbol: 19500.0 + i}
+                risk_manager.check_risk_limits(new_signal, current_prices)
             
             duration = time.time() - start_time
             
