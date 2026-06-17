@@ -24,8 +24,21 @@ from src.adapters.market_factory import MarketFactory
 from src.adapters.market_interface import MarketType
 
 # Setup specialized logging for the backtester
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("Backtester")
+logger.setLevel(logging.INFO)
+logger.handlers = []
+
+# Console Stream Handler
+sh = logging.StreamHandler(sys.stdout)
+sh.setFormatter(logging.Formatter("%(message)s"))
+logger.addHandler(sh)
+
+# File Handler per run
+os.makedirs("backtest_runs", exist_ok=True)
+run_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+fh = logging.FileHandler(f"backtest_runs/backtest_run_{run_time}.log")
+fh.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+logger.addHandler(fh)
 
 class TransparentBacktester:
     def __init__(self, symbols: List[str], days: int = 30):
@@ -101,8 +114,8 @@ class TransparentBacktester:
                 
                 for sig in signals:
                     # Confidence is now deterministic in the engine
-                    # No additional retail-style filtering needed here
-                    if True: 
+                    # Only execute accepted candidate signals
+                    if sig.get('accepted', True):
                         # --- Trade Execution (Structural) ---
                         entry_price = sig['price']
                         sl_price = sig['stop_loss']
@@ -190,6 +203,8 @@ class TransparentBacktester:
         # Test a high-conviction parameter set
         test_params = {
             'confidence_cutoff': 70.0,
+            'min_zone_score': 50.0,
+            'rvol_threshold': 1.0,
         }
         
         logger.info("\n" + "="*60)
@@ -208,6 +223,13 @@ class TransparentBacktester:
         logger.info("="*60)
 
 if __name__ == "__main__":
+    import sys
+    days = 30
+    if len(sys.argv) > 1:
+        try:
+            days = int(sys.argv[1])
+        except ValueError:
+            pass
     symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"]
-    tester = TransparentBacktester(symbols, days=45)
+    tester = TransparentBacktester(symbols, days=days)
     tester.run_full_audit()

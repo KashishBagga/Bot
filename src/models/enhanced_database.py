@@ -166,6 +166,92 @@ class EnhancedTradingDatabase:
                     )
                 ''')
                 
+                # ── Trade Intelligence Warehouse (V2: Profitability Discovery) ──
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS trade_features (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        trade_id TEXT UNIQUE NOT NULL,
+                        date TEXT NOT NULL,
+                        strategy_name TEXT NOT NULL,
+                        strategy_version TEXT DEFAULT 'v1.0',
+                        feature_version TEXT DEFAULT 'v1.0',
+                        market_regime TEXT,
+                        daily_bias TEXT,
+                        hourly_bias TEXT,
+                        trend_strength REAL,
+                        rvol REAL,
+                        atr REAL,
+                        distance_from_supply REAL,
+                        distance_from_demand REAL,
+                        nearest_supply_strength REAL,
+                        nearest_demand_strength REAL,
+                        distance_to_liquidity_pool REAL,
+                        session_type TEXT,
+                        day_type TEXT,
+                        liquidity_score REAL,
+                        fft_score REAL,
+                        entry_time TEXT,
+                        exit_time TEXT,
+                        entry_price REAL,
+                        exit_price REAL,
+                        mfe REAL DEFAULT 0.0,
+                        mae REAL DEFAULT 0.0,
+                        pnl REAL,
+                        win_loss TEXT,
+                        indicator_snapshot JSON,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+
+                # ── Signal Snapshot Table (Priority 1) ────────────────
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS trade_signals_snapshot (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        signal_id TEXT UNIQUE NOT NULL,
+                        timestamp TEXT NOT NULL,
+                        strategy TEXT NOT NULL,
+                        symbol TEXT NOT NULL,
+                        market_regime TEXT,
+                        signal_strength REAL,
+                        accepted INTEGER,  -- 1 for accepted, 0 for rejected
+                        rejected_reason TEXT,
+                        executed INTEGER,  -- 1 for executed, 0 for not
+                        result TEXT,       -- Potential result if tracked
+                        context_snapshot JSON,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+
+                # ── Exit Analytics Table (Priority 2) ─────────────────
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS exit_analysis (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        trade_id TEXT UNIQUE NOT NULL,
+                        exit_reason TEXT NOT NULL, -- TP, SL, TSL, MANUAL, RISK
+                        target_hit REAL,
+                        sl_hit REAL,
+                        trailing_sl REAL,
+                        manual_exit REAL,
+                        risk_manager_exit REAL,
+                        time_in_trade INTEGER, -- Seconds
+                        mfe REAL,
+                        mae REAL,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+
+                # ── Option Warehouse (Priority 6) ──────────────────────
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS option_chain_snapshots (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        underlying TEXT NOT NULL,
+                        timestamp TEXT NOT NULL,
+                        atm_strike REAL NOT NULL,
+                        chain_data JSON NOT NULL,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+
                 # Market conditions table
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS market_conditions (
@@ -193,6 +279,10 @@ class EnhancedTradingDatabase:
                 
                 cursor.execute('CREATE INDEX IF NOT EXISTS idx_daily_summary_date_market ON daily_summary(date, market)')
                 cursor.execute('CREATE INDEX IF NOT EXISTS idx_market_conditions_date_symbol ON market_conditions(date, symbol)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_trade_features_trade_id ON trade_features(trade_id)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_option_snapshots_underlying_time ON option_chain_snapshots(underlying, timestamp)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_signal_snapshots_timestamp ON trade_signals_snapshot(timestamp)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_exit_analysis_trade_id ON exit_analysis(trade_id)')
                 
                 conn.commit()
                 logger.info("✅ Enhanced database initialized with comprehensive table structure")
@@ -582,3 +672,146 @@ class EnhancedTradingDatabase:
         except Exception as e:
             logger.error(f"❌ Failed to update daily summary: {e}")
             return False
+    def save_trade_features(self, features: Dict[str, Any]) -> bool:
+        """Save exhaustive trade features to intelligence warehouse"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Check if entry exists to perform insert or update
+                cursor.execute("SELECT id FROM trade_features WHERE trade_id = ?", (features.get('trade_id'),))
+                row = cursor.fetchone()
+                
+                columns = [
+                    'trade_id', 'date', 'strategy_name', 'strategy_version', 'feature_version',
+                    'market_regime', 'daily_bias', 'hourly_bias', 'trend_strength', 'rvol',
+                    'atr', 'distance_from_supply', 'distance_from_demand', 'nearest_supply_strength',
+                    'nearest_demand_strength', 'distance_to_liquidity_pool', 'session_type',
+                    'day_type', 'liquidity_score', 'fft_score', 'entry_time', 'exit_time',
+                    'entry_price', 'exit_price', 'mfe', 'mae', 'pnl', 'win_loss', 'indicator_snapshot'
+                ]
+                
+                if row:
+                    # Update
+                    update_cols = [f"{col} = ?" for col in columns if col in features]
+                    vals = [features[col] if col != 'indicator_snapshot' else json.dumps(features[col]) 
+                            for col in columns if col in features]
+                    vals.append(features['trade_id'])
+                    
+                    query = f"UPDATE trade_features SET {', '.join(update_cols)} WHERE trade_id = ?"
+                    cursor.execute(query, vals)
+                else:
+                    # Insert
+                    present_cols = [col for col in columns if col in features]
+                    placeholders = ", ".join(["?" for _ in present_cols])
+                    vals = [features[col] if col != 'indicator_snapshot' else json.dumps(features[col])
+                            for col in present_cols]
+                    
+                    query = f"INSERT INTO trade_features ({', '.join(present_cols)}) VALUES ({placeholders})"
+                    cursor.execute(query, vals)
+                
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"❌ Failed to save trade features: {e}")
+            return False
+
+    def save_option_snapshot(self, underlying: str, atm_strike: float, chain_data: Dict) -> bool:
+        """Save raw option chain snapshot"""
+        try:
+            timestamp = datetime.now(self.tz).isoformat()
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO option_chain_snapshots (underlying, timestamp, atm_strike, chain_data)
+                    VALUES (?, ?, ?, ?)
+                ''', (underlying, timestamp, atm_strike, json.dumps(chain_data)))
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"❌ Failed to save option snapshot: {e}")
+            return False
+
+    def get_trade_features(self, trade_id: str) -> Optional[Dict]:
+        """Retrieve features for a specific trade"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM trade_features WHERE trade_id = ?", (trade_id,))
+                result = cursor.fetchone()
+                if result:
+                    columns = [description[0] for description in cursor.description]
+                    return dict(zip(columns, result))
+                return None
+        except Exception as e:
+            logger.error(f"❌ Failed to get trade features: {e}")
+            return None
+    def save_signal_snapshot(self, snapshot: Dict[str, Any]) -> bool:
+        """Save a snapshot of every signal generated"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                columns = [
+                    'signal_id', 'timestamp', 'strategy', 'symbol', 'market_regime',
+                    'signal_strength', 'accepted', 'rejected_reason', 'executed',
+                    'result', 'context_snapshot'
+                ]
+                present_cols = [col for col in columns if col in snapshot]
+                placeholders = ", ".join(["?" for _ in present_cols])
+                vals = [snapshot[col] if col != 'context_snapshot' else json.dumps(snapshot[col])
+                        for col in present_cols]
+                
+                query = f"INSERT OR REPLACE INTO trade_signals_snapshot ({', '.join(present_cols)}) VALUES ({placeholders})"
+                cursor.execute(query, vals)
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"❌ Failed to save signal snapshot: {e}")
+            return False
+
+    def save_exit_analysis(self, analysis: Dict[str, Any]) -> bool:
+        """Save detailed exit analytics for a trade"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                columns = [
+                    'trade_id', 'exit_reason', 'target_hit', 'sl_hit', 'trailing_sl',
+                    'manual_exit', 'risk_manager_exit', 'time_in_trade', 'mfe', 'mae'
+                ]
+                present_cols = [col for col in columns if col in analysis]
+                placeholders = ", ".join(["?" for _ in present_cols])
+                vals = [analysis[col] for col in present_cols]
+                
+                query = f"INSERT OR REPLACE INTO exit_analysis ({', '.join(present_cols)}) VALUES ({placeholders})"
+                cursor.execute(query, vals)
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"❌ Failed to save exit analysis: {e}")
+            return False
+
+    def get_data_completeness_score(self) -> Dict[str, float]:
+        """Calculate population rates for intelligence features"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT COUNT(*) FROM trade_features")
+                total = cursor.fetchone()[0]
+                if total == 0: return {}
+                
+                columns = [
+                    'market_regime', 'daily_bias', 'rvol', 'atr', 
+                    'distance_from_supply', 'liquidity_score', 'fft_score',
+                    'mfe', 'mae', 'session_type', 'day_type'
+                ]
+                
+                scores = {}
+                for col in columns:
+                    cursor.execute(f"SELECT COUNT(*) FROM trade_features WHERE {col} IS NOT NULL")
+                    populated = cursor.fetchone()[0]
+                    scores[col] = (populated / total) * 100
+                    
+                return scores
+        except Exception as e:
+            logger.error(f"❌ Failed to calculate completeness scores: {e}")
+            return {}

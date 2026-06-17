@@ -25,17 +25,20 @@ var/
 .installed.cfg
 *.egg
 
-# Logs
-*.log
-logs/
+# Logs - exclude contents but keep folder structure
+logs/*.log
+logs/websocket/
 startup_debug.log
+
+# Backtest run logs - exclude contents
+backtest_runs/*.log
 
 # Database
 *.db
 *.sqlite3
 
 # Data files
-data/
+data/postgres_data/
 *.parquet
 cache/backtest_results/
 
@@ -66,6 +69,10 @@ fyersRequests.log
 # Session data
 session_stats_*.json
 *_session_stats.json
+
+# Temporary / scratch files at root
+scratch_*.py
+trade_journal.csv
 
 # Temporary files
 *.tmp

@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from enum import Enum
 import json
 from abc import ABC, abstractmethod
+
+from src.models.postgres_database import PostgresDatabase
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 # Configure logging
@@ -187,6 +189,8 @@ class TradeExecutionManager:
         self.last_failure_time = None
         self.circuit_breaker_active = False
         self.reconciliation_task = None
+        self.active_trade_features = {} # trade_id -> features
+        self.db = PostgresDatabase()
         
         # Start position reconciliation
         if config.enable_position_reconciliation:
@@ -195,7 +199,8 @@ class TradeExecutionManager:
     async def place_order(self, symbol: str, side: str, quantity: float, 
                          order_type: OrderType = OrderType.MARKET, 
                          price: Optional[float] = None,
-                         stop_price: Optional[float] = None) -> str:
+                         stop_price: Optional[float] = None,
+                         features: Optional[Dict] = None) -> str:
         """Place order with retry logic and fallback"""
         
         # Check circuit breaker
@@ -222,6 +227,27 @@ class TradeExecutionManager:
                 order_id = await self._place_order_with_retry(order, attempt)
                 if order_id:
                     self.orders[order_id] = order
+                    if features:
+                        features['trade_id'] = order_id
+                        features['entry_price'] = price or 0.0
+                        features['entry_time'] = datetime.now().isoformat()
+                        self.active_trade_features[order_id] = features
+                        # Save trade performance initiation
+                        self.db.save_trade_performance({
+                            'trade_id': order_id,
+                            'entry_time': features['entry_time'],
+                            'strategy': features['strategy_name'],
+                            'symbol': symbol,
+                            'entry_price': features['entry_price'],
+                            'features': features
+                        })
+                        
+                        # Update original signal as executed
+                        if 'signal_id' in features:
+                            self.db.save_signal({
+                                'signal_id': features['signal_id'],
+                                'executed': True
+                            })
                     return order_id
                     
             except Exception as e:
@@ -323,6 +349,9 @@ class TradeExecutionManager:
             
             # Update positions
             self._update_positions(order)
+            
+            # Start MFE/MAE tracking for this order if it's an entry
+            # In a real system, we'd check if this opens a new position
     
     async def _handle_rejected_order(self, order_id: str):
         """Handle rejected order"""
@@ -358,6 +387,78 @@ class TradeExecutionManager:
             self.positions[symbol] = self.positions.get(symbol, 0) + quantity
         else:
             self.positions[symbol] = self.positions.get(symbol, 0) - quantity
+
+    async def close_position(self, symbol: str, reason: str = "MANUAL"):
+        """Close position and record exit analytics"""
+        if symbol in self.positions and abs(self.positions[symbol]) > 0:
+            side = "SELL" if self.positions[symbol] > 0 else "BUY"
+            qty = abs(self.positions[symbol])
+            
+            # Find active trade_id
+            active_trade_id = next((tid for tid, feat in self.active_trade_features.items() 
+                                  if self.orders[tid].symbol == symbol), None)
+            
+            order_id = await self.place_order(symbol, side, qty)
+            
+            if order_id and active_trade_id:
+                features = self.active_trade_features[active_trade_id]
+                entry_time = datetime.fromisoformat(features['entry_time'])
+                exit_time = datetime.now()
+                duration = int((exit_time - entry_time).total_seconds())
+                
+                analysis = {
+                    'trade_id': active_trade_id,
+                    'exit_reason': reason,
+                    'time_in_trade': duration,
+                    'mfe': features.get('mfe', 0.0),
+                    'mae': features.get('mae', 0.0)
+                }
+                
+                # Update features for final save
+                features['exit_time'] = exit_time.isoformat()
+                features['exit_price'] = self.orders[order_id].average_price
+                features['pnl'] = features['mfe'] # Placeholder for actual PnL calculation
+                features['win_loss'] = 'WIN' if features['pnl'] > 0 else 'LOSS'
+                
+                # Update performance in Postgres
+                self.db.save_trade_performance({
+                    'trade_id': active_trade_id,
+                    'exit_time': features['exit_time'],
+                    'exit_price': features['exit_price'],
+                    'pnl': features['pnl'],
+                    'exit_reason': reason,
+                    'mfe': features['mfe'],
+                    'mae': features['mae']
+                })
+                
+                # Cleanup active tracking
+                del self.active_trade_features[active_trade_id]
+
+    async def update_mfe_mae(self, symbol: str, current_price: float):
+        """Update MFE and MAE for all active trades of this symbol"""
+        for order_id, features in self.active_trade_features.items():
+            order = self.orders.get(order_id)
+            if order and order.symbol == symbol and order.status == OrderStatus.FILLED:
+                entry = features['entry_price']
+                side = order.side # BUY or SELL
+                
+                if side == "BUY":
+                    favorable = current_price - entry
+                    adverse = current_price - entry
+                    features['mfe'] = max(features.get('mfe', 0), favorable)
+                    features['mae'] = min(features.get('mae', 0), adverse)
+                else: # SELL
+                    favorable = entry - current_price
+                    adverse = entry - current_price
+                    features['mfe'] = max(features.get('mfe', 0), favorable)
+                    features['mae'] = min(features.get('mae', 0), adverse)
+                
+                # Persist updates periodically
+                self.db.save_trade_performance({
+                    'trade_id': order_id,
+                    'mfe': features['mfe'],
+                    'mae': features['mae']
+                })
     
     async def reconcile_positions(self):
         """Reconcile positions with broker"""

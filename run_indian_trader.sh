@@ -1,5 +1,4 @@
 #!/bin/bash
 # Run Indian Trader with proper Python path
-export PYTHONPATH=/Users/kashishbagga/Desktop/Bot
-cd /Users/kashishbagga/Desktop/Bot
+export PYTHONPATH=$(pwd)
 python3 src/trading/indian_trader.py "$@"

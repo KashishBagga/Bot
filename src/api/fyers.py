@@ -222,15 +222,21 @@ class FyersClient:
             
             # Map interval to Fyers format
             interval_map = {
+                "1": "1",
                 "1m": "1",
+                "5": "5",
                 "5m": "5", 
+                "15": "15",
                 "15m": "15",
+                "30": "30",
                 "30m": "30",
+                "60": "60",
                 "1h": "60",
+                "D": "D",
                 "1d": "D"
             }
             
-            fyers_interval = interval_map.get(interval, "60")
+            fyers_interval = interval_map.get(interval, interval)
             
             # Make API call
             data = {

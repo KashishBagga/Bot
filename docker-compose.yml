@@ -1,0 +1,23 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: trading_db
+    environment:
+      - POSTGRES_DB=trading_warehouse
+      - POSTGRES_USER=trader
+      - POSTGRES_PASSWORD=trading_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_trading
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@trading.bot
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    restart: always
