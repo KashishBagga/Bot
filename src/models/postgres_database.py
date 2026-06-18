@@ -226,7 +226,50 @@ class PostgresDatabase:
                     cursor.execute("ALTER TABLE signal_audit ADD COLUMN IF NOT EXISTS take_profit REAL")
                     cursor.execute("ALTER TABLE signal_audit ADD COLUMN IF NOT EXISTS rr_ratio REAL")
 
+                    # ── Experiment Framework Migrations (v1) ────────────────────────────
+                    # Add experiment_name, strategy_id, version to all research tables.
+                    # Existing rows default to the production experiment name.
+                    _EXP_DEFAULT = 'Structural_v3.2_RVOL1.0'
+                    _SID_DEFAULT = 'structural'
+                    _VER_DEFAULT = 'v3.2'
+
+                    for table in ('signal_audit', 'signals', 'trade_performance',
+                                  'trade_events', 'counterfactual_results',
+                                  'counterfactual_trade_events'):
+                        cursor.execute(
+                            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS "
+                            f"experiment_name TEXT DEFAULT '{_EXP_DEFAULT}'"
+                        )
+
+                    for table in ('signal_audit', 'signals', 'trade_performance',
+                                  'counterfactual_results'):
+                        cursor.execute(
+                            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS "
+                            f"strategy_id TEXT DEFAULT '{_SID_DEFAULT}'"
+                        )
+                        cursor.execute(
+                            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS "
+                            f"version TEXT DEFAULT '{_VER_DEFAULT}'"
+                        )
+
+                    # Experiment metadata table (one row per registered Experiment)
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS experiments (
+                            name        TEXT PRIMARY KEY,
+                            strategy_id TEXT NOT NULL,
+                            version     TEXT NOT NULL,
+                            config_hash TEXT NOT NULL,
+                            git_commit  TEXT,
+                            params      JSONB,
+                            description TEXT,
+                            created_at  TIMESTAMPTZ DEFAULT NOW(),
+                            status      TEXT DEFAULT 'active',
+                            notes       TEXT
+                        )
+                    ''')
+
                 conn.commit()
+
                 logger.info("✅ PostgreSQL tables and migrations checked/initialized")
                 
                 # Convert to hypertables and create indexes
@@ -575,3 +618,31 @@ class PostgresDatabase:
                 logger.info("✨ Research Marts refreshed")
         except Exception as e:
             logger.error(f"❌ Failed to refresh Research Marts: {e}")
+
+    def save_experiment(self, exp_dict: Dict[str, Any]) -> None:
+        """
+        Upsert an experiment record into the experiments metadata table.
+        Call this when registering an Experiment with ExperimentRegistry.
+        exp_dict should come from Experiment.to_db_dict().
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO experiments
+                            (name, strategy_id, version, config_hash, git_commit,
+                             params, description, created_at, status, notes)
+                        VALUES
+                            (%(name)s, %(strategy_id)s, %(version)s, %(config_hash)s,
+                             %(git_commit)s, %(params)s, %(description)s,
+                             %(created_at)s, %(status)s, %(notes)s)
+                        ON CONFLICT (name) DO UPDATE SET
+                            status      = EXCLUDED.status,
+                            notes       = EXCLUDED.notes,
+                            git_commit  = EXCLUDED.git_commit
+                    """, exp_dict)
+                conn.commit()
+                logger.info(f"📋 Experiment saved: {exp_dict.get('name')} "
+                            f"[hash={exp_dict.get('config_hash')} git={exp_dict.get('git_commit')}]")
+        except Exception as e:
+            logger.error(f"❌ Failed to save experiment: {e}")

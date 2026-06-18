@@ -2,11 +2,12 @@
 """
 Institutional Structural Trader (Live Paper Mode)
 =================================================
-Version: 3.1 (Code Freeze)
-- Uses Fractal Structural Bias (Daily HH/HL)
-- Uses ToD Normalized RVOL
-- Uses Structural Invalidation Stops
-- Logs all "False Negatives" for regime analysis
+Version: 4.0 (Strategy Research Framework)
+- Multi-experiment framework: ExperimentRegistry + IndicatorPipeline
+- Single market snapshot per symbol per candle
+- Per-experiment independent positions: (symbol, experiment_name)
+- Portfolio analytics per experiment (passive observer)
+- EnhancedStrategyEngine preserved unchanged inside StructuralStrategy
 """
 
 import os
@@ -16,15 +17,21 @@ import logging
 import schedule
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 # Path Injection
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 sys.path.insert(0, project_root)
 
 from src.adapters.data.fyers_data_provider import FyersDataProvider
-from src.core.enhanced_strategy_engine import EnhancedStrategyEngine
 from src.models.postgres_database import PostgresDatabase
+
+# Strategy Research Framework
+from src.core.indicator_pipeline import IndicatorPipeline
+from src.core.experiment import Experiment
+from src.core.experiment_registry import ExperimentRegistry
+from src.core.portfolio import PortfolioManager
+from src.strategies.structural_strategy import StructuralStrategy
 
 # Setup Logging
 os.makedirs("logs", exist_ok=True)
@@ -68,24 +75,46 @@ class StructuralPaperTrader:
         self.symbols = symbols
         self.data_provider = FyersDataProvider()
         self.db = PostgresDatabase()
-        # Initialize with Optimized Parameters
-        self.engine = EnhancedStrategyEngine(
-            symbols, 
-            min_zone_score=50.0, 
-            rvol_threshold=1.0
-        )
         self.tz = ZoneInfo("Asia/Kolkata")
-        self.active_trades = {}
-        self.active_counterfactuals = {}
+
+        # ── Strategy Research Framework ──────────────────────────────────
+        self.pipeline = IndicatorPipeline(
+            pivot_window=3,
+            zone_cluster_pct=0.002,
+            min_zone_score=50.0,
+        )
+
+        self.registry = ExperimentRegistry()
+        _structural_exp = Experiment(
+            name="Structural_v3.2_RVOL1.0",
+            strategy=StructuralStrategy(rvol_threshold=1.0, min_zone_score=50.0),
+            params={"rvol_threshold": 1.0, "min_zone_score": 50.0},
+            description="Production structural strategy — RVOL threshold 1.0x"
+        )
+        self.registry.register(_structural_exp)
+        self.db.save_experiment(_structural_exp.to_db_dict())
+
+        self.portfolios = PortfolioManager()
+        self.portfolios.register("Structural_v3.2_RVOL1.0")
+
+        # active_trades keyed by (symbol, experiment_name) — independent per experiment
+        self.active_trades: Dict[Tuple[str, str], Dict] = {}
+        # active_counterfactuals keyed by candidate_id (multiple per symbol, unchanged)
+        self.active_counterfactuals: Dict[str, Dict] = {}
         
         # Load open real positions from DB on startup
         open_reals = self.db.get_open_positions()
         for op in open_reals:
             symbol = op['symbol']
-            self.active_trades[symbol] = {
+            experiment_name = op.get('experiment_name', 'Structural_v3.2_RVOL1.0')
+            key = (symbol, experiment_name)
+            self.active_trades[key] = {
                 'trade_id': op['trade_id'],
                 'candidate_id': op['candidate_id'],
                 'symbol': symbol,
+                'experiment_name': experiment_name,
+                'strategy_id': op.get('strategy_id', 'structural'),
+                'version': op.get('version', 'v3.2'),
                 'signal': op['signal_type'],
                 'entry_price': op['entry_price'],
                 'entry_time': op['entry_time'],
@@ -105,7 +134,6 @@ class StructuralPaperTrader:
                 'market_regime': op.get('market_regime', 'UNKNOWN'),
                 'is_counterfactual': False
             }
-            # Log POSITION_RECOVERED event to database
             evt = {
                 'event_id': f"evt_{int(datetime.now().timestamp())}_{symbol}_recovered",
                 'trade_id': op['trade_id'],
@@ -118,7 +146,8 @@ class StructuralPaperTrader:
                     'take_profit': op['take_profit'],
                     'highest_price': op['highest_price'],
                     'lowest_price': op['lowest_price'],
-                    'max_closed_profit_r': op.get('max_closed_profit_r', 0.0) or 0.0
+                    'max_closed_profit_r': op.get('max_closed_profit_r', 0.0) or 0.0,
+                    'experiment_name': experiment_name
                 }
             }
             self.db.save_trade_event(evt)
@@ -181,72 +210,91 @@ class StructuralPaperTrader:
             return
 
         logger.info(f"--- {now.strftime('%H:%M:%S')} Market Pulse ---")
-        
+
         try:
-            # 1. Fetch Multi-Timeframe Data
-            mtf_data = {}
-            current_prices = {}
-            
+            # 1. Fetch Multi-Timeframe Data (once per symbol)
             end_date = datetime.now(self.tz)
             start_date_d1 = end_date - timedelta(days=40)
             start_date_h1 = end_date - timedelta(days=10)
             start_date_m5 = end_date - timedelta(days=5)
-            
+
+            current_prices = {}
+            fetched = {}  # symbol -> (d1, h1, m5)
+
             for symbol in self.symbols:
-                # Fetch data using explicit date ranges
                 d1 = self.data_provider.get_historical_data(symbol, start_date_d1, end_date, "1D")
                 h1 = self.data_provider.get_historical_data(symbol, start_date_h1, end_date, "60")
                 m5 = self.data_provider.get_historical_data(symbol, start_date_m5, end_date, "5")
-                
                 if d1 is not None and h1 is not None and m5 is not None:
-                    mtf_data[symbol] = {'1d': d1, '1h': h1, '5m': m5}
-                    current_prices[symbol] = m5['close'].iloc[-1]
+                    fetched[symbol] = (d1, h1, m5)
+                    current_prices[symbol] = float(m5['close'].iloc[-1])
                 else:
                     logger.warning(f"⚠️ Could not fetch complete MTF data for {symbol}")
 
             # 2. Update Active Trades & Counterfactuals
             self._update_active_trades(current_prices, now)
 
-            # 3. Generate Structural Signals only for symbols without active REAL trades
-            active_symbols = set(self.active_trades.keys())
-            filtered_mtf_data = {sym: data for sym, data in mtf_data.items() if sym not in active_symbols}
-            filtered_current_prices = {sym: price for sym, price in current_prices.items() if sym not in active_symbols}
-            
-            signals = self.engine.generate_signals_for_all_symbols(filtered_mtf_data, filtered_current_prices)
+            # 3. Compute snapshot + run experiments per symbol
+            total_signals = 0
+            for symbol, (d1, h1, m5) in fetched.items():
+                price = current_prices[symbol]
 
-            # 4. Handle Signals & Diagnostic Logging
-            if not signals:
+                snapshot = self.pipeline.compute(symbol, price, d1, h1, m5, now)
+                if snapshot is None:
+                    logger.warning(f"⚠️ Pipeline returned None for {symbol}")
+                    continue
+
+                results = self.registry.run(snapshot)
+
+                for result in results:
+                    if result.errors:
+                        logger.warning(f"⚡ [{result.experiment_name}] errors: {result.errors}")
+                    if result.warnings:
+                        logger.info(f"⚡ [{result.experiment_name}] warnings: {result.warnings}")
+
+                    for sig in result.signals:
+                        experiment_name = sig.get('experiment_name', result.experiment_name)
+                        trade_key = (symbol, experiment_name)
+                        total_signals += 1
+
+                        if sig['accepted']:
+                            # One real trade per (symbol, experiment_name)
+                            if trade_key in self.active_trades:
+                                logger.debug(f"↩️  [{experiment_name}] Already have open position on {symbol}, skipping.")
+                                continue
+                            logger.info(f"🚀 SIGNAL: {symbol} {sig['signal']} | [{experiment_name}]")
+                            logger.info(f"   Entry: {sig['price']} | SL: {sig['stop_loss']} | TP: {sig['take_profit']} (RR: {sig['rr_ratio']})")
+                            self._enter_position(sig, now, trade_key, is_counterfactual=False)
+                            self.portfolios.on_entry(experiment_name, now)
+                        else:
+                            MAX_ACTIVE_COUNTERFACTUALS = 500
+                            if len(self.active_counterfactuals) >= MAX_ACTIVE_COUNTERFACTUALS:
+                                logger.warning(f"⚠️ CF safety limit reached, skipping {symbol}")
+                                continue
+                            logger.info(f"👻 CF: {symbol} {sig['signal']} | [{experiment_name}] | {sig['rejection_reasons']}")
+                            self._enter_position(sig, now, trade_key, is_counterfactual=True)
+
+            if total_signals == 0:
                 logger.info("🧘 Status: Sidelined (No Institutional Alignment)")
-            
-            for sig in signals:
-                if sig['accepted']:
-                    logger.info(f"🚀 SIGNAL DETECTED: {sig['symbol']} {sig['signal']} | {sig['strategy']}")
-                    logger.info(f"   Entry: {sig['price']} | SL: {sig['stop_loss']} | TP: {sig['take_profit']} (RR: {sig['rr_ratio']})")
-                    self._enter_position(sig, now, is_counterfactual=False)
-                else:
-                    # Guard against runaway shadow trades using safety limit
-                    MAX_ACTIVE_COUNTERFACTUALS = 500
-                    if len(self.active_counterfactuals) >= MAX_ACTIVE_COUNTERFACTUALS:
-                        logger.warning(f"⚠️ Safety limit of {MAX_ACTIVE_COUNTERFACTUALS} active counterfactuals reached! Skipping shadow entry for {sig['symbol']}.")
-                        continue
-                    logger.info(f"👻 COUNTERFACTUAL SETUP DETECTED: {sig['symbol']} {sig['signal']} | Setup: {sig['strategy']} | Rejection: {sig['rejection_reasons']}")
-                    self._enter_position(sig, now, is_counterfactual=True)
 
         except Exception as e:
-            logger.error(f"❌ Error in market loop: {e}")
+            logger.error(f"❌ Error in market loop: {e}", exc_info=True)
 
     def _update_active_trades(self, current_prices: Dict[str, float], timestamp):
         """Evaluate open positions against latest market prices."""
-        # Update real trades
-        for symbol in list(self.active_trades.keys()):
+        # Update real trades — keyed by (symbol, experiment_name)
+        for key in list(self.active_trades.keys()):
+            symbol, experiment_name = key
             if symbol not in current_prices:
                 continue
-            pos = self.active_trades[symbol]
+            pos = self.active_trades[key]
             is_closed = self._update_position(pos, current_prices[symbol], timestamp)
             if is_closed:
-                self.active_trades.pop(symbol)
+                pnl_r = pos.get('_last_pnl_r', 0.0)
+                self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
+                self.active_trades.pop(key)
 
-        # Update counterfactual trades
+        # Update counterfactual trades — keyed by candidate_id (unchanged)
         for cand_id in list(self.active_counterfactuals.keys()):
             pos = self.active_counterfactuals[cand_id]
             symbol = pos['symbol']
@@ -340,18 +388,24 @@ class StructuralPaperTrader:
 
         return False
 
-    def _enter_position(self, sig: Dict, timestamp, is_counterfactual: bool):
+    def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool):
         symbol = sig['symbol']
+        experiment_name = sig.get('experiment_name', 'Structural_v3.2_RVOL1.0')
+        strategy_id = sig.get('strategy_id', 'structural')
+        version = sig.get('version', 'v3.2')
         entry_price = sig['price']
         sl_price = sig['stop_loss']
         tp_price = sig['take_profit']
         candidate_id = sig.get('candidate_id')
-        trade_id = f"trade_{symbol}_{int(timestamp.timestamp())}"
-        
+        trade_id = f"trade_{symbol.replace(':', '_').replace('-', '_')}_{int(timestamp.timestamp())}"
+
         pos = {
             'trade_id': trade_id if not is_counterfactual else None,
             'candidate_id': candidate_id,
             'symbol': symbol,
+            'experiment_name': experiment_name,
+            'strategy_id': strategy_id,
+            'version': version,
             'signal': sig['signal'],
             'entry_price': entry_price,
             'entry_time': timestamp,
@@ -367,10 +421,11 @@ class StructuralPaperTrader:
             'bars_held': 0,
             'max_closed_profit_r': 0.0,
             'setup_type': sig.get('strategy'),
-            'strategy_version': sig.get('strategy_version', 'v3.2'),
+            'strategy_version': version,
             'market_regime': sig.get('features', {}).get('market_regime', 'UNKNOWN'),
             'is_counterfactual': is_counterfactual,
-            'rejection_reasons': sig.get('rejection_reasons', [])
+            'rejection_reasons': sig.get('rejection_reasons', []),
+            '_last_pnl_r': 0.0,  # Set by _exit_position for portfolio tracking
         }
         
         if is_counterfactual:
@@ -417,8 +472,11 @@ class StructuralPaperTrader:
                 'duration_minutes': 0.0,
                 'bars_held': 0,
                 'exit_reason': 'OPEN',
-                'strategy_version': sig.get('strategy_version', 'v3.2'),
-                'capture_rate': 0.0
+                'strategy_version': version,
+                'capture_rate': 0.0,
+                'experiment_name': experiment_name,
+                'strategy_id': strategy_id,
+                'version': version,
             }
             self.db.save_counterfactual_result(result)
         else:
@@ -481,7 +539,7 @@ class StructuralPaperTrader:
                 'duration_minutes': 0.0,
                 'bars_held': 0,
                 'market_regime': pos['market_regime'],
-                'signal_logic_version': pos['strategy_version'],
+                'signal_logic_version': version,
                 'position_logic_version': 'v3.1',
                 'risk_logic_version': 'v1.1',
                 'stop_loss': sl_price,
@@ -492,7 +550,10 @@ class StructuralPaperTrader:
                 'lowest_price': entry_price,
                 'stop_loss_distance': abs(entry_price - sl_price) if sl_price else 0.0,
                 'signal_type': sig['signal'],
-                'capture_rate': 0.0
+                'capture_rate': 0.0,
+                'experiment_name': experiment_name,
+                'strategy_id': strategy_id,
+                'version': version,
             }
             self.db.save_trade_performance(perf)
             
@@ -679,6 +740,9 @@ class StructuralPaperTrader:
         capture_rate = 0.0
         if mfe_r > 0.0:
             capture_rate = round(pnl_r / mfe_r, 4)
+
+        # Store pnl_r on pos so _update_active_trades can pass it to PortfolioManager
+        pos['_last_pnl_r'] = pnl_r
 
         if not is_cf:
             # Log to CSV

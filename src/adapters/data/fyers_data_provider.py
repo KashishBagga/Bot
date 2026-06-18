@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
-Fyers Data Provider implementation.
-Connects the Market Interface to the Fyers API.
+Fyers Data Provider — concrete implementation of BaseDataProvider.
+==================================================================
+Connects the IndicatorPipeline to the Fyers API.
+Also satisfies the legacy DataProviderInterface for backwards compatibility.
 """
 
 import pandas as pd
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
+from src.adapters.data.base_data_provider import BaseDataProvider
 from src.adapters.market_interface import DataProviderInterface, Contract
 from src.api.fyers import FyersClient
 
 logger = logging.getLogger(__name__)
 
-class FyersDataProvider(DataProviderInterface):
+class FyersDataProvider(BaseDataProvider, DataProviderInterface):
     """Bridge between Market Interface and Fyers API."""
     
     def __init__(self):

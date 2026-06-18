@@ -1,0 +1,156 @@
+2026-06-14 20:20:20,165 - WARNING - ⚠️ No access token found in environment
+2026-06-14 20:20:20,165 - WARNING - No access token available for initialization
+2026-06-14 20:20:20,183 - ERROR - ❌ Postgres Init Failed: current transaction is aborted, commands ignored until end of transaction block
+
+2026-06-14 20:20:20,183 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-14 20:20:20,183 - INFO - 🏛️ Structural Paper Trader Initialized | Architecture Frozen
+2026-06-14 20:20:20,183 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-14 20:38:48,722 - INFO - 🔑 Access token loaded from environment
+2026-06-14 20:38:48,917 - INFO - ✅ Fyers client initialized successfully
+2026-06-14 20:38:48,937 - INFO - ✅ PostgreSQL tables initialized
+2026-06-14 20:38:48,944 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-14 20:38:48,945 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-14 20:38:48,945 - INFO - 🏛️ Structural Paper Trader Initialized | Architecture Frozen
+2026-06-14 20:38:48,945 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-14 21:12:55,431 - INFO - 🔑 Access token loaded from environment
+2026-06-14 21:12:55,565 - INFO - ✅ Fyers client initialized successfully
+2026-06-14 21:12:55,628 - INFO - ✅ PostgreSQL tables initialized
+2026-06-14 21:12:55,631 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-14 21:12:55,646 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-14 21:12:55,646 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-14 21:12:55,646 - INFO - 🏛️ Structural Paper Trader Initialized | Architecture Frozen
+2026-06-14 21:12:55,646 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-14 21:13:29,010 - INFO - 🔑 Access token loaded from environment
+2026-06-14 21:13:29,116 - INFO - ✅ Fyers client initialized successfully
+2026-06-14 21:13:29,164 - INFO - ✅ PostgreSQL tables initialized
+2026-06-14 21:13:29,166 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-14 21:13:29,181 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-14 21:13:29,181 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-14 21:13:29,181 - INFO - 🏛️ Structural Paper Trader Initialized | Architecture Frozen
+2026-06-14 21:13:29,181 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-15 09:21:07,162 - INFO - 🔑 Access token loaded from environment
+2026-06-15 09:21:07,327 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-15 09:21:07,373 - INFO - ✅ PostgreSQL tables initialized
+2026-06-15 09:21:07,375 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-15 09:21:07,393 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-15 09:21:07,393 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-15 09:21:07,393 - INFO - 🏛️ Structural Paper Trader Initialized | Architecture Frozen
+2026-06-15 09:21:07,393 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-15 09:21:07,543 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-15 09:21:07,787 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-15 09:21:07,868 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-15 09:21:07,868 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-15 09:21:07,951 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-15 09:21:08,258 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-15 09:21:08,359 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-15 09:21:08,359 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-15 09:23:03,649 - INFO - 🔑 Access token loaded from environment
+2026-06-15 09:23:03,761 - INFO - ✅ Fyers client initialized successfully
+2026-06-15 09:23:03,812 - INFO - ✅ PostgreSQL tables initialized
+2026-06-15 09:23:03,815 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-15 09:23:03,831 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-15 09:23:03,831 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-15 09:23:03,831 - INFO - 🏛️ Structural Paper Trader Initialized | Architecture Frozen
+2026-06-15 09:23:03,831 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-15 14:34:45,100 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,106 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,109 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,113 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,116 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,120 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,120 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-15 14:34:45,123 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,126 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,129 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,131 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,134 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,136 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-06-15 14:34:45,136 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-16 08:12:08,384 - INFO - 🔑 Access token loaded from environment
+2026-06-16 08:12:08,489 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 08:12:08,529 - INFO - ✅ PostgreSQL tables initialized
+2026-06-16 08:12:08,531 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-16 08:12:08,543 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:12:08,555 - INFO - ✅ PostgreSQL tables initialized
+2026-06-16 08:12:08,557 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-16 08:12:08,568 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:12:08,568 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 08:12:08,568 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-16 08:12:08,568 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-16 08:12:44,771 - INFO - 🔑 Access token loaded from environment
+2026-06-16 08:12:44,912 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 08:12:44,949 - INFO - ✅ PostgreSQL tables initialized
+2026-06-16 08:12:44,952 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-16 08:12:44,968 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:12:44,983 - INFO - ✅ PostgreSQL tables initialized
+2026-06-16 08:12:44,985 - INFO - ✅ Option snapshots converted to hypertable
+2026-06-16 08:12:44,998 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:12:44,998 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 08:12:44,998 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-16 08:40:49,034 - INFO - 🔑 Access token loaded from environment
+2026-06-16 08:40:49,146 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 08:40:49,251 - INFO - ✅ PostgreSQL tables recreated and initialized
+2026-06-16 08:40:49,286 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 08:40:49,306 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:40:49,367 - INFO - ✅ PostgreSQL tables recreated and initialized
+2026-06-16 08:40:49,383 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 08:40:49,404 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:40:49,404 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 08:40:49,404 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-16 08:41:01,338 - INFO - 🔑 Access token loaded from environment
+2026-06-16 08:41:01,517 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 08:41:01,603 - INFO - ✅ PostgreSQL tables recreated and initialized
+2026-06-16 08:41:01,623 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 08:41:01,643 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:41:01,685 - INFO - ✅ PostgreSQL tables recreated and initialized
+2026-06-16 08:41:01,703 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 08:41:01,722 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 08:41:01,722 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 08:41:01,722 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-16 08:41:01,768 - INFO - 🟢 ENTRY: Logged trade for NSE:NIFTY50-INDEX at 23500.00 (SL: 23450.00, TP: 23600.00)
+2026-06-16 08:41:01,791 - INFO - 🟡 UPDATE (TRAILING_SL): NSE:NIFTY50-INDEX price 23550.00 | New SL: 23450.00, TP: 23600.00
+2026-06-16 08:41:01,811 - INFO - 🔴 EXIT (TARGET_ZONE): Closed trade for NSE:NIFTY50-INDEX at 23600.00 with PnL 2.00R
+2026-06-16 09:04:51,388 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:04:51,400 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:04:51,450 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:04:51,520 - INFO - 🔑 Access token loaded from environment
+2026-06-16 09:04:51,716 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 09:04:51,748 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:04:51,760 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:04:51,799 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:04:51,816 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:04:51,825 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:04:51,851 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:04:51,851 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 09:04:51,888 - INFO - 🔄 Recovered 1 active real positions: ['NSE:NIFTY50-INDEX']
+2026-06-16 09:04:51,928 - INFO - 🔄 Recovered 1 active counterfactual positions: ['cand_banknifty_test_cf']
+2026-06-16 09:04:51,929 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-16 09:04:51,966 - INFO - 🔴 EXIT (TRAILING_SL) : Closed trade for NSE:NIFTY50-INDEX at 21900.00 with PnL -0.55R
+2026-06-16 09:04:51,994 - INFO - 🔴 EXIT (INITIAL_SL) [CF]: Closed trade for NSE:NIFTYBANK-INDEX at 48200.00 with PnL -1.05R
+2026-06-16 09:06:03,888 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:06:03,900 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:06:03,936 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:06:03,975 - INFO - 🔑 Access token loaded from environment
+2026-06-16 09:06:04,230 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 09:06:04,270 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:06:04,282 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:06:04,318 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:06:04,334 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:06:04,344 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:06:04,372 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:06:04,372 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 09:06:04,399 - INFO - 🔄 Recovered 1 active real positions: ['NSE:NIFTY50-INDEX']
+2026-06-16 09:06:04,422 - INFO - 🔄 Recovered 1 active counterfactual positions: ['cand_banknifty_test_cf']
+2026-06-16 09:06:04,422 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-16 09:06:04,458 - INFO - 🔴 EXIT (TRAILING_SL) : Closed trade for NSE:NIFTY50-INDEX at 21900.00 with PnL -0.55R
+2026-06-16 09:06:04,480 - INFO - 🔴 EXIT (INITIAL_SL) [CF]: Closed trade for NSE:NIFTYBANK-INDEX at 48200.00 with PnL -1.05R
+2026-06-16 09:06:49,116 - INFO - 🔑 Access token loaded from environment
+2026-06-16 09:06:49,237 - INFO - ✅ Fyers client initialized successfully
+2026-06-16 09:06:49,292 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:06:49,302 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:06:49,336 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:06:49,353 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-16 09:06:49,361 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-16 09:06:49,386 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-16 09:06:49,387 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-16 09:06:49,411 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
