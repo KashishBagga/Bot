@@ -28,7 +28,7 @@ import hashlib
 import json
 import subprocess
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Dict, Any, Optional
 
@@ -114,16 +114,17 @@ class Experiment:
     def to_db_dict(self) -> Dict[str, Any]:
         """Serialise to a dict for insertion into the experiments table."""
         return {
-            "name":        self.name,
-            "strategy_id": self.strategy.id,
-            "version":     self.strategy.version,
-            "config_hash": self.config_hash,
-            "git_commit":  self.git_commit,
-            "params":      json.dumps(self.params, default=str),
-            "description": self.description,
-            "created_at":  self.created_at,
-            "status":      self.status,
-            "notes":       self.notes,
+            "name":              self.name,
+            "strategy_id":       self.strategy.id,
+            "version":           self.strategy.version,
+            "config_hash":       self.config_hash,
+            "git_commit":        self.git_commit,
+            "params":            json.dumps(self.params, default=str),
+            "description":       self.description,
+            "created_at":        self.created_at,
+            "status":            self.status,
+            "notes":             self.notes,
+            "strategy_metadata": json.dumps(asdict(self.strategy.metadata), default=str) if hasattr(self.strategy, 'metadata') and self.strategy.metadata else None,
         }
 
     def __repr__(self) -> str:

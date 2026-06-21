@@ -22,7 +22,7 @@ Regression guarantee:
 import logging
 from typing import List
 
-from src.core.base_strategy import BaseStrategy, StrategyResult
+from src.core.base_strategy import BaseStrategy, StrategyResult, StrategyMetadata
 from src.core.market_snapshot import MarketSnapshot
 from src.core.enhanced_strategy_engine import EnhancedStrategyEngine
 
@@ -38,9 +38,16 @@ class StructuralStrategy(BaseStrategy):
     the BaseStrategy interface. Zero logic changes.
     """
 
-    id = "structural"
-    name = "Structural Breakout"
-    version = "v3.2"
+    metadata = StrategyMetadata(
+        id="structural",
+        name="Structural Breakout",
+        hypothesis_id="institutional_structure",
+        hypothesis_family="Structural",
+        hypothesis_text="Trades sweeps, breakouts, and traps aligned with macro structure.",
+        version="v3.2",
+        maturity="LIVE",
+        tags=["structure", "sweep", "breakout", "trap"]
+    )
 
     def __init__(
         self,
@@ -107,6 +114,9 @@ class StructuralStrategy(BaseStrategy):
             sig["experiment_name"] = experiment_name
             sig["strategy_id"] = self.id
             sig["version"] = self.version
+            if "features" not in sig or sig["features"] is None:
+                sig["features"] = {}
+            sig["features"].update(snapshot.features.to_dict())
 
         # Diagnostic snapshot for logging / debugging
         diagnostics = {

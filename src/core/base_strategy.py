@@ -24,9 +24,28 @@ Design rules:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple, Optional
 
 from src.core.market_snapshot import MarketSnapshot
+
+
+@dataclass(frozen=True)
+class StrategyMetadata:
+    id: str
+    name: str
+    hypothesis_id: str
+    hypothesis_family: str
+    hypothesis_text: str
+    version: str
+    author: str = "Kashish"
+    expected_holding: Tuple[int, int] = (5, 15)
+    preferred_regimes: List[str] = field(default_factory=list)
+    preferred_sessions: List[str] = field(default_factory=list)
+    risk_profile: str = "medium"
+    tags: List[str] = field(default_factory=list)
+    deprecated: bool = False
+    maturity: str = "RESEARCH"  # RESEARCH, PAPER, SHADOW_LIVE, LIVE, RETIRED
+    extras: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -83,22 +102,30 @@ class BaseStrategy:
     Abstract base class for all strategies.
 
     Every strategy must implement:
-        id      — stable, never-changing DB key (e.g. "structural", "ema_crossover")
-        name    — human-readable display label (can change)
-        version — algorithm version (e.g. "v3.2")
+        metadata — StrategyMetadata object
         evaluate(snapshot, experiment_name) -> StrategyResult
-
-    Rules for evaluate():
-        - NEVER raise. Catch all exceptions, put them in result.errors.
-        - Return a StrategyResult with empty signals if evaluation fails.
-        - Tag every signal dict with experiment_name, strategy_id, version.
-        - Signals must be fully resolved (entry, sl, tp, rr_ratio, accepted,
-          rejection_reasons, candidate_id).
     """
 
-    id: str = "base"
-    name: str = "Base Strategy"
-    version: str = "v0.0"
+    metadata: StrategyMetadata = StrategyMetadata(
+        id="base",
+        name="Base Strategy",
+        hypothesis_id="base_hypothesis",
+        hypothesis_family="Base",
+        hypothesis_text="Base strategy class",
+        version="v0.0"
+    )
+
+    @property
+    def id(self) -> str:
+        return self.metadata.id
+
+    @property
+    def name(self) -> str:
+        return self.metadata.name
+
+    @property
+    def version(self) -> str:
+        return self.metadata.version
 
     def evaluate(
         self,
@@ -107,6 +134,27 @@ class BaseStrategy:
     ) -> StrategyResult:
         raise NotImplementedError(
             f"{self.__class__.__name__} must implement evaluate()"
+        )
+
+    def thesis_key(self, signal: dict) -> tuple:
+        """
+        Define the deduplication key for a rejected signal (CF deduplication).
+        The trader prepends experiment_name, so this should return the
+        strategy-specific dimensions only.
+
+        One active CF per thesis_key — subsequent candles with the same thesis
+        are skipped until the existing CF exits (SL/TP/SESSION_END).
+
+        Default: (symbol, setup_type, direction)
+        Override per strategy to match the actual uniqueness of a thesis:
+          - StructuralStrategy: (symbol, setup_type, direction)  — same breakout direction
+          - EMAStrategy:        (symbol, direction)               — one per crossover direction
+          - Custom strategy:    (symbol, swing_high_timestamp)    — per structural level
+        """
+        return (
+            signal.get('symbol', ''),
+            signal.get('strategy', ''),  # setup_type key in signal dict
+            signal.get('signal', ''),    # 'BUY CALL' or 'BUY PUT'
         )
 
     def _empty_result(

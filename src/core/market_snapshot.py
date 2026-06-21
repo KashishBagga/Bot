@@ -58,6 +58,7 @@ class MarketSnapshot:
     # Strategies access via snapshot.features.get_float("atr") etc.
     # New indicators: add to IndicatorPipeline._stage_features(), nothing else.
     features: FeatureStore
+    market: object  # MarketContext object containing MKE structure, trend, etc.
 
     def __repr__(self) -> str:
         return (

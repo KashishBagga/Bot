@@ -277,7 +277,22 @@ class EnhancedStrategyEngine:
 
         if not take_profit:
             setup_rejection_reasons.append("NO_TARGET_ZONE")
-            take_profit = entry  # Fallback
+            # Use a 2R projection as the fallback target instead of entry price.
+            # TP = entry means reward = 0 → the position manager fires TP_EXPANSION
+            # on the very first tick, creating a phantom R-multiple ladder.
+            risk_dist = abs(entry - sl) if sl else atr
+            take_profit = (entry + 2.0 * risk_dist) if side == "BUY CALL" else (entry - 2.0 * risk_dist)
+
+        # Cap TP at 5× ATR from entry.
+        # Stale demand/supply zones from weeks ago can produce TP targets 900–3000 pts
+        # away, making RR > 100x. Those trades will ALWAYS exit via initial SL and
+        # produce meaningless counterfactual data.
+        max_tp_dist = atr * 5.0
+        current_tp_dist = abs(take_profit - entry)
+        if current_tp_dist > max_tp_dist:
+            take_profit = (entry + max_tp_dist) if side == "BUY CALL" else (entry - max_tp_dist)
+            if "NO_TARGET_ZONE" not in setup_rejection_reasons:
+                setup_rejection_reasons.append("TP_CAPPED")
 
         # Check risk and RR
         risk = abs(entry - sl) if sl else 0.0
@@ -289,6 +304,7 @@ class EnhancedStrategyEngine:
             rr_ratio = round(reward / risk, 2)
             if rr_ratio < 1.5:
                 setup_rejection_reasons.append("LOW_RR")
+
 
         # Combine rejections
         final_reasons = primary_rejections + setup_rejection_reasons

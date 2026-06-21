@@ -147,6 +147,9 @@ class PostgresDatabase:
                             stop_loss_distance REAL,
                             signal_type TEXT,
                             capture_rate REAL,
+                            holding_efficiency REAL,
+                            valid BOOLEAN DEFAULT TRUE,
+                            validation_errors TEXT,
                             PRIMARY KEY (trade_id, entry_time)
                         )
                     ''')
@@ -191,6 +194,9 @@ class PostgresDatabase:
                             exit_reason TEXT,
                             strategy_version TEXT,
                             capture_rate REAL DEFAULT 0.0,
+                            holding_efficiency REAL,
+                            valid BOOLEAN DEFAULT TRUE,
+                            validation_errors TEXT,
                             PRIMARY KEY (candidate_id, timestamp)
                         )
                     ''')
@@ -264,7 +270,76 @@ class PostgresDatabase:
                             description TEXT,
                             created_at  TIMESTAMPTZ DEFAULT NOW(),
                             status      TEXT DEFAULT 'active',
-                            notes       TEXT
+                            notes       TEXT,
+                            strategy_metadata JSONB
+                        )
+                    ''')
+
+                    # Research Decisions table
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS research_decisions (
+                            decision_id SERIAL PRIMARY KEY,
+                            timestamp TIMESTAMPTZ DEFAULT NOW(),
+                            author TEXT,
+                            strategy_id TEXT,
+                            experiment_name TEXT,
+                            parameter_name TEXT,
+                            old_value TEXT,
+                            new_value TEXT,
+                            evidence TEXT,
+                            expected_pnl_change REAL,
+                            notes TEXT
+                        )
+                    ''')
+
+                    # confidence and diagnostics columns
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS confidence REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS diagnostics JSONB")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS confidence REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS diagnostics JSONB")
+                    cursor.execute("ALTER TABLE experiments ADD COLUMN IF NOT EXISTS strategy_metadata JSONB")
+
+                    # holding_efficiency = final_pnl_r / bars_held (R per bar)
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS holding_efficiency REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS holding_efficiency REAL")
+
+                    # Data validation columns
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS valid BOOLEAN DEFAULT TRUE")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS validation_errors TEXT")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS valid BOOLEAN DEFAULT TRUE")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS validation_errors TEXT")
+
+                    # Per-experiment daily summary: one row per (date, experiment) written at session end
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS experiment_daily_metrics (
+                            date                DATE        NOT NULL,
+                            experiment_name     TEXT        NOT NULL,
+                            real_trades         INT         DEFAULT 0,
+                            cf_trades           INT         DEFAULT 0,
+                            wins                INT         DEFAULT 0,
+                            losses              INT         DEFAULT 0,
+                            expectancy          REAL,
+                            total_pnl_r         REAL,
+                            avg_capture_rate    REAL,
+                            avg_holding_eff     REAL,
+                            avg_mfe             REAL,
+                            avg_mae             REAL,
+                            max_drawdown        REAL,
+                            config_hash         TEXT
+                        )
+                    ''')
+
+                    # 9. Market Events (Hypertable)
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS market_events (
+                            event_id TEXT NOT NULL,
+                            timestamp TIMESTAMPTZ NOT NULL,
+                            occurrence_timestamp TIMESTAMPTZ NOT NULL,
+                            symbol TEXT NOT NULL,
+                            event_type TEXT NOT NULL,
+                            engine_version TEXT NOT NULL,
+                            payload JSONB NOT NULL,
+                            PRIMARY KEY (event_id, timestamp)
                         )
                     ''')
 
@@ -302,6 +377,10 @@ class PostgresDatabase:
                         cursor.execute("SELECT create_hypertable('counterfactual_trade_events', 'timestamp', if_not_exists => TRUE)")
                     except Exception:
                         pass
+                    try:
+                        cursor.execute("SELECT create_hypertable('market_events', 'timestamp', if_not_exists => TRUE)")
+                    except Exception:
+                        pass
 
                     # Create Database Indexes
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_sig_audit_cand ON signal_audit(candidate_id)")
@@ -321,6 +400,8 @@ class PostgresDatabase:
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_cf_events_cand ON counterfactual_trade_events(candidate_id)")
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_cf_events_sym ON counterfactual_trade_events(symbol)")
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_cf_events_type ON counterfactual_trade_events(event_type)")
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_events_sym ON market_events(symbol)")
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_events_type ON market_events(event_type)")
 
                     # Create Retention Policy on signal_audit (180 days)
                     try:
@@ -463,11 +544,20 @@ class PostgresDatabase:
     def save_trade_performance(self, perf: Dict[str, Any]):
         """Save or update trade performance metadata"""
         try:
+            # Validate trade data before save
+            from src.core.data_quality import validate_trade_data
+            is_valid, errs = validate_trade_data(perf)
+            perf['valid'] = is_valid
+            perf['validation_errors'] = "; ".join(errs) if errs else None
+
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
-                    if 'features' in perf:
-                        perf['features'] = json.dumps(perf['features'], cls=NumpyEncoder)
-                    columns = list(perf.keys())
+                    perf_copy = dict(perf)
+                    if 'features' in perf_copy:
+                        perf_copy['features'] = json.dumps(perf_copy['features'], cls=NumpyEncoder)
+                    if 'diagnostics' in perf_copy:
+                        perf_copy['diagnostics'] = json.dumps(perf_copy['diagnostics'], cls=NumpyEncoder)
+                    columns = list(perf_copy.keys())
                     placeholders = [f"%({col})s" for col in columns]
                     
                     query = f"""
@@ -499,9 +589,14 @@ class PostgresDatabase:
                         lowest_price = EXCLUDED.lowest_price,
                         stop_loss_distance = EXCLUDED.stop_loss_distance,
                         signal_type = EXCLUDED.signal_type,
-                        capture_rate = EXCLUDED.capture_rate
+                        capture_rate = EXCLUDED.capture_rate,
+                        holding_efficiency = EXCLUDED.holding_efficiency,
+                        valid = EXCLUDED.valid,
+                        validation_errors = EXCLUDED.validation_errors,
+                        confidence = EXCLUDED.confidence,
+                        diagnostics = EXCLUDED.diagnostics
                     """
-                    cursor.execute(query, perf)
+                    cursor.execute(query, perf_copy)
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to save trade performance: {e}")
@@ -557,11 +652,20 @@ class PostgresDatabase:
     def save_counterfactual_result(self, result: Dict[str, Any]):
         """Save or update counterfactual research trade result"""
         try:
+            # Validate trade data before save
+            from src.core.data_quality import validate_trade_data
+            is_valid, errs = validate_trade_data(result)
+            result['valid'] = is_valid
+            result['validation_errors'] = "; ".join(errs) if errs else None
+
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
-                    if 'rejection_reasons' in result:
-                        result['rejection_reasons'] = json.dumps(result['rejection_reasons'], cls=NumpyEncoder)
-                    columns = list(result.keys())
+                    result_copy = dict(result)
+                    if 'rejection_reasons' in result_copy:
+                        result_copy['rejection_reasons'] = json.dumps(result_copy['rejection_reasons'], cls=NumpyEncoder)
+                    if 'diagnostics' in result_copy:
+                        result_copy['diagnostics'] = json.dumps(result_copy['diagnostics'], cls=NumpyEncoder)
+                    columns = list(result_copy.keys())
                     placeholders = [f"%({col})s" for col in columns]
                     
                     query = f"""
@@ -580,9 +684,14 @@ class PostgresDatabase:
                         take_profit = EXCLUDED.take_profit,
                         highest_price = EXCLUDED.highest_price,
                         lowest_price = EXCLUDED.lowest_price,
-                        capture_rate = EXCLUDED.capture_rate
+                        capture_rate = EXCLUDED.capture_rate,
+                        holding_efficiency = EXCLUDED.holding_efficiency,
+                        valid = EXCLUDED.valid,
+                        validation_errors = EXCLUDED.validation_errors,
+                        confidence = EXCLUDED.confidence,
+                        diagnostics = EXCLUDED.diagnostics
                     """
-                    cursor.execute(query, result)
+                    cursor.execute(query, result_copy)
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to save counterfactual result: {e}")
@@ -606,6 +715,27 @@ class PostgresDatabase:
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to save counterfactual event: {e}")
+
+    def save_market_event(self, event: Dict[str, Any]):
+        """Save a persistent market context research event (hypertable)"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    event_copy = dict(event)
+                    if 'payload' in event_copy:
+                        event_copy['payload'] = json.dumps(event_copy['payload'], cls=NumpyEncoder)
+                    columns = list(event_copy.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    
+                    query = f"""
+                        INSERT INTO market_events ({','.join(columns)}) 
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (event_id, timestamp) DO NOTHING
+                    """
+                    cursor.execute(query, event_copy)
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Failed to save market event: {e}")
 
     def refresh_research_marts(self):
         """Refresh materialized views for research"""
@@ -631,18 +761,126 @@ class PostgresDatabase:
                     cursor.execute("""
                         INSERT INTO experiments
                             (name, strategy_id, version, config_hash, git_commit,
-                             params, description, created_at, status, notes)
+                             params, description, created_at, status, notes, strategy_metadata)
                         VALUES
                             (%(name)s, %(strategy_id)s, %(version)s, %(config_hash)s,
                              %(git_commit)s, %(params)s, %(description)s,
-                             %(created_at)s, %(status)s, %(notes)s)
+                             %(created_at)s, %(status)s, %(notes)s, %(strategy_metadata)s)
                         ON CONFLICT (name) DO UPDATE SET
                             status      = EXCLUDED.status,
                             notes       = EXCLUDED.notes,
-                            git_commit  = EXCLUDED.git_commit
+                            git_commit  = EXCLUDED.git_commit,
+                            strategy_metadata = EXCLUDED.strategy_metadata
                     """, exp_dict)
                 conn.commit()
                 logger.info(f"📋 Experiment saved: {exp_dict.get('name')} "
                             f"[hash={exp_dict.get('config_hash')} git={exp_dict.get('git_commit')}]")
         except Exception as e:
             logger.error(f"❌ Failed to save experiment: {e}")
+
+    def save_research_decision(self, decision: Dict[str, Any]):
+        """Save a configuration update or hypothesis update event log for audit trails"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    columns = list(decision.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    query = f"""
+                        INSERT INTO research_decisions ({','.join(columns)})
+                        VALUES ({','.join(placeholders)})
+                    """
+                    cursor.execute(query, decision)
+                conn.commit()
+                logger.info(f"💾 Research decision logged for strategy_id={decision.get('strategy_id')}")
+        except Exception as e:
+            logger.error(f"❌ Failed to save research decision: {e}")
+
+    def save_experiment_daily_metrics(self, date_str: str, experiment_name: str,
+                                      config_hash: str = None) -> None:
+        """
+        Aggregate today's CF and real trade data for an experiment and upsert
+        one summary row into experiment_daily_metrics.
+        Call once per experiment at session end (15:25 IST).
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    # CF aggregates from counterfactual_results
+                    cursor.execute("""
+                        SELECT
+                            COUNT(*)                                         AS cf_trades,
+                            SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END) AS wins,
+                            SUM(CASE WHEN final_pnl_r <= 0 THEN 1 ELSE 0 END) AS losses,
+                            AVG(final_pnl_r)                                  AS expectancy,
+                            SUM(final_pnl_r)                                  AS total_pnl_r,
+                            AVG(capture_rate)                                 AS avg_capture_rate,
+                            AVG(holding_efficiency)                           AS avg_holding_eff,
+                            AVG(mfe_r)                                        AS avg_mfe,
+                            AVG(mae_r)                                        AS avg_mae,
+                            MIN(final_pnl_r)                                  AS max_drawdown
+                        FROM counterfactual_results
+                        WHERE exit_time IS NOT NULL
+                          AND experiment_name = %s
+                          AND DATE(exit_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND valid = TRUE
+                    """, (experiment_name, date_str))
+                    cf_row = cursor.fetchone()
+
+                    # Real trade aggregates from trade_performance
+                    cursor.execute("""
+                        SELECT COUNT(*) AS real_trades
+                        FROM trade_performance
+                        WHERE experiment_name = %s
+                          AND DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND valid = TRUE
+                    """, (experiment_name, date_str))
+                    real_row = cursor.fetchone()
+
+                    metrics = {
+                        'date': date_str,
+                        'experiment_name': experiment_name,
+                        'real_trades': real_row[0] if real_row else 0,
+                        'cf_trades': cf_row[0] if cf_row else 0,
+                        'wins': cf_row[1] if cf_row else 0,
+                        'losses': cf_row[2] if cf_row else 0,
+                        'expectancy': float(cf_row[3]) if cf_row and cf_row[3] is not None else None,
+                        'total_pnl_r': float(cf_row[4]) if cf_row and cf_row[4] is not None else None,
+                        'avg_capture_rate': float(cf_row[5]) if cf_row and cf_row[5] is not None else None,
+                        'avg_holding_eff': float(cf_row[6]) if cf_row and cf_row[6] is not None else None,
+                        'avg_mfe': float(cf_row[7]) if cf_row and cf_row[7] is not None else None,
+                        'avg_mae': float(cf_row[8]) if cf_row and cf_row[8] is not None else None,
+                        'max_drawdown': float(cf_row[9]) if cf_row and cf_row[9] is not None else None,
+                        'config_hash': config_hash,
+                    }
+
+                    cursor.execute("""
+                        INSERT INTO experiment_daily_metrics
+                            (date, experiment_name, real_trades, cf_trades, wins, losses,
+                             expectancy, total_pnl_r, avg_capture_rate, avg_holding_eff,
+                             avg_mfe, avg_mae, max_drawdown, config_hash)
+                        VALUES
+                            (%(date)s, %(experiment_name)s, %(real_trades)s, %(cf_trades)s,
+                             %(wins)s, %(losses)s, %(expectancy)s, %(total_pnl_r)s,
+                             %(avg_capture_rate)s, %(avg_holding_eff)s,
+                             %(avg_mfe)s, %(avg_mae)s, %(max_drawdown)s, %(config_hash)s)
+                        ON CONFLICT (date, experiment_name) DO UPDATE SET
+                            real_trades     = EXCLUDED.real_trades,
+                            cf_trades       = EXCLUDED.cf_trades,
+                            wins            = EXCLUDED.wins,
+                            losses          = EXCLUDED.losses,
+                            expectancy      = EXCLUDED.expectancy,
+                            total_pnl_r     = EXCLUDED.total_pnl_r,
+                            avg_capture_rate = EXCLUDED.avg_capture_rate,
+                            avg_holding_eff = EXCLUDED.avg_holding_eff,
+                            avg_mfe         = EXCLUDED.avg_mfe,
+                            avg_mae         = EXCLUDED.avg_mae,
+                            max_drawdown    = EXCLUDED.max_drawdown,
+                            config_hash     = EXCLUDED.config_hash
+                    """, metrics)
+                conn.commit()
+                logger.info(
+                    f"📊 Daily metrics saved: [{experiment_name}] {date_str} "
+                    f"cf={metrics['cf_trades']} expectancy={metrics['expectancy']}"
+                )
+        except Exception as e:
+            logger.error(f"❌ Failed to save experiment daily metrics for {experiment_name}: {e}")
