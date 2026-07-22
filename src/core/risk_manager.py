@@ -8,7 +8,7 @@ correlation analysis, drawdown protection, and volatility adjustments
 import logging
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum

@@ -43,10 +43,20 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
             
             if data and 'candles' in data:
                 df = pd.DataFrame(data['candles'], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                if df.empty:
+                    return None
                 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
                 df.set_index('timestamp', inplace=True)
                 # Convert UTC to Asia/Kolkata
                 df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
+                # Data hygiene: Fyers can return duplicate rows (the same forming
+                # candle repeated across calls), out-of-order rows, or NaN candles.
+                # Dedup (keep the freshest copy), sort chronologically, drop NaN OHLC
+                # so indicators are never computed on a corrupt/unsorted series.
+                df = df[~df.index.duplicated(keep='last')].sort_index()
+                df = df.dropna(subset=['open', 'high', 'low', 'close'])
+                if df.empty:
+                    return None
                 return df
             return None
         except Exception as e:

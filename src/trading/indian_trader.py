@@ -101,7 +101,19 @@ class StructuralPaperTrader:
         self.execution_auditor = ExecutionAuditor(self.db)
 
         from src.core.position_sizer import PositionSizer
-        self.sizer = PositionSizer(capital=100000.0)
+        self.RISK_CAPITAL = 100000.0
+        self.sizer = PositionSizer(capital=self.RISK_CAPITAL)
+
+        # ── Live risk governor (REAL trades only) ────────────────────────
+        # There was previously NO aggregate risk control in the live path: up to
+        # (experiments × symbols) real positions could open with no daily-loss
+        # halt and no exposure ceiling. These gates apply across all experiments.
+        self.DAILY_LOSS_LIMIT_R    = -6.0   # halt new real entries once realized R for the day <= this
+        self.MAX_CONCURRENT_REAL   = 6      # max simultaneous real positions (all experiments/symbols)
+        self.MAX_DEPLOYED_FRACTION = 0.40   # max fraction of capital deployed across open real trades
+        self._risk_day             = None   # date-string the daily counters belong to
+        self.daily_realized_r      = 0.0    # sum of realized pnl_r on real trades today
+        self.trading_halted_today  = False  # set once the daily loss limit trips
 
         # Expiry & event blackout manager (Bug 18 fix)
         self.expiry_blackout = ExpiryBlackoutManager()
@@ -465,6 +477,9 @@ class StructuralPaperTrader:
         if not (9 <= now.hour < 16):
             return
 
+        # Reset daily risk counters at the first pulse of a new day
+        self._roll_risk_day(now)
+
         logger.info(f"--- {now.strftime('%H:%M:%S')} Market Pulse ---")
 
         try:
@@ -475,20 +490,31 @@ class StructuralPaperTrader:
             start_date_m5 = end_date - timedelta(days=5)
 
             current_prices = {}
+            current_bars = {}  # symbol -> last CLOSED m5 OHLC (for intrabar SL/TP)
             fetched = {}  # symbol -> (d1, h1, m5)
 
             for symbol in self.symbols:
                 d1 = self.data_provider.get_historical_data(symbol, start_date_d1, end_date, "1D")
                 h1 = self.data_provider.get_historical_data(symbol, start_date_h1, end_date, "60")
                 m5 = self.data_provider.get_historical_data(symbol, start_date_m5, end_date, "5")
-                if d1 is not None and h1 is not None and m5 is not None:
+                if d1 is not None and h1 is not None and m5 is not None and len(m5) >= 2:
                     fetched[symbol] = (d1, h1, m5)
-                    current_prices[symbol] = float(m5['close'].iloc[-1])
+                    # iloc[-1] is the still-forming candle; mark positions and check
+                    # stops on the last fully CLOSED candle (iloc[-2]) so live and
+                    # backtest agree on the decision/mark bar.
+                    closed = m5.iloc[-2]
+                    current_prices[symbol] = float(closed['close'])
+                    current_bars[symbol] = {
+                        'open': float(closed['open']),
+                        'high': float(closed['high']),
+                        'low': float(closed['low']),
+                        'close': float(closed['close']),
+                    }
                 else:
                     logger.warning(f"⚠️ Could not fetch complete MTF data for {symbol}")
 
             # 2. Update Active Trades & Counterfactuals
-            self._update_active_trades(current_prices, now)
+            self._update_active_trades(current_prices, now, current_bars)
 
             # 3. Close-of-session guard — no new entries after 15:25
             # The force-exit at 15:25 closes positions, but without this guard new
@@ -532,16 +558,29 @@ class StructuralPaperTrader:
             is_blackout, blackout_reason = self.expiry_blackout.is_blackout()
             if is_blackout:
                 logger.info(f"🚫 Expiry/Event blackout active — no new entries. Reason: {blackout_reason}")
-                # Still update existing positions (SL/TP management continues)
-                self._update_active_trades(current_prices, now)
+                # Positions were already updated in step 2 above; do NOT update
+                # again here. The old double-call inflated bars_held / duration /
+                # holding_efficiency on every blackout candle (lunch 11:30–13:30
+                # daily + all Thursdays), corrupting those metrics for most trades.
                 return
 
             # 4. Compute snapshot + run experiments per symbol
             total_signals = 0
             for symbol, (d1, h1, m5) in fetched.items():
-                price = current_prices[symbol]
+                # Signals must decide on the last CLOSED 5m candle, never the
+                # still-forming one. The loop runs ~5s into a new candle, and the
+                # Fyers feed returns that in-progress bar as the last row (RVOL≈0,
+                # partial OHLC). Dropping it makes live decide on the same bar the
+                # backtester does (which only ever sees closed bars), eliminating
+                # the live/backtest divergence. current_prices[symbol] (the live
+                # LTP) is still used for open-position SL/TP marking above.
+                m5_closed = m5.iloc[:-1] if len(m5) > 1 else m5
+                if len(m5_closed) < 1:
+                    logger.warning(f"⚠️ No closed 5m candle for {symbol}, skipping signals")
+                    continue
+                price = float(m5_closed['close'].iloc[-1])
 
-                snapshot = self.pipeline.compute(symbol, price, d1, h1, m5, now)
+                snapshot = self.pipeline.compute(symbol, price, d1, h1, m5_closed, now)
                 if snapshot is None:
                     logger.warning(f"⚠️ Pipeline returned None for {symbol}")
                     continue
@@ -568,6 +607,13 @@ class StructuralPaperTrader:
                             # One real trade per (symbol, experiment_name)
                             if trade_key in self.active_trades:
                                 logger.debug(f"↩️  [{experiment_name}] Already have open position on {symbol}, skipping.")
+                                continue
+                            # Aggregate risk gate (daily-loss halt / concurrency / exposure)
+                            can_enter, gate_reason = self._can_enter_real(now)
+                            if not can_enter:
+                                logger.warning(
+                                    f"⛔ [{experiment_name}] Real entry on {symbol} blocked by risk governor: {gate_reason}"
+                                )
                                 continue
                             logger.info(f"🚀 SIGNAL: {symbol} {sig['signal']} | [{experiment_name}]")
                             logger.info(f"   Entry: {sig['price']} | SL: {sig['stop_loss']} | TP: {sig['take_profit']} (RR: {sig['rr_ratio']})")
@@ -610,27 +656,81 @@ class StructuralPaperTrader:
         except Exception as e:
             logger.error(f"❌ Error in market loop: {e}", exc_info=True)
 
-    def _update_active_trades(self, current_prices: Dict[str, float], timestamp):
-        """Evaluate open positions against latest market prices."""
+    def _deployed_capital(self) -> float:
+        """Sum of notional currently deployed across OPEN real trades (CFs excluded)."""
+        return sum(float(p.get('position_size_inr', 0.0)) for p in self.active_trades.values())
+
+    def _roll_risk_day(self, now):
+        """Reset the daily risk counters at the first pulse of a new trading day."""
+        today = now.strftime('%Y-%m-%d')
+        if self._risk_day != today:
+            self._risk_day = today
+            self.daily_realized_r = 0.0
+            self.trading_halted_today = False
+            logger.info(f"🗓️ Risk day rolled to {today} — daily counters reset.")
+
+    def _can_enter_real(self, now) -> Tuple[bool, str]:
+        """Aggregate risk gate for NEW real entries. Returns (allowed, reason)."""
+        if self.trading_halted_today:
+            return False, "DAILY_LOSS_HALT"
+        if self.daily_realized_r <= self.DAILY_LOSS_LIMIT_R:
+            self.trading_halted_today = True
+            logger.critical(
+                f"🛑 DAILY LOSS LIMIT hit: realized {self.daily_realized_r:.2f}R "
+                f"<= {self.DAILY_LOSS_LIMIT_R}R. Halting ALL new real entries for the day."
+            )
+            return False, "DAILY_LOSS_HALT"
+        if len(self.active_trades) >= self.MAX_CONCURRENT_REAL:
+            return False, "MAX_CONCURRENT"
+        if self._deployed_capital() >= self.MAX_DEPLOYED_FRACTION * self.RISK_CAPITAL:
+            return False, "MAX_DEPLOYED"
+        return True, "OK"
+
+    def _update_active_trades(self, current_prices: Dict[str, float], timestamp, current_bars: Dict = None):
+        """Evaluate open positions against latest market prices.
+
+        Each position is updated inside its own try/except so that one malformed
+        position (e.g. a bad field after a schema change) cannot abort SL/TP
+        management for the rest of the book — previously an exception here
+        unwound the whole loop and left every remaining position unmanaged.
+        """
+        current_bars = current_bars or {}
         # Update real trades — keyed by (symbol, experiment_name)
         for key in list(self.active_trades.keys()):
             symbol, experiment_name = key
             if symbol not in current_prices:
                 continue
-            pos = self.active_trades[key]
-            is_closed = self._update_position(pos, current_prices[symbol], timestamp)
-            if is_closed:
-                pnl_r = pos.get('_last_pnl_r', 0.0)
-                self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
-                self.active_trades.pop(key)
+            try:
+                pos = self.active_trades[key]
+                is_closed = self._update_position(
+                    pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol)
+                )
+                if is_closed:
+                    pnl_r = pos.get('_last_pnl_r', 0.0)
+                    # Accrue realized R for the daily-loss kill switch
+                    self.daily_realized_r += pnl_r
+                    self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
+                    self.active_trades.pop(key)
+            except Exception as e:
+                logger.critical(
+                    f"🚨 Position update FAILED for real trade {key}: {e}. "
+                    f"Position left open and quarantined for manual review.",
+                    exc_info=True,
+                )
 
         # Update counterfactual trades — keyed by candidate_id (unchanged)
         for cand_id in list(self.active_counterfactuals.keys()):
-            pos = self.active_counterfactuals[cand_id]
-            symbol = pos['symbol']
-            if symbol not in current_prices:
+            try:
+                pos = self.active_counterfactuals[cand_id]
+                symbol = pos['symbol']
+                if symbol not in current_prices:
+                    continue
+                is_closed = self._update_position(
+                    pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol)
+                )
+            except Exception as e:
+                logger.error(f"⚠️ Position update failed for counterfactual {cand_id}: {e}", exc_info=True)
                 continue
-            is_closed = self._update_position(pos, current_prices[symbol], timestamp)
             if is_closed:
                 # Clean up thesis deduplication index so next candle can start a fresh CF
                 exp_name = pos.get('experiment_name', 'Structural_v3.2_RVOL1.0')
@@ -646,12 +746,24 @@ class StructuralPaperTrader:
                 self.active_cf_theses.pop(thesis_key, None)
                 self.active_counterfactuals.pop(cand_id)
 
-    def _update_position(self, pos: Dict, current_price: float, timestamp) -> bool:
-        """Evaluate a position against the latest market tick. Returns True if position exited."""
+    def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None) -> bool:
+        """Evaluate a position against the latest market tick. Returns True if position exited.
+
+        ``bar`` is the last CLOSED candle's OHLC ({'open','high','low','close'}).
+        When present, the stop-loss is evaluated intrabar (against the candle's
+        low/high, not just its close) and gap-through the stop is filled at the
+        candle open — modelling the worst-case fill instead of assuming a perfect
+        fill exactly at the stop price.
+        """
         symbol = pos['symbol']
         is_cf = pos.get('is_counterfactual', False)
         stop_loss_distance = pos['stop_loss_distance']
-        
+
+        # Intrabar extremes for stop evaluation (fall back to the mark price).
+        bar_high = float(bar['high']) if bar else current_price
+        bar_low = float(bar['low']) if bar else current_price
+        bar_open = float(bar['open']) if bar else current_price
+
         # Increment bars held
         pos['bars_held'] = pos.get('bars_held', 0) + 1
         
@@ -674,10 +786,12 @@ class StructuralPaperTrader:
         exit_price = current_price
 
         if pos['signal'] == 'BUY CALL':
-            # Check SL breach
-            if current_price <= pos['stop_loss']:
+            # Check SL breach intrabar (candle low), gap-aware fill at open
+            if bar_low <= pos['stop_loss']:
                 is_closed = True
-                exit_price = pos['stop_loss']
+                # If the candle OPENED below the stop (gap-down), the real fill is
+                # at the open, which is worse than the stop.
+                exit_price = min(pos['stop_loss'], bar_open)
                 exit_reason = 'STOP_LOSS'
             # Check TP expansion — capture old values before modifying pos
             elif current_price >= pos['take_profit']:
@@ -699,10 +813,12 @@ class StructuralPaperTrader:
                                               old_sl=old_sl, old_tp=None)
                     
         elif pos['signal'] == 'BUY PUT':
-            # Check SL breach
-            if current_price >= pos['stop_loss']:
+            # Check SL breach intrabar (candle high), gap-aware fill at open
+            if bar_high >= pos['stop_loss']:
                 is_closed = True
-                exit_price = pos['stop_loss']
+                # If the candle OPENED above the stop (gap-up), the real fill is
+                # at the open, which is worse than the stop.
+                exit_price = max(pos['stop_loss'], bar_open)
                 exit_reason = 'STOP_LOSS'
             # Check TP expansion — capture old values before modifying pos
             elif current_price <= pos['take_profit']:
@@ -792,6 +908,20 @@ class StructuralPaperTrader:
             except Exception as e:
                 logger.error(f"❌ Failed to resolve option contract: {e}", exc_info=True)
 
+            # Never place a REAL order on an unresolved/fabricated contract. If the
+            # premium could not be resolved from the warehouse or a live quote, skip
+            # the entry entirely. (Counterfactuals are research-only and may proceed.)
+            if option_contract is None and not is_counterfactual:
+                logger.critical(
+                    f"🛑 No valid option contract resolved for {symbol}; SKIPPING real entry "
+                    f"(refusing to trade on a fabricated/unknown premium)."
+                )
+                self.execution_auditor.log_event(
+                    "ENTRY_ABORTED", trade_id=t_id, candidate_id=candidate_id,
+                    payload={"reason": "OPTION_UNRESOLVED"}
+                )
+                return
+
         # ── Audit Lifecycle: Order Placement/Fill ────────────────────────
         self.execution_auditor.log_event(
             "ORDER_SUBMITTED" if not is_counterfactual else "CF_SUBMITTED",
@@ -818,7 +948,10 @@ class StructuralPaperTrader:
                 stop_loss_price=sl_price,
                 strategy=sig['strategy'],
                 confidence=confidence,
-                regime=regime
+                regime=regime,
+                # Pass currently-deployed notional so the 40% portfolio-exposure
+                # cap actually binds. Real trades only; CFs don't consume capital.
+                deployed_capital=(0.0 if is_counterfactual else self._deployed_capital()),
             )
             
         if option_contract:
@@ -860,6 +993,8 @@ class StructuralPaperTrader:
             'market_regime': sig.get('features', {}).get('market_regime', 'UNKNOWN'),
             'is_counterfactual': is_counterfactual,
             'rejection_reasons': sig.get('rejection_reasons', []),
+            'position_size_inr': position_size_inr,  # notional; drives deployed-capital exposure gate
+            'lots': lots,
             '_last_pnl_r': 0.0,  # Set by _exit_position for portfolio tracking
             'confidence': sig.get('confidence'),
             'diagnostics': diagnostics,
@@ -1439,17 +1574,25 @@ def main():
     logger.info(f"⏱️ Aligning to 5-min candle boundary. Sleeping {seconds_to_next}s until {(now + timedelta(seconds=seconds_to_next)).strftime('%H:%M:%S')} IST...")
     time.sleep(seconds_to_next)
 
-    # Schedule every 5 minutes from this aligned start
-    schedule.every(5).minutes.do(trader.market_loop)
-
     logger.info("⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.")
 
     # Run once immediately (now aligned to a candle boundary)
     trader.market_loop()
 
+    # Boundary-aligned loop. `schedule.every(5).minutes` anchors the next run to
+    # when the PREVIOUS run finished, so each slow fetch/DB cycle adds drift and
+    # by afternoon the loop runs minutes past the boundary (deep into the forming
+    # candle, and possibly missing the 15:25 force-exit tick). Re-aligning to the
+    # fixed 5-min grid every cycle eliminates that drift and guarantees a tick
+    # lands in the 15:25 square-off window whenever the process is alive.
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        now = datetime.now(tz)
+        seconds_past = (now.minute % 5) * 60 + now.second
+        sleep_s = (5 * 60 - seconds_past) + 5  # +5s data-latency buffer
+        if sleep_s < 10:
+            sleep_s += 300  # too close to the boundary — wait for the next one
+        time.sleep(sleep_s)
+        trader.market_loop()
 
 if __name__ == "__main__":
     main()
