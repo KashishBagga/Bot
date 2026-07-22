@@ -75,30 +75,32 @@ class AtrSqueezeStrategy(BaseStrategy):
             side = None
             sl = None
             take_profit = None
+            rejection_reasons = []
 
             if is_squeezed and has_breakout:
-                setup_type = "SQUEEZE_BREAKOUT"
                 bos_level = m5_struct.last_swing_high if m5_struct.trend == "BULLISH" else m5_struct.last_swing_low
-                
-                if m5_struct.trend == "BULLISH":
-                    side = "BUY CALL"
-                    sl = min(bos_level - (atr * 0.3), price - (atr * 0.5))
-                    take_profit = price + (atr * 3.0)
-                elif m5_struct.trend == "BEARISH":
-                    side = "BUY PUT"
-                    sl = max(bos_level + (atr * 0.3), price + (atr * 0.5))
-                    take_profit = price - (atr * 3.0)
+                if bos_level is not None:
+                    setup_type = "SQUEEZE_BREAKOUT"
+                    if m5_struct.trend == "BULLISH":
+                        side = "BUY CALL"
+                        sl = min(bos_level - (atr * 0.3), price - (atr * 0.5))
+                        take_profit = price + (atr * 3.0)
+                    elif m5_struct.trend == "BEARISH":
+                        side = "BUY PUT"
+                        sl = max(bos_level + (atr * 0.3), price + (atr * 0.5))
+                        take_profit = price - (atr * 3.0)
+                    else:
+                        # Neutral trend is rejected but saved to research candidate DB
+                        side = "BUY CALL"
+                        sl = price - (atr * 0.5)
+                        take_profit = price + (atr * 3.0)
+                        rejection_reasons.append("NEUTRAL_TREND")
 
             if setup_type == "NONE":
                 return self._empty_result(experiment_name)
 
             # Rejections
-            rejection_reasons = []
-
-            # 1. Open hours blackout
             current_time = snapshot.timestamp
-            if current_time.hour == 9 and current_time.minute < 45:
-                rejection_reasons.append("TIME_FILTER")
 
             # 2. RVOL filter (squeeze breakouts need high volume participation)
             if rvol < self.rvol_threshold:
@@ -112,6 +114,17 @@ class AtrSqueezeStrategy(BaseStrategy):
 
             # Invalidation buffer
             risk_dist = abs(price - sl) if sl else atr
+
+            # ── FIX: Enforce minimum SL floor of 0.5×ATR from entry ──────────
+            min_sl_dist = atr * 0.5
+            if side == "BUY PUT" and (sl - price) < min_sl_dist:
+                sl = price + min_sl_dist
+                risk_dist = min_sl_dist
+            elif side == "BUY CALL" and (price - sl) < min_sl_dist:
+                sl = price - min_sl_dist
+                risk_dist = min_sl_dist
+            # ─────────────────────────────────────────────────────────────────
+
             if risk_dist == 0.0:
                 rejection_reasons.append("ZERO_RISK")
 
@@ -126,7 +139,11 @@ class AtrSqueezeStrategy(BaseStrategy):
 
             # Cap TP at 5x ATR
             max_tp_dist = atr * 5.0
-            if abs(take_profit - price) > max_tp_dist:
+            if take_profit is None:
+                # Fallback: no H1 zone found — use ATR-based TP
+                take_profit = (price + max_tp_dist) if side == "BUY CALL" else (price - max_tp_dist)
+                rejection_reasons.append("TP_CAPPED")
+            elif abs(take_profit - price) > max_tp_dist:
                 take_profit = (price + max_tp_dist) if side == "BUY CALL" else (price - max_tp_dist)
                 rejection_reasons.append("TP_CAPPED")
 
@@ -151,7 +168,7 @@ class AtrSqueezeStrategy(BaseStrategy):
             }
 
             accepted = len(rejection_reasons) == 0
-            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_SQBRK_{price:.2f}_{current_time.strftime('%Y%m%d')}"
+            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_SQBRK_{price:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
 
             sig = {
                 'symbol': snapshot.symbol,

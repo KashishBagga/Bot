@@ -31,12 +31,15 @@ from src.core.indicator_pipeline import IndicatorPipeline
 from src.core.experiment import Experiment
 from src.core.experiment_registry import ExperimentRegistry
 from src.core.portfolio import PortfolioManager
+from src.core.expiry_blackout import ExpiryBlackoutManager
 from src.strategies.structural_strategy import StructuralStrategy
 from src.strategies.ema_pullback import EmaPullbackStrategy
 from src.strategies.vwap_reversion import VwapReversionStrategy
 from src.strategies.prev_day_extremes import PrevDayExtremesStrategy
 from src.strategies.orb import OrbStrategy
 from src.strategies.atr_squeeze import AtrSqueezeStrategy
+from src.strategies.geometry_strategy import GeometryStrategy
+from src.strategies.order_flow_strategy import OrderFlowStrategy
 
 # Setup Logging
 os.makedirs("logs", exist_ok=True)
@@ -90,6 +93,18 @@ class StructuralPaperTrader:
         self.data_provider = FyersDataProvider()
         self.db = PostgresDatabase()
         self.tz = ZoneInfo("Asia/Kolkata")
+        
+        from src.core.options_execution_engine import OptionExecutionEngine
+        self.option_engine = OptionExecutionEngine(self.db, self.data_provider, strike_policy="ATM")
+        
+        from src.core.execution_auditor import ExecutionAuditor
+        self.execution_auditor = ExecutionAuditor(self.db)
+
+        from src.core.position_sizer import PositionSizer
+        self.sizer = PositionSizer(capital=100000.0)
+
+        # Expiry & event blackout manager (Bug 18 fix)
+        self.expiry_blackout = ExpiryBlackoutManager()
 
         # ── Strategy Research Framework ──────────────────────────────────
         self.pipeline = IndicatorPipeline(
@@ -178,6 +193,81 @@ class StructuralPaperTrader:
         self.registry.register(_atr_squeeze_exp)
         self.db.save_experiment(_atr_squeeze_exp.to_db_dict())
 
+        # 7. Geometry Strategy — purely from MKE Stage 5 GeometryContext
+        _geometry_v1_exp = Experiment(
+            name="Geometry_v1.0_Score35",
+            strategy=GeometryStrategy(
+                min_confluence_score=50.0,   # BUG FIX: was 35 — too low, accepts junk zones
+                zone_tolerance_pct=0.002,
+                min_body_fraction=0.40,
+                min_bias_confidence=0.45,
+                atr_sl_buffer_mult=0.15,
+                tp_atr_cap=3.0,
+                min_rr=1.5,
+                trendline_break_enabled=True,
+            ),
+            params={
+                "min_confluence_score": 50.0,
+                "zone_tolerance_pct": 0.002,
+                "min_body_fraction": 0.40,
+                "min_bias_confidence": 0.45,
+                "min_rr": 1.5,
+                "trendline_break_enabled": True,
+            },
+            description="Geometry Strategy v1.0 — confluence bounce + trendline retest. Score threshold=50 (fixed from 35)."
+        )
+        self.registry.register(_geometry_v1_exp)
+        self.db.save_experiment(_geometry_v1_exp.to_db_dict())
+
+        _geometry_v1_tight_exp = Experiment(
+            name="Geometry_v1.0_Score50",
+            strategy=GeometryStrategy(
+                min_confluence_score=50.0,
+                zone_tolerance_pct=0.002,
+                min_body_fraction=0.40,
+                min_bias_confidence=0.50,
+                atr_sl_buffer_mult=0.15,
+                tp_atr_cap=3.0,
+                min_rr=1.8,
+                trendline_break_enabled=True,
+            ),
+            params={
+                "min_confluence_score": 50.0,
+                "zone_tolerance_pct": 0.002,
+                "min_body_fraction": 0.40,
+                "min_bias_confidence": 0.50,
+                "min_rr": 1.8,
+                "trendline_break_enabled": True,
+            },
+            description="Geometry Strategy v1.0 tighter — Score threshold=50 (3+ sources), RR>=1.8."
+        )
+        self.registry.register(_geometry_v1_tight_exp)
+        self.db.save_experiment(_geometry_v1_tight_exp.to_db_dict())
+
+        # 8. Order Flow Strategy (Milestone 2C)
+        _order_flow_exp = Experiment(
+            name="OrderFlow_v1.0",
+            strategy=OrderFlowStrategy(
+                min_sweep_confidence=0.60,  # BUG FIX: was 0.45 — too close to coin flip
+                min_imb_confidence=0.55,    # BUG FIX: was 0.45
+                min_body_fraction=0.40,
+                atr_sl_buffer_mult=0.15,
+                tp_atr_cap=3.0,
+                min_rr=1.5
+            ),
+            params={
+                "min_sweep_confidence": 0.60,
+                "min_imb_confidence": 0.55,
+                "min_body_fraction": 0.40,
+                "atr_sl_buffer_mult": 0.15,
+                "tp_atr_cap": 3.0,
+                "min_rr": 1.5
+            },
+            description="Order Flow Strategy v1.0 — stop sweeps and imbalance pullbacks (M2C)"
+        )
+        self.registry.register(_order_flow_exp)
+        self.db.save_experiment(_order_flow_exp.to_db_dict())
+
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
@@ -187,6 +277,9 @@ class StructuralPaperTrader:
         self.portfolios.register("ORB_15m_RVOL1.2")
         self.portfolios.register("ORB_30m_RVOL1.2")
         self.portfolios.register("ATR_Squeeze_RVOL1.0")
+        self.portfolios.register("Geometry_v1.0_Score35")
+        self.portfolios.register("Geometry_v1.0_Score50")
+        self.portfolios.register("OrderFlow_v1.0")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
@@ -201,10 +294,29 @@ class StructuralPaperTrader:
         
         # Load open real positions from DB on startup
         open_reals = self.db.get_open_positions()
+        now = datetime.now(self.tz)
         for op in open_reals:
             symbol = op['symbol']
             experiment_name = op.get('experiment_name', 'Structural_v3.2_RVOL1.0')
             key = (symbol, experiment_name)
+            
+            # Prevent prior-day state leakage (Self-Healing)
+            entry_time = op['entry_time']
+            if entry_time.date() < now.date():
+                # Force-close the real position in the database at 15:25 on its entry day
+                exit_time = entry_time.replace(hour=15, minute=25, second=0, microsecond=0)
+                op_exit = dict(op)
+                op_exit['exit_time'] = exit_time
+                op_exit['exit_price'] = op['entry_price']
+                op_exit['pnl'] = -0.05  # Transaction cost buffer only
+                op_exit['final_pnl_r'] = -0.05
+                op_exit['exit_reason'] = 'SESSION_END'
+                op_exit['valid'] = False
+                op_exit['validation_errors'] = "Orphaned recovery: closed on next startup."
+                self.db.save_trade_performance(op_exit)
+                logger.info(f"🧹 Self-Healed orphaned prior-day Real position: {op['trade_id']} entered on {entry_time.date()}")
+                continue
+
             self.active_trades[key] = {
                 'trade_id': op['trade_id'],
                 'candidate_id': op['candidate_id'],
@@ -263,6 +375,32 @@ class StructuralPaperTrader:
         for op in open_cfs:
             cand_id = op['candidate_id']
             symbol = op['symbol']
+            
+            # Prevent prior-day state leakage (Self-Healing)
+            entry_time = op['timestamp']
+            if entry_time.date() < now.date():
+                # Force-close the counterfactual position in the database at 15:25 on its entry day
+                exit_time = entry_time.replace(hour=15, minute=25, second=0, microsecond=0)
+                op_exit = dict(op)
+                op_exit['exit_time'] = exit_time
+                op_exit['exit_price'] = op['entry_price']
+                op_exit['final_pnl_r'] = -0.05  # Transaction cost buffer only
+                op_exit['exit_reason'] = 'SESSION_END'
+                op_exit['valid'] = False
+                op_exit['validation_errors'] = "Orphaned recovery: closed on next startup."
+                
+                # Convert serializable types
+                if 'rejection_reasons' in op_exit and isinstance(op_exit['rejection_reasons'], str):
+                    import json
+                    try:
+                        op_exit['rejection_reasons'] = json.loads(op_exit['rejection_reasons'])
+                    except Exception:
+                        op_exit['rejection_reasons'] = []
+                        
+                self.db.save_counterfactual_result(op_exit)
+                logger.info(f"🧹 Self-Healed orphaned prior-day CF position: {cand_id} entered on {entry_time.date()}")
+                continue
+
             self.active_counterfactuals[cand_id] = {
                 'candidate_id': cand_id,
                 'symbol': symbol,
@@ -289,9 +427,9 @@ class StructuralPaperTrader:
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics')
             }
-            # Rebuild thesis deduplication index from recovered positions
+            # Rebuild thesis deduplication index from recovered positions - key order matches market_loop check
             exp_name = op.get('experiment_name', 'Structural_v3.2_RVOL1.0')
-            thesis_key = (symbol, exp_name, op['setup_type'], op['signal_type'])
+            thesis_key = (exp_name, symbol, op['setup_type'], op['signal_type'])
             self.active_cf_theses[thesis_key] = cand_id
             # Log POSITION_RECOVERED event to database
             # recovered_after_minutes: distinguish quick restart from multi-hour outage
@@ -387,6 +525,15 @@ class StructuralPaperTrader:
                         self._report_date = today_str
                     except Exception as e:
                         logger.error(f"❌ EOD report generation failed: {e}", exc_info=True)
+                return
+
+            # 3b. Expiry / event blackout gate (Bug 18 fix)
+            # Blocks new entries on weekly expiry Thursdays, monthly expiry, RBI MPC, Budget
+            is_blackout, blackout_reason = self.expiry_blackout.is_blackout()
+            if is_blackout:
+                logger.info(f"🚫 Expiry/Event blackout active — no new entries. Reason: {blackout_reason}")
+                # Still update existing positions (SL/TP management continues)
+                self._update_active_trades(current_prices, now)
                 return
 
             # 4. Compute snapshot + run experiments per symbol
@@ -543,7 +690,9 @@ class StructuralPaperTrader:
             # Check trailing SL
             elif current_price > old_highest:
                 old_sl = pos['stop_loss']
-                new_sl = current_price - stop_loss_distance
+                # FIX: Tighten trail step to 0.75× once 1.5R is in the bag
+                trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
+                new_sl = current_price - (stop_loss_distance * trail_mult)
                 if new_sl > old_sl:
                     pos['stop_loss'] = new_sl
                     self._log_position_update(pos, current_price, timestamp, 'TRAILING_SL',
@@ -566,7 +715,9 @@ class StructuralPaperTrader:
             # Check trailing SL
             elif current_price < old_lowest:
                 old_sl = pos['stop_loss']
-                new_sl = current_price + stop_loss_distance
+                # FIX: Tighten trail step to 0.75× once 1.5R is in the bag
+                trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
+                new_sl = current_price + (stop_loss_distance * trail_mult)
                 if new_sl < old_sl:
                     pos['stop_loss'] = new_sl
                     self._log_position_update(pos, current_price, timestamp, 'TRAILING_SL',
@@ -602,6 +753,87 @@ class StructuralPaperTrader:
         candidate_id = sig.get('candidate_id')
         trade_id = f"trade_{symbol.replace(':', '_').replace('-', '_')}_{int(timestamp.timestamp())}"
 
+        # ── Audit Lifecycle: Signal Generated ────────────────────────────
+        t_id = None if is_counterfactual else trade_id
+        self.execution_auditor.log_event("SIGNAL_GENERATED", trade_id=t_id, candidate_id=candidate_id, payload=sig)
+
+        # ── Option Contract Strike Selection Redesign ────────────────────
+        option_contract = None
+        if "INDEX" in symbol:
+            try:
+                option_contract = self.option_engine.resolve(sig, entry_price)
+                logger.info(
+                    f"⚡ Option strike selection resolved index signal to contract {option_contract.symbol} "
+                    f"@ premium {option_contract.premium} (type: {option_contract.option_type}, strike: {option_contract.strike})"
+                )
+                
+                # ── Audit Lifecycle: Option Resolved ────────────────────────
+                self.execution_auditor.log_event(
+                    "STRIKE_SELECTED", 
+                    trade_id=t_id, 
+                    candidate_id=candidate_id, 
+                    payload={
+                        "symbol": option_contract.symbol,
+                        "strike": option_contract.strike,
+                        "expiry": option_contract.expiry,
+                        "type": option_contract.option_type
+                    }
+                )
+                self.execution_auditor.log_event(
+                    "PREMIUM_RETRIEVED", 
+                    trade_id=t_id, 
+                    candidate_id=candidate_id, 
+                    payload={
+                        "premium": option_contract.premium,
+                        "bid": option_contract.bid,
+                        "ask": option_contract.ask
+                    }
+                )
+            except Exception as e:
+                logger.error(f"❌ Failed to resolve option contract: {e}", exc_info=True)
+
+        # ── Audit Lifecycle: Order Placement/Fill ────────────────────────
+        self.execution_auditor.log_event(
+            "ORDER_SUBMITTED" if not is_counterfactual else "CF_SUBMITTED",
+            trade_id=t_id,
+            candidate_id=candidate_id,
+            payload={"price": entry_price, "sl": sl_price, "tp": tp_price}
+        )
+        self.execution_auditor.log_event(
+            "ORDER_FILLED" if not is_counterfactual else "CF_FILLED",
+            trade_id=t_id,
+            candidate_id=candidate_id,
+            payload={"price": entry_price, "sl": sl_price, "tp": tp_price}
+        )
+
+        # Calculate Position Size (Bug 21)
+        position_size_inr = 1000.0
+        lots = 1.0
+        regime = sig.get('features', {}).get('market_regime', 'UNKNOWN')
+        confidence = sig.get('confidence', 70.0) or 70.0
+        
+        if sl_price and entry_price and sl_price != entry_price:
+            position_size_inr = self.sizer.get_position_size(
+                entry_price=entry_price,
+                stop_loss_price=sl_price,
+                strategy=sig['strategy'],
+                confidence=confidence,
+                regime=regime
+            )
+            
+        if option_contract:
+            from src.core.options_mapper import OptionsMapper
+            lot_size = OptionsMapper.get_lot_size(option_contract.symbol)
+            premium = option_contract.premium or 100.0
+            if premium > 0 and lot_size > 0:
+                lots = max(1, int(position_size_inr / (premium * lot_size)))
+
+        diagnostics = sig.get('diagnostics') or {}
+        if not isinstance(diagnostics, dict):
+            diagnostics = {"raw": diagnostics}
+        diagnostics['position_size_inr'] = position_size_inr
+        diagnostics['lots'] = lots
+
         pos = {
             'trade_id': trade_id if not is_counterfactual else None,
             'candidate_id': candidate_id,
@@ -630,7 +862,9 @@ class StructuralPaperTrader:
             'rejection_reasons': sig.get('rejection_reasons', []),
             '_last_pnl_r': 0.0,  # Set by _exit_position for portfolio tracking
             'confidence': sig.get('confidence'),
-            'diagnostics': sig.get('diagnostics'),
+            'diagnostics': diagnostics,
+            'option_symbol': option_contract.symbol if option_contract else None,
+            'option_premium': option_contract.premium if option_contract else None,
         }
         
         if is_counterfactual:
@@ -657,7 +891,9 @@ class StructuralPaperTrader:
                     'entry_price': entry_price,
                     'stop_loss': sl_price,
                     'take_profit': tp_price,
-                    'rejection_reasons': sig.get('rejection_reasons', [])
+                    'rejection_reasons': sig.get('rejection_reasons', []),
+                    'option_symbol': option_contract.symbol if option_contract else None,
+                    'option_premium': option_contract.premium if option_contract else None,
                 }
             }
             self.db.save_counterfactual_event(event)
@@ -728,7 +964,9 @@ class StructuralPaperTrader:
                     'entry_price': entry_price,
                     'stop_loss': sl_price,
                     'take_profit': tp_price,
-                    'candidate_id': candidate_id
+                    'candidate_id': candidate_id,
+                    'option_symbol': option_contract.symbol if option_contract else None,
+                    'option_premium': option_contract.premium if option_contract else None,
                 }
             }
             self.db.save_trade_event(event)
@@ -798,6 +1036,24 @@ class StructuralPaperTrader:
         highest = pos['highest_price']
         lowest = pos['lowest_price']
         is_cf = pos.get('is_counterfactual', False)
+        
+        # ── Audit Lifecycle: Order Modification ─────────────────────────
+        t_id = pos.get('trade_id')
+        cand_id = pos.get('candidate_id')
+        event_type = "SL_MODIFIED" if reason == "TRAILING_SL" else "TP_EXPANDED" if reason == "TP_EXPANSION" else f"ORDER_{reason}"
+        self.execution_auditor.log_event(
+            event_type if not is_cf else f"CF_{event_type}",
+            trade_id=t_id,
+            candidate_id=cand_id,
+            payload={
+                "price": current_price,
+                "old_sl": old_sl,
+                "new_sl": pos['stop_loss'],
+                "old_tp": old_tp,
+                "new_tp": pos['take_profit'],
+                "reason": reason
+            }
+        )
         
         # Calculate excursions
         if pos['signal'] == 'BUY CALL':
@@ -997,6 +1253,26 @@ class StructuralPaperTrader:
         # Store pnl_r on pos so _update_active_trades can pass it to PortfolioManager
         pos['_last_pnl_r'] = pnl_r
 
+        # Update PositionSizer Kelly fraction stats
+        if not is_cf:
+            self.sizer.record_trade_result(pos['strategy'], pnl_r)
+
+        # ── Audit Lifecycle: Order Exited ──────────────────────────────
+        t_id = pos.get('trade_id')
+        cand_id = pos.get('candidate_id')
+        self.execution_auditor.log_event(
+            "ORDER_EXITED" if not is_cf else "CF_EXITED",
+            trade_id=t_id,
+            candidate_id=cand_id,
+            payload={
+                "exit_price": exit_price,
+                "exit_reason": mapped_reason,
+                "pnl_r": pnl_r,
+                "duration_minutes": duration_minutes,
+                "bars_held": bars_held
+            }
+        )
+
         if not is_cf:
             # Log to CSV
             self._log_to_journal(
@@ -1148,15 +1424,29 @@ class StructuralPaperTrader:
 
 def main():
     trader = StructuralPaperTrader(["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"])
-    
-    # Schedule to run every 5 minutes
+
+    # BUG FIX (Bug 19): Align scheduler to actual 5-minute candle close boundaries.
+    # NSE 5-min candles close at 09:20, 09:25, 09:30 ... 15:25 IST.
+    # Running at an arbitrary offset (e.g. start at 10:03 → runs at 10:03,10:08...)
+    # means we sometimes evaluate incomplete forming candles or stale closed candles.
+    tz = ZoneInfo("Asia/Kolkata")
+    now = datetime.now(tz)
+    # Calculate seconds until the next 5-minute boundary (with a 5-second buffer for data latency)
+    seconds_past_boundary = (now.minute % 5) * 60 + now.second
+    seconds_to_next = (5 * 60 - seconds_past_boundary) + 5  # +5s data latency buffer
+    if seconds_to_next < 10:
+        seconds_to_next += 300  # Already very close — wait for the one after
+    logger.info(f"⏱️ Aligning to 5-min candle boundary. Sleeping {seconds_to_next}s until {(now + timedelta(seconds=seconds_to_next)).strftime('%H:%M:%S')} IST...")
+    time.sleep(seconds_to_next)
+
+    # Schedule every 5 minutes from this aligned start
     schedule.every(5).minutes.do(trader.market_loop)
-    
-    logger.info("⏱️ Scheduler started. Waiting for next 5-minute candle...")
-    
-    # Run once immediately for testing
+
+    logger.info("⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.")
+
+    # Run once immediately (now aligned to a candle boundary)
     trader.market_loop()
-    
+
     while True:
         schedule.run_pending()
         time.sleep(1)

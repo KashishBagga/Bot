@@ -30,21 +30,74 @@ class StructureEngine:
     def __init__(self, pivot_window: int = 3):
         self.w = pivot_window
 
+    def _find_swings(self, highs, lows) -> Tuple[List[Tuple[int, float]], List[Tuple[int, float]]]:
+        """Find fractal pivots using window w."""
+        sw_highs, sw_lows = [], []
+        n = len(highs)
+        for i in range(self.w, n - self.w):
+            if all(highs[i] >= highs[i-j] for j in range(1, self.w+1)) and \
+               all(highs[i] > highs[i+j] for j in range(1, self.w+1)):
+                sw_highs.append((i, float(highs[i])))
+            if all(lows[i] <= lows[i-j] for j in range(1, self.w+1)) and \
+               all(lows[i] < lows[i+j] for j in range(1, self.w+1)):
+                sw_lows.append((i, float(lows[i])))
+        return sw_highs, sw_lows
+
     def analyze(
         self,
         df: pd.DataFrame,
-        raw_swings: List[SwingPoint],
-        clusters: List[Any],
-        symbol: str,
+        raw_swings: Optional[List[SwingPoint]] = None,
+        clusters: Optional[List[Any]] = None,
+        symbol: str = "",
         timeframe: str = "m5"
-    ) -> Tuple[StructureState, List[ResearchEvent]]:
+    ) -> Any:
         """
         Runs the structure analysis pass.
         Computes swing relationships, updates statuses, maps completed/developing legs,
         and generates high-value ResearchEvents.
         """
         if df is None or len(df) < 20:
+            if raw_swings is None:
+                return StructureState()
             return StructureState(), []
+
+        is_legacy = (raw_swings is None)
+
+        highs = df['high'].values
+        lows = df['low'].values
+        closes = df['close'].values
+        timestamps = df.index
+
+        if raw_swings is None:
+            sw_highs, sw_lows = self._find_swings(highs, lows)
+            raw_swings = []
+            for idx, p in sw_highs:
+                raw_swings.append(SwingPoint(
+                    id=f"sw_h_{idx}",
+                    timestamp=timestamps[idx].to_pydatetime(),
+                    price=p,
+                    type="HIGH",
+                    status=SwingStatus.ACTIVE,
+                    confidence=1.0,
+                    strength=1.0,
+                    strength_components={},
+                    provenance={"engine": "StructureEngine", "version": "v1.0"}
+                ))
+            for idx, p in sw_lows:
+                raw_swings.append(SwingPoint(
+                    id=f"sw_l_{idx}",
+                    timestamp=timestamps[idx].to_pydatetime(),
+                    price=p,
+                    type="LOW",
+                    status=SwingStatus.ACTIVE,
+                    confidence=1.0,
+                    strength=1.0,
+                    strength_components={},
+                    provenance={"engine": "StructureEngine", "version": "v1.0"}
+                ))
+
+        if clusters is None:
+            clusters = []
 
         # Resolve interval minutes based on timeframe
         interval_mins = 5
@@ -297,4 +350,6 @@ class StructureEngine:
             is_compressed=is_compressed
         )
 
+        if is_legacy:
+            return state
         return state, events

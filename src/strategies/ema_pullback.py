@@ -97,10 +97,8 @@ class EmaPullbackStrategy(BaseStrategy):
             # Rejections
             rejection_reasons = []
             
-            # 1. Open hours blackout
+            # 1. Open hours blackout (Removed)
             current_time = snapshot.timestamp
-            if current_time.hour == 9 and current_time.minute < 45:
-                rejection_reasons.append("TIME_FILTER")
 
             # 2. RVOL filter
             if rvol < self.rvol_threshold:
@@ -118,6 +116,17 @@ class EmaPullbackStrategy(BaseStrategy):
 
             # Invalidation buffer
             risk_dist = abs(price - sl) if sl else atr
+
+            # ── FIX: Enforce minimum SL floor of 0.5×ATR from entry ──────────
+            min_sl_dist = atr * 0.5
+            if side == "BUY PUT" and (sl - price) < min_sl_dist:
+                sl = price + min_sl_dist
+                risk_dist = min_sl_dist
+            elif side == "BUY CALL" and (price - sl) < min_sl_dist:
+                sl = price - min_sl_dist
+                risk_dist = min_sl_dist
+            # ─────────────────────────────────────────────────────────────────
+
             if risk_dist == 0.0:
                 rejection_reasons.append("ZERO_RISK")
 
@@ -164,7 +173,7 @@ class EmaPullbackStrategy(BaseStrategy):
             }
 
             accepted = len(rejection_reasons) == 0
-            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_EMAPULL_{price:.2f}_{current_time.strftime('%Y%m%d')}"
+            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_EMAPULL_{price:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
 
             sig = {
                 'symbol': snapshot.symbol,

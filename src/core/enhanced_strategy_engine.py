@@ -103,8 +103,6 @@ class EnhancedStrategyEngine:
         
         # Primary Rejections Accumulator
         primary_rejections = []
-        if current_time.hour == 9 and current_time.minute < 45:
-            primary_rejections.append("TIME_FILTER")
         if vol_report.rvol_tod < self.rvol_threshold:
             primary_rejections.append("LOW_RVOL")
         if is_opposed:
@@ -168,7 +166,7 @@ class EnhancedStrategyEngine:
         if at_zone and QuantUtils.is_strong_rejection(m5_df):
             setup_checked = "SWEEP"
             trigger_level = target_zone.level
-            candidate_id = f"cand_{symbol_clean}_SWEEP_{trigger_level:.2f}_{current_time.strftime('%Y%m%d')}"
+            candidate_id = f"cand_{symbol_clean}_SWEEP_{trigger_level:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
             
             if target_zone.zone_type == 'DEMAND':
                 side = "BUY CALL"
@@ -192,20 +190,21 @@ class EnhancedStrategyEngine:
         base_features['wickiness'] = wickiness
         
         if not setup_checked and m5_struct.bos_count > 0:
-            setup_checked = "BREAKOUT"
             bos_level = m5_struct.last_swing_high if m5_struct.trend == "BULLISH" else m5_struct.last_swing_low
-            trigger_level = bos_level
-            candidate_id = f"cand_{symbol_clean}_BREAKOUT_{trigger_level:.2f}_{current_time.strftime('%Y%m%d')}"
-            
-            side = "BUY CALL" if m5_struct.trend == "BULLISH" else "BUY PUT"
-            if side == "BUY CALL":
-                sl = min(bos_level - (atr * 0.3), price - min_stop_dist)
-                if htf_bias != "BULLISH":
-                    setup_rejection_reasons.append("BIAS_MISMATCH")
-            else:
-                sl = max(bos_level + (atr * 0.3), price + min_stop_dist)
-                if htf_bias != "BEARISH":
-                    setup_rejection_reasons.append("BIAS_MISMATCH")
+            if bos_level is not None:
+                setup_checked = "BREAKOUT"
+                trigger_level = bos_level
+                candidate_id = f"cand_{symbol_clean}_BREAKOUT_{trigger_level:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
+                
+                side = "BUY CALL" if m5_struct.trend == "BULLISH" else "BUY PUT"
+                if side == "BUY CALL":
+                    sl = min(bos_level - (atr * 0.3), price - min_stop_dist)
+                    if htf_bias != "BULLISH":
+                        setup_rejection_reasons.append("BIAS_MISMATCH")
+                else:
+                    sl = max(bos_level + (atr * 0.3), price + min_stop_dist)
+                    if htf_bias != "BEARISH":
+                        setup_rejection_reasons.append("BIAS_MISMATCH")
                     
             if move_efficiency <= 0.6:
                 setup_rejection_reasons.append("LOW_EFFICIENCY")
@@ -215,17 +214,18 @@ class EnhancedStrategyEngine:
         # --- Setup C: Failed Follow-Through (FFT Trap) ---
         if not setup_checked and m5_struct.bos_count > 0:
             bos_level = m5_struct.last_swing_high if m5_struct.trend == "BULLISH" else m5_struct.last_swing_low
-            trap_type = self.fft_engine.detect_trap(m5_df, bos_level, m5_struct.trend)
-            if trap_type:
-                setup_checked = "TRAP"
-                trigger_level = bos_level
-                candidate_id = f"cand_{symbol_clean}_TRAP_{trigger_level:.2f}_{current_time.strftime('%Y%m%d')}"
-                side = trap_type
-                sl = m5_df['high'].iloc[-1] + 1.0 if side == "BUY PUT" else m5_df['low'].iloc[-1] - 1.0
-                if side == "BUY CALL" and htf_bias == "BEARISH":
-                    setup_rejection_reasons.append("BIAS_MISMATCH")
-                elif side == "BUY PUT" and htf_bias == "BULLISH":
-                    setup_rejection_reasons.append("BIAS_MISMATCH")
+            if bos_level is not None:
+                trap_type = self.fft_engine.detect_trap(m5_df, bos_level, m5_struct.trend)
+                if trap_type:
+                    setup_checked = "TRAP"
+                    trigger_level = bos_level
+                    candidate_id = f"cand_{symbol_clean}_TRAP_{trigger_level:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
+                    side = trap_type
+                    sl = m5_df['high'].iloc[-1] + 1.0 if side == "BUY PUT" else m5_df['low'].iloc[-1] - 1.0
+                    if side == "BUY CALL" and htf_bias == "BEARISH":
+                        setup_rejection_reasons.append("BIAS_MISMATCH")
+                    elif side == "BUY PUT" and htf_bias == "BULLISH":
+                        setup_rejection_reasons.append("BIAS_MISMATCH")
 
         if not setup_checked:
             setup_checked = "NONE"

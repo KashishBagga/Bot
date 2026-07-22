@@ -155,14 +155,27 @@ class OrbStrategy(BaseStrategy):
             if risk_dist == 0.0:
                 rejection_reasons.append("ZERO_RISK")
 
-            # Find take profit (Next 1H opposite zone)
+            # Find take profit: next H1 zone, but never below a 2R minimum floor
+            # BUG FIX: Zone override was lowering TP below 2R, causing valid breakouts
+            # to get LOW_RR rejections. Zone should only RAISE TP, never lower it.
+            tp_floor = (price + 2.0 * risk_dist) if side == "BUY CALL" else (price - 2.0 * risk_dist)
+            tp_from_zone = None
             for z in snapshot.h1_zones:
                 if side == "BUY CALL" and z.level > price:
-                    take_profit = z.level
+                    tp_from_zone = z.level
                     break
                 if side == "BUY PUT" and z.level < price:
-                    take_profit = z.level
+                    tp_from_zone = z.level
                     break
+
+            if tp_from_zone is not None:
+                # Use zone TP only if it's better than (or equal to) the 2R floor
+                if side == "BUY CALL":
+                    take_profit = max(tp_floor, tp_from_zone)
+                else:
+                    take_profit = min(tp_floor, tp_from_zone)
+            else:
+                take_profit = tp_floor
 
             # Cap TP at 5x ATR
             max_tp_dist = atr * 5.0
@@ -194,7 +207,7 @@ class OrbStrategy(BaseStrategy):
             }
 
             accepted = len(rejection_reasons) == 0
-            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_ORB_{self.opening_range_minutes}M_{price:.2f}_{current_time.strftime('%Y%m%d')}"
+            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_ORB_{self.opening_range_minutes}M_{price:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
 
             sig = {
                 'symbol': snapshot.symbol,

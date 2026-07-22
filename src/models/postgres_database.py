@@ -214,6 +214,19 @@ class PostgresDatabase:
                         )
                     ''')
 
+                    # 7b. Execution Events (NEW)
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS execution_events (
+                            event_id TEXT NOT NULL,
+                            trade_id TEXT,
+                            candidate_id TEXT,
+                            timestamp TIMESTAMPTZ NOT NULL,
+                            event_type TEXT NOT NULL,
+                            payload JSONB,
+                            PRIMARY KEY (event_id, timestamp)
+                        )
+                    ''')
+
                     # --- Migration Checks to Alter Existing Tables safely ---
                     # trade_performance additions
                     cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS stop_loss REAL")
@@ -308,6 +321,13 @@ class PostgresDatabase:
                     cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS validation_errors TEXT")
                     cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS valid BOOLEAN DEFAULT TRUE")
                     cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS validation_errors TEXT")
+
+                    # research_id columns and indexes (M2B)
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
+                    cursor.execute("ALTER TABLE market_events ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_trades_research_id ON trade_performance(research_id) WHERE research_id IS NOT NULL")
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_events_research_id ON market_events(research_id) WHERE research_id IS NOT NULL")
+
 
                     # Per-experiment daily summary: one row per (date, experiment) written at session end
                     cursor.execute('''
@@ -715,6 +735,27 @@ class PostgresDatabase:
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to save counterfactual event: {e}")
+
+    def save_execution_event(self, event: Dict[str, Any]):
+        """Save execution trace event record"""
+        try:
+            event_copy = event.copy()
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    if 'payload' in event_copy:
+                        event_copy['payload'] = json.dumps(event_copy['payload'], cls=NumpyEncoder)
+                    columns = list(event_copy.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    
+                    query = f"""
+                        INSERT INTO execution_events ({','.join(columns)}) 
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (event_id, timestamp) DO NOTHING
+                    """
+                    cursor.execute(query, event_copy)
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Failed to save execution event: {e}")
 
     def save_market_event(self, event: Dict[str, Any]):
         """Save a persistent market context research event (hypertable)"""

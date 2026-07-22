@@ -46,6 +46,74 @@ class SwingPoint:
     strength_components: Dict[str, float]  # geometry, participation, reaction, persistence
     provenance: Dict[str, Any]  # engine, settings, left_window, right_window
 
+    def __float__(self) -> float:
+        return self.price
+
+    def __int__(self) -> int:
+        return int(self.price)
+
+    def __add__(self, other):
+        if hasattr(other, 'price'):
+            return self.price + other.price
+        return self.price + other
+
+    def __radd__(self, other):
+        return self.price + other
+
+    def __sub__(self, other):
+        if hasattr(other, 'price'):
+            return self.price - other.price
+        return self.price - other
+
+    def __rsub__(self, other):
+        return other - self.price
+
+    def __mul__(self, other):
+        if hasattr(other, 'price'):
+            return self.price * other.price
+        return self.price * other
+
+    def __rmul__(self, other):
+        return self.price * other
+
+    def __truediv__(self, other):
+        if hasattr(other, 'price'):
+            return self.price / other.price
+        return self.price / other
+
+    def __rtruediv__(self, other):
+        return other / self.price
+
+    def __eq__(self, other):
+        if hasattr(other, 'id'):
+            return self.id == other.id
+        if hasattr(other, 'price'):
+            return self.price == other.price
+        return self.price == other
+
+    def __lt__(self, other):
+        if hasattr(other, 'price'):
+            return self.price < other.price
+        return self.price < other
+
+    def __le__(self, other):
+        if hasattr(other, 'price'):
+            return self.price <= other.price
+        return self.price <= other
+
+    def __gt__(self, other):
+        if hasattr(other, 'price'):
+            return self.price > other.price
+        return self.price > other
+
+    def __ge__(self, other):
+        if hasattr(other, 'price'):
+            return self.price >= other.price
+        return self.price >= other
+
+    def __format__(self, format_spec):
+        return format(self.price, format_spec)
+
 
 @dataclass(frozen=True)
 class SwingRelationship:
@@ -93,18 +161,23 @@ class ResearchEvent:
     event_type: str            # "BOS_CONFIRMED", "CHOCH_CONFIRMED", "STRUCTURE_RESET"
     engine_version: str
     payload: Dict[str, Any]
+    research_id: Optional[str] = None  # Added for M2B
 
     def to_dict(self) -> Dict[str, Any]:
         """Strict application-level schema contract serialization."""
-        return {
+        d = {
             "event_id": str(self.event_id),
-            "timestamp": self.timestamp.isoformat(),
-            "occurrence_timestamp": self.occurrence_timestamp.isoformat(),
+            "timestamp": self.timestamp.isoformat() if isinstance(self.timestamp, datetime) else self.timestamp,
+            "occurrence_timestamp": self.occurrence_timestamp.isoformat() if isinstance(self.occurrence_timestamp, datetime) else self.occurrence_timestamp,
             "symbol": str(self.symbol),
             "event_type": str(self.event_type),
             "engine_version": str(self.engine_version),
             "payload": self.payload
         }
+        if self.research_id is not None:
+            d["research_id"] = str(self.research_id)
+        return d
+
 
 
 @dataclass(frozen=True)
@@ -118,6 +191,52 @@ class StructureState:
     last_swing_high: Optional[SwingPoint] = None
     last_swing_low: Optional[SwingPoint] = None
     is_compressed: bool = False
+
+    @property
+    def trend(self) -> str:
+        high_swings = [s for s in self.swings if s.type == "HIGH"]
+        low_swings = [s for s in self.swings if s.type == "LOW"]
+        if len(high_swings) < 2 or len(low_swings) < 2:
+            return "NEUTRAL"
+        last_h, prev_h = high_swings[-1].price, high_swings[-2].price
+        last_l, prev_l = low_swings[-1].price, low_swings[-2].price
+        if last_h > prev_h and last_l > prev_l:
+            return "BULLISH"
+        elif last_h < prev_h and last_l < prev_l:
+            return "BEARISH"
+        return "NEUTRAL"
+
+    @property
+    def bos_count(self) -> int:
+        return sum(1 for s in self.swings if s.status in (SwingStatus.BREACHED, SwingStatus.RETESTED))
+
+    @property
+    def choch_detected(self) -> bool:
+        for s in self.swings:
+            if s.status in (SwingStatus.BREACHED, SwingStatus.RETESTED):
+                rel = self.relationships.get(s.id)
+                if rel and rel.label in ["LH", "HL"]:
+                    return True
+        return False
+
+    @property
+    def market_phase(self) -> str:
+        trend = self.trend
+        if trend == "NEUTRAL" or not self.swings:
+            return "NEUTRAL"
+        if self.developing_leg:
+            return self.developing_leg.type
+        return "NEUTRAL"
+
+    @property
+    def quality_score(self) -> float:
+        score = 50.0
+        score += min(self.bos_count * 10, 30)
+        if self.choch_detected:
+            score -= 40
+        if self.is_compressed:
+            score += 20
+        return max(0.0, min(100.0, score))
 
 
 @dataclass(frozen=True)
@@ -133,5 +252,7 @@ class MarketContext:
         self.htf_structure: Dict[str, HTFStructure] = {}
         self.trend: Optional[Any] = None
         self.levels: Optional[Any] = None
+        self.geometry: Optional[Any] = None
         self.patterns: Optional[Any] = None
+        self.liquidity: Optional[Any] = None
         self.regime: Optional[Any] = None

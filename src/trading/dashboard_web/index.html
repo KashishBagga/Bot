@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOD Trading Analytics & Execution Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #0a0b0d;
+            --bg-card: rgba(22, 25, 34, 0.65);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(99, 102, 241, 0.15);
+            
+            --neon-purple: #a855f7;
+            --neon-indigo: #6366f1;
+            --neon-cyan: #06b6d4;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --neon-orange: #f97316;
+            
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 2.5rem;
+            line-height: 1.5;
+        }
+
+        h1, h2, h3, h4, .title-font {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-card);
+            padding-bottom: 1.5rem;
+        }
+
+        .header-left h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .selector-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        select {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            color: var(--text-primary);
+            padding: 0.6rem 1.5rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--neon-indigo);
+            box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        /* Metrics grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+        }
+
+        .metric-card.pnl::before { background: var(--neon-purple); }
+        .metric-card.winrate::before { background: var(--neon-green); }
+        .metric-card.expectancy::before { background: var(--neon-indigo); }
+        .metric-card.pf::before { background: var(--neon-cyan); }
+        .metric-card.dd::before { background: var(--neon-red); }
+        .metric-card.hold::before { background: var(--neon-orange); }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .metric-trend {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up { color: var(--neon-green); }
+        .trend-down { color: var(--neon-red); }
+
+        /* Dashboard sections grid */
+        .sections-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .sections-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        /* Trades table styles */
+        .trades-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .trade-row {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .trade-row:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .trade-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            cursor: pointer;
+        }
+
+        .trade-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .trade-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-win {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--neon-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-loss {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--neon-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .trade-symbol-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trade-symbol {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .trade-strategy {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.1rem;
+        }
+
+        .trade-prices {
+            display: flex;
+            gap: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .trade-pnl-column {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 100px;
+        }
+
+        .trade-pnl-val {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .trade-pnl-val.win { color: var(--neon-green); }
+        .trade-pnl-val.loss { color: var(--neon-red); }
+
+        .trade-details {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            display: none;
+        }
+
+        /* Execution timeline styles */
+        .execution-timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 1rem 0;
+        }
+
+        .execution-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .timeline-step {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg-main);
+            border: 2px solid var(--neon-indigo);
+        }
+
+        .timeline-step.completed::before {
+            background: var(--neon-indigo);
+            box-shadow: 0 0 10px var(--neon-indigo);
+        }
+
+        .timeline-step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-step-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .timeline-step-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .timeline-step-payload {
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .timeline-step-latency {
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
+            font-weight: 500;
+        }
+
+        /* Filter Analytics elements */
+        .filter-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .filter-table th {
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.9rem;
+        }
+
+        .verdict-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .verdict-overfiltered {
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--neon-orange);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .verdict-neutral {
+            background: rgba(107, 114, 128, 0.15);
+            color: var(--text-secondary);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .verdict-insufficient {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        /* Strategy compare cards */
+        .strategy-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .strategy-compare-card {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.25rem;
+        }
+
+        .strategy-compare-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .strategy-compare-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .strategy-compare-val {
+            font-weight: 700;
+            color: var(--neon-indigo);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-indigo), var(--neon-purple));
+            border-radius: 3px;
+        }
+
+        /* Strategy selection pills/tabs */
+        .strategy-selector-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .strategy-tab {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .strategy-tab:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .strategy-tab.active {
+            background: var(--neon-indigo);
+            border-color: var(--neon-indigo);
+            color: white;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Expanded trade details grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .detail-card h5 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 0.4rem;
+        }
+
+        .detail-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-card p b {
+            color: var(--text-primary);
+        }
+
+        .factors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .factor-pill {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .factor-name {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .factor-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-top: 0.15rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <h1>Structural Trading & Replay Dashboard</h1>
+            <p id="sub-header-date">Live Paper Mode Session</p>
+        </div>
+        <div class="selector-container">
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">Select Session Date:</span>
+            <select id="report-date-selector" onchange="loadReport(this.value)">
+                <!-- Dynamically populated -->
+            </select>
+        </div>
+    </header>
+
+    <!-- Metrics Bar -->
+    <div class="metrics-grid" id="metrics-bar">
+        <div class="metric-card pnl">
+            <div class="metric-label">Total Realized PnL</div>
+            <div class="metric-value" id="metric-pnl">-0.00R</div>
+            <div class="metric-trend" id="trend-pnl">...</div>
+        </div>
+        <div class="metric-card winrate">
+            <div class="metric-label">Win Rate</div>
+            <div class="metric-value" id="metric-winrate">0%</div>
+            <div class="metric-trend" id="trend-winrate">...</div>
+        </div>
+        <div class="metric-card expectancy">
+            <div class="metric-label">Real Expectancy</div>
+            <div class="metric-value" id="metric-expectancy">0.00R</div>
+            <div class="metric-trend" id="trend-expectancy">...</div>
+        </div>
+        <div class="metric-card pf">
+            <div class="metric-label">Shadow PnL (Counterfactual)</div>
+            <div class="metric-value" id="metric-shadow-pnl">0.00R</div>
+            <div class="metric-trend" id="trend-shadow-pnl">...</div>
+        </div>
+        <div class="metric-card dd">
+            <div class="metric-label">Total Trades Taken</div>
+            <div class="metric-value" id="metric-trades-count">0</div>
+            <div class="metric-trend" id="trend-trades-count">...</div>
+        </div>
+        <div class="metric-card hold">
+            <div class="metric-label">Avg Excursions (MFE)</div>
+            <div class="metric-value" id="metric-mfe">0.00R</div>
+            <div class="metric-trend" id="trend-mfe">...</div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="sections-layout">
+        <!-- Left Side: Trades Timeline -->
+        <div class="sections-column">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Session Realized Positions</h2>
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;" id="trades-summary-label">0 Trade(s)</span>
+                </div>
+                <div class="strategy-selector-tabs" id="trades-strategy-tabs">
+                    <!-- Loaded dynamically -->
+                </div>
+                <div class="trades-list" id="trades-list-container">
+                    <!-- Loaded dynamically -->
+                    <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No real trades recorded for this date.</div>
+                </div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Counterfactual Missed Opportunities</h2>
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;" id="candidates-summary-label">0 Signal(s)</span>
+                </div>
+                <div class="strategy-selector-tabs" id="candidates-strategy-tabs">
+                    <!-- Loaded dynamically -->
+                </div>
+                <div class="trades-list" id="candidates-list-container">
+                    <!-- Loaded dynamically -->
+                    <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No counterfactual opportunities.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Analytics and Rankings -->
+        <div class="sections-column">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Filter Impact Analytics</h2>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="filter-table">
+                        <thead>
+                            <tr>
+                                <th>Filter</th>
+                                <th>Blocked</th>
+                                <th>Win Rate</th>
+                                <th>Rolling Exp</th>
+                                <th>Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filter-analytics-tbody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Experiment Leaderboard</h2>
+                </div>
+                <div class="strategy-grid" id="experiments-leaderboard">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Init: Load all dates
+        fetch("/api/reports")
+            .then(res => res.json())
+            .then(dates => {
+                const selector = document.getElementById("report-date-selector");
+                selector.innerHTML = "";
+                if (dates.length === 0) {
+                    selector.innerHTML = "<option>No reports found</option>";
+                    return;
+                }
+                dates.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d;
+                    opt.textContent = d;
+                    selector.appendChild(opt);
+                });
+                // Load latest
+                loadReport(dates[0]);
+            })
+            .catch(err => console.error("Error loading dates:", err));
+
+        let sessionData = null;
+        let selectedRealStrategy = "ALL";
+        let selectedCfStrategy = "ALL";
+
+        // Init: Load all dates
+        fetch("/api/reports")
+            .then(res => res.json())
+            .then(dates => {
+                const selector = document.getElementById("report-date-selector");
+                selector.innerHTML = "";
+                if (dates.length === 0) {
+                    selector.innerHTML = "<option>No reports found</option>";
+                    return;
+                }
+                dates.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d;
+                    opt.textContent = d;
+                    selector.appendChild(opt);
+                });
+                // Load latest
+                loadReport(dates[0]);
+            })
+            .catch(err => console.error("Error loading dates:", err));
+
+        function loadReport(dateStr) {
+            document.getElementById("sub-header-date").textContent = `EOD Review Session — ${dateStr}`;
+            
+            fetch(`/api/report?date=${dateStr}`)
+                .then(res => res.json())
+                .then(data => {
+                    sessionData = data;
+                    selectedRealStrategy = "ALL";
+                    selectedCfStrategy = "ALL";
+                    
+                    renderMetrics(data);
+                    buildStrategyTabs(data);
+                    applyFilters();
+                    renderFilterAnalytics(data);
+                    renderLeaderboard(data);
+                })
+                .catch(err => console.error("Error loading report details:", err));
+        }
+
+        function buildStrategyTabs(data) {
+            // Real Trades strategies
+            const realStrategies = ["ALL", ...new Set(data.trades.map(t => t.strategy).filter(Boolean))];
+            const realTabsContainer = document.getElementById("trades-strategy-tabs");
+            realTabsContainer.innerHTML = "";
+            realStrategies.forEach(s => {
+                const count = s === "ALL" ? data.trades.length : data.trades.filter(t => t.strategy === s).length;
+                const tab = document.createElement("div");
+                tab.className = `strategy-tab ${s === selectedRealStrategy ? 'active' : ''}`;
+                tab.textContent = `${s} (${count})`;
+                tab.onclick = () => {
+                    selectedRealStrategy = s;
+                    document.querySelectorAll("#trades-strategy-tabs .strategy-tab").forEach(el => el.classList.remove("active"));
+                    tab.classList.add("active");
+                    applyFilters();
+                };
+                realTabsContainer.appendChild(tab);
+            });
+
+            // Candidates strategies
+            const cfStrategies = ["ALL", ...new Set(data.candidates.map(c => c.setup_type || c.strategy).filter(Boolean))];
+            const cfTabsContainer = document.getElementById("candidates-strategy-tabs");
+            cfTabsContainer.innerHTML = "";
+            cfStrategies.forEach(s => {
+                const count = s === "ALL" ? data.candidates.length : data.candidates.filter(c => (c.setup_type || c.strategy) === s).length;
+                const tab = document.createElement("div");
+                tab.className = `strategy-tab ${s === selectedCfStrategy ? 'active' : ''}`;
+                tab.textContent = `${s} (${count})`;
+                tab.onclick = () => {
+                    selectedCfStrategy = s;
+                    document.querySelectorAll("#candidates-strategy-tabs .strategy-tab").forEach(el => el.classList.remove("active"));
+                    tab.classList.add("active");
+                    applyFilters();
+                };
+                cfTabsContainer.appendChild(tab);
+            });
+        }
+
+        function applyFilters() {
+            if (!sessionData) return;
+            
+            // Filter real trades
+            const filteredReal = selectedRealStrategy === "ALL" 
+                ? sessionData.trades 
+                : sessionData.trades.filter(t => t.strategy === selectedRealStrategy);
+            renderRealTradesList(filteredReal);
+            
+            // Filter candidates
+            const filteredCf = selectedCfStrategy === "ALL" 
+                ? sessionData.candidates 
+                : sessionData.candidates.filter(c => (c.setup_type || c.strategy) === selectedCfStrategy);
+            renderCandidatesList(filteredCf);
+        }
+
+        function renderMetrics(data) {
+            const eod = data.eod_report || {};
+            const summary = eod.sections?.executive_summary || {};
+            
+            const realPnl = summary.real?.total_pnl_r !== undefined ? summary.real.total_pnl_r : 0.0;
+            const realWinrate = summary.real?.win_rate !== undefined ? (summary.real.win_rate * 100).toFixed(0) : "0";
+            const realExpectancy = summary.real?.expectancy !== undefined ? summary.real.expectancy : 0.0;
+            const shadowPnl = summary.cf?.total_pnl_r !== undefined ? summary.cf.total_pnl_r : 0.0;
+            const tradesCount = summary.real?.trades !== undefined ? summary.real.trades : 0;
+            
+            // Excursions calculation
+            let totalMfe = 0.0;
+            if (data.trades && data.trades.length > 0) {
+                totalMfe = data.trades.reduce((acc, t) => acc + (t.mfe_r || 0.0), 0.0) / data.trades.length;
+            }
+
+            document.getElementById("metric-pnl").textContent = `${realPnl >= 0 ? '+' : ''}${realPnl.toFixed(2)}R`;
+            document.getElementById("metric-pnl").className = `metric-value ${realPnl >= 0 ? 'trend-up' : 'trend-down'}`;
+            document.getElementById("trend-pnl").innerHTML = realPnl >= 0 ? "🟢 Positive R-performance" : "🔴 Loss-absorption state";
+
+            document.getElementById("metric-winrate").textContent = `${realWinrate}%`;
+            document.getElementById("trend-winrate").innerHTML = `Wins: ${summary.real?.wins || 0} / Losses: ${summary.real?.losses || 0}`;
+
+            document.getElementById("metric-expectancy").textContent = `${realExpectancy >= 0 ? '+' : ''}${realExpectancy.toFixed(2)}R`;
+            document.getElementById("trend-expectancy").innerHTML = realExpectancy >= 0 ? "🟢 Profit expectable" : "🔴 Negative expectancy session";
+
+            document.getElementById("metric-shadow-pnl").textContent = `${shadowPnl >= 0 ? '+' : ''}${shadowPnl.toFixed(2)}R`;
+            document.getElementById("trend-shadow-pnl").innerHTML = `Rejected opportunities: ${summary.cf?.total || 0}`;
+
+            document.getElementById("metric-trades-count").textContent = tradesCount;
+            document.getElementById("trend-trades-count").innerHTML = "Real market entries executed";
+
+            document.getElementById("metric-mfe").textContent = `${totalMfe.toFixed(2)}R`;
+            document.getElementById("trend-mfe").innerHTML = "Average Maximum Favourable Excursion";
+        }
+
+        function renderRealTradesList(trades) {
+            const listContainer = document.getElementById("trades-list-container");
+            document.getElementById("trades-summary-label").textContent = `${trades.length} Position(s)`;
+            
+            if (trades.length === 0) {
+                listContainer.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No matching realized positions.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = "";
+            trades.forEach(t => {
+                const row = document.createElement("div");
+                row.className = "trade-row";
+                
+                const isWin = (t.pnl || 0.0) >= 0.0;
+                const pnlText = `${isWin ? '+' : ''}${t.pnl.toFixed(2)}R`;
+                
+                // Get execution milestones for this trade
+                const milestones = sessionData.execution_events.filter(e => e.trade_id === t.trade_id);
+                let timelineHtml = '<div style="color: var(--text-muted); font-size: 0.85rem;">No execution logs found.</div>';
+                
+                if (milestones.length > 0) {
+                    let prevTime = null;
+                    timelineHtml = milestones.map((m, index) => {
+                        const curTime = new Date(m.timestamp);
+                        let latencyInfo = "";
+                        if (prevTime) {
+                            const diff = curTime - prevTime;
+                            latencyInfo = `<span class="timeline-step-latency">(+${diff}ms)</span>`;
+                        }
+                        prevTime = curTime;
+                        
+                        const timeStr = curTime.toLocaleTimeString();
+                        const payloadStr = m.payload ? JSON.stringify(m.payload) : "{}";
+                        
+                        return `
+                            <div class="timeline-step completed">
+                                <div class="timeline-step-header">
+                                    <div class="timeline-step-title">${m.event_type} ${latencyInfo}</div>
+                                    <div class="timeline-step-time">${timeStr}</div>
+                                </div>
+                                <div class="timeline-step-payload">${payloadStr}</div>
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                // Diagnostics triggers formatting
+                let diagnosticsHtml = '<div style="color: var(--text-muted); font-size: 0.85rem;">No trigger factors or indicators stored.</div>';
+                const diag = t.diagnostics || t.features;
+                if (diag && Object.keys(diag).length > 0) {
+                    diagnosticsHtml = '<div class="factors-grid">';
+                    for (const [key, val] of Object.entries(diag)) {
+                        if (typeof val === 'object' && val !== null) continue;
+                        const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+                        diagnosticsHtml += `
+                            <div class="factor-pill">
+                                <span class="factor-name">${formattedKey}</span>
+                                <span class="factor-val">${typeof val === 'number' ? val.toFixed(2) : val}</span>
+                            </div>
+                        `;
+                    }
+                    diagnosticsHtml += '</div>';
+                }
+
+                row.innerHTML = `
+                    <div class="trade-summary" onclick="toggleDetails(this)">
+                        <div class="trade-info">
+                            <span class="trade-badge ${isWin ? 'badge-win' : 'badge-loss'}">${isWin ? 'Win' : 'Loss'}</span>
+                            <div class="trade-symbol-container">
+                                <span class="trade-symbol">${t.symbol}</span>
+                                <span class="trade-strategy">${t.strategy} &bull; ${t.experiment_name}</span>
+                            </div>
+                            <div class="trade-prices">
+                                <span>Entry: <b>${t.entry_price.toFixed(2)}</b></span>
+                                <span>Exit: <b>${t.exit_price ? t.exit_price.toFixed(2) : 'N/A'}</b></span>
+                                <span>SL: <b>${t.stop_loss ? t.stop_loss.toFixed(2) : 'N/A'}</b></span>
+                                <span>TP: <b>${t.take_profit ? t.take_profit.toFixed(2) : 'N/A'}</b></span>
+                            </div>
+                        </div>
+                        <div class="trade-pnl-column">
+                            <span class="trade-pnl-val ${isWin ? 'win' : 'loss'}">${pnlText}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${t.exit_reason || 'OPEN'}</span>
+                        </div>
+                    </div>
+                    <div class="trade-details">
+                        <div class="detail-grid">
+                            <div class="detail-card">
+                                <h5>Execution Milestones</h5>
+                                <p>🔑 <b>Trade ID:</b> ${t.trade_id || 'N/A'}</p>
+                                <p>📅 <b>Executed At:</b> ${new Date(t.entry_time).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+                                <p>⏱️ <b>Hold Duration:</b> ${t.duration_minutes ? t.duration_minutes.toFixed(1) + ' min' : 'N/A'}</p>
+                                <p>🏁 <b>Outcome:</b> <span class="${isWin ? 'trend-up' : 'trend-down'}">${t.pnl.toFixed(2)}R</span> (${t.exit_reason || 'OPEN'})</p>
+                                <p>🎯 <b>Target/Exit Prices:</b> Entry: ${t.entry_price.toFixed(2)} | SL: ${t.stop_loss ? t.stop_loss.toFixed(2) : 'N/A'} | TP: ${t.take_profit ? t.take_profit.toFixed(2) : 'N/A'} | Exit: ${t.exit_price ? t.exit_price.toFixed(2) : 'N/A'}</p>
+                            </div>
+                            <div class="detail-card">
+                                <h5>Trigger Factors & Indicators</h5>
+                                ${diagnosticsHtml}
+                            </div>
+                        </div>
+                        <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 1rem; margin-top: 1rem;">Execution Milestones & Latency Logs</h4>
+                        <div class="execution-timeline">
+                            ${timelineHtml}
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function renderCandidatesList(candidates) {
+            const listContainer = document.getElementById("candidates-list-container");
+            document.getElementById("candidates-summary-label").textContent = `${candidates.length} Signal(s)`;
+
+            if (candidates.length === 0) {
+                listContainer.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No matching counterfactual opportunities.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = "";
+            candidates.forEach(c => {
+                const row = document.createElement("div");
+                row.className = "trade-row";
+                
+                const pnl = c.final_pnl_r !== null ? c.final_pnl_r : 0.0;
+                const isWin = pnl >= 0.0;
+                const pnlText = `${isWin ? '+' : ''}${pnl.toFixed(2)}R`;
+                
+                // Get execution milestones for this candidate
+                const milestones = sessionData.execution_events.filter(e => e.candidate_id === c.candidate_id);
+                let timelineHtml = '<div style="color: var(--text-muted); font-size: 0.85rem;">No execution logs found.</div>';
+                
+                if (milestones.length > 0) {
+                    let prevTime = null;
+                    timelineHtml = milestones.map((m, index) => {
+                        const curTime = new Date(m.timestamp);
+                        let latencyInfo = "";
+                        if (prevTime) {
+                            const diff = curTime - prevTime;
+                            latencyInfo = `<span class="timeline-step-latency">(+${diff}ms)</span>`;
+                        }
+                        prevTime = curTime;
+                        
+                        const timeStr = curTime.toLocaleTimeString();
+                        const payloadStr = m.payload ? JSON.stringify(m.payload) : "{}";
+                        
+                        return `
+                            <div class="timeline-step completed">
+                                <div class="timeline-step-header">
+                                    <div class="timeline-step-title">${m.event_type} ${latencyInfo}</div>
+                                    <div class="timeline-step-time">${timeStr}</div>
+                                </div>
+                                <div class="timeline-step-payload">${payloadStr}</div>
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                // Diagnostics triggers formatting
+                let diagnosticsHtml = '<div style="color: var(--text-muted); font-size: 0.85rem;">No trigger factors or indicators stored.</div>';
+                const diag = c.diagnostics;
+                if (diag && Object.keys(diag).length > 0) {
+                    diagnosticsHtml = '<div class="factors-grid">';
+                    for (const [key, val] of Object.entries(diag)) {
+                        if (typeof val === 'object' && val !== null) continue;
+                        const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+                        diagnosticsHtml += `
+                            <div class="factor-pill">
+                                <span class="factor-name">${formattedKey}</span>
+                                <span class="factor-val">${typeof val === 'number' ? val.toFixed(2) : val}</span>
+                            </div>
+                        `;
+                    }
+                    diagnosticsHtml += '</div>';
+                }
+
+                row.innerHTML = `
+                    <div class="trade-summary" onclick="toggleDetails(this)">
+                        <div class="trade-info">
+                            <span class="trade-badge" style="background: rgba(249, 115, 22, 0.1); color: var(--neon-orange); border: 1px solid rgba(249, 115, 22, 0.25);">Shadow</span>
+                            <div class="trade-symbol-container">
+                                <span class="trade-symbol">${c.symbol} &bull; <span style="font-weight: normal; font-size: 0.85rem; color: var(--text-secondary);">${c.signal_type}</span></span>
+                                <span class="trade-strategy">${c.setup_type || c.strategy} &bull; ${c.experiment_name}</span>
+                            </div>
+                            <div class="trade-prices">
+                                <span>Entry: <b>${c.entry_price ? c.entry_price.toFixed(2) : 'N/A'}</b></span>
+                                <span>SL: <b>${c.stop_loss ? c.stop_loss.toFixed(2) : 'N/A'}</b></span>
+                                <span>TP: <b>${c.take_profit ? c.take_profit.toFixed(2) : 'N/A'}</b></span>
+                            </div>
+                        </div>
+                        <div class="trade-pnl-column">
+                            <span class="trade-pnl-val" style="color: var(--neon-orange);">${pnlText}</span>
+                            <span style="font-size: 0.75rem; color: var(--neon-red); font-weight: 500;">Blocked: ${c.primary_rejection_reason || 'UNKNOWN'}</span>
+                        </div>
+                    </div>
+                    <div class="trade-details">
+                        <div class="detail-grid">
+                            <div class="detail-card">
+                                <h5>Execution Milestones</h5>
+                                <p>🔑 <b>Candidate ID:</b> ${c.candidate_id || 'N/A'}</p>
+                                <p>📅 <b>Triggered At:</b> ${new Date(c.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+                                <p>⏱️ <b>Simulation Duration:</b> ${c.duration_minutes ? c.duration_minutes.toFixed(1) + ' min' : 'N/A'}</p>
+                                <p>🏁 <b>Outcome:</b> <span style="color: var(--neon-orange);">${pnlText}</span> (${c.exit_reason || 'OPEN'})</p>
+                                <p>🎯 <b>Target/Exit Prices:</b> Entry: ${c.entry_price ? c.entry_price.toFixed(2) : 'N/A'} | SL: ${c.stop_loss ? c.stop_loss.toFixed(2) : 'N/A'} | TP: ${c.take_profit ? c.take_profit.toFixed(2) : 'N/A'} | Exit: ${c.exit_price ? c.exit_price.toFixed(2) : 'N/A'}</p>
+                            </div>
+                            <div class="detail-card">
+                                <h5>Trigger Factors & Indicators</h5>
+                                ${diagnosticsHtml}
+                            </div>
+                        </div>
+                        <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 1rem; margin-top: 1rem;">Execution Milestones & Latency Logs</h4>
+                        <div class="execution-timeline">
+                            ${timelineHtml}
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function renderFilterAnalytics(data) {
+            const tbody = document.getElementById("filter-analytics-tbody");
+            const eod = data.eod_report || {};
+            const filters = eod.sections?.counterfactual_insights?.filters || [];
+
+            if (filters.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">No filter telemetry loaded.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            filters.forEach(f => {
+                const row = document.createElement("tr");
+                
+                let badgeClass = "verdict-neutral";
+                let text = "Neutral";
+                if (f.verdict === "over_filtered") {
+                    badgeClass = "verdict-overfiltered";
+                    text = "Over-Filtered ⚠️";
+                } else if (f.verdict === "insufficient_data") {
+                    badgeClass = "verdict-insufficient";
+                    text = "Insufficient Data";
+                }
+
+                row.innerHTML = `
+                    <td style="font-weight: 600;">${f.name}</td>
+                    <td>${f.today_count}</td>
+                    <td>${(f.today_win_rate * 100).toFixed(0)}%</td>
+                    <td style="font-family: monospace; font-weight: 500;">${f.rolling_20d_expectancy >= 0 ? '+' : ''}${f.rolling_20d_expectancy.toFixed(2)}R</td>
+                    <td>
+                        <span class="verdict-badge ${badgeClass}">${text}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderLeaderboard(data) {
+            const container = document.getElementById("experiments-leaderboard");
+            const eod = data.eod_report || {};
+            const experiments = eod.sections?.executive_summary?.experiments || [];
+
+            if (experiments.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">No active experiments ranked.</div>`;
+                return;
+            }
+
+            // Find max PnL for scaling progress bars
+            const maxPnl = Math.max(...experiments.map(e => Math.abs(e.total_pnl_r || 0.0)), 1.0);
+
+            container.innerHTML = "";
+            experiments.forEach((e, idx) => {
+                const pct = Math.min(((Math.abs(e.total_pnl_r || 0.0) / maxPnl) * 100), 100);
+                const isPositive = (e.total_pnl_r || 0.0) >= 0.0;
+                
+                const card = document.createElement("div");
+                card.className = "strategy-compare-card";
+                card.innerHTML = `
+                    <div class="strategy-compare-header">
+                        <span class="strategy-compare-name">${idx + 1}. ${e.name}</span>
+                        <span class="strategy-compare-val" style="color: ${isPositive ? 'var(--neon-green)' : 'var(--neon-red)'}">
+                            ${isPositive ? '+' : ''}${e.total_pnl_r ? e.total_pnl_r.toFixed(2) : '0.00'}R
+                        </span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <span>CF Trades: <b>${e.cf_trades}</b></span>
+                        <span>Expectancy: <b>${e.expectancy >= 0 ? '+' : ''}${e.expectancy ? e.expectancy.toFixed(2) : '0.00'}R</b></span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: ${pct}%; background: ${isPositive ? 'linear-gradient(90deg, var(--neon-indigo), var(--neon-green))' : 'linear-gradient(90deg, var(--neon-orange), var(--neon-red))'};"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleDetails(element) {
+            const details = element.nextElementSibling;
+            if (details.style.display === "block") {
+                details.style.display = "none";
+            } else {
+                details.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

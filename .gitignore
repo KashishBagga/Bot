@@ -71,6 +71,7 @@ session_stats_*.json
 *_session_stats.json
 
 # Temporary / scratch files at root
+scratch/
 scratch_*.py
 trade_journal.csv
 

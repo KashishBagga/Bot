@@ -45,12 +45,17 @@ class QuantUtils:
         return "NEUTRAL"
 
     @staticmethod
-    def is_strong_rejection(df: pd.DataFrame, candle_idx: int = -1) -> bool:
+    def is_strong_rejection(df: pd.DataFrame, candle_idx: int = -2) -> bool:
         """
-        Deterministic Rejection:
+        Deterministic Rejection (on CONFIRMED candle):
         - Wick >= 2x Body
         - Close in extreme 25% of the candle range
+
+        Uses df.iloc[-2] by default (last CLOSED candle) — NOT the live forming candle.
+        Evaluating iloc[-1] during a live 5-min bar produces false signals on incomplete wicks.
         """
+        if len(df) < 2:
+            return False
         candle = df.iloc[candle_idx]
         high, low, close, open_ = candle['high'], candle['low'], candle['close'], candle['open']
         body = abs(close - open_)

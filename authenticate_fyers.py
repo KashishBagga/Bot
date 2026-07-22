@@ -97,6 +97,21 @@ def main():
             token = response['access_token']
             print("🚀 Access Token generated successfully!")
             update_env("FYERS_ACCESS_TOKEN", token)
+            
+            # Cache locally to tokens/
+            try:
+                import json
+                from datetime import date
+                token_dir = os.path.join(project_root, "tokens")
+                os.makedirs(token_dir, exist_ok=True)
+                today_str = date.today().strftime('%Y-%m-%d')
+                token_path = os.path.join(token_dir, f"token_{today_str}.json")
+                with open(token_path, 'w') as f:
+                    json.dump({"access_token": token, "date": today_str}, f)
+                print(f"💾 Cached access token to: {token_path}")
+            except Exception as ex:
+                print(f"❌ Failed to save local token cache: {ex}")
+                
             print("\n✅ Setup Complete! You can now run the bot in Live Mode.")
         else:
             print(f"❌ Failed to generate token: {response}")

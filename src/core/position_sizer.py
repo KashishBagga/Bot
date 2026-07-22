@@ -172,6 +172,7 @@ class PositionSizer:
 
             # --- Effective risk fraction ---
             stats             = self._get_or_create_stats(strategy)
+            effective_fraction = stats.kelly_fraction
             
             # Regime multiplier
             regime_mult = REGIME_MULTIPLIERS.get(regime.upper(), REGIME_MULTIPLIERS["UNKNOWN"])

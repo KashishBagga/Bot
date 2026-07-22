@@ -98,7 +98,8 @@ class PrevDayExtremesStrategy(BaseStrategy):
                 if is_near_high and high >= prev_high and close < prev_high:
                     setup_type = "REVERSAL"
                     side = "BUY PUT"
-                    sl = max(high + 1.0, price + (atr * 0.5))
+                    # BUG FIX: ATR-scaled buffer (was fixed +1.0pt — dangerous for BankNifty)
+                    sl = max(high + (atr * 0.15), price + (atr * 0.5))
                     # TP set to opposite low or default
                     take_profit = prev_low
                     if rvol < self.reversal_rvol_threshold:
@@ -110,7 +111,8 @@ class PrevDayExtremesStrategy(BaseStrategy):
                 elif is_near_low and low <= prev_low and close > prev_low:
                     setup_type = "REVERSAL"
                     side = "BUY CALL"
-                    sl = min(low - 1.0, price - (atr * 0.5))
+                    # BUG FIX: ATR-scaled buffer (was fixed -1.0pt — dangerous for BankNifty)
+                    sl = min(low - (atr * 0.15), price - (atr * 0.5))
                     take_profit = prev_high
                     if rvol < self.reversal_rvol_threshold:
                         rejection_reasons.append("LOW_RVOL")
@@ -145,13 +147,21 @@ class PrevDayExtremesStrategy(BaseStrategy):
                 return self._empty_result(experiment_name)
 
             # --- 3. Filter checks ---
-            # Open hours blackout
+            # Open hours blackout (Removed)
             current_time = snapshot.timestamp
-            if current_time.hour == 9 and current_time.minute < 45:
-                rejection_reasons.append("TIME_FILTER")
 
             # Invalidation buffer
             risk_dist = abs(price - sl) if sl else atr
+
+            # SL floor: minimum 0.5×ATR distance from entry (same fix as all other strategies)
+            min_sl_dist = atr * 0.5
+            if side == "BUY PUT" and (sl - price) < min_sl_dist:
+                sl = price + min_sl_dist
+                risk_dist = min_sl_dist
+            elif side == "BUY CALL" and (price - sl) < min_sl_dist:
+                sl = price - min_sl_dist
+                risk_dist = min_sl_dist
+
             if risk_dist == 0.0:
                 rejection_reasons.append("ZERO_RISK")
 
@@ -198,7 +208,7 @@ class PrevDayExtremesStrategy(BaseStrategy):
             }
 
             accepted = len(rejection_reasons) == 0
-            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_PDHL_{setup_type}_{price:.2f}_{current_time.strftime('%Y%m%d')}"
+            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_PDHL_{setup_type}_{price:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
 
             sig = {
                 'symbol': snapshot.symbol,

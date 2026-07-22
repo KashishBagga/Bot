@@ -38,13 +38,32 @@ class FyersClient:
         self.access_token = None
         self.fyers = None
         
-        # Load access token from environment
+        # Load access token from tokens directory or environment fallback
         import os
-        self.access_token = os.getenv("FYERS_ACCESS_TOKEN")
-        if self.access_token:
-            logger.info("🔑 Access token loaded from environment")
-        else:
-            logger.warning("⚠️ No access token found in environment")        # Rate limiting
+        import json
+        from datetime import date
+        
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        token_dir = os.path.join(project_root, "tokens")
+        today_str = date.today().strftime('%Y-%m-%d')
+        token_path = os.path.join(token_dir, f"token_{today_str}.json")
+        
+        if os.path.exists(token_path):
+            try:
+                with open(token_path, 'r') as f:
+                    data = json.load(f)
+                    self.access_token = data.get("access_token")
+                if self.access_token:
+                    logger.info(f"🔑 Loaded access token from local JSON cache: {token_path}")
+            except Exception as e:
+                logger.error(f"❌ Failed to read token cache: {e}")
+                
+        if not self.access_token:
+            self.access_token = os.getenv("FYERS_ACCESS_TOKEN")
+            if self.access_token:
+                logger.info("🔑 Access token loaded from environment fallback")
+            else:
+                logger.warning("⚠️ No access token found in JSON cache or environment")        # Rate limiting
         self.last_api_call = 0
         self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls to avoid rate limits
         
@@ -108,6 +127,23 @@ class FyersClient:
             if 'access_token' in response:
                 self.access_token = response['access_token']
                 logger.info("Access token generated successfully")
+                
+                # Cache token in JSON file
+                try:
+                    import os
+                    import json
+                    from datetime import date
+                    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                    token_dir = os.path.join(project_root, "tokens")
+                    os.makedirs(token_dir, exist_ok=True)
+                    today_str = date.today().strftime('%Y-%m-%d')
+                    token_path = os.path.join(token_dir, f"token_{today_str}.json")
+                    with open(token_path, 'w') as f:
+                        json.dump({"access_token": self.access_token, "date": today_str}, f)
+                    logger.info(f"💾 Saved access token to local JSON cache: {token_path}")
+                except Exception as ex:
+                    logger.error(f"❌ Failed to save token cache: {ex}")
+                    
                 return True
             else:
                 logger.error(f"Failed to generate access token: {response}")

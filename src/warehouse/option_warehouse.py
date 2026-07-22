@@ -33,7 +33,7 @@ class OptionWarehouse:
         self.data_provider = FyersDataProvider()
         self.db = PostgresDatabase()
         self.tz = ZoneInfo("Asia/Kolkata")
-        self.interval = 3 
+        self.interval = 60 
         
         # Health Metrics (P0)
         self.stats = {
@@ -45,7 +45,7 @@ class OptionWarehouse:
 
     async def run(self):
         """Main loop to capture snapshots during market hours."""
-        logger.info(f"🚀 Option Warehouse started for: {self.underlyings}")
+        logger.info(f"🚀 Option Warehouse started for: {self.underlyings} (Interval: {self.interval}s)")
         
         while True:
             try:
@@ -53,6 +53,7 @@ class OptionWarehouse:
                 # Check market hours
                 if (9 <= now.hour <= 15) and (now.minute >= 15 or now.hour > 9) and (now.minute <= 30 or now.hour < 15):
                     if now.weekday() < 5: # Monday to Friday
+                        success_count = 0
                         for underlying in self.underlyings:
                             start_time = time.time()
                             self.stats['expected'] += 1
@@ -60,15 +61,34 @@ class OptionWarehouse:
                             latency = (time.time() - start_time) * 1000
                             self.stats['latency_ms'].append(latency)
                             
-                            if chain and 'snapshots' in chain:
-                                self.stats['received'] += 1
+                            if not chain:
+                                logger.warning(f"⚠️ No data returned from Fyers for {underlying}")
+                                continue
+                            if 'snapshots' not in chain:
+                                logger.warning(f"⚠️ Unexpected payload missing 'snapshots' for {underlying}: {chain}")
+                                continue
+                            self.stats['received'] += 1
+                            try:
                                 self.db.save_option_snapshots(chain['snapshots'])
+                                success_count += 1
+                            except Exception as db_err:
+                                logger.error(f"❌ DB insert failed for {underlying}: {db_err}")
+                                continue
                                 
-                                # Quality Check
-                                if any(s['ltp'] == 0 for s in chain['snapshots']):
-                                    self.stats['zeros'] += 1
-                                    
-                                logger.debug(f"📊 Captured {len(chain['snapshots'])} option snapshots for {underlying}")
+                            # Quality Check
+                            if any(s.get('ltp', 0) == 0 for s in chain['snapshots']):
+                                self.stats['zeros'] += 1
+                                logger.warning(f"⚠️ Zero LTP detected in snapshots for {underlying}")
+                                
+                            logger.info(f"📊 Captured {len(chain['snapshots'])} option snapshots for {underlying}")
+                            
+                            # Stagger requests by sleeping 2 seconds between underlyings
+                            await asyncio.sleep(2)
+                            
+                        if len(self.underlyings) > 0 and success_count == 0:
+                            logger.warning("⚠️ All data fetches failed in this cycle. Backing off for 30s to cool down rate limits...")
+                            await asyncio.sleep(30)
+                            continue
                 
                 await asyncio.sleep(self.interval)
                 

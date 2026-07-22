@@ -84,12 +84,13 @@ class VwapReversionStrategy(BaseStrategy):
                 if distance_to_vwap > 0.0:
                     # Overstretched upward -> Mean revert downward (BUY PUT)
                     side = "BUY PUT"
-                    sl = max(high + 1.0, price + (atr * 0.5))
+                    # ATR-scaled buffer instead of fixed 1.0pt — important for BankNifty
+                    sl = max(high + (atr * 0.15), price + (atr * 0.5))
                     take_profit = vwap
                 elif distance_to_vwap < 0.0:
                     # Overstretched downward -> Mean revert upward (BUY CALL)
                     side = "BUY CALL"
-                    sl = min(low - 1.0, price - (atr * 0.5))
+                    sl = min(low - (atr * 0.15), price - (atr * 0.5))
                     take_profit = vwap
 
             if setup_type == "NONE":
@@ -98,10 +99,8 @@ class VwapReversionStrategy(BaseStrategy):
             # Rejections
             rejection_reasons = []
             
-            # 1. Open hours blackout
+            # 1. Open hours blackout (Removed)
             current_time = snapshot.timestamp
-            if current_time.hour == 9 and current_time.minute < 45:
-                rejection_reasons.append("TIME_FILTER")
 
             # 2. RVOL filter
             if rvol < self.rvol_threshold:
@@ -115,8 +114,24 @@ class VwapReversionStrategy(BaseStrategy):
 
             # Invalidation buffer
             risk_dist = abs(price - sl) if sl else atr
+
+            # ── FIX: Enforce minimum SL floor of 0.5×ATR from entry ──────────
+            min_sl_dist = atr * 0.5
+            if side == "BUY PUT" and (sl - price) < min_sl_dist:
+                sl = price + min_sl_dist
+                risk_dist = min_sl_dist
+            elif side == "BUY CALL" and (price - sl) < min_sl_dist:
+                sl = price - min_sl_dist
+                risk_dist = min_sl_dist
+            # ─────────────────────────────────────────────────────────────────
+
             if risk_dist == 0.0:
                 rejection_reasons.append("ZERO_RISK")
+
+            # ── FIX: Move efficiency gate — choppy moves don't revert cleanly
+            move_efficiency = snapshot.features.get_float("move_efficiency")
+            if move_efficiency < 0.5:
+                rejection_reasons.append("LOW_EFFICIENCY")
 
             # Cap TP at 5x ATR from entry
             max_tp_dist = atr * 5.0
@@ -148,7 +163,7 @@ class VwapReversionStrategy(BaseStrategy):
             }
 
             accepted = len(rejection_reasons) == 0
-            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_VWAPREV_{price:.2f}_{current_time.strftime('%Y%m%d')}"
+            candidate_id = f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_VWAPREV_{price:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
 
             sig = {
                 'symbol': snapshot.symbol,

@@ -9,10 +9,16 @@ No API calls. No strategy logic. Pure computation.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, time
 from typing import Optional, List, Tuple, Dict, Any
 
 import pandas as pd
+
+from src.core.pattern_engine import PatternEngine
+from src.core.liquidity_engine import LiquidityEngine
+from src.core.market_facts import MarketFacts
+from src.core.trading_clock import TradingClock
+
 
 from src.core.feature_store import FeatureStore
 from src.core.market_snapshot import MarketSnapshot
@@ -21,6 +27,12 @@ from src.core.zone_engine import ZoneEngine
 from src.core.volume_engine import VolumeEngine
 from src.core.regime_engine import RegimeEngine
 from src.core.quant_utils import QuantUtils
+from src.core.level_engine import LevelEngine
+from src.core.trendline_engine import TrendlineEngine
+from src.core.fusion_engine import FusionEngine
+from src.core.confluence_engine import ConfluenceEngine
+from src.core.narrative_engine import NarrativeEngine
+from src.core.market_geometry import GeometryContext, CompositeLevel, Trendline, ConfluenceZone
 
 # MKE Stage 1 Context Imports
 from src.core.market_knowledge import MarketContext, HTFStructure, StructureState, SwingStatus, ResearchEvent
@@ -111,8 +123,17 @@ class IndicatorPipeline:
         self.volume_engine = VolumeEngine(historical_days=historical_days)
         self.regime_engine = RegimeEngine()
         
+        self.level_engine = LevelEngine()
+        self.trendline_engine = TrendlineEngine()
+        self.fusion_engine = FusionEngine()
+        self.confluence_engine = ConfluenceEngine()
+        self.narrative_engine = NarrativeEngine()
+        self.pattern_engine = PatternEngine()
+        self.liquidity_engine = LiquidityEngine()
+        
         # Instantiate PostgresDatabase for persisting research events
         self.db = PostgresDatabase()
+
 
     @property
     def required_history(self) -> int:
@@ -121,7 +142,8 @@ class IndicatorPipeline:
             self.structure_engine.required_history,
             self.pivot_engine.required_history,
             self.cluster_engine.required_history,
-            self.tod_engine.required_history
+            self.tod_engine.required_history,
+            self.trendline_engine.required_history
         )
 
     # ── Public interface ───────────────────────────────────────────────────
@@ -166,6 +188,114 @@ class IndicatorPipeline:
             # Save m5 confirmed events
             for event in m5_events:
                 self.db.save_market_event(event.to_dict())
+                
+            # Build MarketFacts shared context
+            t_time = timestamp.time()
+            session = "MID"
+            if t_time >= time(9, 15) and t_time < time(10, 0):
+                session = "OPEN"
+            elif t_time >= time(14, 45) and t_time <= time(15, 30):
+                session = "CLOSE"
+                
+            is_open_blackout = (t_time >= time(9, 15) and t_time < time(9, 30))
+            is_close_blackout = (t_time >= time(15, 15) and t_time <= time(15, 30))
+            
+            facts = MarketFacts(
+                symbol=symbol,
+                current_price=price,
+                current_bar=TradingClock.trading_bar_id(timestamp),
+                atr=features.get_float("atr"),
+                tick_size=0.05,
+                timestamp=timestamp,
+                session=session,
+                is_open_blackout=is_open_blackout,
+                is_close_blackout=is_close_blackout,
+                swings=tuple(m5_state.swings),
+                completed_legs=tuple(m5_state.legs),
+                developing_leg=m5_state.developing_leg,
+                clusters=tuple(m5_state.clusters),
+                relationships=m5_state.relationships,
+                rvol_tod=volume_report.rvol_tod if hasattr(volume_report, 'rvol_tod') else 1.0,
+                atr_percentile=features.get_float("atr_percentile"),
+                last_swing_high=m5_state.last_swing_high,
+                last_swing_low=m5_state.last_swing_low,
+                is_compressed=m5_state.is_compressed
+            )
+            
+            # Compute Stage 5 Geometry raw parts
+            composites, trendlines, support_confluence, resistance_confluence, geo_events = self._stage_geometry(
+                m5=m5, h1=h1, d1=d1, structure=m5_state, features=features,
+                current_price=price, symbol=symbol, now=timestamp
+            )
+            
+            # Stage 6: PatternEngine
+            patterns_ctx = self.pattern_engine.detect(
+                facts=facts,
+                composites=composites,
+                trendlines=trendlines,
+                support_confluence=support_confluence,
+                resistance_confluence=resistance_confluence
+            )
+            market_ctx.patterns = patterns_ctx
+            
+            # Stage 7: LiquidityEngine
+            liquidity_ctx = self.liquidity_engine.analyze(
+                facts=facts,
+                composites=composites,
+                trendlines=trendlines,
+                patterns=patterns_ctx,
+                m5=m5,
+                d1=d1
+            )
+            market_ctx.liquidity = liquidity_ctx
+            
+            # Stage 9: NarrativeEngine
+            geo_ctx_temp = GeometryContext(
+                composites=composites,
+                trendlines=trendlines,
+                current_price=price,
+                support_confluence=support_confluence,
+                resistance_confluence=resistance_confluence
+            )
+            
+            narrative = self.narrative_engine.synthesize(
+                structure=m5_state,
+                levels_view=geo_ctx_temp.levels,
+                trendlines_view=geo_ctx_temp.trendlines,
+                support_confluence=support_confluence,
+                resistance_confluence=resistance_confluence,
+                regime={"volatility_state": self._stage_regime(m5)},
+                current_price=price,
+                patterns=patterns_ctx,
+                liquidity=liquidity_ctx
+            )
+            
+            # Stage 10: GeometryContext built
+            geometry_ctx = GeometryContext(
+                composites=composites,
+                trendlines=trendlines,
+                current_price=price,
+                support_confluence=support_confluence,
+                resistance_confluence=resistance_confluence,
+                narrative=narrative,
+                pending_events=geo_events
+            )
+            market_ctx.geometry = geometry_ctx
+            
+            # Save geometry pending events
+            for event in geo_events:
+                self.db.save_market_event(event.to_dict())
+                
+            # Save pattern transition events
+            for event in patterns_ctx.transition_events:
+                research_event = event.to_research_event(timestamp)
+                self.db.save_market_event(research_event.to_dict())
+
+            # Save liquidity transition events
+            for event in liquidity_ctx.transition_events:
+                research_event = event.to_research_event(timestamp)
+                self.db.save_market_event(research_event.to_dict())
+
                 
             # Compute h1 HTF structures
             h1_conf_state, h1_conf_events = self._compute_mke_structure(h1, symbol, "h1", confirmed_only_bars=True)
@@ -268,8 +398,17 @@ class IndicatorPipeline:
             2. Add it to the `data` dict with a clear key name.
             3. Nothing else changes — strategies read via features.get_float("rsi14").
         """
-        # ATR (simple range-based approximation)
-        atr = float(m5["high"].tail(14).mean() - m5["low"].tail(14).mean())
+        # ── ATR (True Range, 14-period rolling mean) ──────────────────────
+        # BUG FIX: Previous formula was mean(highs) - mean(lows) which ignores
+        # overnight gaps and is NOT a valid ATR. True Range = max(H-L, |H-PC|, |L-PC|)
+        close_prev = m5["close"].shift(1)
+        tr_series = pd.concat([
+            m5["high"] - m5["low"],
+            (m5["high"] - close_prev).abs(),
+            (m5["low"]  - close_prev).abs(),
+        ], axis=1).max(axis=1)
+        atr_rolling = tr_series.rolling(window=14).mean()
+        atr = float(atr_rolling.iloc[-1]) if not pd.isna(atr_rolling.iloc[-1]) else float(m5["high"].tail(14).mean() - m5["low"].tail(14).mean())
 
         # EMA values on close
         ema20 = float(m5["close"].ewm(span=20, adjust=False).mean().iloc[-1])
@@ -277,18 +416,34 @@ class IndicatorPipeline:
 
         # Move quality metrics (used by StructuralStrategy filters)
         move_efficiency = float(QuantUtils.calculate_move_efficiency(m5, lookback=10))
+        # Longer-lookback efficiency for H1-timeframe strategies (2h = 24 bars of 5m)
+        move_efficiency_h1 = float(QuantUtils.calculate_move_efficiency(m5, lookback=24))
         wickiness = float(QuantUtils.calculate_wickiness(m5, lookback=5))
 
         # EMA cross direction (convenience boolean for EMA strategy)
         ema_bullish = ema20 > ema50
 
-        # ── VWAP Distance ──
+        # ── RSI-14 ─────────────────────────────────────────────────────────
+        rsi14 = 50.0
+        try:
+            delta = m5["close"].diff()
+            gain = delta.clip(lower=0).rolling(window=14).mean()
+            loss = (-delta.clip(upper=0)).rolling(window=14).mean()
+            rs = gain / loss.replace(0, float('nan'))
+            rsi_series = 100 - (100 / (1 + rs))
+            val = rsi_series.iloc[-1]
+            rsi14 = float(val) if not pd.isna(val) else 50.0
+        except Exception as e:
+            logger.warning(f"Error calculating RSI: {e}")
+
+        # ── VWAP Distance ──────────────────────────────────────────────────
         distance_to_vwap = 0.0
         try:
             last_date = m5.index[-1].date()
             day_mask = m5.index.date == last_date
             day_m5 = m5[day_mask]
-            if len(day_m5) > 0:
+            # BUG FIX: Need at least 8 bars (~40 min) for a meaningful intraday VWAP
+            if len(day_m5) >= 8:
                 typical_price = (day_m5["high"] + day_m5["low"] + day_m5["close"]) / 3.0
                 pv = typical_price * day_m5["volume"]
                 cum_pv = pv.cumsum()
@@ -297,23 +452,16 @@ class IndicatorPipeline:
                 vwap = float(cum_pv.iloc[-1] / latest_cum_vol) if latest_cum_vol > 0 else 0.0
                 close = float(m5["close"].iloc[-1])
                 distance_to_vwap = (close - vwap) / vwap if vwap > 0 else 0.0
+            # else: distance_to_vwap stays 0.0 (neutral) — VWAP not yet meaningful
         except Exception as e:
             logger.warning(f"Error calculating VWAP distance: {e}")
 
-        # ── ATR Percentile ──
+        # ── ATR Percentile ── reuse the True Range series already computed above
         atr_percentile = 0.5
         try:
-            high = m5["high"]
-            low = m5["low"]
-            close_prev = m5["close"].shift(1)
-            tr1 = high - low
-            tr2 = (high - close_prev).abs()
-            tr3 = (low - close_prev).abs()
-            tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-            atr_series = tr.rolling(window=14).mean()
-            current_atr = atr_series.iloc[-1]
-            atr_lookback = atr_series.tail(250).dropna()
-            if len(atr_lookback) > 1:
+            atr_lookback = atr_rolling.tail(250).dropna()
+            current_atr = atr_rolling.iloc[-1]
+            if len(atr_lookback) > 1 and not pd.isna(current_atr):
                 atr_percentile = float((atr_lookback < current_atr).sum() / len(atr_lookback))
         except Exception as e:
             logger.warning(f"Error calculating ATR percentile: {e}")
@@ -342,8 +490,10 @@ class IndicatorPipeline:
             "ema20":                  round(ema20, 2),
             "ema50":                  round(ema50, 2),
             "move_efficiency":        round(move_efficiency, 4),
+            "move_efficiency_h1":     round(move_efficiency_h1, 4),
             "wickiness":              round(wickiness, 4),
             "ema_bullish":            ema_bullish,
+            "rsi14":                  round(rsi14, 2),
             "distance_to_vwap":       round(distance_to_vwap, 4),
             "atr_percentile":         round(atr_percentile, 4),
             "dist_prev_high":         round(dist_prev_high, 4),
@@ -351,3 +501,56 @@ class IndicatorPipeline:
         }
 
         return FeatureStore(data)
+
+    def _stage_geometry(
+        self,
+        m5: pd.DataFrame,
+        h1: Optional[pd.DataFrame],
+        d1: Optional[pd.DataFrame],
+        structure: StructureState,
+        features: FeatureStore,
+        current_price: float,
+        symbol: str,
+        now: datetime,
+    ) -> Tuple[List[CompositeLevel], List[Trendline], Optional[ConfluenceZone], Optional[ConfluenceZone], List[ResearchEvent]]:
+        """Runs the complete geometry pipeline and returns raw levels, trendlines, and confluence."""
+        atr = features.get_float("atr")
+        if atr <= 0:
+            atr = 1.0
+
+        ema20 = features.get_float("ema20")
+        ema50 = features.get_float("ema50")
+
+        # Reconstruct VWAP price from distance_to_vwap if possible
+        vwap = current_price
+        try:
+            dist_vwap = features.get_float("distance_to_vwap")
+            vwap = current_price / (1.0 + dist_vwap)
+        except Exception:
+            pass
+
+        # 1. Level detection
+        levels, level_events = self.level_engine.detect_levels(
+            m5=m5, h1=h1, d1=d1, structure=structure, atr=atr,
+            vwap=vwap, ema20=ema20, ema50=ema50, current_price=current_price,
+            symbol=symbol, now=now
+        )
+
+        # 2. Trendline detection
+        trendlines, tl_events = self.trendline_engine.detect_trendlines(
+            m5=m5, structure=structure, atr=atr, current_price=current_price,
+            symbol=symbol, now=now
+        )
+
+        # 3. Fusion (clustering)
+        composites = self.fusion_engine.fuse(
+            levels=levels, trendlines=trendlines, atr=atr
+        )
+
+        # 4. Confluence zones
+        support_confluence, resistance_confluence = self.confluence_engine.calculate_confluence(
+            composites=composites, trendlines=trendlines, current_price=current_price, atr=atr
+        )
+
+        return composites, trendlines, support_confluence, resistance_confluence, level_events + tl_events
+
