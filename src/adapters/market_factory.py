@@ -8,6 +8,7 @@ from src.markets.indian.indian_market import IndianMarket
 from src.markets.crypto.crypto_market import CryptoMarket
 
 
+
 class MarketFactory:
     """Factory for creating market instances."""
     
