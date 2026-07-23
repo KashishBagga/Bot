@@ -389,6 +389,9 @@ class StructuralPaperTrader:
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics')
             }
+            # Restore multi-leg combo fields (legs / premium thresholds) if this
+            # recovered row is a STRADDLE/STRANGLE, so premium-space management resumes.
+            self._restore_combo_fields(self.active_trades[key], op.get('diagnostics'))
             # recovered_after_minutes: distinguish quick restart from multi-hour outage
             recovered_after_minutes = round(
                 (datetime.now(self.tz) - op['entry_time']).total_seconds() / 60.0, 1
@@ -471,6 +474,7 @@ class StructuralPaperTrader:
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics')
             }
+            self._restore_combo_fields(self.active_counterfactuals[cand_id], op.get('diagnostics'))
             # Rebuild thesis deduplication index from recovered positions - key order matches market_loop check
             exp_name = op.get('experiment_name', 'Structural_v3.2_RVOL1.0')
             thesis_key = (exp_name, symbol, op['setup_type'], op['signal_type'])
@@ -932,6 +936,22 @@ class StructuralPaperTrader:
     # ────────────────────────────────────────────────────────────────────
     # Multi-leg volatility combos (STRADDLE / STRANGLE) — premium-space
     # ────────────────────────────────────────────────────────────────────
+    def _restore_combo_fields(self, pos: Dict, diagnostics) -> Dict:
+        """Rehydrate combo-specific fields on a recovered position from its stored
+        diagnostics['combo'] block. No-op for ordinary directional positions."""
+        diag = diagnostics if isinstance(diagnostics, dict) else {}
+        combo = diag.get('combo') if isinstance(diag, dict) else None
+        if not combo:
+            return pos  # not a combo — leave as-is
+        pos['is_combo'] = True
+        pos['combo_type'] = combo.get('type', pos.get('signal'))
+        pos['legs'] = combo.get('legs', [])
+        pos['premium_sl_pct'] = combo.get('premium_sl_pct', 0.40)
+        pos['premium_tp_pct'] = combo.get('premium_tp_pct', 0.60)
+        pos['max_bars'] = combo.get('max_bars', 24)
+        pos['_last_combined'] = pos.get('entry_price')
+        return pos
+
     def _combo_current_premium(self, pos: Dict) -> Optional[float]:
         """Sum the current live premium of both legs. Returns None (→ hold) if a
         leg quote can't be fetched, caching the last good value on the position."""
@@ -1000,6 +1020,18 @@ class StructuralPaperTrader:
             'option_type': l.option_type, 'expiry': l.expiry, 'entry_premium': l.premium,
         } for l in legs]
 
+        # Embed the full combo spec in diagnostics so an open combo can be
+        # reconstructed from its persisted DB row on restart (the legs / premium
+        # thresholds are not first-class trade_performance columns).
+        combo_diag = dict(sig.get('diagnostics') or {})
+        combo_diag['combo'] = {
+            'type': combo_type, 'legs': leg_records,
+            'premium_sl_pct': premium_sl_pct, 'premium_tp_pct': premium_tp_pct,
+            'max_bars': max_bars, 'entry_combined': entry_combined,
+        }
+        combo_diag['position_size_inr'] = position_size_inr
+        combo_diag['lots'] = lots
+
         pos = {
             'trade_id': trade_id if not is_counterfactual else None,
             'candidate_id': candidate_id, 'symbol': symbol,
@@ -1018,7 +1050,7 @@ class StructuralPaperTrader:
             'strategy_version': version, 'market_regime': regime,
             'is_counterfactual': is_counterfactual, 'rejection_reasons': sig.get('rejection_reasons', []),
             'position_size_inr': position_size_inr, 'lots': lots, '_last_pnl_r': 0.0,
-            'confidence': sig.get('confidence'), 'diagnostics': sig.get('diagnostics') or {},
+            'confidence': sig.get('confidence'), 'diagnostics': combo_diag,
             # combo-specific
             'is_combo': True, 'combo_type': combo_type, 'legs': leg_records,
             'premium_sl_pct': premium_sl_pct, 'premium_tp_pct': premium_tp_pct, 'max_bars': max_bars,
@@ -1031,14 +1063,64 @@ class StructuralPaperTrader:
             exp_obj = self.registry.get(experiment_name)
             thesis_base = exp_obj.strategy.thesis_key(sig) if exp_obj else (symbol, sig.get('strategy', ''), combo_type)
             self.active_cf_theses[(experiment_name,) + thesis_base] = candidate_id
+            self._persist_combo_entry(pos, timestamp, is_counterfactual=True)
         else:
             self.active_trades[trade_key] = pos
+            self._persist_combo_entry(pos, timestamp, is_counterfactual=False)
 
         logger.info(
             f"🎯 {'CF ' if is_counterfactual else ''}{combo_type} {symbol} | legs={[l.symbol for l in legs]} "
             f"| combined premium={entry_combined:.2f} lots={lots} | SL -{premium_sl_pct:.0%} TP +{premium_tp_pct:.0%}"
         )
         return
+
+    def _persist_combo_entry(self, pos: Dict, timestamp, is_counterfactual: bool):
+        """Persist an OPEN combo row (exit_time NULL) so it survives a restart.
+        The combo spec lives in diagnostics['combo'] for reconstruction."""
+        symbol = pos['symbol']
+        base = {
+            'entry_price': pos['entry_price'], 'stop_loss': pos['stop_loss'],
+            'take_profit': pos['take_profit'], 'initial_stop_loss': pos['initial_stop_loss'],
+            'initial_take_profit': pos['initial_take_profit'],
+            'highest_price': pos['highest_price'], 'lowest_price': pos['lowest_price'],
+            'stop_loss_distance': pos['stop_loss_distance'], 'exit_time': None, 'exit_price': None,
+            'mfe_r': 0.0, 'mae_r': 0.0, 'final_pnl_r': 0.0, 'duration_minutes': 0.0,
+            'bars_held': 0, 'exit_reason': 'OPEN', 'strategy_version': pos['version'],
+            'capture_rate': 0.0, 'experiment_name': pos['experiment_name'],
+            'strategy_id': pos['strategy_id'], 'version': pos['version'],
+            'confidence': pos.get('confidence'), 'diagnostics': pos['diagnostics'],
+            'setup_type': pos['setup_type'],
+        }
+        try:
+            if is_counterfactual:
+                self.db.save_counterfactual_event({
+                    'event_id': f"evt_{int(timestamp.timestamp())}_{pos['candidate_id']}_entry_cf",
+                    'candidate_id': pos['candidate_id'], 'symbol': symbol, 'timestamp': timestamp,
+                    'event_type': 'ENTRY', 'payload': {'combo': pos['diagnostics'].get('combo')},
+                })
+                self.db.save_counterfactual_result({
+                    'candidate_id': pos['candidate_id'], 'timestamp': timestamp, 'symbol': symbol,
+                    'signal_type': pos['signal'], 'rejection_reasons': pos.get('rejection_reasons', []),
+                    'primary_rejection_reason': (pos.get('rejection_reasons') or ['NONE'])[0],
+                    **base,
+                })
+            else:
+                self.db.save_trade_event({
+                    'event_id': f"evt_{int(timestamp.timestamp())}_{symbol}_entry",
+                    'trade_id': pos['trade_id'], 'timestamp': timestamp, 'event_type': 'ENTRY',
+                    'payload': {'combo': pos['diagnostics'].get('combo')},
+                })
+                self.db.save_trade_performance({
+                    'trade_id': pos['trade_id'], 'candidate_id': pos['candidate_id'],
+                    'entry_time': timestamp, 'strategy': pos['strategy'], 'symbol': symbol,
+                    'signal_type': pos['signal'], 'market_regime': pos['market_regime'],
+                    'signal_logic_version': pos['version'], 'position_logic_version': 'v1.0',
+                    'risk_logic_version': 'v1.0', 'features': pos.get('features', {}),
+                    'mfe': 0.0, 'mae': 0.0, 'pnl': 0.0, 'max_closed_profit_r': 0.0,
+                    **base,
+                })
+        except Exception as e:
+            logger.warning(f"combo entry persist failed for {symbol}: {e}")
 
     def _update_combo(self, pos: Dict, timestamp) -> bool:
         """Manage a combo in premium space: SL/TP on combined premium %, time stop,
