@@ -617,6 +617,10 @@ class StructuralPaperTrader:
                     logger.warning(f"⚠️ Pipeline returned None for {symbol}")
                     continue
 
+                # Persist the live market view for the dashboard — this is exactly
+                # what the engine saw this candle (no dashboard-side recomputation).
+                self._persist_market_status(snapshot, now)
+
                 results = self.registry.run(snapshot)
 
                 for result in results:
@@ -687,6 +691,37 @@ class StructuralPaperTrader:
 
         except Exception as e:
             logger.error(f"❌ Error in market loop: {e}", exc_info=True)
+
+    def _persist_market_status(self, snapshot, now):
+        """Write the current market view + active-position counts for the dashboard.
+
+        Stored as a MARKET_STATUS market_event so the dashboard reads exactly what
+        the engine computed (no divergent recomputation on the dashboard side)."""
+        try:
+            mv = getattr(snapshot, "market_view", None)
+            sym = snapshot.symbol
+            active_real = sum(1 for k in self.active_trades if k[0] == sym)
+            active_cf = sum(1 for p in self.active_counterfactuals.values() if p.get("symbol") == sym)
+            payload = {
+                "price": snapshot.current_price,
+                "daily_bias": snapshot.daily_bias,
+                "regime": snapshot.market_regime,
+                "rvol": snapshot.volume_report.rvol_tod if snapshot.volume_report else None,
+                "market_view": mv.as_dict() if mv is not None else None,
+                "active_real_trades": active_real,
+                "active_counterfactuals": active_cf,
+            }
+            self.db.save_market_event({
+                "event_id": f"status_{sym.replace(':', '_').replace('-', '_')}_{int(now.timestamp())}",
+                "timestamp": now,
+                "occurrence_timestamp": now,
+                "symbol": sym,
+                "event_type": "MARKET_STATUS",
+                "engine_version": "v4.0",
+                "payload": payload,
+            })
+        except Exception as e:
+            logger.warning(f"market status persist failed: {e}")
 
     def _deployed_capital(self) -> float:
         """Sum of notional currently deployed across OPEN real trades (CFs excluded)."""
