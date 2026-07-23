@@ -109,6 +109,9 @@ class ExecutiveSummarySection(BaseSection):
             FROM trade_performance
             WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
               AND valid = TRUE
+              AND exit_time IS NOT NULL   -- CLOSED trades only; open positions have
+                                          -- final_pnl_r=0 and would be counted as
+                                          -- 0R losses, deflating win rate/expectancy
             """,
             (date_str,),
         )

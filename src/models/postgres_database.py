@@ -685,6 +685,22 @@ class PostgresDatabase:
             logger.error(f"❌ Failed to fetch open counterfactuals: {e}")
             return []
 
+    def get_latest_market_status(self) -> List[Dict[str, Any]]:
+        """Latest MARKET_STATUS row per symbol (for the live dashboard)."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT DISTINCT ON (symbol) symbol, timestamp, payload
+                        FROM market_events
+                        WHERE event_type = 'MARKET_STATUS'
+                        ORDER BY symbol, timestamp DESC
+                    """)
+                    return list(cursor.fetchall())
+        except Exception as e:
+            logger.error(f"❌ Failed to fetch market status: {e}")
+            return []
+
     def save_counterfactual_result(self, result: Dict[str, Any]):
         """Save or update counterfactual research trade result"""
         try:

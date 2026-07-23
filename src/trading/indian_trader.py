@@ -17,7 +17,7 @@ import logging
 import schedule
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 # Path Injection
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -40,6 +40,11 @@ from src.strategies.orb import OrbStrategy
 from src.strategies.atr_squeeze import AtrSqueezeStrategy
 from src.strategies.geometry_strategy import GeometryStrategy
 from src.strategies.order_flow_strategy import OrderFlowStrategy
+from src.strategies.reversal_pattern_strategy import ReversalPatternStrategy
+from src.strategies.continuation_pattern_strategy import ContinuationPatternStrategy
+from src.strategies.rsi_divergence_strategy import RsiDivergenceStrategy
+from src.strategies.squeeze_breakout_strategy import SqueezeBreakoutStrategy
+from src.strategies.volatility_straddle_strategy import VolatilityStraddleStrategy
 
 # Setup Logging
 os.makedirs("logs", exist_ok=True)
@@ -280,6 +285,31 @@ class StructuralPaperTrader:
         self.registry.register(_order_flow_exp)
         self.db.save_experiment(_order_flow_exp.to_db_dict())
 
+        # ── New confluence-aware strategies (chart patterns + volatility) ────
+        _new_experiments = [
+            ("Reversal_Pattern_v1.0", ReversalPatternStrategy(min_confidence=0.5, min_rvol=1.0),
+             {"min_confidence": 0.5, "min_rvol": 1.0},
+             "H&S / double top-bottom reversals confirmed on neckline break"),
+            ("Continuation_Pattern_v1.0", ContinuationPatternStrategy(min_confidence=0.45, min_rvol=1.1, min_efficiency=0.5),
+             {"min_confidence": 0.45, "min_rvol": 1.1, "min_efficiency": 0.5},
+             "Triangle / flag breakouts in the trend direction"),
+            ("RSI_Divergence_v1.0", RsiDivergenceStrategy(min_confidence=0.5, max_rvol=3.0),
+             {"min_confidence": 0.5, "max_rvol": 3.0},
+             "RSI/price divergence — momentum exhaustion / mean-reversion"),
+            ("Squeeze_Breakout_v1.0", SqueezeBreakoutStrategy(range_lookback=20, min_rvol=1.2),
+             {"range_lookback": 20, "min_rvol": 1.2},
+             "Directional break out of a Bollinger/Keltner squeeze"),
+            ("Volatility_Straddle_v1.0", VolatilityStraddleStrategy(),
+             {"straddle_atr_pct": 0.15, "max_atr_pct": 0.40, "premium_sl_pct": 0.40, "premium_tp_pct": 0.60},
+             "Non-directional STRADDLE/STRANGLE on compressed, cheap volatility"),
+        ]
+        self._new_experiment_names = []
+        for _name, _strat, _params, _desc in _new_experiments:
+            _exp = Experiment(name=_name, strategy=_strat, params=_params, description=_desc)
+            self.registry.register(_exp)
+            self.db.save_experiment(_exp.to_db_dict())
+            self._new_experiment_names.append(_name)
+
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
@@ -292,6 +322,8 @@ class StructuralPaperTrader:
         self.portfolios.register("Geometry_v1.0_Score35")
         self.portfolios.register("Geometry_v1.0_Score50")
         self.portfolios.register("OrderFlow_v1.0")
+        for _name in self._new_experiment_names:
+            self.portfolios.register(_name)
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
@@ -357,6 +389,9 @@ class StructuralPaperTrader:
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics')
             }
+            # Restore multi-leg combo fields (legs / premium thresholds) if this
+            # recovered row is a STRADDLE/STRANGLE, so premium-space management resumes.
+            self._restore_combo_fields(self.active_trades[key], op.get('diagnostics'))
             # recovered_after_minutes: distinguish quick restart from multi-hour outage
             recovered_after_minutes = round(
                 (datetime.now(self.tz) - op['entry_time']).total_seconds() / 60.0, 1
@@ -439,6 +474,7 @@ class StructuralPaperTrader:
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics')
             }
+            self._restore_combo_fields(self.active_counterfactuals[cand_id], op.get('diagnostics'))
             # Rebuild thesis deduplication index from recovered positions - key order matches market_loop check
             exp_name = op.get('experiment_name', 'Structural_v3.2_RVOL1.0')
             thesis_key = (exp_name, symbol, op['setup_type'], op['signal_type'])
@@ -585,6 +621,10 @@ class StructuralPaperTrader:
                     logger.warning(f"⚠️ Pipeline returned None for {symbol}")
                     continue
 
+                # Persist the live market view for the dashboard — this is exactly
+                # what the engine saw this candle (no dashboard-side recomputation).
+                self._persist_market_status(snapshot, now)
+
                 results = self.registry.run(snapshot)
 
                 for result in results:
@@ -655,6 +695,37 @@ class StructuralPaperTrader:
 
         except Exception as e:
             logger.error(f"❌ Error in market loop: {e}", exc_info=True)
+
+    def _persist_market_status(self, snapshot, now):
+        """Write the current market view + active-position counts for the dashboard.
+
+        Stored as a MARKET_STATUS market_event so the dashboard reads exactly what
+        the engine computed (no divergent recomputation on the dashboard side)."""
+        try:
+            mv = getattr(snapshot, "market_view", None)
+            sym = snapshot.symbol
+            active_real = sum(1 for k in self.active_trades if k[0] == sym)
+            active_cf = sum(1 for p in self.active_counterfactuals.values() if p.get("symbol") == sym)
+            payload = {
+                "price": snapshot.current_price,
+                "daily_bias": snapshot.daily_bias,
+                "regime": snapshot.market_regime,
+                "rvol": snapshot.volume_report.rvol_tod if snapshot.volume_report else None,
+                "market_view": mv.as_dict() if mv is not None else None,
+                "active_real_trades": active_real,
+                "active_counterfactuals": active_cf,
+            }
+            self.db.save_market_event({
+                "event_id": f"status_{sym.replace(':', '_').replace('-', '_')}_{int(now.timestamp())}",
+                "timestamp": now,
+                "occurrence_timestamp": now,
+                "symbol": sym,
+                "event_type": "MARKET_STATUS",
+                "engine_version": "v4.0",
+                "payload": payload,
+            })
+        except Exception as e:
+            logger.warning(f"market status persist failed: {e}")
 
     def _deployed_capital(self) -> float:
         """Sum of notional currently deployed across OPEN real trades (CFs excluded)."""
@@ -755,6 +826,10 @@ class StructuralPaperTrader:
         candle open — modelling the worst-case fill instead of assuming a perfect
         fill exactly at the stop price.
         """
+        # Multi-leg combos are managed entirely in premium space.
+        if pos.get('is_combo'):
+            return self._update_combo(pos, timestamp)
+
         symbol = pos['symbol']
         is_cf = pos.get('is_counterfactual', False)
         stop_loss_distance = pos['stop_loss_distance']
@@ -858,6 +933,228 @@ class StructuralPaperTrader:
 
         return False
 
+    # ────────────────────────────────────────────────────────────────────
+    # Multi-leg volatility combos (STRADDLE / STRANGLE) — premium-space
+    # ────────────────────────────────────────────────────────────────────
+    def _restore_combo_fields(self, pos: Dict, diagnostics) -> Dict:
+        """Rehydrate combo-specific fields on a recovered position from its stored
+        diagnostics['combo'] block. No-op for ordinary directional positions."""
+        diag = diagnostics if isinstance(diagnostics, dict) else {}
+        combo = diag.get('combo') if isinstance(diag, dict) else None
+        if not combo:
+            return pos  # not a combo — leave as-is
+        pos['is_combo'] = True
+        pos['combo_type'] = combo.get('type', pos.get('signal'))
+        pos['legs'] = combo.get('legs', [])
+        pos['premium_sl_pct'] = combo.get('premium_sl_pct', 0.40)
+        pos['premium_tp_pct'] = combo.get('premium_tp_pct', 0.60)
+        pos['max_bars'] = combo.get('max_bars', 24)
+        pos['_last_combined'] = pos.get('entry_price')
+        return pos
+
+    def _combo_current_premium(self, pos: Dict) -> Optional[float]:
+        """Sum the current live premium of both legs. Returns None (→ hold) if a
+        leg quote can't be fetched, caching the last good value on the position."""
+        total = 0.0
+        for leg in pos.get('legs', []):
+            p = self.option_engine.get_leg_premium(
+                leg['underlying'], leg['strike'], leg['option_type'], leg['expiry'], leg['symbol']
+            )
+            if p is None or p <= 0:
+                return pos.get('_last_combined')  # best-effort: hold on last known
+            total += p
+        pos['_last_combined'] = total
+        return total
+
+    def _enter_combo(self, sig, timestamp, trade_key, is_counterfactual, trade_id, t_id):
+        """Enter a two-leg STRADDLE/STRANGLE, managed in combined-premium space."""
+        symbol = sig['symbol']
+        experiment_name = sig.get('experiment_name', 'Structural_v3.2_RVOL1.0')
+        strategy_id = sig.get('strategy_id', 'unknown')
+        version = sig.get('version', 'v1.0')
+        candidate_id = sig.get('candidate_id')
+        combo = sig.get('combo', {}) or {}
+        combo_type = combo.get('type', sig['signal'])
+
+        # Resolve both legs. On failure, never enter a REAL combo (CF may proceed
+        # only if we still have a synthetic price — but we refuse fabricated fills,
+        # so a failed resolve skips both).
+        try:
+            legs = self.option_engine.resolve_combo(sig, sig['price'])
+        except Exception as e:
+            logger.error(f"❌ Failed to resolve combo legs for {symbol}: {e}")
+            self.execution_auditor.log_event("ENTRY_ABORTED", trade_id=t_id, candidate_id=candidate_id,
+                                             payload={"reason": "COMBO_UNRESOLVED"})
+            return
+
+        entry_combined = float(sum(l.premium for l in legs))
+        if entry_combined <= 0:
+            logger.error(f"❌ Combo entry premium non-positive for {symbol}; skipping.")
+            return
+
+        premium_sl_pct = float(combo.get('premium_sl_pct', 0.40))
+        premium_tp_pct = float(combo.get('premium_tp_pct', 0.60))
+        max_bars = int(combo.get('max_bars', 24))
+        regime = sig.get('features', {}).get('market_regime', 'UNKNOWN')
+        confidence = sig.get('confidence', 70.0) or 70.0
+
+        # Size on the combined premium; 1R = premium_sl_pct of combined premium.
+        position_size_inr = self.sizer.get_position_size(
+            entry_price=entry_combined,
+            stop_loss_price=entry_combined * (1.0 - premium_sl_pct),
+            strategy=sig['strategy'], confidence=confidence, regime=regime,
+            deployed_capital=(0.0 if is_counterfactual else self._deployed_capital()),
+        )
+        from src.core.options_mapper import OptionsMapper
+        lot_size = OptionsMapper.get_lot_size(legs[0].symbol)
+        lots = max(1, int(position_size_inr / (entry_combined * lot_size))) if entry_combined > 0 and lot_size > 0 else 1
+
+        self.execution_auditor.log_event(
+            "COMBO_FILLED" if not is_counterfactual else "CF_COMBO_FILLED",
+            trade_id=t_id, candidate_id=candidate_id,
+            payload={"type": combo_type, "legs": [l.symbol for l in legs], "combined_premium": entry_combined, "lots": lots},
+        )
+
+        leg_records = [{
+            'underlying': symbol, 'symbol': l.symbol, 'strike': l.strike,
+            'option_type': l.option_type, 'expiry': l.expiry, 'entry_premium': l.premium,
+        } for l in legs]
+
+        # Embed the full combo spec in diagnostics so an open combo can be
+        # reconstructed from its persisted DB row on restart (the legs / premium
+        # thresholds are not first-class trade_performance columns).
+        combo_diag = dict(sig.get('diagnostics') or {})
+        combo_diag['combo'] = {
+            'type': combo_type, 'legs': leg_records,
+            'premium_sl_pct': premium_sl_pct, 'premium_tp_pct': premium_tp_pct,
+            'max_bars': max_bars, 'entry_combined': entry_combined,
+        }
+        combo_diag['position_size_inr'] = position_size_inr
+        combo_diag['lots'] = lots
+
+        pos = {
+            'trade_id': trade_id if not is_counterfactual else None,
+            'candidate_id': candidate_id, 'symbol': symbol,
+            'experiment_name': experiment_name, 'strategy_id': strategy_id, 'version': version,
+            'signal': combo_type,                       # STRADDLE | STRANGLE
+            'entry_price': entry_combined,              # combined premium (premium space)
+            'entry_time': timestamp,
+            'stop_loss': entry_combined * (1.0 - premium_sl_pct),
+            'take_profit': entry_combined * (1.0 + premium_tp_pct),
+            'initial_stop_loss': entry_combined * (1.0 - premium_sl_pct),
+            'initial_take_profit': entry_combined * (1.0 + premium_tp_pct),
+            'stop_loss_distance': entry_combined * premium_sl_pct,   # 1R in premium terms
+            'highest_price': entry_combined, 'lowest_price': entry_combined,
+            'strategy': sig['strategy'], 'features': sig.get('features', {}),
+            'bars_held': 0, 'max_closed_profit_r': 0.0, 'setup_type': sig.get('strategy'),
+            'strategy_version': version, 'market_regime': regime,
+            'is_counterfactual': is_counterfactual, 'rejection_reasons': sig.get('rejection_reasons', []),
+            'position_size_inr': position_size_inr, 'lots': lots, '_last_pnl_r': 0.0,
+            'confidence': sig.get('confidence'), 'diagnostics': combo_diag,
+            # combo-specific
+            'is_combo': True, 'combo_type': combo_type, 'legs': leg_records,
+            'premium_sl_pct': premium_sl_pct, 'premium_tp_pct': premium_tp_pct, 'max_bars': max_bars,
+            '_last_combined': entry_combined,
+            'option_symbol': "|".join(l.symbol for l in legs), 'option_premium': entry_combined,
+        }
+
+        if is_counterfactual:
+            self.active_counterfactuals[candidate_id] = pos
+            exp_obj = self.registry.get(experiment_name)
+            thesis_base = exp_obj.strategy.thesis_key(sig) if exp_obj else (symbol, sig.get('strategy', ''), combo_type)
+            self.active_cf_theses[(experiment_name,) + thesis_base] = candidate_id
+            self._persist_combo_entry(pos, timestamp, is_counterfactual=True)
+        else:
+            self.active_trades[trade_key] = pos
+            self._persist_combo_entry(pos, timestamp, is_counterfactual=False)
+
+        logger.info(
+            f"🎯 {'CF ' if is_counterfactual else ''}{combo_type} {symbol} | legs={[l.symbol for l in legs]} "
+            f"| combined premium={entry_combined:.2f} lots={lots} | SL -{premium_sl_pct:.0%} TP +{premium_tp_pct:.0%}"
+        )
+        return
+
+    def _persist_combo_entry(self, pos: Dict, timestamp, is_counterfactual: bool):
+        """Persist an OPEN combo row (exit_time NULL) so it survives a restart.
+        The combo spec lives in diagnostics['combo'] for reconstruction."""
+        symbol = pos['symbol']
+        base = {
+            'entry_price': pos['entry_price'], 'stop_loss': pos['stop_loss'],
+            'take_profit': pos['take_profit'], 'initial_stop_loss': pos['initial_stop_loss'],
+            'initial_take_profit': pos['initial_take_profit'],
+            'highest_price': pos['highest_price'], 'lowest_price': pos['lowest_price'],
+            'stop_loss_distance': pos['stop_loss_distance'], 'exit_time': None, 'exit_price': None,
+            'mfe_r': 0.0, 'mae_r': 0.0, 'final_pnl_r': 0.0, 'duration_minutes': 0.0,
+            'bars_held': 0, 'exit_reason': 'OPEN', 'strategy_version': pos['version'],
+            'capture_rate': 0.0, 'experiment_name': pos['experiment_name'],
+            'strategy_id': pos['strategy_id'], 'version': pos['version'],
+            'confidence': pos.get('confidence'), 'diagnostics': pos['diagnostics'],
+            'setup_type': pos['setup_type'],
+        }
+        try:
+            if is_counterfactual:
+                self.db.save_counterfactual_event({
+                    'event_id': f"evt_{int(timestamp.timestamp())}_{pos['candidate_id']}_entry_cf",
+                    'candidate_id': pos['candidate_id'], 'symbol': symbol, 'timestamp': timestamp,
+                    'event_type': 'ENTRY', 'payload': {'combo': pos['diagnostics'].get('combo')},
+                })
+                self.db.save_counterfactual_result({
+                    'candidate_id': pos['candidate_id'], 'timestamp': timestamp, 'symbol': symbol,
+                    'signal_type': pos['signal'], 'rejection_reasons': pos.get('rejection_reasons', []),
+                    'primary_rejection_reason': (pos.get('rejection_reasons') or ['NONE'])[0],
+                    **base,
+                })
+            else:
+                self.db.save_trade_event({
+                    'event_id': f"evt_{int(timestamp.timestamp())}_{symbol}_entry",
+                    'trade_id': pos['trade_id'], 'timestamp': timestamp, 'event_type': 'ENTRY',
+                    'payload': {'combo': pos['diagnostics'].get('combo')},
+                })
+                self.db.save_trade_performance({
+                    'trade_id': pos['trade_id'], 'candidate_id': pos['candidate_id'],
+                    'entry_time': timestamp, 'strategy': pos['strategy'], 'symbol': symbol,
+                    'signal_type': pos['signal'], 'market_regime': pos['market_regime'],
+                    'signal_logic_version': pos['version'], 'position_logic_version': 'v1.0',
+                    'risk_logic_version': 'v1.0', 'features': pos.get('features', {}),
+                    'mfe': 0.0, 'mae': 0.0, 'pnl': 0.0, 'max_closed_profit_r': 0.0,
+                    **base,
+                })
+        except Exception as e:
+            logger.warning(f"combo entry persist failed for {symbol}: {e}")
+
+    def _update_combo(self, pos: Dict, timestamp) -> bool:
+        """Manage a combo in premium space: SL/TP on combined premium %, time stop,
+        session end. Returns True if the combo exited."""
+        pos['bars_held'] = pos.get('bars_held', 0) + 1
+        entry = pos['entry_price']
+        sld = pos['stop_loss_distance']
+
+        current = self._combo_current_premium(pos)
+        if current is None:
+            current = pos.get('_last_combined', entry)  # couldn't fetch — hold at last known
+
+        pos['highest_price'] = max(pos['highest_price'], current)
+        pos['lowest_price'] = min(pos['lowest_price'], current)
+        pnl_r = (current - entry) / sld if sld > 0 else 0.0
+        pos['max_closed_profit_r'] = max(pos.get('max_closed_profit_r', 0.0), pnl_r)
+
+        is_closed, exit_reason = False, None
+        if timestamp.hour == 15 and timestamp.minute >= 25:
+            is_closed, exit_reason = True, 'SESSION_END'
+        elif current <= pos['stop_loss']:
+            is_closed, exit_reason = True, 'STOP_LOSS'
+        elif current >= pos['take_profit']:
+            is_closed, exit_reason = True, 'TAKE_PROFIT'
+        elif pos['bars_held'] >= pos.get('max_bars', 24):
+            is_closed, exit_reason = True, 'TIME_STOP'
+
+        if is_closed:
+            # Two-leg round-trip friction is higher than a single option leg.
+            pnl_r -= 0.10
+            self._exit_position(pos, current, exit_reason, timestamp, pnl_r)
+            return True
+        return False
+
     def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool):
         symbol = sig['symbol']
         experiment_name = sig.get('experiment_name', 'Structural_v3.2_RVOL1.0')
@@ -872,6 +1169,10 @@ class StructuralPaperTrader:
         # ── Audit Lifecycle: Signal Generated ────────────────────────────
         t_id = None if is_counterfactual else trade_id
         self.execution_auditor.log_event("SIGNAL_GENERATED", trade_id=t_id, candidate_id=candidate_id, payload=sig)
+
+        # Multi-leg volatility combos are entered/managed in premium space.
+        if sig.get('signal') in ('STRADDLE', 'STRANGLE'):
+            return self._enter_combo(sig, timestamp, trade_key, is_counterfactual, trade_id, t_id)
 
         # ── Option Contract Strike Selection Redesign ────────────────────
         option_contract = None
@@ -1350,8 +1651,10 @@ class StructuralPaperTrader:
         lowest = min(pos['lowest_price'], exit_price)
         is_cf = pos.get('is_counterfactual', False)
         
-        # Excursions
-        if pos['signal'] == 'BUY CALL':
+        # Excursions. A combo is long-premium: it profits when the combined
+        # premium (tracked in entry_price/highest/lowest) rises, i.e. it behaves
+        # like a BUY CALL on the combined premium.
+        if pos.get('is_combo') or pos['signal'] == 'BUY CALL':
             mfe_r = (highest - entry_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
             mae_r = (entry_price - lowest) / stop_loss_distance if stop_loss_distance > 0 else 0.0
         else: # BUY PUT

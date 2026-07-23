@@ -60,6 +60,12 @@ class MarketSnapshot:
     features: FeatureStore
     market: object  # MarketContext object containing MKE structure, trend, etc.
 
+    # ── Shared confluence layer (optional) ─────────────────────────────────
+    # MarketView aggregates chart patterns + bias + regime + RVOL. Strategies
+    # read it to boost/dampen their own confidence (composability). Optional so
+    # non-pipeline construction paths (tests, legacy engine) still work.
+    market_view: object = None  # src.core.market_view.MarketView | None
+
     def __repr__(self) -> str:
         return (
             f"MarketSnapshot("
