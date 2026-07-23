@@ -316,6 +316,22 @@ class IndicatorPipeline:
                 for event in d1_conf_events:
                     self.db.save_market_event(event.to_dict())
 
+            # ── Stage 6: Shared confluence view ──
+            # Chart patterns + bias + regime + RVOL → one MarketView object that
+            # every strategy can read for confluence (see market_view.py).
+            market_view = None
+            try:
+                from src.core.market_view import MarketViewEngine
+                rvol_val = volume_report.rvol_tod if volume_report else 1.0
+                market_view = MarketViewEngine().build(
+                    symbol=symbol, m5=m5, h1=h1,
+                    atr=features.get_float("atr"),
+                    atr_percentile=features.get_float("atr_percentile", 0.5),
+                    daily_bias=daily_bias, market_regime=market_regime, rvol=rvol_val,
+                )
+            except Exception as e:
+                logger.warning(f"[Pipeline] MarketView build failed for {symbol}: {e}")
+
             return MarketSnapshot(
                 symbol=symbol,
                 current_price=price,
@@ -329,7 +345,8 @@ class IndicatorPipeline:
                 market_regime=market_regime,
                 volume_report=volume_report,
                 features=features,
-                market=market_ctx
+                market=market_ctx,
+                market_view=market_view,
             )
 
         except Exception as e:
