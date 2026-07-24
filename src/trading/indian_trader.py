@@ -1860,8 +1860,53 @@ class StructuralPaperTrader:
                 f.write("timestamp,symbol,action,signal_type,price,stop_loss,take_profit,strategy,pnl_r,mfe_r,mae_r,max_closed_profit_r,duration_minutes,bars_held,reason\n")
             f.write(f"{timestamp},{symbol},{action},{signal_type},{price:.2f},{stop_loss:.2f},{take_profit:.2f},{strategy},{pnl_r:.2f},{mfe_r:.2f},{mae_r:.2f},{max_closed_profit_r:.2f},{duration_minutes:.2f},{bars_held},{reason}\n")
 
+# ── Pulse watchdog ──────────────────────────────────────────────────────────
+# The scheduler runs market_loop() serially in the main thread, and the Fyers
+# SDK network calls (quotes/history) have no timeout. A single hung call would
+# otherwise freeze the ENTIRE engine indefinitely (observed: a 40-minute silent
+# gap with no error, requiring a manual restart). A SIGALRM watchdog aborts any
+# pulse that exceeds the budget so the engine continues to the next candle.
+PULSE_TIMEOUT_S = 90
+
+
+class _PulseTimeout(BaseException):
+    """Not an Exception — so market_loop's broad `except Exception` can't swallow it."""
+
+
+def _install_pulse_watchdog():
+    import signal
+    try:
+        def _handler(signum, frame):
+            raise _PulseTimeout()
+        signal.signal(signal.SIGALRM, _handler)
+        return signal
+    except (ValueError, AttributeError, OSError):
+        return None  # non-main-thread or unsupported platform → no watchdog
+
+
+def _run_pulse(trader, sig_mod):
+    """Run one market pulse under the watchdog; never propagate a hang."""
+    if sig_mod is not None:
+        sig_mod.alarm(PULSE_TIMEOUT_S)
+    try:
+        trader.market_loop()
+    except _PulseTimeout:
+        logger.critical(
+            f"⏱️ WATCHDOG: market pulse exceeded {PULSE_TIMEOUT_S}s (likely a hung API "
+            f"call) — aborting this pulse and continuing to the next candle."
+        )
+    except Exception as e:
+        logger.error(f"❌ Unhandled error in market pulse: {e}", exc_info=True)
+    finally:
+        if sig_mod is not None:
+            sig_mod.alarm(0)
+
+
 def main():
     trader = StructuralPaperTrader(["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"])
+    _sig = _install_pulse_watchdog()
+    if _sig is None:
+        logger.warning("⚠️ Pulse watchdog unavailable on this platform — a hung API call could stall the loop.")
 
     # BUG FIX (Bug 19): Align scheduler to actual 5-minute candle close boundaries.
     # NSE 5-min candles close at 09:20, 09:25, 09:30 ... 15:25 IST.
@@ -1880,7 +1925,7 @@ def main():
     logger.info("⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.")
 
     # Run once immediately (now aligned to a candle boundary)
-    trader.market_loop()
+    _run_pulse(trader, _sig)
 
     # Boundary-aligned loop. `schedule.every(5).minutes` anchors the next run to
     # when the PREVIOUS run finished, so each slow fetch/DB cycle adds drift and
@@ -1895,7 +1940,7 @@ def main():
         if sleep_s < 10:
             sleep_s += 300  # too close to the boundary — wait for the next one
         time.sleep(sleep_s)
-        trader.market_loop()
+        _run_pulse(trader, _sig)
 
 if __name__ == "__main__":
     main()
