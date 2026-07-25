@@ -331,3 +331,50 @@ class OptionExecutionEngine:
         )
         logger.info(f"Resolved index signal into option contract: {contract}")
         return contract
+
+    def resolve_combo(self, signal: Dict, index_ltp: float) -> List[OptionContract]:
+        """Resolve a non-directional combo (STRADDLE / STRANGLE) into TWO legs
+        (a CE and a PE). STRADDLE uses ATM strikes for both; STRANGLE offsets each
+        leg OTM by ``combo.otm_pct`` of spot. Raises (via PremiumResolver) if a real
+        premium cannot be resolved for either leg, so the caller can skip the trade.
+        """
+        index_symbol = signal['symbol']
+        combo = signal.get('combo', {}) or {}
+        otm_pct = float(combo.get('otm_pct', 0.0))
+        expiry = self.expiry_resolver.get_active_expiry(index_symbol, self.data_provider)
+        base = "BANKNIFTY" if "BANK" in index_symbol else "NIFTY"
+        selector = StrikeSelector(index_symbol)
+        resolver = PremiumResolver(self.db, self.data_provider)
+
+        legs: List[OptionContract] = []
+        # CE leg referenced above spot, PE leg below spot (OTM for a strangle; both
+        # collapse to ATM when otm_pct == 0 for a straddle).
+        for option_type, sign in (("CE", +1.0), ("PE", -1.0)):
+            ref_price = index_ltp * (1.0 + sign * otm_pct)
+            strike = selector.select_strike(ref_price, option_type, "ATM")
+            option_symbol = f"NSE:{base}{expiry}{strike}{option_type}"
+            premium, bid, ask, volume = resolver.resolve_premium(
+                index_symbol, strike, option_type, expiry, option_symbol
+            )
+            legs.append(OptionContract(
+                symbol=option_symbol, strike=float(strike), expiry=expiry,
+                option_type=option_type, premium=premium, delta=0.5,
+                bid=bid, ask=ask, volume=volume, resolved_at=datetime.now(),
+            ))
+        logger.info(
+            f"Resolved {combo.get('type','COMBO')} into legs "
+            f"{[l.symbol for l in legs]} combined premium={sum(l.premium for l in legs):.2f}"
+        )
+        return legs
+
+    def get_leg_premium(self, underlying: str, strike: float, option_type: str,
+                        expiry: str, symbol: str) -> Optional[float]:
+        """Best-effort live premium for one leg; returns None on failure (caller holds)."""
+        try:
+            premium, _bid, _ask, _vol = PremiumResolver(self.db, self.data_provider).resolve_premium(
+                underlying, strike, option_type, expiry, symbol
+            )
+            return float(premium)
+        except Exception as e:
+            logger.warning(f"get_leg_premium failed for {symbol}: {e}")
+            return None

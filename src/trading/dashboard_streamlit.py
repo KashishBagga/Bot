@@ -27,6 +27,31 @@ def format_dt(dt):
         dt = dt.astimezone(kolkata_tz)
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
+
+def event_ts_ist(ev):
+    """Normalise an event's timestamp to a tz-aware IST datetime for correct
+    ordering and latency deltas (some legacy rows were naive/mixed-tz)."""
+    ts = ev.get("timestamp")
+    if isinstance(ts, str):
+        try:
+            ts = datetime.fromisoformat(ts)
+        except ValueError:
+            return None
+    if ts is None:
+        return None
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=kolkata_tz)
+    return ts.astimezone(kolkata_tz)
+
+
+def price_label(row):
+    """Distinguish index-level prices from combined-premium (combo) prices so the
+    dashboard never presents a NIFTY level as if it were the option premium."""
+    strat = str(row.get("strategy") or row.get("setup_type") or "")
+    diag = row.get("diagnostics")
+    is_combo = "STRADDLE" in strat or "STRANGLE" in strat or (isinstance(diag, dict) and "combo" in diag)
+    return "combined premium ₹" if is_combo else "index level"
+
 def format_event_description(event_type, payload):
     if not payload:
         return "No details provided"
@@ -127,7 +152,95 @@ def get_db():
 
 db = get_db()
 
-# Load available report dates
+st.title("📊 Trading Analytics")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# LIVE MARKET STATUS  (what's happening now + current active trades)
+# ══════════════════════════════════════════════════════════════════════════
+@st.cache_data(ttl=10)
+def load_live():
+    """Latest engine-computed market status + currently OPEN positions."""
+    status, open_real, open_cf = [], [], []
+    try:
+        status = db.get_latest_market_status()
+        open_real = db.get_open_positions()          # exit_time IS NULL
+        open_cf = db.get_open_counterfactuals()       # exit_time IS NULL
+    except Exception as e:
+        st.error(f"Live query failed: {e}")
+    return status, open_real, open_cf
+
+
+def render_live():
+    status, open_real, open_cf = load_live()
+    st.header("🟢 Live Market Status")
+
+    if not status:
+        st.info("No live market status yet — start the trader (`./run_indian_trader.sh`) during market hours.")
+    else:
+        # price for each symbol (used for unrealized R on open directional trades)
+        price_by_symbol = {}
+        cols = st.columns(len(status))
+        for col, row in zip(cols, status):
+            p = row.get("payload") or {}
+            if isinstance(p, str):
+                try: p = json.loads(p)
+                except Exception: p = {}
+            sym = row.get("symbol", "?")
+            price_by_symbol[sym] = p.get("price")
+            mv = p.get("market_view") or {}
+            with col:
+                st.subheader(sym.replace("NSE:", "").replace("-INDEX", ""))
+                st.metric("Price", f"{p.get('price', 0):.2f}")
+                st.caption(f"as of {format_dt(row.get('timestamp'))}")
+                st.write(f"**View:** {mv.get('dominant_direction', 'n/a')} "
+                         f"(dir {mv.get('directional_score', 0):+.2f})")
+                st.write(f"**Regime:** {mv.get('regime_label', p.get('regime', 'n/a'))}")
+                st.write(f"**Bias:** {p.get('daily_bias', 'n/a')}  |  **RVOL:** {p.get('rvol') or 0:.2f}")
+                pats = ", ".join(pt.get("name", "") for pt in mv.get("patterns", [])) or "none"
+                st.write(f"**Patterns:** {pats}")
+                st.caption(f"active real: {p.get('active_real_trades', 0)} | "
+                           f"shadow: {p.get('active_counterfactuals', 0)}")
+
+        # ── Active REAL trades (open) ──
+        st.subheader(f"🎯 Active Trades ({len(open_real)})")
+        if not open_real:
+            st.caption("No open real positions.")
+        for t in open_real:
+            sym = t.get("symbol", "?")
+            sig = t.get("signal_type") or t.get("setup_type") or "?"
+            entry = t.get("entry_price") or 0.0
+            sld = t.get("stop_loss_distance") or 0.0
+            cur = price_by_symbol.get(sym)
+            # Unrealized R for directional trades only (combos are premium-space).
+            is_combo = str(sig) in ("STRADDLE", "STRANGLE")
+            if cur and sld and not is_combo:
+                if "CALL" in str(sig):
+                    ur = (cur - entry) / sld
+                else:
+                    ur = (entry - cur) / sld
+                ur_str = f"{ur:+.2f} R (live)"
+            else:
+                ur_str = "combo (premium-space)" if is_combo else "n/a"
+            st.markdown(
+                f"**{sym.replace('NSE:','')}** · `{sig}` · [{t.get('experiment_name','?')}] — "
+                f"entry `{entry:.2f}`, SL `{t.get('stop_loss') or 0:.2f}`, TP `{t.get('take_profit') or 0:.2f}`, "
+                f"bars `{t.get('bars_held', 0)}` · **{ur_str}**"
+            )
+
+        # ── Active shadow trades by experiment ──
+        if open_cf:
+            from collections import Counter
+            by_exp = Counter(c.get("experiment_name", "?") for c in open_cf)
+            st.subheader(f"👻 Active Shadow Trades ({len(open_cf)})")
+            st.write(" · ".join(f"{k}: {v}" for k, v in sorted(by_exp.items())))
+
+    st.divider()
+
+
+render_live()
+
+# Load available report dates (historical replay is optional; live works without it)
 reports_dir = os.path.join(project_root, "reports")
 dates = []
 if os.path.exists(reports_dir):
@@ -137,11 +250,11 @@ if os.path.exists(reports_dir):
 dates.sort(reverse=True)
 
 if not dates:
-    st.warning("⚠️ No daily reports found in reports/ directory.")
+    st.info("📁 No end-of-day reports yet — showing live status only. Reports appear after 15:35 IST.")
     st.stop()
 
 # Header layout
-st.title("📊 Trading Session Analytics & Replay")
+st.header("🕰️ Historical Session Replay")
 selected_date = st.selectbox("Select Session Date", dates)
 
 # Data querying
@@ -171,7 +284,7 @@ def load_data(report_date):
                            entry_price, exit_price, pnl, exit_reason, mfe_r, mae_r, final_pnl_r, 
                            bars_held, stop_loss, take_profit, experiment_name, diagnostics, features
                     FROM trade_performance
-                    WHERE entry_time::date = %s
+                    WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
                     ORDER BY entry_time ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -185,7 +298,7 @@ def load_data(report_date):
                            stop_loss, take_profit, exit_time, exit_price, mfe_r, mae_r, final_pnl_r, 
                            experiment_name, diagnostics
                     FROM counterfactual_results
-                    WHERE timestamp::date = %s
+                    WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                     ORDER BY timestamp ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -198,7 +311,7 @@ def load_data(report_date):
                 cursor.execute("""
                     SELECT event_id, trade_id, NULL AS candidate_id, timestamp, event_type, payload
                     FROM trade_events
-                    WHERE timestamp::date = %s
+                    WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                     ORDER BY timestamp ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -208,7 +321,7 @@ def load_data(report_date):
                 cursor.execute("""
                     SELECT event_id, NULL AS trade_id, candidate_id, timestamp, event_type, payload
                     FROM counterfactual_trade_events
-                    WHERE timestamp::date = %s
+                    WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                     ORDER BY timestamp ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -220,7 +333,7 @@ def load_data(report_date):
                     cursor.execute("""
                         SELECT event_id, trade_id, candidate_id, timestamp, event_type, payload
                         FROM execution_events
-                        WHERE timestamp::date = %s
+                        WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                         ORDER BY timestamp ASC
                     """, (report_date,))
                     cols = [desc[0] for desc in cursor.description]
@@ -278,19 +391,23 @@ filtered_candidates = data["candidates"]
 
 if selected_strat != "All":
     filtered_trades = [t for t in data["trades"] if t["strategy"] == selected_strat]
-    filtered_candidates = [c for c in data["candidates"] if (c["setup_type"] or c["strategy"]) == selected_strat]
+    filtered_candidates = [c for c in data["candidates"] if (c.get("setup_type") or c.get("strategy_version")) == selected_strat]
+
+# Only CLOSED trades are "realized". Open positions (exit_time IS NULL) have
+# pnl 0.0 and belong in the Live panel, not counted here as +0.00 R winners.
+closed_trades = [t for t in filtered_trades if t.get("exit_time") is not None]
 
 tab1, tab2 = st.tabs([
-    f"📈 Realized Positions ({len(filtered_trades)})", 
-    f"👻 Counterfactual Missed Opportunities ({len(filtered_candidates)})"
+    f"📈 Realized Positions ({len(closed_trades)})",
+    f"👻 Counterfactual / Shadow Trades ({len(filtered_candidates)})"
 ])
 
 # 1. Realized positions tab
 with tab1:
-    if not filtered_trades:
-        st.info("No realized trades match this strategy filter.")
+    if not closed_trades:
+        st.info("No realized (closed) trades for this date / filter.")
     else:
-        for t in filtered_trades:
+        for t in closed_trades:
             pnl_val = t["pnl"] or 0.0
             emoji = "🟢" if pnl_val >= 0 else "🔴"
             title = f"{emoji} {t['symbol']} | {t['strategy']} | {pnl_val:+.2f} R"
@@ -303,7 +420,8 @@ with tab1:
                     st.write(f"⏱️ **Executed At:** {format_dt(t['entry_time'])}")
                     st.write(f"🛑 **Outcome/Exit Reason:** {t['exit_reason'] or 'OPEN'}")
                     st.write(f"💸 **PnL:** {pnl_val:+.2f} R")
-                    st.write(f"🎯 **Target / Exit:** Entry: {t['entry_price']:.2f} | Exit: {t['exit_price'] or 0.0:.2f} | SL: {t['stop_loss'] or 0.0:.2f} | TP: {t['take_profit'] or 0.0:.2f}")
+                    st.write(f"🎯 **Levels ({price_label(t)}):** Entry: {t['entry_price']:.2f} | Exit: {t['exit_price'] or 0.0:.2f} | SL: {t['stop_loss'] or 0.0:.2f} | TP: {t['take_profit'] or 0.0:.2f}")
+                    st.caption("P&L shown as R-multiples of the trade's defined risk (not rupees).")
                     st.write(f"📦 **Experiment / Version:** {t['experiment_name']}")
 
                 with m_col2:
@@ -320,20 +438,24 @@ with tab1:
                 
                 st.subheader("Execution Latency Timeline")
                 t_events = [e for e in data["events"] if e["trade_id"] == t["trade_id"]]
+                # Sort chronologically on normalised IST timestamps (events come
+                # from three tables and were previously unsorted + mixed-tz, making
+                # latency deltas negative/meaningless). Drop rows with no timestamp.
+                t_events = sorted((e for e in t_events if event_ts_ist(e)), key=event_ts_ist)
                 if not t_events:
                     st.text("No audit trace events found for this trade.")
                 else:
                     prev_t = None
                     for ev in t_events:
-                        curr_t = ev["timestamp"]
-                        curr_t_local = curr_t.astimezone(kolkata_tz) if curr_t.tzinfo else curr_t
+                        curr_t = event_ts_ist(ev)
+                        if curr_t is None:
+                            continue
                         latency = ""
-                        if prev_t:
+                        if prev_t is not None:
                             diff_ms = int((curr_t - prev_t).total_seconds() * 1000)
-                            latency = f"*(+{diff_ms}ms latency)*"
+                            latency = f"*(+{diff_ms}ms latency)*" if diff_ms >= 0 else ""
                         prev_t = curr_t
-                        
-                        st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_event_description(ev['event_type'], ev['payload'])}")
+                        st.markdown(f"- **{curr_t.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_event_description(ev['event_type'], ev['payload'])}")
 
 # 2. Counterfactual missed opportunities tab
 with tab2:
@@ -353,7 +475,7 @@ with tab2:
                     st.write(f"🛑 **Primary Rejection:** {c['primary_rejection_reason']}")
                     st.write(f"⛔ **All Rejections:** {c['rejection_reasons']}")
                     st.write(f"💸 **Simulated Outcome:** {pnl_val:+.2f} R")
-                    st.write(f"🎯 **Target / Exit:** Entry: {c['entry_price'] or 0.0:.2f} | Exit: {c['exit_price'] or 0.0:.2f} | SL: {c['stop_loss'] or 0.0:.2f} | TP: {c['take_profit'] or 0.0:.2f}")
+                    st.write(f"🎯 **Levels ({price_label(c)}):** Entry: {c['entry_price'] or 0.0:.2f} | Exit: {c['exit_price'] or 0.0:.2f} | SL: {c['stop_loss'] or 0.0:.2f} | TP: {c['take_profit'] or 0.0:.2f}")
 
                 with m_col2:
                     st.subheader("Attribution / Trigger Factors")
@@ -369,17 +491,18 @@ with tab2:
 
                 st.subheader("Execution Latency Timeline")
                 t_events = [e for e in data["events"] if e["candidate_id"] == c["candidate_id"]]
+                t_events = sorted((e for e in t_events if event_ts_ist(e)), key=event_ts_ist)
                 if not t_events:
                     st.text("No audit trace events found for this signal.")
                 else:
                     prev_t = None
                     for ev in t_events:
-                        curr_t = ev["timestamp"]
-                        curr_t_local = curr_t.astimezone(kolkata_tz) if curr_t.tzinfo else curr_t
+                        curr_t = event_ts_ist(ev)
+                        if curr_t is None:
+                            continue
                         latency = ""
-                        if prev_t:
+                        if prev_t is not None:
                             diff_ms = int((curr_t - prev_t).total_seconds() * 1000)
-                            latency = f"*(+{diff_ms}ms latency)*"
+                            latency = f"*(+{diff_ms}ms latency)*" if diff_ms >= 0 else ""
                         prev_t = curr_t
-                        
-                        st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_event_description(ev['event_type'], ev['payload'])}")
+                        st.markdown(f"- **{curr_t.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_event_description(ev['event_type'], ev['payload'])}")
