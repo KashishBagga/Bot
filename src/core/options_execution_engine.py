@@ -269,7 +269,14 @@ class PremiumResolver:
         except Exception as e:
             logger.error(f"Failed to query live quote for option {symbol}: {e}")
 
-        return 100.0, 99.0, 101.0, 100  # Fallback dummy premium values if both fail
+        # Both the DB warehouse and the live API failed. DO NOT fabricate a
+        # premium — a synthetic price (the old dummy 100.0) silently sizes and
+        # "fills" a real order against a made-up number. Fail loudly so the
+        # caller skips the trade instead.
+        raise ValueError(
+            f"Could not resolve a real premium for {symbol} "
+            f"(DB warehouse miss/stale AND live quote failed)"
+        )
 
 class OptionExecutionEngine:
     """Main facade engine coordinating option resolution."""

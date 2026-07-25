@@ -109,7 +109,16 @@ class EnhancedStrategyEngine:
             primary_rejections.append("BIAS_OPPOSED")
 
         # ── Intelligence Metadata ──────────────────────────────
-        atr = m5_df['high'].tail(14).mean() - m5_df['low'].tail(14).mean()
+        # True-Range ATR (not mean(high)-mean(low), which ignores gaps and
+        # understates volatility on gap days). Drives min_stop_dist / TP cap.
+        _tr = pd.concat([
+            m5_df['high'] - m5_df['low'],
+            (m5_df['high'] - m5_df['close'].shift(1)).abs(),
+            (m5_df['low'] - m5_df['close'].shift(1)).abs()
+        ], axis=1).max(axis=1)
+        atr = float(_tr.tail(14).mean())
+        if np.isnan(atr) or atr <= 0:
+            atr = float(m5_df['high'].iloc[-1] - m5_df['low'].iloc[-1])
         at_zone, target_zone, dist = self.zone_engine.is_price_at_zone(price, zones)
         
         dist_supply = next((abs(z.level - price) for z in zones if z.zone_type == 'SUPPLY'), 9999.0)
@@ -189,32 +198,17 @@ class EnhancedStrategyEngine:
         base_features['move_efficiency'] = move_efficiency
         base_features['wickiness'] = wickiness
         
-        if not setup_checked and m5_struct.bos_count > 0:
+        # Only an explicitly directional (BULLISH/BEARISH) 5m structure produces a
+        # breakout/trap thesis. NEUTRAL has no directional basis — it previously
+        # collapsed into a BUY PUT breakout, creating a systematic short skew in chop.
+        if not setup_checked and m5_struct.bos_count > 0 and m5_struct.trend in ("BULLISH", "BEARISH"):
             bos_level = m5_struct.last_swing_high if m5_struct.trend == "BULLISH" else m5_struct.last_swing_low
             if bos_level is not None:
-                setup_checked = "BREAKOUT"
-                trigger_level = bos_level
-                candidate_id = f"cand_{symbol_clean}_BREAKOUT_{trigger_level:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
-                
-                side = "BUY CALL" if m5_struct.trend == "BULLISH" else "BUY PUT"
-                if side == "BUY CALL":
-                    sl = min(bos_level - (atr * 0.3), price - min_stop_dist)
-                    if htf_bias != "BULLISH":
-                        setup_rejection_reasons.append("BIAS_MISMATCH")
-                else:
-                    sl = max(bos_level + (atr * 0.3), price + min_stop_dist)
-                    if htf_bias != "BEARISH":
-                        setup_rejection_reasons.append("BIAS_MISMATCH")
-                    
-            if move_efficiency <= 0.6:
-                setup_rejection_reasons.append("LOW_EFFICIENCY")
-            if wickiness >= 0.5:
-                setup_rejection_reasons.append("HIGH_WICKINESS")
-
-        # --- Setup C: Failed Follow-Through (FFT Trap) ---
-        if not setup_checked and m5_struct.bos_count > 0:
-            bos_level = m5_struct.last_swing_high if m5_struct.trend == "BULLISH" else m5_struct.last_swing_low
-            if bos_level is not None:
+                # --- Setup C: Failed Follow-Through (FFT Trap) — tested FIRST ---
+                # A failed breakout is the *opposite* trade to a breakout. It must be
+                # evaluated before the breakout branch; otherwise the breakout branch
+                # always claims the setup and the trap never fires, and the engine
+                # would BUY INTO the very trap it exists to fade.
                 trap_type = self.fft_engine.detect_trap(m5_df, bos_level, m5_struct.trend)
                 if trap_type:
                     setup_checked = "TRAP"
@@ -226,6 +220,29 @@ class EnhancedStrategyEngine:
                         setup_rejection_reasons.append("BIAS_MISMATCH")
                     elif side == "BUY PUT" and htf_bias == "BULLISH":
                         setup_rejection_reasons.append("BIAS_MISMATCH")
+                else:
+                    # --- Setup B: Breakout Acceptance ---
+                    setup_checked = "BREAKOUT"
+                    trigger_level = bos_level
+                    candidate_id = f"cand_{symbol_clean}_BREAKOUT_{trigger_level:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
+
+                    side = "BUY CALL" if m5_struct.trend == "BULLISH" else "BUY PUT"
+                    if side == "BUY CALL":
+                        sl = min(bos_level - (atr * 0.3), price - min_stop_dist)
+                        if htf_bias != "BULLISH":
+                            setup_rejection_reasons.append("BIAS_MISMATCH")
+                    else:
+                        sl = max(bos_level + (atr * 0.3), price + min_stop_dist)
+                        if htf_bias != "BEARISH":
+                            setup_rejection_reasons.append("BIAS_MISMATCH")
+
+                    # Breakout-quality filters apply to BREAKOUT only. A TRAP is by
+                    # nature a low-efficiency, wicky failed move, so these must not
+                    # reject it.
+                    if move_efficiency <= 0.6:
+                        setup_rejection_reasons.append("LOW_EFFICIENCY")
+                    if wickiness >= 0.5:
+                        setup_rejection_reasons.append("HIGH_WICKINESS")
 
         if not setup_checked:
             setup_checked = "NONE"
@@ -266,14 +283,16 @@ class EnhancedStrategyEngine:
             self.db.save_signal_audit(audit_record)
             return []
 
-        # Find target zone (take profit)
-        for z in zones:
-            if side == "BUY CALL" and z.level > entry:
-                take_profit = z.level
-                break
-            if side == "BUY PUT" and z.level < entry:
-                take_profit = z.level
-                break
+        # Find target zone (take profit) — the NEAREST opposing-liquidity zone.
+        # `zones` is sorted by score, so the old first-match picked the highest-
+        # scored zone in the trade direction (often far away, and possibly the
+        # wrong type), inflating reward/RR and making R-multiples meaningless.
+        if side == "BUY CALL":
+            supply_above = [z.level for z in zones if z.zone_type == 'SUPPLY' and z.level > entry]
+            take_profit = min(supply_above) if supply_above else None
+        else:  # BUY PUT
+            demand_below = [z.level for z in zones if z.zone_type == 'DEMAND' and z.level < entry]
+            take_profit = max(demand_below) if demand_below else None
 
         if not take_profit:
             setup_rejection_reasons.append("NO_TARGET_ZONE")

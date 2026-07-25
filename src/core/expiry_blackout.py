@@ -75,6 +75,21 @@ class ExpiryBlackoutManager:
         self.pre_event   = timedelta(minutes=pre_event_mins)
         self.post_event  = timedelta(minutes=post_event_mins)
 
+        # Warn loudly if the hard-coded RBI/Budget tables no longer cover any
+        # future date — otherwise event-day protection silently stops working
+        # once the last listed date passes, with no visible signal.
+        today = datetime.now(IST).date()
+        future_events = [
+            d for d in (RBI_MPC_DATES + BUDGET_DATES + CUSTOM_EVENT_DATES)
+            if date(d[0], d[1], d[2]) >= today
+        ]
+        if not future_events:
+            logger.warning(
+                "⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured "
+                "(hard-coded tables are stale). Event-day entry protection is currently INACTIVE — "
+                "update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py."
+            )
+
     # ── Public API ────────────────────────────────────────────────────────────
 
     def is_blackout(self, now: Optional[datetime] = None) -> Tuple[bool, str]:

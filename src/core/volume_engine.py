@@ -36,17 +36,21 @@ class VolumeEngine:
         current_candle = df.iloc[-1]
         current_time = current_candle.name.time() # Extract HH:MM:SS
         current_vol = current_candle['volume']
-        
+
         # ── 1. Calculate ToD Average ──────────────────────────────
-        # Filter all previous candles at this EXACT time
+        # Filter all candles at this EXACT time, then EXCLUDE the current bar
+        # so the baseline is purely historical. Including the current bar in its
+        # own average deflates a genuine volume spike (a big bar drags its own
+        # denominator up and can never exceed ~len/(len-1)x its own baseline).
         same_time_candles = df[df.index.time == current_time]
-        
-        if len(same_time_candles) < 2:
-            # Fallback to simple rolling mean if we don't have enough history
-            tod_avg = df['volume'].tail(20).mean()
+        prior_same_time = same_time_candles.iloc[:-1]  # drop the current (last) bar
+
+        if len(prior_same_time) < 1:
+            # Fallback to simple rolling mean (also excluding the current bar)
+            tod_avg = df['volume'].iloc[:-1].tail(20).mean()
         else:
             # Avg volume for this exact minute/5-minute slot over the lookback
-            tod_avg = same_time_candles['volume'].tail(self.historical_days).mean()
+            tod_avg = prior_same_time['volume'].tail(self.historical_days).mean()
 
         # ── 2. Calculate ToD RVOL ─────────────────────────────────
         rvol_tod = current_vol / tod_avg if tod_avg > 0 else 1.0

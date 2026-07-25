@@ -324,9 +324,12 @@ class PostgresDatabase:
 
                     # research_id columns and indexes (M2B)
                     cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
-                    cursor.execute("ALTER TABLE market_events ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_trades_research_id ON trade_performance(research_id) WHERE research_id IS NOT NULL")
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_events_research_id ON market_events(research_id) WHERE research_id IS NOT NULL")
+                    # NOTE: the market_events research_id ALTER/INDEX was moved to
+                    # AFTER `CREATE TABLE market_events` below. On a fresh database the
+                    # table does not yet exist here, so running them at this point
+                    # raised, rolled back the whole init transaction, and left the DB
+                    # with NO tables while the error was swallowed.
 
 
                     # Per-experiment daily summary: one row per (date, experiment) written at session end
@@ -362,6 +365,11 @@ class PostgresDatabase:
                             PRIMARY KEY (event_id, timestamp)
                         )
                     ''')
+
+                    # market_events research_id migration (moved here from above so
+                    # it runs only after the table is guaranteed to exist).
+                    cursor.execute("ALTER TABLE market_events ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_events_research_id ON market_events(research_id) WHERE research_id IS NOT NULL")
 
                 conn.commit()
 
@@ -498,15 +506,16 @@ class PostgresDatabase:
         try:
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
+                    audit = dict(audit)  # copy — don't mutate caller's dict (double-encode on retry)
                     if 'rejection_reasons' in audit:
                         audit['rejection_reasons'] = json.dumps(audit['rejection_reasons'], cls=NumpyEncoder)
                     if 'score_breakdown' in audit:
                         audit['score_breakdown'] = json.dumps(audit['score_breakdown'], cls=NumpyEncoder)
                     columns = list(audit.keys())
                     placeholders = [f"%({col})s" for col in columns]
-                    
+
                     query = f"""
-                        INSERT INTO signal_audit ({','.join(columns)}) 
+                        INSERT INTO signal_audit ({','.join(columns)})
                         VALUES ({','.join(placeholders)})
                         ON CONFLICT (candidate_id, timestamp) DO UPDATE SET
                         accepted = EXCLUDED.accepted,
@@ -534,6 +543,7 @@ class PostgresDatabase:
         try:
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
+                    signal = dict(signal)  # copy — don't mutate caller's dict (double-encode on retry)
                     if 'score_breakdown' in signal:
                         signal['score_breakdown'] = json.dumps(signal['score_breakdown'], cls=NumpyEncoder)
                     if 'context' in signal:
@@ -619,27 +629,33 @@ class PostgresDatabase:
                     cursor.execute(query, perf_copy)
                 conn.commit()
         except Exception as e:
-            logger.error(f"❌ Failed to save trade performance: {e}")
+            # CRITICAL, not error: a failed real-trade write means P&L accounting
+            # and DB state silently diverge from reality, and the position will be
+            # "recovered" as still-open on restart. Must be alertable.
+            logger.critical(f"🚨 DATA LOSS: failed to save trade_performance {perf.get('trade_id')}: {e}", exc_info=True)
 
     def save_trade_event(self, event: Dict[str, Any]):
         """Save trade event lifecycle tracking record"""
         try:
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
-                    if 'payload' in event:
-                        event['payload'] = json.dumps(event['payload'], cls=NumpyEncoder)
-                    columns = list(event.keys())
+                    # Copy before serializing — mutating the caller's dict in place
+                    # double-encodes the payload if the same dict is ever retried.
+                    event_copy = dict(event)
+                    if 'payload' in event_copy:
+                        event_copy['payload'] = json.dumps(event_copy['payload'], cls=NumpyEncoder)
+                    columns = list(event_copy.keys())
                     placeholders = [f"%({col})s" for col in columns]
-                    
+
                     query = f"""
-                        INSERT INTO trade_events ({','.join(columns)}) 
+                        INSERT INTO trade_events ({','.join(columns)})
                         VALUES ({','.join(placeholders)})
                         ON CONFLICT (event_id, timestamp) DO NOTHING
                     """
-                    cursor.execute(query, event)
+                    cursor.execute(query, event_copy)
                 conn.commit()
         except Exception as e:
-            logger.error(f"❌ Failed to save trade event: {e}")
+            logger.critical(f"🚨 DATA LOSS: failed to save trade_event {event.get('event_id')}: {e}", exc_info=True)
 
     def get_open_positions(self) -> List[Dict[str, Any]]:
         """Fetch all currently open real positions for recovery"""

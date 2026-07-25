@@ -32,13 +32,13 @@ class QuantUtils:
         
         lows = df[df['is_low']]['low'].tail(3).values
         highs = df[df['is_high']]['high'].tail(3).values
-        
-        if len(lows) < 2 or len(highs) < 2: return "NEUTRAL"
-        
-        # Bullish: HH + HL
-        is_bullish = (lows[-1] > lows[-2]) and (highs[-1] > highs[-2])
-        # Bearish: LH + LL
-        is_bearish = (lows[-1] < lows[-2]) and (highs[-1] < highs[-2])
+
+        if len(lows) < 3 or len(highs) < 3: return "NEUTRAL"
+
+        # Bullish: 2 consecutive Higher Highs + 2 consecutive Higher Lows
+        is_bullish = (lows[-1] > lows[-2] > lows[-3]) and (highs[-1] > highs[-2] > highs[-3])
+        # Bearish: 2 consecutive Lower Highs + 2 consecutive Lower Lows
+        is_bearish = (lows[-1] < lows[-2] < lows[-3]) and (highs[-1] < highs[-2] < highs[-3])
         
         if is_bullish: return "BULLISH"
         if is_bearish: return "BEARISH"
@@ -106,8 +106,16 @@ class QuantUtils:
 
     @staticmethod
     def get_adaptive_rvol_rank(df: pd.DataFrame, candle_idx: int = -1, lookback: int = 50) -> float:
-        """Returns percentile rank of volume."""
-        if len(df) < lookback: return 0.5
-        volumes = df['volume'].iloc[-(lookback+1):].values
+        """
+        Percentile rank of the volume at ``candle_idx`` versus the ``lookback``
+        bars that precede it. The window is anchored on candle_idx (not always
+        the most-recent bars) so that "RVOL at rejection/touch" is measured
+        around the touch itself, not against the latest bars.
+        """
+        if len(df) < 2: return 0.5
+        idx = candle_idx if candle_idx >= 0 else len(df) + candle_idx
+        start = max(0, idx - lookback)
+        prior = df['volume'].iloc[start:idx].values  # bars strictly before the touch
+        if len(prior) < 1: return 0.5
         current_vol = df['volume'].iloc[candle_idx]
-        return (volumes < current_vol).mean()
+        return float((prior < current_vol).mean())

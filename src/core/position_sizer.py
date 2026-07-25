@@ -74,11 +74,21 @@ class StrategyStats:
          R = avg_win / avg_loss  (reward-to-risk ratio)
         We use half-Kelly for conservatism.
         """
+        # Tiny samples produce absurd fractions: a single win gives W=1.0,
+        # avg_loss=0 → R→∞ → kelly≈1.0 → half-Kelly 0.5, i.e. ~66× the base
+        # 0.75% risk. Require a minimum trade count before Kelly deviates from
+        # the base fraction, and hard-cap the result.
+        MIN_TRADES_FOR_KELLY = 20
+        KELLY_FRACTION_CEILING = 0.05
+        if self.total_trades < MIN_TRADES_FOR_KELLY:
+            self.kelly_fraction = RISK_FRACTION
+            return
         w = self.win_rate
         r = self.avg_win / max(0.01, self.avg_loss)
         kelly = w - (1 - w) / r
         kelly = max(0.0, kelly)
-        self.kelly_fraction = kelly / 2 if KELLY_HALF else kelly
+        kelly = kelly / 2 if KELLY_HALF else kelly
+        self.kelly_fraction = min(kelly, KELLY_FRACTION_CEILING)
 
 
 # ── Regime multipliers ────────────────────────────────────────────────────────
