@@ -10,7 +10,7 @@ indicates the dominant market direction.
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 import pandas as pd
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from src.core.base_strategy import BaseStrategy, StrategyResult, StrategyMetadata
 from src.core.market_snapshot import MarketSnapshot
@@ -75,14 +75,13 @@ class OrbStrategy(BaseStrategy):
             if len(today_m5) == 0:
                 return self._empty_result(experiment_name)
 
-            # Determine the cutoff time for the opening range
-            # Session start is assumed to be 09:15 IST
-            if self.opening_range_minutes == 15:
-                cutoff_time = time(9, 30)
-            elif self.opening_range_minutes == 30:
-                cutoff_time = time(9, 45)
-            else:
-                cutoff_time = time(9, 30)  # Default fallback 15m
+            # Determine the cutoff time for the opening range. Session start is
+            # 09:15 IST. Computed from opening_range_minutes directly instead of
+            # a hardcoded 15/30 lookup — that table silently fell back to the
+            # 15-min cutoff for any other window (e.g. a 60-min "Initial
+            # Balance" variant) while still labeling itself "ORB_60M".
+            cutoff_dt = datetime.combine(today_date, time(9, 15)) + timedelta(minutes=self.opening_range_minutes)
+            cutoff_time = cutoff_dt.time()
 
             # Find opening candles
             opening_candles = today_m5[today_m5.index.time <= cutoff_time]
@@ -177,11 +176,12 @@ class OrbStrategy(BaseStrategy):
             else:
                 take_profit = tp_floor
 
-            # Cap TP at 5x ATR
+            # Cap TP at 5x ATR. The cap bounds the distance to something
+            # tradeable and RR is checked against it below — don't also reject
+            # on top of that (was double-penalizing otherwise-clean signals).
             max_tp_dist = atr * 5.0
             if abs(take_profit - price) > max_tp_dist:
                 take_profit = (price + max_tp_dist) if side == "BUY CALL" else (price - max_tp_dist)
-                rejection_reasons.append("TP_CAPPED")
 
             rr = round(abs(take_profit - price) / risk_dist, 2) if risk_dist > 0 else 0.0
             if rr < 1.5:

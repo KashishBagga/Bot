@@ -304,14 +304,15 @@ class EnhancedStrategyEngine:
 
         # Cap TP at 5× ATR from entry.
         # Stale demand/supply zones from weeks ago can produce TP targets 900–3000 pts
-        # away, making RR > 100x. Those trades will ALWAYS exit via initial SL and
-        # produce meaningless counterfactual data.
+        # away, making RR > 100x. The cap alone already fixes that (RR is computed
+        # below against this bounded distance and independently gated by LOW_RR) —
+        # appending TP_CAPPED as a rejection on top double-penalized signals that
+        # were otherwise clean; counterfactual data showed it was over-filtering
+        # (positive rolling expectancy on TP_CAPPED-only rejections).
         max_tp_dist = atr * 5.0
         current_tp_dist = abs(take_profit - entry)
         if current_tp_dist > max_tp_dist:
             take_profit = (entry + max_tp_dist) if side == "BUY CALL" else (entry - max_tp_dist)
-            if "NO_TARGET_ZONE" not in setup_rejection_reasons:
-                setup_rejection_reasons.append("TP_CAPPED")
 
         # Check risk and RR
         risk = abs(entry - sl) if sl else 0.0

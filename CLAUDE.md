@@ -49,7 +49,10 @@ Every entry point injects the repo root onto `sys.path`, but modules use absolut
 
 ## Testing
 
-There is **no pytest suite, config, or CI**. "Tests" are ad-hoc verification scripts in `scratch/` (e.g. `scratch/test_recovery_counterfactuals.py`, `scratch/check_db_observability.py`, `scratch/test_live_start.py`) run manually against a live DB / API. Note: `scratch/`, `scratch_*.py`, and `trade_journal.csv` are **gitignored** — don't rely on them being present or commit new work there expecting it to persist in git.
+
+There is **no pytest suite, config, or CI**. "Tests" are ad-hoc verification scripts run manually against a live DB / API:
+- `scratch/` (e.g. `scratch/test_recovery_counterfactuals.py`, `scratch/check_db_observability.py`, `scratch/test_live_start.py`) — gitignored along with `scratch_*.py` and `trade_journal.csv`; don't rely on them being present or commit new work there expecting it to persist in git.
+- `src/testing/comprehensive_system_test.py` and `src/testing/chaos_testing.py` — tracked, heavier load/chaos scripts exercising production systems under simulated stress.
 
 ## Architecture
 

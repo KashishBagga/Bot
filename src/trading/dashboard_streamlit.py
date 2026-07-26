@@ -94,7 +94,9 @@ st.set_page_config(
     page_title="EOD Trading Analytics & Replay",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    # "expanded" (not "collapsed") so the multipage nav — including the new
+    # Live Trades page in pages/ — is visible without the user hunting for it.
+    initial_sidebar_state="expanded"
 )
 
 # Dark theme support custom CSS

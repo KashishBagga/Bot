@@ -325,6 +325,178 @@ class PostgresDatabase:
                     # research_id columns and indexes (M2B)
                     cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_trades_research_id ON trade_performance(research_id) WHERE research_id IS NOT NULL")
+
+                    # Position sizing — was only ever kept in-memory, so a restart
+                    # lost it and _deployed_capital() undercounted recovered real
+                    # positions, silently weakening the exposure gate.
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS position_size_inr REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS lots REAL")
+
+                    # Live dashboard support: per-candle heartbeat for open real
+                    # positions (previously the row was only updated on a SL trail
+                    # or TP expansion, so it went stale between those events), and
+                    # tp1 — the 1.5R partial target every strategy already computes
+                    # but which was never persisted or surfaced anywhere.
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS current_price REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS unrealized_pnl_r REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS last_heartbeat_at TIMESTAMPTZ")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS tp1 REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS tp1 REAL")
+
+                    # Signals that passed every strategy filter (accepted=True) but
+                    # were still blocked from becoming a real trade by the portfolio
+                    # risk governor (daily-loss halt / max concurrent / max deployed
+                    # capital). Previously these were just a warning log line — saved
+                    # nowhere, so "why are real trades near-zero" couldn't be
+                    # distinguished from "strategy filters are just strict".
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS risk_governor_blocks (
+                            block_id        TEXT        NOT NULL,
+                            timestamp       TIMESTAMPTZ NOT NULL,
+                            symbol          TEXT        NOT NULL,
+                            experiment_name TEXT        NOT NULL,
+                            setup_type      TEXT,
+                            signal_type     TEXT,
+                            candidate_id    TEXT,
+                            gate_reason     TEXT        NOT NULL,
+                            entry_price     REAL,
+                            stop_loss       REAL,
+                            take_profit     REAL,
+                            rr_ratio        REAL,
+                            PRIMARY KEY (block_id, timestamp)
+                        )
+                    ''')
+                    cursor.execute(
+                        "CREATE INDEX IF NOT EXISTS idx_risk_blocks_reason "
+                        "ON risk_governor_blocks(gate_reason, timestamp)"
+                    )
+
+                    # One row per symbol, overwritten every candle — "what does the
+                    # system currently believe about this market": bias, regime,
+                    # RVOL/ATR/efficiency, active S/R zones, and in-progress/ready
+                    # chart patterns. Previously none of this was persisted anywhere
+                    # queryable; MarketSnapshot lived only in-memory inside the
+                    # trader process for the duration of one candle. Feeds the
+                    # dashboard's Market State page.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS market_state (
+                            symbol               TEXT        PRIMARY KEY,
+                            updated_at           TIMESTAMPTZ NOT NULL,
+                            current_price        REAL,
+                            daily_bias           TEXT,
+                            market_regime        TEXT,
+                            rvol                 REAL,
+                            atr                  REAL,
+                            move_efficiency      REAL,
+                            wickiness            REAL,
+                            narrative_bias       TEXT,
+                            narrative_confidence REAL,
+                            zones                JSONB,
+                            patterns             JSONB
+                        )
+                    ''')
+
+                    # Multi-leg options combos (vertical spreads, straddle/strangle).
+                    # Deliberately a SEPARATE schema from trade_performance, not a
+                    # retrofit — a combo's risk/PnL is combined-premium-based, not a
+                    # single directional index-price R-multiple, and forcing it into
+                    # the single-leg schema would corrupt both. `legs` stores each
+                    # leg's resolved contract + entry/exit premiums as JSONB (same
+                    # convention as diagnostics/zones/patterns elsewhere) rather than
+                    # a child table — legs are fixed at entry and don't need
+                    # independent relational queries.
+                    #
+                    # final_pnl_r is combined premium P&L divided by max_loss (the
+                    # premium paid, for every combo type built so far — vertical
+                    # spreads and long straddle/strangle are both debit/defined-risk
+                    # structures) — this keeps combos comparable in R-multiple terms
+                    # to every other strategy's expectancy stats.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS combo_trades (
+                            combo_id           TEXT        NOT NULL,
+                            entry_time         TIMESTAMPTZ NOT NULL,
+                            exit_time          TIMESTAMPTZ,
+                            symbol             TEXT        NOT NULL,
+                            experiment_name    TEXT,
+                            strategy_id        TEXT,
+                            version            TEXT,
+                            combo_type         TEXT        NOT NULL,
+                            setup_type         TEXT,
+                            underlying_entry_price REAL,
+                            underlying_exit_price  REAL,
+                            legs               JSONB,
+                            net_premium_paid   REAL,
+                            max_loss           REAL,
+                            max_profit         REAL,
+                            target_r           REAL,
+                            stop_r             REAL,
+                            current_pnl_r      REAL,
+                            final_pnl_r        REAL,
+                            exit_reason        TEXT,
+                            duration_minutes   REAL,
+                            confidence         REAL,
+                            diagnostics        JSONB,
+                            valid              BOOLEAN     DEFAULT TRUE,
+                            validation_errors  TEXT,
+                            PRIMARY KEY (combo_id, entry_time)
+                        )
+                    ''')
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS combo_trade_events (
+                            event_id   TEXT        NOT NULL,
+                            combo_id   TEXT,
+                            timestamp  TIMESTAMPTZ NOT NULL,
+                            event_type TEXT        NOT NULL,
+                            payload    JSONB,
+                            PRIMARY KEY (event_id, timestamp)
+                        )
+                    ''')
+                    # Counterfactual mirror — same "track every rejection" guarantee
+                    # the single-leg system already has, same combined-premium engine,
+                    # separate storage only.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS counterfactual_combo_results (
+                            combo_id           TEXT        NOT NULL,
+                            entry_time         TIMESTAMPTZ NOT NULL,
+                            exit_time          TIMESTAMPTZ,
+                            symbol             TEXT        NOT NULL,
+                            experiment_name    TEXT,
+                            strategy_id        TEXT,
+                            version            TEXT,
+                            combo_type         TEXT        NOT NULL,
+                            setup_type         TEXT,
+                            rejection_reasons  JSONB,
+                            primary_rejection_reason TEXT,
+                            underlying_entry_price REAL,
+                            underlying_exit_price  REAL,
+                            legs               JSONB,
+                            net_premium_paid   REAL,
+                            max_loss           REAL,
+                            max_profit         REAL,
+                            target_r           REAL,
+                            stop_r             REAL,
+                            current_pnl_r      REAL,
+                            final_pnl_r        REAL,
+                            exit_reason        TEXT,
+                            duration_minutes   REAL,
+                            confidence         REAL,
+                            diagnostics        JSONB,
+                            valid              BOOLEAN     DEFAULT TRUE,
+                            validation_errors  TEXT,
+                            PRIMARY KEY (combo_id, entry_time)
+                        )
+                    ''')
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS counterfactual_combo_events (
+                            event_id   TEXT        NOT NULL,
+                            combo_id   TEXT,
+                            timestamp  TIMESTAMPTZ NOT NULL,
+                            event_type TEXT        NOT NULL,
+                            payload    JSONB,
+                            PRIMARY KEY (event_id, timestamp)
+                        )
+                    ''')
+
                     # NOTE: the market_events research_id ALTER/INDEX was moved to
                     # AFTER `CREATE TABLE market_events` below. On a fresh database the
                     # table does not yet exist here, so running them at this point
@@ -624,7 +796,10 @@ class PostgresDatabase:
                         valid = EXCLUDED.valid,
                         validation_errors = EXCLUDED.validation_errors,
                         confidence = EXCLUDED.confidence,
-                        diagnostics = EXCLUDED.diagnostics
+                        diagnostics = EXCLUDED.diagnostics,
+                        position_size_inr = EXCLUDED.position_size_inr,
+                        lots = EXCLUDED.lots,
+                        tp1 = EXCLUDED.tp1
                     """
                     cursor.execute(query, perf_copy)
                 conn.commit()
@@ -670,6 +845,133 @@ class PostgresDatabase:
         except Exception as e:
             logger.error(f"❌ Failed to fetch open positions: {e}")
             return []
+
+    def update_live_heartbeat(
+        self, trade_id: str, current_price: float, unrealized_pnl_r: float,
+        mfe_r: float, mae_r: float, bars_held: int, stop_loss: float,
+        take_profit: float, timestamp,
+    ) -> None:
+        """Lightweight per-candle refresh for an OPEN real position.
+
+        Separate from save_trade_performance's upsert: this fires every market
+        pulse (not just on a SL trail / TP expansion), so the live dashboard has
+        a current price and unrealized PnL instead of data that's only as fresh
+        as the last stop/target change.
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        UPDATE trade_performance
+                        SET current_price = %s,
+                            unrealized_pnl_r = %s,
+                            mfe_r = %s,
+                            mae_r = %s,
+                            bars_held = %s,
+                            stop_loss = %s,
+                            take_profit = %s,
+                            last_heartbeat_at = %s
+                        WHERE trade_id = %s AND exit_time IS NULL
+                        """,
+                        (current_price, unrealized_pnl_r, mfe_r, mae_r, bars_held,
+                         stop_loss, take_profit, timestamp, trade_id),
+                    )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"⚠️ Failed to write live heartbeat for {trade_id}: {e}")
+
+    def upsert_market_state(self, record: Dict[str, Any]) -> None:
+        """Overwrite the single current-state row for `record['symbol']`.
+
+        Insert-or-replace, not append — this table answers "what does the
+        system currently believe", not "what has it believed historically"
+        (pattern/zone history already lives in market_events / signal_audit).
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    rec = dict(record)
+                    rec['zones'] = json.dumps(rec.get('zones', []), cls=NumpyEncoder)
+                    rec['patterns'] = json.dumps(rec.get('patterns', []), cls=NumpyEncoder)
+                    cursor.execute(
+                        """
+                        INSERT INTO market_state (
+                            symbol, updated_at, current_price, daily_bias, market_regime,
+                            rvol, atr, move_efficiency, wickiness,
+                            narrative_bias, narrative_confidence, zones, patterns
+                        ) VALUES (
+                            %(symbol)s, %(updated_at)s, %(current_price)s, %(daily_bias)s, %(market_regime)s,
+                            %(rvol)s, %(atr)s, %(move_efficiency)s, %(wickiness)s,
+                            %(narrative_bias)s, %(narrative_confidence)s, %(zones)s, %(patterns)s
+                        )
+                        ON CONFLICT (symbol) DO UPDATE SET
+                            updated_at = EXCLUDED.updated_at,
+                            current_price = EXCLUDED.current_price,
+                            daily_bias = EXCLUDED.daily_bias,
+                            market_regime = EXCLUDED.market_regime,
+                            rvol = EXCLUDED.rvol,
+                            atr = EXCLUDED.atr,
+                            move_efficiency = EXCLUDED.move_efficiency,
+                            wickiness = EXCLUDED.wickiness,
+                            narrative_bias = EXCLUDED.narrative_bias,
+                            narrative_confidence = EXCLUDED.narrative_confidence,
+                            zones = EXCLUDED.zones,
+                            patterns = EXCLUDED.patterns
+                        """,
+                        rec,
+                    )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"⚠️ Failed to upsert market_state for {record.get('symbol')}: {e}")
+
+    def save_risk_governor_block(self, record: Dict[str, Any]) -> None:
+        """Log a signal that passed strategy filters but was blocked by the
+        portfolio risk governor (daily-loss halt / max concurrent / max deployed).
+        Insert-only — there's nothing to update later, unlike a live position.
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    columns = list(record.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    cursor.execute(
+                        f"""
+                        INSERT INTO risk_governor_blocks ({','.join(columns)})
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (block_id, timestamp) DO NOTHING
+                        """,
+                        record,
+                    )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"⚠️ Failed to log risk governor block: {e}")
+
+    def get_realized_r_today(self, date_str: str) -> float:
+        """Sum of final_pnl_r for real trades already closed today (IST).
+
+        Used to reconstruct the daily-loss kill switch on startup so a same-day
+        restart can't silently undo an already-tripped halt (daily_realized_r
+        was previously in-memory only and reset to 0 on every process start).
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT COALESCE(SUM(final_pnl_r), 0)
+                        FROM trade_performance
+                        WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND exit_time IS NOT NULL
+                          AND valid = TRUE
+                        """,
+                        (date_str,),
+                    )
+                    row = cursor.fetchone()
+                    return float(row[0]) if row and row[0] is not None else 0.0
+        except Exception as e:
+            logger.error(f"❌ Failed to fetch today's realized R: {e}")
+            return 0.0
 
     def get_open_counterfactuals(self) -> List[Dict[str, Any]]:
         """Fetch all currently open counterfactual positions for recovery"""
@@ -751,6 +1053,148 @@ class PostgresDatabase:
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to save counterfactual event: {e}")
+
+    # ── Multi-leg options combos (vertical spreads, straddle/strangle) ──────
+
+    def save_combo_trade(self, combo: Dict[str, Any]):
+        """Save or update a real multi-leg combo position."""
+        try:
+            from src.core.data_quality import validate_combo_data
+            is_valid, errs = validate_combo_data(combo)
+            combo['valid'] = is_valid
+            combo['validation_errors'] = "; ".join(errs) if errs else None
+
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    c = dict(combo)
+                    if 'legs' in c:
+                        c['legs'] = json.dumps(c['legs'], cls=NumpyEncoder)
+                    if 'diagnostics' in c:
+                        c['diagnostics'] = json.dumps(c['diagnostics'], cls=NumpyEncoder)
+                    columns = list(c.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    query = f"""
+                        INSERT INTO combo_trades ({','.join(columns)})
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (combo_id, entry_time) DO UPDATE SET
+                        exit_time = EXCLUDED.exit_time,
+                        underlying_exit_price = EXCLUDED.underlying_exit_price,
+                        legs = EXCLUDED.legs,
+                        current_pnl_r = EXCLUDED.current_pnl_r,
+                        final_pnl_r = EXCLUDED.final_pnl_r,
+                        exit_reason = EXCLUDED.exit_reason,
+                        duration_minutes = EXCLUDED.duration_minutes,
+                        diagnostics = EXCLUDED.diagnostics,
+                        valid = EXCLUDED.valid,
+                        validation_errors = EXCLUDED.validation_errors
+                    """
+                    cursor.execute(query, c)
+                conn.commit()
+        except Exception as e:
+            logger.critical(f"🚨 DATA LOSS: failed to save combo_trade {combo.get('combo_id')}: {e}", exc_info=True)
+
+    def save_combo_event(self, event: Dict[str, Any]):
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    e = dict(event)
+                    if 'payload' in e:
+                        e['payload'] = json.dumps(e['payload'], cls=NumpyEncoder)
+                    columns = list(e.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    cursor.execute(
+                        f"""
+                        INSERT INTO combo_trade_events ({','.join(columns)})
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (event_id, timestamp) DO NOTHING
+                        """,
+                        e,
+                    )
+                conn.commit()
+        except Exception as ex:
+            logger.critical(f"🚨 DATA LOSS: failed to save combo_trade_event: {ex}", exc_info=True)
+
+    def save_counterfactual_combo_result(self, combo: Dict[str, Any]):
+        """Save or update a shadow (rejected) multi-leg combo candidate."""
+        try:
+            from src.core.data_quality import validate_combo_data
+            is_valid, errs = validate_combo_data(combo)
+            combo['valid'] = is_valid
+            combo['validation_errors'] = "; ".join(errs) if errs else None
+
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    c = dict(combo)
+                    if 'legs' in c:
+                        c['legs'] = json.dumps(c['legs'], cls=NumpyEncoder)
+                    if 'rejection_reasons' in c:
+                        c['rejection_reasons'] = json.dumps(c['rejection_reasons'], cls=NumpyEncoder)
+                    if 'diagnostics' in c:
+                        c['diagnostics'] = json.dumps(c['diagnostics'], cls=NumpyEncoder)
+                    columns = list(c.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    query = f"""
+                        INSERT INTO counterfactual_combo_results ({','.join(columns)})
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (combo_id, entry_time) DO UPDATE SET
+                        exit_time = EXCLUDED.exit_time,
+                        underlying_exit_price = EXCLUDED.underlying_exit_price,
+                        legs = EXCLUDED.legs,
+                        current_pnl_r = EXCLUDED.current_pnl_r,
+                        final_pnl_r = EXCLUDED.final_pnl_r,
+                        exit_reason = EXCLUDED.exit_reason,
+                        duration_minutes = EXCLUDED.duration_minutes,
+                        diagnostics = EXCLUDED.diagnostics,
+                        valid = EXCLUDED.valid,
+                        validation_errors = EXCLUDED.validation_errors
+                    """
+                    cursor.execute(query, c)
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Failed to save counterfactual combo result: {e}")
+
+    def save_counterfactual_combo_event(self, event: Dict[str, Any]):
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    e = dict(event)
+                    if 'payload' in e:
+                        e['payload'] = json.dumps(e['payload'], cls=NumpyEncoder)
+                    columns = list(e.keys())
+                    placeholders = [f"%({col})s" for col in columns]
+                    cursor.execute(
+                        f"""
+                        INSERT INTO counterfactual_combo_events ({','.join(columns)})
+                        VALUES ({','.join(placeholders)})
+                        ON CONFLICT (event_id, timestamp) DO NOTHING
+                        """,
+                        e,
+                    )
+                conn.commit()
+        except Exception as ex:
+            logger.error(f"❌ Failed to save counterfactual combo event: {ex}")
+
+    def get_open_combo_positions(self) -> List[Dict[str, Any]]:
+        """Fetch all currently open real combo positions for restart recovery."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute("SELECT * FROM combo_trades WHERE exit_time IS NULL")
+                    return list(cursor.fetchall())
+        except Exception as e:
+            logger.error(f"❌ Failed to fetch open combo positions: {e}")
+            return []
+
+    def get_open_counterfactual_combos(self) -> List[Dict[str, Any]]:
+        """Fetch all currently open shadow combo positions for restart recovery."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute("SELECT * FROM counterfactual_combo_results WHERE exit_time IS NULL")
+                    return list(cursor.fetchall())
+        except Exception as e:
+            logger.error(f"❌ Failed to fetch open counterfactual combos: {e}")
+            return []
 
     def save_execution_event(self, event: Dict[str, Any]):
         """Save execution trace event record"""

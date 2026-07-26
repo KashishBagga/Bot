@@ -99,6 +99,11 @@ class EODReportGenerator:
                 rolling=rolling,
             )
             data = section.safe_compute()
+            if section.section_id == "market_narrative":
+                # Shared with downstream sections (e.g. tomorrow_outlook) so trend
+                # quality / close position are computed once, not re-derived from
+                # a second OHLC pull that can drift from this one.
+                rolling["market_narrative"] = data
             md = section.safe_render_md(data)
             js = section.render_json(data)
             section_mds.append(md)

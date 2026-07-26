@@ -106,3 +106,48 @@ def validate_trade_data(row: Dict[str, Any]) -> Tuple[bool, List[str]]:
                     errors.append(f"PnL inconsistency: stored {final_pnl_r:.2f}R, expected raw {expected_pnl_raw:.2f}R")
 
     return len(errors) == 0, errors
+
+
+def validate_combo_data(row: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    Validate combo_trades / counterfactual_combo_results rows.
+
+    A separate validator, not a reuse of validate_trade_data() above — combos
+    have no single entry_price/stop_loss/take_profit (they have N legs and a
+    combined-premium risk model), so running them through the single-leg
+    checks would flag entry_price/stop_loss/take_profit as "missing" on every
+    combo row and mark it invalid, silently excluding it from every query that
+    filters WHERE valid = TRUE.
+    """
+    errors = []
+
+    combo_id = row.get("combo_id")
+    legs = row.get("legs")
+    net_premium_paid = row.get("net_premium_paid")
+    max_loss = row.get("max_loss")
+
+    if not legs:
+        errors.append("Combo has no legs recorded")
+
+    if net_premium_paid is None or net_premium_paid <= 0:
+        errors.append(f"Invalid net_premium_paid: {net_premium_paid}")
+
+    if max_loss is None or max_loss <= 0:
+        errors.append(f"Invalid max_loss: {max_loss}")
+
+    if combo_id and any(x in str(combo_id).lower() for x in ("test", "mock", "dummy")):
+        errors.append("Test/mock combo quarantined")
+
+    exit_time = row.get("exit_time")
+    exit_reason = row.get("exit_reason")
+    if exit_time is not None or exit_reason is not None:
+        final_pnl_r = row.get("final_pnl_r")
+        if final_pnl_r is None:
+            errors.append("Closed combo missing final_pnl_r")
+        # A defined-risk combo (max_loss = premium paid) can't lose more than
+        # 1R, structurally — anything far beyond that means the PnL math or
+        # the leg exit prices are wrong, not a legitimately bad trade.
+        elif final_pnl_r < -1.5:
+            errors.append(f"final_pnl_r ({final_pnl_r:.2f}R) exceeds defined max loss — PnL inconsistency")
+
+    return len(errors) == 0, errors

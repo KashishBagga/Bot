@@ -133,11 +133,13 @@ class VwapReversionStrategy(BaseStrategy):
             if move_efficiency < 0.5:
                 rejection_reasons.append("LOW_EFFICIENCY")
 
-            # Cap TP at 5x ATR from entry
+            # Cap TP at 5x ATR from entry. The cap bounds the distance to
+            # something tradeable and RR is checked against it below — don't
+            # also reject on top of that (was double-penalizing otherwise-clean
+            # signals).
             max_tp_dist = atr * 5.0
             if abs(take_profit - price) > max_tp_dist:
                 take_profit = (price + max_tp_dist) if side == "BUY CALL" else (price - max_tp_dist)
-                rejection_reasons.append("TP_CAPPED")
 
             rr = round(abs(take_profit - price) / risk_dist, 2) if risk_dist > 0 else 0.0
             if rr < 1.5:

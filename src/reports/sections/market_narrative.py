@@ -64,6 +64,10 @@ class MarketNarrativeSection(BaseSection):
             "session_close": None,
             "bullets": [],
             "regime_from_cf": "UNKNOWN",
+            # Single source of truth for session trend/close-position per symbol —
+            # other sections (e.g. tomorrow_outlook) must read this instead of
+            # recomputing from their own OHLC pull, or the numbers drift apart.
+            "by_symbol": {},
         }
 
         try:
@@ -121,6 +125,20 @@ class MarketNarrativeSection(BaseSection):
             else:
                 bullets.append(f"Closed at {close_position*100:.0f}% of session range")
 
+            by_symbol = {
+                "nifty": {
+                    "open": round(session_open, 2),
+                    "high": round(session_high, 2),
+                    "low": round(session_low, 2),
+                    "close": round(session_close, 2),
+                    "trend_quality": round(trend_quality, 2),
+                    "close_position": round(close_position, 2),
+                }
+            }
+            bn_snapshot = self._symbol_snapshot(bn_5m, dt)
+            if bn_snapshot:
+                by_symbol["banknifty"] = bn_snapshot
+
             result.update({
                 "gap": {"direction": gap_dir.title(), "pct": round(gap_pct, 2)},
                 "opening_range_pts": round(or_range, 2),
@@ -132,12 +150,34 @@ class MarketNarrativeSection(BaseSection):
                 "session_close": round(session_close, 2),
                 "prev_close": round(prev_close, 2),
                 "bullets": bullets,
+                "by_symbol": by_symbol,
             })
 
         except Exception as e:
             logger.warning(f"Narrative build failed: {e}")
 
         return result
+
+    @staticmethod
+    def _symbol_snapshot(df, dt) -> dict:
+        """Session open/high/low/close + trend quality/close position for one symbol's 5m data."""
+        if df is None or df.empty:
+            return None
+        session = df[df.index.date == dt.date()]
+        if session.empty:
+            return None
+        o = float(session.iloc[0]["open"])
+        c = float(session.iloc[-1]["close"])
+        h = float(session["high"].max())
+        l = float(session["low"].min())
+        return {
+            "open": round(o, 2),
+            "high": round(h, 2),
+            "low": round(l, 2),
+            "close": round(c, 2),
+            "trend_quality": round(abs(c - o) / (h - l + 0.01), 2),
+            "close_position": round((c - l) / (h - l + 0.01), 2),
+        }
 
     def render_md(self, data: Dict[str, Any]) -> str:
         lines = ["\n---\n\n## 2. Market Narrative\n"]

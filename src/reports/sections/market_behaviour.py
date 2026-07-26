@@ -85,18 +85,20 @@ class MarketBehaviourSection(BaseSection):
                 "avg_pnl": round(stats["total_pnl"] / t, 2) if t > 0 else 0.0,
             }
 
-        # Score out of 10
+        # Score out of 10 — how much of today's edge came from breakouts
+        # following through vs. reverting. NOT a price-trend metric (see
+        # Section 2 "Market Narrative" for actual session trend quality).
         breakout_rate = setup_summary.get("BREAKOUT", {}).get("success_rate", 0)
         sweep_rate = setup_summary.get("SWEEP", {}).get("success_rate", 0)
-        trend_score = max(0, min(10, int(breakout_rate * 12)))
-        mean_rev_score = 10 - trend_score
+        breakout_dominance_score = max(0, min(10, int(breakout_rate * 12)))
+        mean_rev_score = 10 - breakout_dominance_score
 
         return {
             "total_cf": total,
             "choppiness": choppiness,
             "initial_sl_rate": choppiness,
             "setup_summary": setup_summary,
-            "trend_score": trend_score,
+            "breakout_dominance_score": breakout_dominance_score,
             "mean_reversion_score": mean_rev_score,
             "breakout_success_pct": breakout_rate,
             "sweep_success_pct": sweep_rate,
@@ -113,7 +115,7 @@ class MarketBehaviourSection(BaseSection):
         chop_pct = f"{data['choppiness']*100:.0f}%"
         lines.append(
             f"| Metric | Score |\n|---|---|\n"
-            f"| Trend Quality | {data['trend_score']}/10 |\n"
+            f"| Breakout Dominance | {data['breakout_dominance_score']}/10 |\n"
             f"| Mean Reversion | {data['mean_reversion_score']}/10 |\n"
             f"| Breakout Success | {data['breakout_success_pct']*100:.0f}% |\n"
             f"| Sweep Success | {data['sweep_success_pct']*100:.0f}% |\n"

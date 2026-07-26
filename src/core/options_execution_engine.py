@@ -218,6 +218,15 @@ class StrikeSelector:
         logger.warning(f"Unknown strike policy '{policy}', defaulting to ATM.")
         return atm
 
+    def select_strike_offset(self, price: float, option_type: str, strikes_away: int) -> int:
+        """ATM + N strike intervals, signed so the caller controls direction
+        directly (e.g. strangle wings: CE above ATM, PE below ATM) rather than
+        going through the ITM/OTM-relative-to-option-type policy strings above.
+        strikes_away=0 is ATM; positive moves the strike up, negative down.
+        """
+        atm = self.get_atm_strike(price)
+        return atm + (strikes_away * self.interval)
+
 class PremiumResolver:
     """Fetches option premium from database cache or falls back to Fyers API quotes."""
     

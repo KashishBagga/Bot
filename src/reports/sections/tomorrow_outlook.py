@@ -2,7 +2,8 @@
 """Section 10 — Tomorrow's Outlook.
 
 Scenarios-based, not predictive. Derived from:
-  - Today's close position and trend quality (from Fyers OHLC)
+  - Today's close position and trend quality (reused from the Market Narrative
+    section's intraday snapshot — see rolling["market_narrative"]["by_symbol"])
   - Session OHLC for structural levels
   - CF pattern (bias from today's dominant direction)
 
@@ -10,15 +11,11 @@ Wording is always conditional: "If X, then watch Y."
 """
 
 import logging
-from datetime import datetime, timedelta
 from typing import Any, Dict
 
 from src.reports.base_section import BaseSection
 
 logger = logging.getLogger(__name__)
-
-NIFTY = "NSE:NIFTY50-INDEX"
-BANKNIFTY = "NSE:NIFTYBANK-INDEX"
 
 
 class TomorrowOutlookSection(BaseSection):
@@ -26,40 +23,9 @@ class TomorrowOutlookSection(BaseSection):
     section_title = "Tomorrow's Outlook"
 
     def compute(self) -> Dict[str, Any]:
-        dt = datetime.strptime(self.date_str, "%Y-%m-%d")
-        start = dt - timedelta(days=5)
-        end = dt + timedelta(days=1)
-
-        nifty_data, bn_data = None, None
-        try:
-            nifty_df = self.data_provider.get_historical_data(NIFTY, start, end, "D")
-            bn_df = self.data_provider.get_historical_data(BANKNIFTY, start, end, "D")
-            if nifty_df is not None and not nifty_df.empty:
-                today_rows = nifty_df[nifty_df.index.date == dt.date()]
-                if not today_rows.empty:
-                    row = today_rows.iloc[-1]
-                    o, h, l, c = float(row["open"]), float(row["high"]), float(row["low"]), float(row["close"])
-                    close_pos = (c - l) / (h - l + 0.01)
-                    trend_q = abs(c - o) / (h - l + 0.01)
-                    nifty_data = {
-                        "open": o, "high": h, "low": l, "close": c,
-                        "close_position": round(close_pos, 2),
-                        "trend_quality": round(trend_q, 2),
-                    }
-            if bn_df is not None and not bn_df.empty:
-                today_rows = bn_df[bn_df.index.date == dt.date()]
-                if not today_rows.empty:
-                    row = today_rows.iloc[-1]
-                    o, h, l, c = float(row["open"]), float(row["high"]), float(row["low"]), float(row["close"])
-                    close_pos = (c - l) / (h - l + 0.01)
-                    trend_q = abs(c - o) / (h - l + 0.01)
-                    bn_data = {
-                        "open": o, "high": h, "low": l, "close": c,
-                        "close_position": round(close_pos, 2),
-                        "trend_quality": round(trend_q, 2),
-                    }
-        except Exception as e:
-            logger.warning(f"Tomorrow outlook API fetch failed: {e}")
+        by_symbol = self.rolling.get("market_narrative", {}).get("by_symbol") or {}
+        nifty_data = by_symbol.get("nifty")
+        bn_data = by_symbol.get("banknifty")
 
         # Dominant bias from today's CFs
         bias_rows = self._query(

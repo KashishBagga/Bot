@@ -226,11 +226,15 @@ class OrderFlowStrategy(BaseStrategy):
         rr = round(tp_dist / risk_dist, 2)
 
         rejection_reasons = list(global_rejections)
+        # BUG FIX: this branch previously checked `bias != NarrativeBias.REVERSAL`
+        # and did nothing (`pass`) — BUY PUT sweep-reversals had no bias-opposition
+        # filter at all, unlike BUY CALL just above. Mirrors the CALL condition
+        # (same pattern geometry_strategy.py uses for both its bullish and bearish
+        # setups: `bias == REVERSAL and confidence >= 0.55` opposes either side).
         if side == "BUY CALL" and bias == NarrativeBias.REVERSAL and bias_confidence >= 0.55:
             rejection_reasons.append("NARRATIVE_BIAS_OPPOSED")
-        elif side == "BUY PUT" and bias != NarrativeBias.REVERSAL and bias_confidence >= 0.55:
-            # Narrative Reversal is positive (Bullish bounce target)
-            pass
+        elif side == "BUY PUT" and bias == NarrativeBias.REVERSAL and bias_confidence >= 0.55:
+            rejection_reasons.append("NARRATIVE_BIAS_OPPOSED")
 
         if rr < self.min_rr:
             rejection_reasons.append(f"LOW_RR:{rr}")
