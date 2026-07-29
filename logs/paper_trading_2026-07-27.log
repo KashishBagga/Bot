@@ -1,0 +1,98 @@
+2026-07-27 09:26:21,494 - INFO - 🗓️ Risk day rolled to 2026-07-27 — daily counters reset.
+2026-07-27 09:26:21,497 - INFO - --- 09:26:21 Market Pulse ---
+2026-07-27 09:26:21,510 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,516 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,519 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,522 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,524 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,526 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,526 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-27 09:26:21,528 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,530 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,531 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,533 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,534 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,536 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:21,536 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-27 09:26:21,536 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-27 09:26:22,218 - INFO - 🗓️ Risk day rolled to 2026-07-27 — daily counters reset.
+2026-07-27 09:26:22,221 - INFO - --- 09:26:22 Market Pulse ---
+2026-07-27 09:26:22,232 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,234 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,236 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,238 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,240 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,242 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,242 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-27 09:26:22,244 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,246 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,248 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,250 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,251 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,253 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 09:26:22,253 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-27 09:26:22,253 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-27 13:03:24,224 - INFO - --- 13:03:24 Market Pulse ---
+2026-07-27 13:03:24,232 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,237 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,242 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,245 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,248 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,251 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,251 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-27 13:03:24,254 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,256 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,258 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,260 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,262 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,264 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,264 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-27 13:03:24,264 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-27 13:03:24,510 - INFO - --- 13:03:24 Market Pulse ---
+2026-07-27 13:03:24,514 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,517 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,519 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,521 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,524 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,526 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,526 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-27 13:03:24,528 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,530 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,532 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,534 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,537 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,539 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 13:03:24,539 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-27 13:03:24,539 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-27 14:13:39,819 - INFO - --- 14:13:39 Market Pulse ---
+2026-07-27 14:13:39,826 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,828 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,831 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,833 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,835 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,837 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,837 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-27 14:13:39,839 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,841 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,843 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,845 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,848 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,849 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:39,850 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-27 14:13:39,850 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-27 14:13:40,087 - INFO - --- 14:13:40 Market Pulse ---
+2026-07-27 14:13:40,093 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,097 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,101 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,103 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,107 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,109 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,110 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-27 14:13:40,112 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,115 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,117 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,120 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,123 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,125 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-27 14:13:40,125 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-27 14:13:40,125 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)

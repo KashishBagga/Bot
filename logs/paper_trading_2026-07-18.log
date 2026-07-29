@@ -1,0 +1,220 @@
+2026-07-18 09:01:56,267 - INFO - --- 09:01:56 Market Pulse ---
+2026-07-18 09:01:56,959 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:01:57,418 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:01:57,513 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:01:57,514 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 09:01:58,602 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:01:58,771 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:01:58,918 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:01:58,918 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 09:01:58,919 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 09:17:00,577 - INFO - --- 09:17:00 Market Pulse ---
+2026-07-18 09:17:01,076 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:17:01,749 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:17:01,834 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:17:01,835 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 09:17:01,921 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:17:02,063 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:17:02,169 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:17:02,170 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 09:17:02,170 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 09:32:58,007 - INFO - --- 09:32:58 Market Pulse ---
+2026-07-18 09:32:58,657 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:32:58,743 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:32:58,857 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:32:58,857 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 09:32:59,001 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:32:59,197 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:32:59,394 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:32:59,394 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 09:32:59,394 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 09:45:50,128 - INFO - --- 09:45:50 Market Pulse ---
+2026-07-18 09:45:51,106 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:45:51,623 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:45:51,805 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:45:51,806 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 09:45:51,894 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:45:52,069 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:45:52,161 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 09:45:52,161 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 09:45:52,161 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 10:02:55,896 - INFO - --- 10:02:55 Market Pulse ---
+2026-07-18 10:02:56,336 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:02:56,469 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:02:56,564 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:02:56,564 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 10:02:56,691 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:02:56,869 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:02:57,054 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:02:57,054 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 10:02:57,054 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 10:17:59,153 - INFO - --- 10:17:59 Market Pulse ---
+2026-07-18 10:17:59,911 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:18:00,224 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:18:00,311 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:18:00,311 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 10:18:00,477 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:18:00,593 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:18:00,754 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:18:00,754 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 10:18:00,754 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 10:25:19,826 - INFO - --- 10:25:19 Market Pulse ---
+2026-07-18 10:25:20,732 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:25:20,903 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:25:21,166 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:25:21,167 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 10:25:21,268 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:25:21,424 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:25:21,515 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:25:21,515 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 10:25:21,515 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 10:30:22,481 - INFO - --- 10:30:22 Market Pulse ---
+2026-07-18 10:30:22,656 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:30:22,748 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:30:22,842 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:30:22,842 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 10:30:22,941 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:30:23,037 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:30:23,174 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:30:23,174 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 10:30:23,174 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 10:35:24,005 - INFO - --- 10:35:24 Market Pulse ---
+2026-07-18 10:35:24,200 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:35:24,294 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:35:24,390 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:35:24,390 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 10:35:24,484 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:35:24,648 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:35:24,736 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:35:24,737 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 10:35:24,737 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 10:40:24,887 - INFO - --- 10:40:24 Market Pulse ---
+2026-07-18 10:40:25,012 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:40:25,117 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:40:25,266 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:40:25,266 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 10:40:25,358 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:40:25,444 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:40:25,533 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 10:40:25,533 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 10:40:25,533 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 11:00:30,601 - INFO - --- 11:00:30 Market Pulse ---
+2026-07-18 11:00:31,011 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:00:31,184 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:00:31,278 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:00:31,278 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 11:00:31,367 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:00:31,527 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:00:31,616 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:00:31,616 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 11:00:31,616 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 11:17:43,921 - INFO - --- 11:17:43 Market Pulse ---
+2026-07-18 11:17:44,019 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:17:44,440 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:17:44,591 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:17:44,591 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 11:17:44,918 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:17:45,007 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:17:45,096 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:17:45,097 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 11:17:45,097 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 11:33:18,838 - INFO - --- 11:33:18 Market Pulse ---
+2026-07-18 11:33:19,591 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:33:19,766 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:33:19,869 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:33:19,869 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 11:33:20,040 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:33:20,138 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:33:20,314 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:33:20,314 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 11:33:20,314 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 11:50:45,023 - INFO - --- 11:50:45 Market Pulse ---
+2026-07-18 11:50:45,366 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:50:45,523 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:50:45,603 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:50:45,603 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 11:50:45,695 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:50:45,858 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:50:45,957 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 11:50:45,958 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 11:50:45,958 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 12:06:44,641 - INFO - --- 12:06:44 Market Pulse ---
+2026-07-18 12:06:44,945 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:06:45,178 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:06:45,283 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:06:45,283 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 12:06:45,440 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:06:45,536 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:06:45,699 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:06:45,699 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 12:06:45,699 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 12:24:43,355 - INFO - --- 12:24:43 Market Pulse ---
+2026-07-18 12:24:44,339 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:24:44,675 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:24:44,807 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:24:44,807 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 12:24:44,896 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:24:44,989 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:24:45,142 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:24:45,143 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 12:24:45,143 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 12:42:08,857 - INFO - --- 12:42:08 Market Pulse ---
+2026-07-18 12:42:09,676 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:42:09,765 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:42:09,913 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:42:09,913 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 12:42:09,900 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:42:10,067 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:42:10,156 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 12:42:10,156 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 12:42:10,156 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 13:01:07,271 - INFO - --- 13:01:07 Market Pulse ---
+2026-07-18 13:01:08,229 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:01:08,395 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:01:08,499 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:01:08,499 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 13:01:08,671 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:01:08,806 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:01:08,891 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:01:08,891 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 13:01:08,891 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 13:17:21,562 - INFO - --- 13:17:21 Market Pulse ---
+2026-07-18 13:17:21,921 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:17:22,213 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:17:22,319 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:17:22,320 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 13:17:22,484 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:17:22,571 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:17:22,734 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:17:22,734 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 13:17:22,735 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 13:35:10,418 - INFO - --- 13:35:10 Market Pulse ---
+2026-07-18 13:35:10,972 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:35:11,304 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:35:11,547 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:35:11,547 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 13:35:11,633 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:35:11,725 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:35:11,881 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:35:11,882 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 13:35:11,882 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 13:46:24,133 - INFO - --- 13:46:24 Market Pulse ---
+2026-07-18 13:46:24,963 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:46:25,441 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:46:25,542 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:46:25,542 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 13:46:25,631 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:46:25,801 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:46:25,957 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 13:46:25,957 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 13:46:25,958 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-18 14:04:06,289 - INFO - --- 14:04:06 Market Pulse ---
+2026-07-18 14:04:07,385 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 14:04:07,471 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 14:04:07,558 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 14:04:07,559 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-18 14:04:07,692 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 14:04:07,870 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 14:04:08,044 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-18 14:04:08,044 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-18 14:04:08,044 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)

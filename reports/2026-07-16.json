@@ -1,0 +1,2371 @@
+{
+  "date": "2026-07-16",
+  "generated_at": "2026-07-16 15:38:34",
+  "sections": {
+    "executive_summary": {
+      "date": "2026-07-16",
+      "market": {
+        "nifty": {
+          "open": 24142.1,
+          "high": 24186.5,
+          "low": 24050.0,
+          "close": 24072.75,
+          "prev_close": 24078.5,
+          "change_pct": -0.02,
+          "gap_pct": 0.26,
+          "close_position": 0.17,
+          "trend_quality": 0.51
+        },
+        "banknifty": {
+          "open": 57831.1,
+          "high": 57931.3,
+          "low": 57420.15,
+          "close": 57582.25,
+          "prev_close": 57757.85,
+          "change_pct": -0.3,
+          "gap_pct": 0.13,
+          "close_position": 0.32,
+          "trend_quality": 0.49
+        },
+        "vix": {
+          "value": 0.0
+        },
+        "day_type": "Balanced Day"
+      },
+      "real": {
+        "trades": 7,
+        "wins": 5,
+        "losses": 2,
+        "win_rate": 0.71,
+        "total_pnl_r": 23.42,
+        "expectancy": 3.35
+      },
+      "cf": {
+        "total": 129,
+        "positive": 68,
+        "negative": 61,
+        "positive_rate": 0.53,
+        "expectancy": 1.25,
+        "total_pnl_r": 161.83
+      },
+      "experiments": [
+        {
+          "name": "Geometry_v1.0_Score50",
+          "expectancy": 7.91,
+          "total_pnl_r": 23.72,
+          "cf_trades": 3,
+          "real_trades": 0
+        },
+        {
+          "name": "Geometry_v1.0_Score35",
+          "expectancy": 3.94,
+          "total_pnl_r": 23.65,
+          "cf_trades": 6,
+          "real_trades": 6
+        },
+        {
+          "name": "ORB_15m_RVOL1.2",
+          "expectancy": 2.06,
+          "total_pnl_r": 6.17,
+          "cf_trades": 3,
+          "real_trades": 0
+        },
+        {
+          "name": "VWAP_Reversion_1.5ATR_RVOL1.0",
+          "expectancy": 1.47,
+          "total_pnl_r": 1.47,
+          "cf_trades": 1,
+          "real_trades": 1
+        },
+        {
+          "name": "ATR_Squeeze_RVOL1.0",
+          "expectancy": 1.21,
+          "total_pnl_r": 18.11,
+          "cf_trades": 15,
+          "real_trades": 0
+        },
+        {
+          "name": "Structural_v3.2_RVOL0.8",
+          "expectancy": 0.98,
+          "total_pnl_r": 36.11,
+          "cf_trades": 37,
+          "real_trades": 0
+        },
+        {
+          "name": "Structural_v3.2_RVOL1.0",
+          "expectancy": 0.98,
+          "total_pnl_r": 36.11,
+          "cf_trades": 37,
+          "real_trades": 0
+        },
+        {
+          "name": "EMA_Pullback_20_50_RVOL1.0",
+          "expectancy": 0.86,
+          "total_pnl_r": 15.39,
+          "cf_trades": 18,
+          "real_trades": 0
+        },
+        {
+          "name": "PrevDay_Extremes_RVOL1.2",
+          "expectancy": 0.31,
+          "total_pnl_r": 0.62,
+          "cf_trades": 2,
+          "real_trades": 0
+        },
+        {
+          "name": "ORB_30m_RVOL1.2",
+          "expectancy": 0.16,
+          "total_pnl_r": 0.82,
+          "cf_trades": 5,
+          "real_trades": 0
+        },
+        {
+          "name": "OrderFlow_v1.0",
+          "expectancy": -0.18,
+          "total_pnl_r": -0.36,
+          "cf_trades": 2,
+          "real_trades": 0
+        }
+      ]
+    },
+    "market_narrative": {
+      "gap": {
+        "direction": "Up",
+        "pct": 0.29
+      },
+      "opening_range_pts": 70.35,
+      "trend_quality": 0.45,
+      "close_position": 0.23,
+      "session_high": 24186.5,
+      "session_low": 24050.0,
+      "session_open": 24142.1,
+      "session_close": 24081.1,
+      "bullets": [
+        "Gap-up open (+0.29%)",
+        "Mixed session \u2014 partial trend with consolidation",
+        "Closed at 23% of session range"
+      ],
+      "regime_from_cf": "UNKNOWN",
+      "prev_close": 24073.45
+    },
+    "trade_review": {
+      "trades": [
+        {
+          "trade_id": "trade_NSE_NIFTY50_INDEX_1784182151",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY CALL",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 24161.0,
+          "exit": 24159.5,
+          "sl": 24159.5,
+          "tp": 24207.02,
+          "pnl_r": -1.05,
+          "mfe_r": 0.0,
+          "mae_r": 6.77,
+          "exit_reason": "INITIAL_SL",
+          "bars_held": 1,
+          "duration_min": 5.1,
+          "capture_rate": null,
+          "holding_eff": -1.05,
+          "tp_expansions": 0,
+          "grade": "D",
+          "grade_desc": "Loser",
+          "note": "Stopped at initial SL \u2014 thesis failed immediately"
+        },
+        {
+          "trade_id": "trade_NSE_NIFTYBANK_INDEX_1784182456",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY PUT",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 57649.25,
+          "exit": 57630.38,
+          "sl": 57630.38,
+          "tp": 57614.01,
+          "pnl_r": 1.86,
+          "mfe_r": 2.91,
+          "mae_r": 0.19,
+          "exit_reason": "TRAILING_SL",
+          "bars_held": 3,
+          "duration_min": 15.2,
+          "capture_rate": 0.64,
+          "holding_eff": 0.62,
+          "tp_expansions": 1,
+          "grade": "B",
+          "grade_desc": "Good trade",
+          "note": "Trailing SL locked in profits correctly"
+        },
+        {
+          "trade_id": "trade_NSE_NIFTYBANK_INDEX_1784184284",
+          "experiment": "VWAP_Reversion_1.5ATR_RVOL1.0",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY CALL",
+          "setup": "REVERSION",
+          "entry": 57602.4,
+          "exit": 57660.69,
+          "sl": 57660.69,
+          "tp": 57688.93,
+          "pnl_r": 2.16,
+          "mfe_r": 3.21,
+          "mae_r": 0.0,
+          "exit_reason": "TRAILING_SL",
+          "bars_held": 4,
+          "duration_min": 20.3,
+          "capture_rate": 0.67,
+          "holding_eff": 0.54,
+          "tp_expansions": 0,
+          "grade": "B",
+          "grade_desc": "Good trade",
+          "note": "Trailing SL locked in profits correctly"
+        },
+        {
+          "trade_id": "trade_NSE_NIFTY50_INDEX_1784185505",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY PUT",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 24145.8,
+          "exit": 24119.48,
+          "sl": 24119.48,
+          "tp": 24132.18,
+          "pnl_r": 12.92,
+          "mfe_r": 13.97,
+          "mae_r": 0.0,
+          "exit_reason": "TRAILING_SL",
+          "bars_held": 6,
+          "duration_min": 30.6,
+          "capture_rate": 0.92,
+          "holding_eff": 2.153,
+          "tp_expansions": 5,
+          "grade": "A+",
+          "grade_desc": "Elite execution",
+          "note": "TP expansion captured continuation (5 expansions)"
+        },
+        {
+          "trade_id": "trade_NSE_NIFTY50_INDEX_1784190400",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY CALL",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 24091.65,
+          "exit": 24099.09,
+          "sl": 24099.09,
+          "tp": 24100.84,
+          "pnl_r": 5.85,
+          "mfe_r": 6.9,
+          "mae_r": 0.79,
+          "exit_reason": "TRAILING_SL",
+          "bars_held": 3,
+          "duration_min": 15.3,
+          "capture_rate": 0.85,
+          "holding_eff": 1.952,
+          "tp_expansions": 0,
+          "grade": "A+",
+          "grade_desc": "Elite execution",
+          "note": "Trailing SL locked in profits correctly"
+        },
+        {
+          "trade_id": "trade_NSE_NIFTYBANK_INDEX_1784191011",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY CALL",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 57568.1,
+          "exit": 57557.34,
+          "sl": 57557.34,
+          "tp": 57647.34,
+          "pnl_r": -1.05,
+          "mfe_r": 0.0,
+          "mae_r": 3.19,
+          "exit_reason": "INITIAL_SL",
+          "bars_held": 1,
+          "duration_min": 5.1,
+          "capture_rate": null,
+          "holding_eff": -1.05,
+          "tp_expansions": 0,
+          "grade": "D",
+          "grade_desc": "Loser",
+          "note": "Stopped at initial SL \u2014 thesis failed immediately"
+        },
+        {
+          "trade_id": "trade_NSE_NIFTYBANK_INDEX_1784194071",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY CALL",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 57580.7,
+          "exit": 57595.19,
+          "sl": 57595.19,
+          "tp": 57621.41,
+          "pnl_r": 2.73,
+          "mfe_r": 3.78,
+          "mae_r": 1.28,
+          "exit_reason": "TRAILING_SL",
+          "bars_held": 4,
+          "duration_min": 20.4,
+          "capture_rate": 0.72,
+          "holding_eff": 0.683,
+          "tp_expansions": 0,
+          "grade": "A",
+          "grade_desc": "Strong trade",
+          "note": "Trailing SL locked in profits correctly"
+        }
+      ],
+      "count": 7
+    },
+    "losing_trades": {
+      "losers": [
+        {
+          "trade_id": "trade_NSE_NIFTY50_INDEX_1784182151",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY CALL",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 24161.0,
+          "exit": 24159.5,
+          "pnl_r": -1.05,
+          "mfe_r": 0.0,
+          "exit_reason": "INITIAL_SL",
+          "bars_held": 1,
+          "avoidable": false,
+          "avoidance_reason": null,
+          "failure_note": "Never moved in our favour \u2014 thesis was immediately invalidated."
+        },
+        {
+          "trade_id": "trade_NSE_NIFTYBANK_INDEX_1784191011",
+          "experiment": "Geometry_v1.0_Score35",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY CALL",
+          "setup": "CONFLUENCE_BOUNCE",
+          "entry": 57568.1,
+          "exit": 57557.34,
+          "pnl_r": -1.05,
+          "mfe_r": 0.0,
+          "exit_reason": "INITIAL_SL",
+          "bars_held": 1,
+          "avoidable": false,
+          "avoidance_reason": null,
+          "failure_note": "Never moved in our favour \u2014 thesis was immediately invalidated."
+        }
+      ],
+      "count": 2
+    },
+    "missed_opportunities": {
+      "opportunities": [
+        {
+          "candidate_id": "cand_NSE_NIFTY50_INDEX_BREAKOUT_24131.95_20260716_123000_Structural_v3.2_RVOL1.0",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY PUT",
+          "setup": "BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "LOW_EFFICIENCY",
+            "TP_CAPPED"
+          ],
+          "entry_price": 24160.0,
+          "sl": 24064.83,
+          "sl_dist": 6.68,
+          "mfe_r": 15.25,
+          "mae_r": 0.0,
+          "final_pnl_r": 14.2,
+          "capture_rate": 0.9311,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "priority_stars": 4,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        },
+        {
+          "candidate_id": "cand_NSE_NIFTY50_INDEX_BREAKOUT_24131.95_20260716_123000_Structural_v3.2_RVOL0.8",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY PUT",
+          "setup": "BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "LOW_EFFICIENCY",
+            "TP_CAPPED"
+          ],
+          "entry_price": 24160.0,
+          "sl": 24064.83,
+          "sl_dist": 6.68,
+          "mfe_r": 15.25,
+          "mae_r": 0.0,
+          "final_pnl_r": 14.2,
+          "capture_rate": 0.9311,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL0.8",
+          "priority_stars": 4,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        },
+        {
+          "candidate_id": "cand_NSE_NIFTY50_INDEX_SQBRK_24160.00_20260716_123000_ATR_Squeeze_RVOL1.0",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY PUT",
+          "setup": "SQUEEZE_BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "TP_CAPPED"
+          ],
+          "entry_price": 24160.0,
+          "sl": 24064.83,
+          "sl_dist": 6.68,
+          "mfe_r": 15.25,
+          "mae_r": 0.0,
+          "final_pnl_r": 14.2,
+          "capture_rate": 0.9311,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "ATR_Squeeze_RVOL1.0",
+          "priority_stars": 4,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        },
+        {
+          "candidate_id": "cand_NSE_NIFTY50_INDEX_CONFLUENCE_BOUNCE_24145.80_202607161235_Geometry_v1.0_Score50",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY PUT",
+          "setup": "CONFLUENCE_BOUNCE",
+          "primary_rejection": "LOW_RR:1.71",
+          "rejection_reasons": [
+            "LOW_RR:1.71"
+          ],
+          "entry_price": 24145.8,
+          "sl": 24119.48,
+          "sl_dist": 2.03,
+          "mfe_r": 13.97,
+          "mae_r": 0.0,
+          "final_pnl_r": 12.92,
+          "capture_rate": 0.9248,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Geometry_v1.0_Score50",
+          "priority_stars": 3,
+          "blocking_hint": "LOW_RR:1.71"
+        },
+        {
+          "candidate_id": "cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57575.75_20260716_123000_Structural_v3.2_RVOL1.0",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY PUT",
+          "setup": "BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "BIAS_MISMATCH",
+            "LOW_EFFICIENCY",
+            "HIGH_WICKINESS",
+            "TP_CAPPED"
+          ],
+          "entry_price": 57687.05,
+          "sl": 57452.04,
+          "sl_dist": 23.94,
+          "mfe_r": 10.82,
+          "mae_r": 0.0,
+          "final_pnl_r": 9.77,
+          "capture_rate": 0.9029,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "priority_stars": 3,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        }
+      ],
+      "count": 5
+    },
+    "counterfactual_insights": {
+      "filters": [
+        {
+          "name": "LOW_RVOL",
+          "today_count": 105,
+          "today_expectancy": 0.95,
+          "today_wins": 51,
+          "today_win_rate": 0.49,
+          "avg_mfe": 1.96,
+          "rolling_5d_count": 105,
+          "rolling_5d_expectancy": 0.95,
+          "rolling_20d_count": 309,
+          "rolling_20d_expectancy": 0.97,
+          "verdict": "over_filtered",
+          "verdict_text": "\u26a0\ufe0f Over-filtered \u2014 rolling expectancy positive, worth investigating"
+        },
+        {
+          "name": "TIME_FILTER",
+          "today_count": 6,
+          "today_expectancy": 0.09,
+          "today_wins": 3,
+          "today_win_rate": 0.5,
+          "avg_mfe": 1.14,
+          "rolling_5d_count": 6,
+          "rolling_5d_expectancy": 0.09,
+          "rolling_20d_count": 19,
+          "rolling_20d_expectancy": -0.47,
+          "verdict": "neutral",
+          "verdict_text": "\u27a1\ufe0f Neutral \u2014 keep monitoring"
+        },
+        {
+          "name": "NARRATIVE_BIAS_BEARISH",
+          "today_count": 4,
+          "today_expectancy": 5.4,
+          "today_wins": 4,
+          "today_win_rate": 1.0,
+          "avg_mfe": 6.45,
+          "rolling_5d_count": 4,
+          "rolling_5d_expectancy": 5.4,
+          "rolling_20d_count": 9,
+          "rolling_20d_expectancy": 4.57,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "BIAS_MISMATCH",
+          "today_count": 3,
+          "today_expectancy": 1.69,
+          "today_wins": 2,
+          "today_win_rate": 0.67,
+          "avg_mfe": 2.74,
+          "rolling_5d_count": 3,
+          "rolling_5d_expectancy": 1.69,
+          "rolling_20d_count": 24,
+          "rolling_20d_expectancy": 2.25,
+          "verdict": "over_filtered",
+          "verdict_text": "\u26a0\ufe0f Over-filtered \u2014 rolling expectancy positive, worth investigating"
+        },
+        {
+          "name": "LOW_EFFICIENCY",
+          "today_count": 2,
+          "today_expectancy": 1.59,
+          "today_wins": 2,
+          "today_win_rate": 1.0,
+          "avg_mfe": 2.64,
+          "rolling_5d_count": 2,
+          "rolling_5d_expectancy": 1.59,
+          "rolling_20d_count": 3,
+          "rolling_20d_expectancy": 0.71,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "TP_CAPPED",
+          "today_count": 2,
+          "today_expectancy": 2.92,
+          "today_wins": 2,
+          "today_win_rate": 1.0,
+          "avg_mfe": 3.97,
+          "rolling_5d_count": 2,
+          "rolling_5d_expectancy": 2.92,
+          "rolling_20d_count": 2,
+          "rolling_20d_expectancy": 2.92,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:0.15",
+          "today_count": 1,
+          "today_expectancy": -0.88,
+          "today_wins": 0,
+          "today_win_rate": 0.0,
+          "avg_mfe": 0.17,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": -0.88,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": -0.88,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:1.71",
+          "today_count": 1,
+          "today_expectancy": 12.92,
+          "today_wins": 1,
+          "today_win_rate": 1.0,
+          "avg_mfe": 13.97,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": 12.92,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": 12.92,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:0.16",
+          "today_count": 1,
+          "today_expectancy": 5.62,
+          "today_wins": 1,
+          "today_win_rate": 1.0,
+          "avg_mfe": 6.67,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": 5.62,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": 5.62,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:1.13",
+          "today_count": 1,
+          "today_expectancy": 9.15,
+          "today_wins": 1,
+          "today_win_rate": 1.0,
+          "avg_mfe": 10.2,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": 9.15,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": 9.15,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:0.51",
+          "today_count": 1,
+          "today_expectancy": -1.05,
+          "today_wins": 0,
+          "today_win_rate": 0.0,
+          "avg_mfe": 0.0,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": -1.05,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": -1.05,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:0.12",
+          "today_count": 1,
+          "today_expectancy": 0.69,
+          "today_wins": 1,
+          "today_win_rate": 1.0,
+          "avg_mfe": 1.74,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": 0.69,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": 0.69,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        },
+        {
+          "name": "LOW_RR:1.18",
+          "today_count": 1,
+          "today_expectancy": -1.05,
+          "today_wins": 0,
+          "today_win_rate": 0.0,
+          "avg_mfe": 0.0,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": -1.05,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": -1.05,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        }
+      ],
+      "count": 13
+    },
+    "experiment_ranking": {
+      "rankings": [
+        {
+          "rank": 1,
+          "name": "Geometry_v1.0_Score50",
+          "today_expectancy": 7.91,
+          "today_pnl_r": 23.72,
+          "today_cf": 3,
+          "today_real": 0,
+          "wins": 3,
+          "losses": 0,
+          "avg_mfe": 8.96,
+          "avg_mae": 0.0,
+          "avg_capture": 0.86,
+          "avg_hold_eff": 1.792,
+          "config_hash": "431ce308e16d5c85",
+          "expectancy_5d": 7.91,
+          "cf_5d": 3
+        },
+        {
+          "rank": 2,
+          "name": "Geometry_v1.0_Score35",
+          "today_expectancy": 3.94,
+          "today_pnl_r": 23.65,
+          "today_cf": 6,
+          "today_real": 6,
+          "wins": 4,
+          "losses": 2,
+          "avg_mfe": 4.99,
+          "avg_mae": 0.68,
+          "avg_capture": -0.37,
+          "avg_hold_eff": 0.982,
+          "config_hash": "5b54205496d059aa",
+          "expectancy_5d": 3.94,
+          "cf_5d": 6
+        },
+        {
+          "rank": 3,
+          "name": "ORB_15m_RVOL1.2",
+          "today_expectancy": 2.06,
+          "today_pnl_r": 6.17,
+          "today_cf": 3,
+          "today_real": 0,
+          "wins": 2,
+          "losses": 1,
+          "avg_mfe": 2.91,
+          "avg_mae": 0.51,
+          "avg_capture": -1.16,
+          "avg_hold_eff": 0.397,
+          "config_hash": "7977fff6d541cc39",
+          "expectancy_5d": 2.06,
+          "cf_5d": 3
+        },
+        {
+          "rank": 4,
+          "name": "VWAP_Reversion_1.5ATR_RVOL1.0",
+          "today_expectancy": 1.47,
+          "today_pnl_r": 1.47,
+          "today_cf": 1,
+          "today_real": 1,
+          "wins": 1,
+          "losses": 0,
+          "avg_mfe": 2.52,
+          "avg_mae": 0.48,
+          "avg_capture": 0.58,
+          "avg_hold_eff": 0.184,
+          "config_hash": "3d6d96cb21ff71cd",
+          "expectancy_5d": 1.47,
+          "cf_5d": 1
+        },
+        {
+          "rank": 5,
+          "name": "ATR_Squeeze_RVOL1.0",
+          "today_expectancy": 1.21,
+          "today_pnl_r": 18.11,
+          "today_cf": 15,
+          "today_real": 0,
+          "wins": 6,
+          "losses": 9,
+          "avg_mfe": 2.26,
+          "avg_mae": 1.39,
+          "avg_capture": -6.64,
+          "avg_hold_eff": -0.183,
+          "config_hash": "9ad2746007bcc7e7",
+          "expectancy_5d": 1.21,
+          "cf_5d": 15
+        },
+        {
+          "rank": 6,
+          "name": "Structural_v3.2_RVOL0.8",
+          "today_expectancy": 0.98,
+          "today_pnl_r": 36.11,
+          "today_cf": 37,
+          "today_real": 0,
+          "wins": 20,
+          "losses": 17,
+          "avg_mfe": 1.97,
+          "avg_mae": 0.91,
+          "avg_capture": -2.31,
+          "avg_hold_eff": -0.064,
+          "config_hash": "40874fb174f2baa6",
+          "expectancy_5d": 0.98,
+          "cf_5d": 37
+        },
+        {
+          "rank": 7,
+          "name": "Structural_v3.2_RVOL1.0",
+          "today_expectancy": 0.98,
+          "today_pnl_r": 36.11,
+          "today_cf": 37,
+          "today_real": 0,
+          "wins": 20,
+          "losses": 17,
+          "avg_mfe": 1.97,
+          "avg_mae": 0.91,
+          "avg_capture": -2.31,
+          "avg_hold_eff": -0.064,
+          "config_hash": "e94c3fcc1fbc618d",
+          "expectancy_5d": 0.98,
+          "cf_5d": 37
+        },
+        {
+          "rank": 8,
+          "name": "EMA_Pullback_20_50_RVOL1.0",
+          "today_expectancy": 0.86,
+          "today_pnl_r": 15.39,
+          "today_cf": 18,
+          "today_real": 0,
+          "wins": 7,
+          "losses": 11,
+          "avg_mfe": 1.9,
+          "avg_mae": 0.78,
+          "avg_capture": -5.04,
+          "avg_hold_eff": -0.143,
+          "config_hash": "0296a97f007a6675",
+          "expectancy_5d": 0.86,
+          "cf_5d": 18
+        },
+        {
+          "rank": 9,
+          "name": "PrevDay_Extremes_RVOL1.2",
+          "today_expectancy": 0.31,
+          "today_pnl_r": 0.62,
+          "today_cf": 2,
+          "today_real": 0,
+          "wins": 1,
+          "losses": 1,
+          "avg_mfe": 1.36,
+          "avg_mae": 0.65,
+          "avg_capture": -5.53,
+          "avg_hold_eff": 0.09,
+          "config_hash": "952708070530c475",
+          "expectancy_5d": 0.31,
+          "cf_5d": 2
+        },
+        {
+          "rank": 10,
+          "name": "ORB_30m_RVOL1.2",
+          "today_expectancy": 0.16,
+          "today_pnl_r": 0.82,
+          "today_cf": 5,
+          "today_real": 0,
+          "wins": 3,
+          "losses": 2,
+          "avg_mfe": 1.16,
+          "avg_mae": 0.68,
+          "avg_capture": -0.7,
+          "avg_hold_eff": 0.035,
+          "config_hash": "a4c360e3a0cd8ef8",
+          "expectancy_5d": 0.16,
+          "cf_5d": 5
+        },
+        {
+          "rank": 11,
+          "name": "OrderFlow_v1.0",
+          "today_expectancy": -0.18,
+          "today_pnl_r": -0.36,
+          "today_cf": 2,
+          "today_real": 0,
+          "wins": 1,
+          "losses": 1,
+          "avg_mfe": 0.87,
+          "avg_mae": 0.88,
+          "avg_capture": 0.4,
+          "avg_hold_eff": -0.148,
+          "config_hash": "db8c841e65c2c062",
+          "expectancy_5d": -0.18,
+          "cf_5d": 2
+        }
+      ]
+    },
+    "thesis_analysis": {
+      "theses": [
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 34,
+          "net_pnl_today": 44.78,
+          "avg_pnl_today": 1.32,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 26,
+          "net_pnl_today": 26.16,
+          "avg_pnl_today": 1.01,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 10,
+          "net_pnl_today": 1.26,
+          "avg_pnl_today": 0.13,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "SQUEEZE_BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 10,
+          "net_pnl_today": 6.45,
+          "avg_pnl_today": 0.64,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "PULLBACK",
+          "signal": "BUY CALL",
+          "attempts_today": 7,
+          "net_pnl_today": 0.78,
+          "avg_pnl_today": 0.11,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "PULLBACK",
+          "signal": "BUY PUT",
+          "attempts_today": 7,
+          "net_pnl_today": 12.1,
+          "avg_pnl_today": 1.73,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 6,
+          "net_pnl_today": 0.64,
+          "avg_pnl_today": 0.11,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "PULLBACK",
+          "signal": "BUY PUT",
+          "attempts_today": 4,
+          "net_pnl_today": 2.51,
+          "avg_pnl_today": 0.63,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "CONFLUENCE_BOUNCE",
+          "signal": "BUY CALL",
+          "attempts_today": 4,
+          "net_pnl_today": 20.77,
+          "avg_pnl_today": 5.19,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "SQUEEZE_BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 3,
+          "net_pnl_today": -1.48,
+          "avg_pnl_today": -0.49,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "ORB_30M",
+          "signal": "BUY PUT",
+          "attempts_today": 3,
+          "net_pnl_today": 1.43,
+          "avg_pnl_today": 0.48,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "CONFLUENCE_BOUNCE",
+          "signal": "BUY PUT",
+          "attempts_today": 2,
+          "net_pnl_today": 11.87,
+          "avg_pnl_today": 5.93,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "ORB_30M",
+          "signal": "BUY PUT",
+          "attempts_today": 2,
+          "net_pnl_today": -0.6,
+          "avg_pnl_today": -0.3,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "CONFLUENCE_BOUNCE",
+          "signal": "BUY CALL",
+          "attempts_today": 2,
+          "net_pnl_today": 9.11,
+          "avg_pnl_today": 4.56,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "SQUEEZE_BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 2,
+          "net_pnl_today": 13.15,
+          "avg_pnl_today": 6.57,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "ORB_15M",
+          "signal": "BUY PUT",
+          "attempts_today": 2,
+          "net_pnl_today": 7.03,
+          "avg_pnl_today": 3.52,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "CONFLUENCE_BOUNCE",
+          "signal": "BUY PUT",
+          "attempts_today": 1,
+          "net_pnl_today": 5.62,
+          "avg_pnl_today": 5.62,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "LIQUIDITY_SWEEP",
+          "signal": "BUY PUT",
+          "attempts_today": 1,
+          "net_pnl_today": 0.69,
+          "avg_pnl_today": 0.69,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "REVERSION",
+          "signal": "BUY CALL",
+          "attempts_today": 1,
+          "net_pnl_today": 1.47,
+          "avg_pnl_today": 1.47,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "ORB_15M",
+          "signal": "BUY PUT",
+          "attempts_today": 1,
+          "net_pnl_today": -0.87,
+          "avg_pnl_today": -0.87,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "LIQUIDITY_SWEEP",
+          "signal": "BUY CALL",
+          "attempts_today": 1,
+          "net_pnl_today": -1.05,
+          "avg_pnl_today": -1.05,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        }
+      ],
+      "flagged": [
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 34,
+          "net_pnl_today": 44.78,
+          "avg_pnl_today": 1.32,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 26,
+          "net_pnl_today": 26.16,
+          "avg_pnl_today": 1.01,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 10,
+          "net_pnl_today": 1.26,
+          "avg_pnl_today": 0.13,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "SQUEEZE_BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 10,
+          "net_pnl_today": 6.45,
+          "avg_pnl_today": 0.64,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "PULLBACK",
+          "signal": "BUY CALL",
+          "attempts_today": 7,
+          "net_pnl_today": 0.78,
+          "avg_pnl_today": 0.11,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "PULLBACK",
+          "signal": "BUY PUT",
+          "attempts_today": 7,
+          "net_pnl_today": 12.1,
+          "avg_pnl_today": 1.73,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 6,
+          "net_pnl_today": 0.64,
+          "avg_pnl_today": 0.11,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        }
+      ]
+    },
+    "market_behaviour": {
+      "total_cf": 129,
+      "choppiness": 0.25,
+      "initial_sl_rate": 0.25,
+      "setup_summary": {
+        "SQUEEZE_BREAKOUT": {
+          "total": 15,
+          "success_rate": 0.67,
+          "avg_pnl": 1.21
+        },
+        "BREAKOUT": {
+          "total": 76,
+          "success_rate": 0.74,
+          "avg_pnl": 0.96
+        },
+        "PULLBACK": {
+          "total": 18,
+          "success_rate": 0.72,
+          "avg_pnl": 0.86
+        },
+        "CONFLUENCE_BOUNCE": {
+          "total": 9,
+          "success_rate": 0.89,
+          "avg_pnl": 5.26
+        },
+        "ORB_30M": {
+          "total": 5,
+          "success_rate": 0.8,
+          "avg_pnl": 0.16
+        },
+        "LIQUIDITY_SWEEP": {
+          "total": 2,
+          "success_rate": 0.5,
+          "avg_pnl": -0.18
+        },
+        "ORB_15M": {
+          "total": 3,
+          "success_rate": 1.0,
+          "avg_pnl": 2.06
+        },
+        "REVERSION": {
+          "total": 1,
+          "success_rate": 1.0,
+          "avg_pnl": 1.47
+        }
+      },
+      "trend_score": 8,
+      "mean_reversion_score": 2,
+      "breakout_success_pct": 0.74,
+      "sweep_success_pct": 0,
+      "hourly_performance": [
+        {
+          "hour": 9,
+          "trades": 8,
+          "avg_pnl": 0.25,
+          "wins": 4,
+          "win_rate": 0.5
+        },
+        {
+          "hour": 10,
+          "trades": 25,
+          "avg_pnl": -0.23,
+          "wins": 9,
+          "win_rate": 0.36
+        },
+        {
+          "hour": 11,
+          "trades": 18,
+          "avg_pnl": 1.33,
+          "wins": 11,
+          "win_rate": 0.61
+        },
+        {
+          "hour": 12,
+          "trades": 17,
+          "avg_pnl": 0.75,
+          "wins": 9,
+          "win_rate": 0.53
+        },
+        {
+          "hour": 13,
+          "trades": 20,
+          "avg_pnl": 4.63,
+          "wins": 11,
+          "win_rate": 0.55
+        },
+        {
+          "hour": 14,
+          "trades": 27,
+          "avg_pnl": 0.73,
+          "wins": 14,
+          "win_rate": 0.52
+        },
+        {
+          "hour": 15,
+          "trades": 14,
+          "avg_pnl": 1.18,
+          "wins": 10,
+          "win_rate": 0.71
+        }
+      ]
+    },
+    "tomorrow_outlook": {
+      "nifty": {
+        "open": 24142.1,
+        "high": 24186.5,
+        "low": 24050.0,
+        "close": 24072.75,
+        "close_position": 0.17,
+        "trend_quality": 0.51
+      },
+      "banknifty": {
+        "open": 57831.1,
+        "high": 57931.3,
+        "low": 57420.15,
+        "close": 57582.25,
+        "close_position": 0.32,
+        "trend_quality": 0.49
+      },
+      "best_signal_today": "BUY PUT",
+      "scenarios": [
+        {
+          "name": "Scenario A \u2014 Range continuation",
+          "pct": 50,
+          "desc": "Fade extremes within 24050.0-24186.0 until breakout"
+        },
+        {
+          "name": "Scenario B \u2014 Directional breakout",
+          "pct": 50,
+          "desc": "Clean RVOL breakout above/below today's range triggers thesis"
+        }
+      ],
+      "observations": [
+        "Weak close near session lows (17% of range)",
+        "Low trend quality (51%) \u2014 choppy session"
+      ],
+      "watch_levels": [
+        {
+          "label": "Today's High (supply)",
+          "level": 24186.0,
+          "symbol": "NIFTY"
+        },
+        {
+          "label": "Today's Low (demand)",
+          "level": 24050.0,
+          "symbol": "NIFTY"
+        },
+        {
+          "label": "Today's Close",
+          "level": 24073.0,
+          "symbol": "NIFTY"
+        },
+        {
+          "label": "Today's High (supply)",
+          "level": 57931.0,
+          "symbol": "BANKNIFTY"
+        },
+        {
+          "label": "Today's Low (demand)",
+          "level": 57420.0,
+          "symbol": "BANKNIFTY"
+        }
+      ],
+      "avoid": "Low-RVOL breakout trades in the first 30 minutes",
+      "prefer": "Wait for RVOL confirmation before entering directional setups"
+    },
+    "research_queue": {
+      "queue": [
+        {
+          "priority": 4,
+          "title": "Investigate `LOW_RVOL` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RVOL` show rolling expectancy +0.97R over 309 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 4,
+          "confidence": "High",
+          "rolling_expectancy": 0.97,
+          "sample_count": 309,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RVOL threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.67` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.67` show rolling expectancy +4.33R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 4.33,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.67 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:1.08` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:1.08` show rolling expectancy +1.14R over 2 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 1.14,
+          "sample_count": 2,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:1.08 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.03` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.03` show rolling expectancy +8.12R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 8.12,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.03 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `BIAS_MISMATCH` filter threshold",
+          "description": "Shadow trades rejected for `BIAS_MISMATCH` show rolling expectancy +2.25R over 24 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.25,
+          "sample_count": 24,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with BIAS_MISMATCH threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.65` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.65` show rolling expectancy +4.72R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 4.72,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.65 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.98` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.98` show rolling expectancy +3.88R over 2 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 3.88,
+          "sample_count": 2,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.98 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.16` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.16` show rolling expectancy +5.62R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 5.62,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.16 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `TIME_FILTER:CLOSE` filter threshold",
+          "description": "Shadow trades rejected for `TIME_FILTER:CLOSE` show rolling expectancy +0.77R over 2 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 0.77,
+          "sample_count": 2,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with TIME_FILTER:CLOSE threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.41` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.41` show rolling expectancy +5.64R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 5.64,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.41 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.14` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.14` show rolling expectancy +1.35R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 1.35,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.14 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `NARRATIVE_BIAS_BULLISH` filter threshold",
+          "description": "Shadow trades rejected for `NARRATIVE_BIAS_BULLISH` show rolling expectancy +2.53R over 5 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.53,
+          "sample_count": 5,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with NARRATIVE_BIAS_BULLISH threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `TP_CAPPED` filter threshold",
+          "description": "Shadow trades rejected for `TP_CAPPED` show rolling expectancy +2.92R over 2 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.92,
+          "sample_count": 2,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with TP_CAPPED threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:1.65` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:1.65` show rolling expectancy +0.85R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 0.85,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:1.65 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:1.71` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:1.71` show rolling expectancy +12.92R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 12.92,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:1.71 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_EFFICIENCY` filter threshold",
+          "description": "Shadow trades rejected for `LOW_EFFICIENCY` show rolling expectancy +0.71R over 3 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 0.71,
+          "sample_count": 3,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_EFFICIENCY threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.29` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.29` show rolling expectancy +9.95R over 2 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 9.95,
+          "sample_count": 2,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.29 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.12` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.12` show rolling expectancy +0.69R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 0.69,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.12 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:1.13` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:1.13` show rolling expectancy +9.15R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 9.15,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:1.13 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_RR:0.62` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RR:0.62` show rolling expectancy +2.72R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.72,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RR:0.62 threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `NARRATIVE_BIAS_BEARISH` filter threshold",
+          "description": "Shadow trades rejected for `NARRATIVE_BIAS_BEARISH` show rolling expectancy +4.57R over 9 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 4.57,
+          "sample_count": 9,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with NARRATIVE_BIAS_BEARISH threshold loosened by 20%, run for 5 days."
+        }
+      ]
+    },
+    "strategy_health": {
+      "execution": {
+        "score": 10,
+        "loop_errors": 0,
+        "detail": "No crashes"
+      },
+      "data_quality": {
+        "score": 6,
+        "fetch_errors": 4,
+        "detail": "4 MTF fetch warning(s) \u2014 transient API hiccup"
+      },
+      "strategy": {
+        "score": 9,
+        "avg_20d_expectancy": 1.15,
+        "avg_5d_expectancy": 1.15,
+        "trend": "Strongly positive",
+        "detail": "20d avg: +1.15R, 5d avg: +1.15R"
+      },
+      "research": {
+        "stars": 5,
+        "confidence": "High",
+        "total_cf": 815,
+        "cf_last_5d": 129,
+        "detail": "Based on 815 cumulative shadow trades."
+      },
+      "recommendation": "\u2705 No strategy changes. System is performing as designed.",
+      "equity_curve": [
+        {
+          "date": "2026-06-16",
+          "cumulative_pnl": -4.53
+        },
+        {
+          "date": "2026-06-17",
+          "cumulative_pnl": 11.35
+        },
+        {
+          "date": "2026-06-18",
+          "cumulative_pnl": 45.93
+        },
+        {
+          "date": "2026-06-19",
+          "cumulative_pnl": 120.39
+        },
+        {
+          "date": "2026-06-21",
+          "cumulative_pnl": 114.04
+        },
+        {
+          "date": "2026-06-23",
+          "cumulative_pnl": 612.51
+        },
+        {
+          "date": "2026-06-24",
+          "cumulative_pnl": 703.7
+        },
+        {
+          "date": "2026-06-25",
+          "cumulative_pnl": 940.83
+        },
+        {
+          "date": "2026-06-30",
+          "cumulative_pnl": 1134.37
+        },
+        {
+          "date": "2026-07-01",
+          "cumulative_pnl": 1254.19
+        },
+        {
+          "date": "2026-07-16",
+          "cumulative_pnl": 1416.01
+        }
+      ]
+    }
+  },
+  "equity_curve": [
+    {
+      "date": "2026-06-16",
+      "cumulative_pnl": -4.53
+    },
+    {
+      "date": "2026-06-17",
+      "cumulative_pnl": 11.35
+    },
+    {
+      "date": "2026-06-18",
+      "cumulative_pnl": 45.93
+    },
+    {
+      "date": "2026-06-19",
+      "cumulative_pnl": 120.39
+    },
+    {
+      "date": "2026-06-21",
+      "cumulative_pnl": 114.04
+    },
+    {
+      "date": "2026-06-23",
+      "cumulative_pnl": 612.51
+    },
+    {
+      "date": "2026-06-24",
+      "cumulative_pnl": 703.7
+    },
+    {
+      "date": "2026-06-25",
+      "cumulative_pnl": 940.83
+    },
+    {
+      "date": "2026-06-30",
+      "cumulative_pnl": 1134.37
+    },
+    {
+      "date": "2026-07-01",
+      "cumulative_pnl": 1254.19
+    },
+    {
+      "date": "2026-07-16",
+      "cumulative_pnl": 1416.01
+    }
+  ],
+  "filter_stats": [
+    {
+      "name": "LOW_RVOL",
+      "today_count": 105,
+      "today_expectancy": 0.95,
+      "today_wins": 51,
+      "today_win_rate": 0.49,
+      "avg_mfe": 1.96,
+      "rolling_5d_count": 105,
+      "rolling_5d_expectancy": 0.95,
+      "rolling_20d_count": 309,
+      "rolling_20d_expectancy": 0.97,
+      "verdict": "over_filtered",
+      "verdict_text": "\u26a0\ufe0f Over-filtered \u2014 rolling expectancy positive, worth investigating"
+    },
+    {
+      "name": "TIME_FILTER",
+      "today_count": 6,
+      "today_expectancy": 0.09,
+      "today_wins": 3,
+      "today_win_rate": 0.5,
+      "avg_mfe": 1.14,
+      "rolling_5d_count": 6,
+      "rolling_5d_expectancy": 0.09,
+      "rolling_20d_count": 19,
+      "rolling_20d_expectancy": -0.47,
+      "verdict": "neutral",
+      "verdict_text": "\u27a1\ufe0f Neutral \u2014 keep monitoring"
+    },
+    {
+      "name": "NARRATIVE_BIAS_BEARISH",
+      "today_count": 4,
+      "today_expectancy": 5.4,
+      "today_wins": 4,
+      "today_win_rate": 1.0,
+      "avg_mfe": 6.45,
+      "rolling_5d_count": 4,
+      "rolling_5d_expectancy": 5.4,
+      "rolling_20d_count": 9,
+      "rolling_20d_expectancy": 4.57,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "BIAS_MISMATCH",
+      "today_count": 3,
+      "today_expectancy": 1.69,
+      "today_wins": 2,
+      "today_win_rate": 0.67,
+      "avg_mfe": 2.74,
+      "rolling_5d_count": 3,
+      "rolling_5d_expectancy": 1.69,
+      "rolling_20d_count": 24,
+      "rolling_20d_expectancy": 2.25,
+      "verdict": "over_filtered",
+      "verdict_text": "\u26a0\ufe0f Over-filtered \u2014 rolling expectancy positive, worth investigating"
+    },
+    {
+      "name": "LOW_EFFICIENCY",
+      "today_count": 2,
+      "today_expectancy": 1.59,
+      "today_wins": 2,
+      "today_win_rate": 1.0,
+      "avg_mfe": 2.64,
+      "rolling_5d_count": 2,
+      "rolling_5d_expectancy": 1.59,
+      "rolling_20d_count": 3,
+      "rolling_20d_expectancy": 0.71,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "TP_CAPPED",
+      "today_count": 2,
+      "today_expectancy": 2.92,
+      "today_wins": 2,
+      "today_win_rate": 1.0,
+      "avg_mfe": 3.97,
+      "rolling_5d_count": 2,
+      "rolling_5d_expectancy": 2.92,
+      "rolling_20d_count": 2,
+      "rolling_20d_expectancy": 2.92,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:0.15",
+      "today_count": 1,
+      "today_expectancy": -0.88,
+      "today_wins": 0,
+      "today_win_rate": 0.0,
+      "avg_mfe": 0.17,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": -0.88,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": -0.88,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:1.71",
+      "today_count": 1,
+      "today_expectancy": 12.92,
+      "today_wins": 1,
+      "today_win_rate": 1.0,
+      "avg_mfe": 13.97,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": 12.92,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": 12.92,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:0.16",
+      "today_count": 1,
+      "today_expectancy": 5.62,
+      "today_wins": 1,
+      "today_win_rate": 1.0,
+      "avg_mfe": 6.67,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": 5.62,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": 5.62,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:1.13",
+      "today_count": 1,
+      "today_expectancy": 9.15,
+      "today_wins": 1,
+      "today_win_rate": 1.0,
+      "avg_mfe": 10.2,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": 9.15,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": 9.15,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:0.51",
+      "today_count": 1,
+      "today_expectancy": -1.05,
+      "today_wins": 0,
+      "today_win_rate": 0.0,
+      "avg_mfe": 0.0,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": -1.05,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": -1.05,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:0.12",
+      "today_count": 1,
+      "today_expectancy": 0.69,
+      "today_wins": 1,
+      "today_win_rate": 1.0,
+      "avg_mfe": 1.74,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": 0.69,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": 0.69,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    },
+    {
+      "name": "LOW_RR:1.18",
+      "today_count": 1,
+      "today_expectancy": -1.05,
+      "today_wins": 0,
+      "today_win_rate": 0.0,
+      "avg_mfe": 0.0,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": -1.05,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": -1.05,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    }
+  ],
+  "trade_distribution": [
+    {
+      "hour": 9,
+      "trades": 8,
+      "avg_pnl": 0.25,
+      "wins": 4,
+      "win_rate": 0.5
+    },
+    {
+      "hour": 10,
+      "trades": 25,
+      "avg_pnl": -0.23,
+      "wins": 9,
+      "win_rate": 0.36
+    },
+    {
+      "hour": 11,
+      "trades": 18,
+      "avg_pnl": 1.33,
+      "wins": 11,
+      "win_rate": 0.61
+    },
+    {
+      "hour": 12,
+      "trades": 17,
+      "avg_pnl": 0.75,
+      "wins": 9,
+      "win_rate": 0.53
+    },
+    {
+      "hour": 13,
+      "trades": 20,
+      "avg_pnl": 4.63,
+      "wins": 11,
+      "win_rate": 0.55
+    },
+    {
+      "hour": 14,
+      "trades": 27,
+      "avg_pnl": 0.73,
+      "wins": 14,
+      "win_rate": 0.52
+    },
+    {
+      "hour": 15,
+      "trades": 14,
+      "avg_pnl": 1.18,
+      "wins": 10,
+      "win_rate": 0.71
+    }
+  ],
+  "experiment_rankings": [
+    {
+      "rank": 1,
+      "name": "Geometry_v1.0_Score50",
+      "today_expectancy": 7.91,
+      "today_pnl_r": 23.72,
+      "today_cf": 3,
+      "today_real": 0,
+      "wins": 3,
+      "losses": 0,
+      "avg_mfe": 8.96,
+      "avg_mae": 0.0,
+      "avg_capture": 0.86,
+      "avg_hold_eff": 1.792,
+      "config_hash": "431ce308e16d5c85",
+      "expectancy_5d": 7.91,
+      "cf_5d": 3
+    },
+    {
+      "rank": 2,
+      "name": "Geometry_v1.0_Score35",
+      "today_expectancy": 3.94,
+      "today_pnl_r": 23.65,
+      "today_cf": 6,
+      "today_real": 6,
+      "wins": 4,
+      "losses": 2,
+      "avg_mfe": 4.99,
+      "avg_mae": 0.68,
+      "avg_capture": -0.37,
+      "avg_hold_eff": 0.982,
+      "config_hash": "5b54205496d059aa",
+      "expectancy_5d": 3.94,
+      "cf_5d": 6
+    },
+    {
+      "rank": 3,
+      "name": "ORB_15m_RVOL1.2",
+      "today_expectancy": 2.06,
+      "today_pnl_r": 6.17,
+      "today_cf": 3,
+      "today_real": 0,
+      "wins": 2,
+      "losses": 1,
+      "avg_mfe": 2.91,
+      "avg_mae": 0.51,
+      "avg_capture": -1.16,
+      "avg_hold_eff": 0.397,
+      "config_hash": "7977fff6d541cc39",
+      "expectancy_5d": 2.06,
+      "cf_5d": 3
+    },
+    {
+      "rank": 4,
+      "name": "VWAP_Reversion_1.5ATR_RVOL1.0",
+      "today_expectancy": 1.47,
+      "today_pnl_r": 1.47,
+      "today_cf": 1,
+      "today_real": 1,
+      "wins": 1,
+      "losses": 0,
+      "avg_mfe": 2.52,
+      "avg_mae": 0.48,
+      "avg_capture": 0.58,
+      "avg_hold_eff": 0.184,
+      "config_hash": "3d6d96cb21ff71cd",
+      "expectancy_5d": 1.47,
+      "cf_5d": 1
+    },
+    {
+      "rank": 5,
+      "name": "ATR_Squeeze_RVOL1.0",
+      "today_expectancy": 1.21,
+      "today_pnl_r": 18.11,
+      "today_cf": 15,
+      "today_real": 0,
+      "wins": 6,
+      "losses": 9,
+      "avg_mfe": 2.26,
+      "avg_mae": 1.39,
+      "avg_capture": -6.64,
+      "avg_hold_eff": -0.183,
+      "config_hash": "9ad2746007bcc7e7",
+      "expectancy_5d": 1.21,
+      "cf_5d": 15
+    },
+    {
+      "rank": 6,
+      "name": "Structural_v3.2_RVOL0.8",
+      "today_expectancy": 0.98,
+      "today_pnl_r": 36.11,
+      "today_cf": 37,
+      "today_real": 0,
+      "wins": 20,
+      "losses": 17,
+      "avg_mfe": 1.97,
+      "avg_mae": 0.91,
+      "avg_capture": -2.31,
+      "avg_hold_eff": -0.064,
+      "config_hash": "40874fb174f2baa6",
+      "expectancy_5d": 0.98,
+      "cf_5d": 37
+    },
+    {
+      "rank": 7,
+      "name": "Structural_v3.2_RVOL1.0",
+      "today_expectancy": 0.98,
+      "today_pnl_r": 36.11,
+      "today_cf": 37,
+      "today_real": 0,
+      "wins": 20,
+      "losses": 17,
+      "avg_mfe": 1.97,
+      "avg_mae": 0.91,
+      "avg_capture": -2.31,
+      "avg_hold_eff": -0.064,
+      "config_hash": "e94c3fcc1fbc618d",
+      "expectancy_5d": 0.98,
+      "cf_5d": 37
+    },
+    {
+      "rank": 8,
+      "name": "EMA_Pullback_20_50_RVOL1.0",
+      "today_expectancy": 0.86,
+      "today_pnl_r": 15.39,
+      "today_cf": 18,
+      "today_real": 0,
+      "wins": 7,
+      "losses": 11,
+      "avg_mfe": 1.9,
+      "avg_mae": 0.78,
+      "avg_capture": -5.04,
+      "avg_hold_eff": -0.143,
+      "config_hash": "0296a97f007a6675",
+      "expectancy_5d": 0.86,
+      "cf_5d": 18
+    },
+    {
+      "rank": 9,
+      "name": "PrevDay_Extremes_RVOL1.2",
+      "today_expectancy": 0.31,
+      "today_pnl_r": 0.62,
+      "today_cf": 2,
+      "today_real": 0,
+      "wins": 1,
+      "losses": 1,
+      "avg_mfe": 1.36,
+      "avg_mae": 0.65,
+      "avg_capture": -5.53,
+      "avg_hold_eff": 0.09,
+      "config_hash": "952708070530c475",
+      "expectancy_5d": 0.31,
+      "cf_5d": 2
+    },
+    {
+      "rank": 10,
+      "name": "ORB_30m_RVOL1.2",
+      "today_expectancy": 0.16,
+      "today_pnl_r": 0.82,
+      "today_cf": 5,
+      "today_real": 0,
+      "wins": 3,
+      "losses": 2,
+      "avg_mfe": 1.16,
+      "avg_mae": 0.68,
+      "avg_capture": -0.7,
+      "avg_hold_eff": 0.035,
+      "config_hash": "a4c360e3a0cd8ef8",
+      "expectancy_5d": 0.16,
+      "cf_5d": 5
+    },
+    {
+      "rank": 11,
+      "name": "OrderFlow_v1.0",
+      "today_expectancy": -0.18,
+      "today_pnl_r": -0.36,
+      "today_cf": 2,
+      "today_real": 0,
+      "wins": 1,
+      "losses": 1,
+      "avg_mfe": 0.87,
+      "avg_mae": 0.88,
+      "avg_capture": 0.4,
+      "avg_hold_eff": -0.148,
+      "config_hash": "db8c841e65c2c062",
+      "expectancy_5d": -0.18,
+      "cf_5d": 2
+    }
+  ],
+  "research_queue": [
+    {
+      "priority": 4,
+      "title": "Investigate `LOW_RVOL` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RVOL` show rolling expectancy +0.97R over 309 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 4,
+      "confidence": "High",
+      "rolling_expectancy": 0.97,
+      "sample_count": 309,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RVOL threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.67` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.67` show rolling expectancy +4.33R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 4.33,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.67 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:1.08` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:1.08` show rolling expectancy +1.14R over 2 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 1.14,
+      "sample_count": 2,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:1.08 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.03` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.03` show rolling expectancy +8.12R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 8.12,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.03 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `BIAS_MISMATCH` filter threshold",
+      "description": "Shadow trades rejected for `BIAS_MISMATCH` show rolling expectancy +2.25R over 24 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.25,
+      "sample_count": 24,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with BIAS_MISMATCH threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.65` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.65` show rolling expectancy +4.72R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 4.72,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.65 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.98` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.98` show rolling expectancy +3.88R over 2 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 3.88,
+      "sample_count": 2,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.98 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.16` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.16` show rolling expectancy +5.62R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 5.62,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.16 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `TIME_FILTER:CLOSE` filter threshold",
+      "description": "Shadow trades rejected for `TIME_FILTER:CLOSE` show rolling expectancy +0.77R over 2 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 0.77,
+      "sample_count": 2,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with TIME_FILTER:CLOSE threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.41` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.41` show rolling expectancy +5.64R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 5.64,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.41 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.14` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.14` show rolling expectancy +1.35R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 1.35,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.14 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `NARRATIVE_BIAS_BULLISH` filter threshold",
+      "description": "Shadow trades rejected for `NARRATIVE_BIAS_BULLISH` show rolling expectancy +2.53R over 5 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.53,
+      "sample_count": 5,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with NARRATIVE_BIAS_BULLISH threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `TP_CAPPED` filter threshold",
+      "description": "Shadow trades rejected for `TP_CAPPED` show rolling expectancy +2.92R over 2 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.92,
+      "sample_count": 2,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with TP_CAPPED threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:1.65` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:1.65` show rolling expectancy +0.85R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 0.85,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:1.65 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:1.71` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:1.71` show rolling expectancy +12.92R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 12.92,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:1.71 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_EFFICIENCY` filter threshold",
+      "description": "Shadow trades rejected for `LOW_EFFICIENCY` show rolling expectancy +0.71R over 3 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 0.71,
+      "sample_count": 3,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_EFFICIENCY threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.29` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.29` show rolling expectancy +9.95R over 2 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 9.95,
+      "sample_count": 2,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.29 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.12` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.12` show rolling expectancy +0.69R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 0.69,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.12 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:1.13` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:1.13` show rolling expectancy +9.15R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 9.15,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:1.13 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_RR:0.62` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RR:0.62` show rolling expectancy +2.72R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.72,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RR:0.62 threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `NARRATIVE_BIAS_BEARISH` filter threshold",
+      "description": "Shadow trades rejected for `NARRATIVE_BIAS_BEARISH` show rolling expectancy +4.57R over 9 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 4.57,
+      "sample_count": 9,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with NARRATIVE_BIAS_BEARISH threshold loosened by 20%, run for 5 days."
+    }
+  ]
+}

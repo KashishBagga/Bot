@@ -96,6 +96,7 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
     def _find_active_expiry(self, underlying: str, ltp: float) -> Optional[tuple]:
         """Dynamically detect the active weekly expiry by probing quotes for candidate dates."""
         try:
+            from src.core.options_execution_engine import ExpiryResolver
             base = "BANKNIFTY" if "BANK" in underlying else "NIFTY"
             interval = 100 if "BANK" in underlying else 50
             atm_strike = int(round(ltp / interval) * interval)
@@ -106,12 +107,8 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
             now = datetime.now()
             
             for i in range(9):
-                future_date = now + timedelta(days=i)
-                yy = str(future_date.year)[-2:]
-                m = str(future_date.month)
-                dd = f"{future_date.day:02d}"
-                
-                expiry_str = f"{yy}{m}{dd}"
+                future_date = (now + timedelta(days=i)).date()
+                expiry_str = ExpiryResolver.date_to_fyers_expiry(future_date)
                 symbol = f"NSE:{base}{expiry_str}{atm_strike}CE"
                 candidates.append(symbol)
                 date_map[symbol] = (expiry_str, future_date.strftime("%Y-%m-%d"))

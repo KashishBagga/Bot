@@ -1,0 +1,980 @@
+2026-07-29 09:08:23,507 - INFO - 🗓️ Risk day rolled to 2026-07-29 — daily counters reset.
+2026-07-29 09:08:23,510 - INFO - --- 09:08:23 Market Pulse ---
+2026-07-29 09:08:23,634 - INFO - 🗓️ Risk day rolled to 2026-07-29 — daily counters reset.
+2026-07-29 09:08:23,637 - INFO - --- 09:08:23 Market Pulse ---
+2026-07-29 09:08:23,653 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:23,743 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:23,766 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:23,845 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:23,862 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:23,862 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:08:23,938 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:23,938 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:08:23,960 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:24,070 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:24,217 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:24,313 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:24,313 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:08:24,314 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:08:24,331 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:24,424 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:08:24,424 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:08:24,425 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:38:54,482 - INFO - --- 09:38:54 Market Pulse ---
+2026-07-29 09:38:54,578 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:38:54,662 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:38:54,755 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:38:54,755 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:38:54,835 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:38:54,922 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:38:55,086 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:38:55,087 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:38:55,087 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:39:13,894 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-29.json
+2026-07-29 09:39:14,006 - INFO - ✅ Fyers client initialized successfully
+2026-07-29 09:39:14,102 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:39:14,116 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:39:14,155 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:39:14,162 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-07-29 09:39:14,162 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-29 09:39:14,163 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-29 09:39:14,192 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:39:14,201 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:39:14,228 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:39:14,256 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:39:14,266 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:39:14,294 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:39:14,294 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-29 09:39:14,295 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-29 09:39:14,306 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=900180f
+2026-07-29 09:39:14,318 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=900180f]
+2026-07-29 09:39:14,346 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:39:14,355 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:39:14,381 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:39:14,381 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-29 09:39:14,382 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-29 09:39:14,392 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=900180f
+2026-07-29 09:39:14,402 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=900180f]
+2026-07-29 09:39:14,412 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=900180f
+2026-07-29 09:39:14,424 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=900180f]
+2026-07-29 09:39:14,433 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=900180f
+2026-07-29 09:39:14,445 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=900180f]
+2026-07-29 09:39:14,455 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=900180f
+2026-07-29 09:39:14,468 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=900180f]
+2026-07-29 09:39:14,476 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=900180f
+2026-07-29 09:39:14,487 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=900180f]
+2026-07-29 09:39:14,496 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=900180f
+2026-07-29 09:39:14,509 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=900180f]
+2026-07-29 09:39:14,518 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=900180f
+2026-07-29 09:39:14,531 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=900180f]
+2026-07-29 09:39:14,531 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-29 09:39:14,539 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=900180f
+2026-07-29 09:39:14,550 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=900180f]
+2026-07-29 09:39:14,550 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-29 09:39:14,559 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=900180f
+2026-07-29 09:39:14,570 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=900180f]
+2026-07-29 09:39:14,570 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-29 09:39:14,579 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=900180f
+2026-07-29 09:39:14,591 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=900180f]
+2026-07-29 09:39:14,591 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.55, candle_strength>=0.4, min_rr>=1.5]
+2026-07-29 09:39:14,599 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf55 [chart_pattern@v1.0] hash=ce9ab5b18515d260 git=900180f
+2026-07-29 09:39:14,611 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf55 [hash=ce9ab5b18515d260 git=900180f]
+2026-07-29 09:39:14,611 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.4, candle_strength>=0.3, min_rr>=1.3]
+2026-07-29 09:39:14,620 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf40 [chart_pattern@v1.0] hash=22ad684465d991ac git=900180f
+2026-07-29 09:39:14,631 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf40 [hash=22ad684465d991ac git=900180f]
+2026-07-29 09:39:14,640 - INFO - 📋 Registered experiment: VWAP_Reclaim_v1.0 [vwap_reclaim@v1.0] hash=2592ffc98e68bca5 git=900180f
+2026-07-29 09:39:14,651 - INFO - 📋 Experiment saved: VWAP_Reclaim_v1.0 [hash=2592ffc98e68bca5 git=900180f]
+2026-07-29 09:39:14,660 - INFO - 📋 Registered experiment: CPR_v1.0 [cpr@v1.0] hash=0d2ee99831362dc3 git=900180f
+2026-07-29 09:39:14,672 - INFO - 📋 Experiment saved: CPR_v1.0 [hash=0d2ee99831362dc3 git=900180f]
+2026-07-29 09:39:14,680 - INFO - 📋 Registered experiment: Gap_v1.0 [gap@v1.0] hash=b855c688d7bea446 git=900180f
+2026-07-29 09:39:14,691 - INFO - 📋 Experiment saved: Gap_v1.0 [hash=b855c688d7bea446 git=900180f]
+2026-07-29 09:39:14,700 - INFO - 📋 Registered experiment: ORB_60m_IB_RVOL1.2 [orb@v1.0] hash=fb43c099fbb7b444 git=900180f
+2026-07-29 09:39:14,711 - INFO - 📋 Experiment saved: ORB_60m_IB_RVOL1.2 [hash=fb43c099fbb7b444 git=900180f]
+2026-07-29 09:39:14,721 - INFO - 📋 Registered experiment: VerticalSpread_v1.0 [vertical_spread@v1.0] hash=ebcc2ee58dde4134 git=900180f
+2026-07-29 09:39:14,733 - INFO - 📋 Experiment saved: VerticalSpread_v1.0 [hash=ebcc2ee58dde4134 git=900180f]
+2026-07-29 09:39:14,741 - INFO - 📋 Registered experiment: Straddle_v1.0_VolCompression [straddle_strangle@v1.0] hash=5f6294f74dfd83c4 git=900180f
+2026-07-29 09:39:14,754 - INFO - 📋 Experiment saved: Straddle_v1.0_VolCompression [hash=5f6294f74dfd83c4 git=900180f]
+2026-07-29 09:39:14,762 - INFO - 📋 Registered experiment: Strangle_v1.0_VolCompression [straddle_strangle@v1.0] hash=f9e42ca23b1aa8eb git=900180f
+2026-07-29 09:39:14,773 - INFO - 📋 Experiment saved: Strangle_v1.0_VolCompression [hash=f9e42ca23b1aa8eb git=900180f]
+2026-07-29 09:39:14,831 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_EMAPULL_56195.75_20260724_104505_EMA_Pullback_20_50_RVOL1.0 entered on 2026-07-24
+2026-07-29 09:39:14,843 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_SHOULDERS_56195.75_20260724_104505_Reversal_Pattern_v1.0 entered on 2026-07-24
+2026-07-29 09:39:14,843 - INFO - 🔄 Recovered 2 active counterfactual positions: []
+2026-07-29 09:39:14,864 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-29 09:39:14,864 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 51s until 09:40:05 IST...
+2026-07-29 09:40:05,092 - INFO - --- 09:40:05 Market Pulse ---
+2026-07-29 09:40:05,101 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,105 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,110 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,114 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,117 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,120 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,120 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:40:05,124 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,127 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,129 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,132 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,134 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,136 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,136 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:40:05,136 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:40:05,869 - INFO - ⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.
+2026-07-29 09:40:05,869 - INFO - --- 09:40:05 Market Pulse ---
+2026-07-29 09:40:05,875 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,878 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,880 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,882 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,884 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,886 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,887 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:40:05,889 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,891 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,893 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,894 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,896 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,898 - ERROR - ❌ Alternative method also failed: local variable 'response' referenced before assignment
+2026-07-29 09:40:05,898 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:40:05,898 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:41:31,929 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-29.json
+2026-07-29 09:41:33,100 - INFO - ✅ Fyers client initialized successfully
+2026-07-29 09:41:33,170 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:41:33,183 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:41:33,222 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:41:33,225 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-07-29 09:41:33,225 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-29 09:41:33,225 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-29 09:41:33,254 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:41:33,263 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:41:33,290 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:41:33,318 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:41:33,327 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:41:33,354 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:41:33,354 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-29 09:41:33,355 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-29 09:41:33,371 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=900180f
+2026-07-29 09:41:33,383 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=900180f]
+2026-07-29 09:41:33,411 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-29 09:41:33,420 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-29 09:41:33,446 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-29 09:41:33,447 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-29 09:41:33,447 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-29 09:41:33,456 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=900180f
+2026-07-29 09:41:33,467 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=900180f]
+2026-07-29 09:41:33,476 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=900180f
+2026-07-29 09:41:33,488 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=900180f]
+2026-07-29 09:41:33,497 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=900180f
+2026-07-29 09:41:33,508 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=900180f]
+2026-07-29 09:41:33,517 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=900180f
+2026-07-29 09:41:33,528 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=900180f]
+2026-07-29 09:41:33,536 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=900180f
+2026-07-29 09:41:33,548 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=900180f]
+2026-07-29 09:41:33,557 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=900180f
+2026-07-29 09:41:33,568 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=900180f]
+2026-07-29 09:41:33,577 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=900180f
+2026-07-29 09:41:33,589 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=900180f]
+2026-07-29 09:41:33,589 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-29 09:41:33,597 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=900180f
+2026-07-29 09:41:33,609 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=900180f]
+2026-07-29 09:41:33,609 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-29 09:41:33,617 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=900180f
+2026-07-29 09:41:33,629 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=900180f]
+2026-07-29 09:41:33,629 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-29 09:41:33,637 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=900180f
+2026-07-29 09:41:33,649 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=900180f]
+2026-07-29 09:41:33,649 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.55, candle_strength>=0.4, min_rr>=1.5]
+2026-07-29 09:41:33,658 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf55 [chart_pattern@v1.0] hash=ce9ab5b18515d260 git=900180f
+2026-07-29 09:41:33,669 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf55 [hash=ce9ab5b18515d260 git=900180f]
+2026-07-29 09:41:33,669 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.4, candle_strength>=0.3, min_rr>=1.3]
+2026-07-29 09:41:33,677 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf40 [chart_pattern@v1.0] hash=22ad684465d991ac git=900180f
+2026-07-29 09:41:33,690 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf40 [hash=22ad684465d991ac git=900180f]
+2026-07-29 09:41:33,698 - INFO - 📋 Registered experiment: VWAP_Reclaim_v1.0 [vwap_reclaim@v1.0] hash=2592ffc98e68bca5 git=900180f
+2026-07-29 09:41:33,710 - INFO - 📋 Experiment saved: VWAP_Reclaim_v1.0 [hash=2592ffc98e68bca5 git=900180f]
+2026-07-29 09:41:33,718 - INFO - 📋 Registered experiment: CPR_v1.0 [cpr@v1.0] hash=0d2ee99831362dc3 git=900180f
+2026-07-29 09:41:33,729 - INFO - 📋 Experiment saved: CPR_v1.0 [hash=0d2ee99831362dc3 git=900180f]
+2026-07-29 09:41:33,737 - INFO - 📋 Registered experiment: Gap_v1.0 [gap@v1.0] hash=b855c688d7bea446 git=900180f
+2026-07-29 09:41:33,748 - INFO - 📋 Experiment saved: Gap_v1.0 [hash=b855c688d7bea446 git=900180f]
+2026-07-29 09:41:33,757 - INFO - 📋 Registered experiment: ORB_60m_IB_RVOL1.2 [orb@v1.0] hash=fb43c099fbb7b444 git=900180f
+2026-07-29 09:41:33,767 - INFO - 📋 Experiment saved: ORB_60m_IB_RVOL1.2 [hash=fb43c099fbb7b444 git=900180f]
+2026-07-29 09:41:33,776 - INFO - 📋 Registered experiment: VerticalSpread_v1.0 [vertical_spread@v1.0] hash=ebcc2ee58dde4134 git=900180f
+2026-07-29 09:41:33,787 - INFO - 📋 Experiment saved: VerticalSpread_v1.0 [hash=ebcc2ee58dde4134 git=900180f]
+2026-07-29 09:41:33,796 - INFO - 📋 Registered experiment: Straddle_v1.0_VolCompression [straddle_strangle@v1.0] hash=5f6294f74dfd83c4 git=900180f
+2026-07-29 09:41:33,807 - INFO - 📋 Experiment saved: Straddle_v1.0_VolCompression [hash=5f6294f74dfd83c4 git=900180f]
+2026-07-29 09:41:33,816 - INFO - 📋 Registered experiment: Strangle_v1.0_VolCompression [straddle_strangle@v1.0] hash=f9e42ca23b1aa8eb git=900180f
+2026-07-29 09:41:33,827 - INFO - 📋 Experiment saved: Strangle_v1.0_VolCompression [hash=f9e42ca23b1aa8eb git=900180f]
+2026-07-29 09:41:33,890 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-29 09:41:33,890 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 212s until 09:45:05 IST...
+2026-07-29 09:45:05,142 - INFO - --- 09:45:05 Market Pulse ---
+2026-07-29 09:45:05,249 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:45:05,366 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:45:05,628 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:45:05,629 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:45:05,716 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:45:05,895 - INFO - ⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.
+2026-07-29 09:45:05,896 - INFO - --- 09:45:05 Market Pulse ---
+2026-07-29 09:45:06,018 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:45:06,155 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:45:06,155 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:45:06,155 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:45:08,419 - INFO - 👻 [ChartPattern_v1.0_Conf55] CF INVERSE_HEAD_AND_SHOULDERS NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'LOW_PATTERN_CONFIDENCE:0.513', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:08,419 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55', 'signal': 'BUY CALL', 'price': 24212.2, 'stop_loss': 23736.0, 'take_profit': 24926.5, 'tp1': 24926.5, 'rr_ratio': 1.5, 'strategy': 'INVERSE_HEAD_AND_SHOULDERS', 'confidence': 51.3, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'LOW_PATTERN_CONFIDENCE:0.513', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.772, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 23800.05, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': None, 'tp_measured_move': 24389.2, 'tp_extended_1618': 24389.2, 'pattern_explanation': 'Detected INVERSE_HEAD_AND_SHOULDERS pattern with confidence 0.513'}, 'experiment_name': 'ChartPattern_v1.0_Conf55', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:08,425 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:08,491 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:08,491 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:09,002 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:09,002 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:09,012 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24212.2, 'sl': 23736.0, 'tp': 24926.5}
+2026-07-29 09:45:09,041 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24212.2, 'sl': 23736.0, 'tp': 24926.5}
+2026-07-29 09:45:09,061 - INFO - 💰 Position size [INVERSE_HEAD_AND_SHOULDERS|UNKNOWN|conf=51]: frac=0.003 → ₹5,000 (risk/unit=1.97%)
+2026-07-29 09:45:09,094 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX BUY CALL @ 24212.20 | SL: 23736.00 TP: 24926.50
+2026-07-29 09:45:09,094 - INFO - 👻 [ChartPattern_v1.0_Conf55] CF DOUBLE_BOTTOM NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'LOW_PATTERN_CONFIDENCE:0.477', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:09,094 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55', 'signal': 'BUY CALL', 'price': 24212.2, 'stop_loss': 23952.4, 'take_profit': 24601.9, 'tp1': 24601.9, 'rr_ratio': 1.5, 'strategy': 'DOUBLE_BOTTOM', 'confidence': 47.7, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'LOW_PATTERN_CONFIDENCE:0.477', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.682, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 24011.75, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': None, 'tp_measured_move': 24053.4, 'tp_extended_1618': 24079.14, 'pattern_explanation': 'Detected DOUBLE_BOTTOM pattern with confidence 0.477'}, 'experiment_name': 'ChartPattern_v1.0_Conf55', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:09,101 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:09,503 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:09,503 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:10,015 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:10,015 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:10,016 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24212.2, 'sl': 23952.4, 'tp': 24601.9}
+2026-07-29 09:45:10,049 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24212.2, 'sl': 23952.4, 'tp': 24601.9}
+2026-07-29 09:45:10,067 - INFO - 💰 Position size [DOUBLE_BOTTOM|UNKNOWN|conf=48]: frac=0.003 → ₹5,000 (risk/unit=1.07%)
+2026-07-29 09:45:10,097 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX BUY CALL @ 24212.20 | SL: 23952.40 TP: 24601.90
+2026-07-29 09:45:10,097 - INFO - 👻 [ChartPattern_v1.0_Conf40] CF INVERSE_HEAD_AND_SHOULDERS NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:10,097 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40', 'signal': 'BUY CALL', 'price': 24212.2, 'stop_loss': 23736.0, 'take_profit': 24926.5, 'tp1': 24926.5, 'rr_ratio': 1.5, 'strategy': 'INVERSE_HEAD_AND_SHOULDERS', 'confidence': 51.3, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.772, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 23800.05, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': None, 'tp_measured_move': 24389.2, 'tp_extended_1618': 24389.2, 'pattern_explanation': 'Detected INVERSE_HEAD_AND_SHOULDERS pattern with confidence 0.513'}, 'experiment_name': 'ChartPattern_v1.0_Conf40', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:10,103 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:10,522 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:10,523 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:11,017 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:11,017 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:11,018 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24212.2, 'sl': 23736.0, 'tp': 24926.5}
+2026-07-29 09:45:11,055 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24212.2, 'sl': 23736.0, 'tp': 24926.5}
+2026-07-29 09:45:11,077 - INFO - 💰 Position size [INVERSE_HEAD_AND_SHOULDERS|UNKNOWN|conf=51]: frac=0.003 → ₹5,000 (risk/unit=1.97%)
+2026-07-29 09:45:11,110 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX BUY CALL @ 24212.20 | SL: 23736.00 TP: 24926.50
+2026-07-29 09:45:11,110 - INFO - 👻 [ChartPattern_v1.0_Conf40] CF DOUBLE_BOTTOM NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:11,110 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40', 'signal': 'BUY CALL', 'price': 24212.2, 'stop_loss': 23952.4, 'take_profit': 24601.9, 'tp1': 24601.9, 'rr_ratio': 1.5, 'strategy': 'DOUBLE_BOTTOM', 'confidence': 47.7, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.682, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 24011.75, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': None, 'tp_measured_move': 24053.4, 'tp_extended_1618': 24079.14, 'pattern_explanation': 'Detected DOUBLE_BOTTOM pattern with confidence 0.477'}, 'experiment_name': 'ChartPattern_v1.0_Conf40', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:11,117 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:11,526 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:11,526 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:12,019 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:12,019 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:12,019 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24212.2, 'sl': 23952.4, 'tp': 24601.9}
+2026-07-29 09:45:12,047 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24212.2, 'sl': 23952.4, 'tp': 24601.9}
+2026-07-29 09:45:12,065 - INFO - 💰 Position size [DOUBLE_BOTTOM|UNKNOWN|conf=48]: frac=0.003 → ₹5,000 (risk/unit=1.07%)
+2026-07-29 09:45:12,099 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX BUY CALL @ 24212.20 | SL: 23952.40 TP: 24601.90
+2026-07-29 09:45:12,099 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Gap_v1.0]
+2026-07-29 09:45:12,099 - INFO -    Entry: 24212.2 | SL: 24171.34 | TP: 24293.92 (RR: 2.0)
+2026-07-29 09:45:12,099 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_Gap_v1.0_1785298505, candidate_id=cand_NSE_NIFTY50_INDEX_GAP_AND_GO_24212.20_20260729_094505_Gap_v1.0, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY CALL', 'strategy': 'GAP_AND_GO', 'price': 24212.2, 'stop_loss': 24171.34, 'take_profit': 24293.92, 'tp1': 24273.49, 'rr_ratio': 2.0, 'timestamp': '2026-07-29T09:45:05.895992+05:30', 'accepted': True, 'rejection_reasons': [], 'candidate_id': 'cand_NSE_NIFTY50_INDEX_GAP_AND_GO_24212.20_20260729_094505_Gap_v1.0', 'confidence': 0.88, 'diagnostics': {'gap_pct': 0.798, 'today_open': 24176.65, 'prev_close': 23985.35, 'minutes_since_open': 30.1, 'rvol': 1.36, 'atr': 35.4, 'move_efficiency': 0.823}, 'experiment_name': 'Gap_v1.0', 'strategy_id': 'gap', 'version': 'v1.0'}
+2026-07-29 09:45:12,543 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:12,543 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:13,036 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:13,036 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:13,037 - CRITICAL - 🛑 No valid option contract resolved for NSE:NIFTY50-INDEX; SKIPPING real entry (refusing to trade on a fabricated/unknown premium).
+2026-07-29 09:45:13,038 - INFO - 📊 EXECUTION AUDIT [ENTRY_ABORTED]: trade_id=trade_NSE_NIFTY50_INDEX_Gap_v1.0_1785298505, candidate_id=cand_NSE_NIFTY50_INDEX_GAP_AND_GO_24212.20_20260729_094505_Gap_v1.0, payload={'reason': 'OPTION_UNRESOLVED'}
+2026-07-29 09:45:13,070 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX BULL_CALL_SPREAD | [VerticalSpread_v1.0]
+2026-07-29 09:45:13,542 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:13,542 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:14,046 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:14,047 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:14,047 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTY50-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.99']
+2026-07-29 09:45:14,554 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:14,554 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:15,065 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:45:15,065 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:15,065 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTY50-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.99']
+2026-07-29 09:45:15,565 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:45:15,565 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:16,056 - WARNING - No quotes data available for ['NSE:NIFTY2673024300CE']
+2026-07-29 09:45:16,057 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY2673024300CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:17,354 - INFO - 👻 [PrevDay_Extremes_RVOL1.2] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH']
+2026-07-29 09:45:17,354 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_PDHL_BREAKOUT_57071.35_20260729_094505_PrevDay_Extremes_RVOL1.2, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY CALL', 'strategy': 'BREAKOUT', 'price': 57071.35, 'stop_loss': 57018.619999999995, 'take_profit': 57598.65, 'tp1': 57150.44500000001, 'rr_ratio': 10.0, 'timestamp': '2026-07-29T09:45:05.895992+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH'], 'features': {'atr': 105.46, 'ema20': 56888.78, 'ema50': 56878.69, 'move_efficiency': 0.512, 'move_efficiency_h1': 0.2285, 'wickiness': 0.6896, 'ema_bullish': True, 'rsi14': 65.92, 'distance_to_vwap': 0.0, 'atr_percentile': 0.9954, 'dist_prev_high': 0.0003, 'dist_prev_low': 0.007}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_PDHL_BREAKOUT_57071.35_20260729_094505_PrevDay_Extremes_RVOL1.2', 'confidence': 0.5, 'diagnostics': {'dist_prev_high': 0.0003, 'dist_prev_low': 0.007, 'prev_high': 57054.23, 'prev_low': 56674.63, 'setup_type': 'BREAKOUT', 'rvol': 0.6, 'atr': 105.46, 'atr_percentile': 0.995}, 'experiment_name': 'PrevDay_Extremes_RVOL1.2', 'strategy_id': 'prev_day_extremes', 'version': 'v1.0'}
+2026-07-29 09:45:17,434 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:17,434 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:17,952 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:17,953 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:17,953 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_PDHL_BREAKOUT_57071.35_20260729_094505_PrevDay_Extremes_RVOL1.2, payload={'price': 57071.35, 'sl': 57018.619999999995, 'tp': 57598.65}
+2026-07-29 09:45:17,990 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_PDHL_BREAKOUT_57071.35_20260729_094505_PrevDay_Extremes_RVOL1.2, payload={'price': 57071.35, 'sl': 57018.619999999995, 'tp': 57598.65}
+2026-07-29 09:45:18,010 - INFO - 💰 Position size [BREAKOUT|UNKNOWN|conf=0]: frac=0.003 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 09:45:18,042 - INFO - 🟢 ENTRY [CF|PrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 57018.62 TP: 57598.65
+2026-07-29 09:45:18,042 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.25']
+2026-07-29 09:45:18,042 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY CALL', 'strategy': 'TRENDLINE_RETEST', 'price': 57071.35, 'stop_loss': 56968.73, 'take_profit': 57046.13, 'tp1': 57225.28, 'rr_ratio': -0.25, 'timestamp': '2026-07-29T09:45:05.895992+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:-0.25'], 'stop_loss_distance': 102.62, 'atr': 105.46, 'confidence': 0.683, 'diagnostics': {'trendline_id': 'tl_446f66e46453d2f4', 'trendline_confidence': 0.728, 'trendline_r2': 1.0, 'trendline_touches': 9, 'trendline_price_at_now': 57190.4, 'dist_pct': 0.00209, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 09:45:18,452 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:18,452 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:18,959 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:18,959 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:18,960 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score35, payload={'price': 57071.35, 'sl': 56968.73, 'tp': 57046.13}
+2026-07-29 09:45:18,997 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score35, payload={'price': 57071.35, 'sl': 56968.73, 'tp': 57046.13}
+2026-07-29 09:45:19,016 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.18%)
+2026-07-29 09:45:19,047 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 56968.73 TP: 57046.13
+2026-07-29 09:45:19,047 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.25']
+2026-07-29 09:45:19,048 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY CALL', 'strategy': 'TRENDLINE_RETEST', 'price': 57071.35, 'stop_loss': 56968.73, 'take_profit': 57046.13, 'tp1': 57225.28, 'rr_ratio': -0.25, 'timestamp': '2026-07-29T09:45:05.895992+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:-0.25'], 'stop_loss_distance': 102.62, 'atr': 105.46, 'confidence': 0.683, 'diagnostics': {'trendline_id': 'tl_446f66e46453d2f4', 'trendline_confidence': 0.728, 'trendline_r2': 1.0, 'trendline_touches': 9, 'trendline_price_at_now': 57190.4, 'dist_pct': 0.00209, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 09:45:19,470 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:19,470 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:19,956 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:19,957 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:19,957 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score50, payload={'price': 57071.35, 'sl': 56968.73, 'tp': 57046.13}
+2026-07-29 09:45:19,994 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score50, payload={'price': 57071.35, 'sl': 56968.73, 'tp': 57046.13}
+2026-07-29 09:45:20,014 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.18%)
+2026-07-29 09:45:20,045 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 56968.73 TP: 57046.13
+2026-07-29 09:45:20,045 - INFO - 👻 [ChartPattern_v1.0_Conf55] CF INVERSE_HEAD_AND_SHOULDERS NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:20,045 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf55', 'signal': 'BUY CALL', 'price': 57071.35, 'stop_loss': 56946.45, 'take_profit': 57280.4, 'tp1': 57258.7, 'rr_ratio': 1.67, 'strategy': 'INVERSE_HEAD_AND_SHOULDERS', 'confidence': 81.3, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'READY', 'pattern_quality_score': 0.758, 'pattern_completion_pct': 0.907, 'pattern_trigger_quality': 0.89, 'breakout_level': 57084.2, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': 58228.65, 'tp_measured_move': 57280.4, 'tp_extended_1618': 57401.65, 'pattern_explanation': 'Detected INVERSE_HEAD_AND_SHOULDERS pattern with confidence 0.813'}, 'experiment_name': 'ChartPattern_v1.0_Conf55', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:20,051 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:20,459 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:20,459 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:20,971 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:20,972 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:20,972 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 57071.35, 'sl': 56946.45, 'tp': 57280.4}
+2026-07-29 09:45:21,012 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 57071.35, 'sl': 56946.45, 'tp': 57280.4}
+2026-07-29 09:45:21,032 - INFO - 💰 Position size [INVERSE_HEAD_AND_SHOULDERS|UNKNOWN|conf=81]: frac=0.005 → ₹5,000 (risk/unit=0.22%)
+2026-07-29 09:45:21,065 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 56946.45 TP: 57280.40
+2026-07-29 09:45:21,065 - INFO - 👻 [ChartPattern_v1.0_Conf55] CF DOUBLE_BOTTOM NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:21,065 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf55', 'signal': 'BUY CALL', 'price': 57071.35, 'stop_loss': 56008.17, 'take_profit': 58666.12, 'tp1': 58666.12, 'rr_ratio': 1.5, 'strategy': 'DOUBLE_BOTTOM', 'confidence': 74.2, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.544, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 56216.0, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': 58228.65, 'tp_measured_move': 57598.65, 'tp_extended_1618': 57598.65, 'pattern_explanation': 'Detected DOUBLE_BOTTOM pattern with confidence 0.742'}, 'experiment_name': 'ChartPattern_v1.0_Conf55', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:21,071 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:21,456 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:21,456 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:21,967 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:21,967 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:21,967 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 57071.35, 'sl': 56008.17, 'tp': 58666.12}
+2026-07-29 09:45:21,993 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 57071.35, 'sl': 56008.17, 'tp': 58666.12}
+2026-07-29 09:45:22,009 - INFO - 💰 Position size [DOUBLE_BOTTOM|UNKNOWN|conf=74]: frac=0.004 → ₹5,000 (risk/unit=1.86%)
+2026-07-29 09:45:22,041 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 56008.17 TP: 58666.12
+2026-07-29 09:45:22,041 - INFO - 👻 [ChartPattern_v1.0_Conf40] CF INVERSE_HEAD_AND_SHOULDERS NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 09:45:22,041 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf40', 'signal': 'BUY CALL', 'price': 57071.35, 'stop_loss': 56946.45, 'take_profit': 57280.4, 'tp1': 57258.7, 'rr_ratio': 1.67, 'strategy': 'INVERSE_HEAD_AND_SHOULDERS', 'confidence': 81.3, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'READY', 'pattern_quality_score': 0.758, 'pattern_completion_pct': 0.907, 'pattern_trigger_quality': 0.89, 'breakout_level': 57084.2, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': 58228.65, 'tp_measured_move': 57280.4, 'tp_extended_1618': 57401.65, 'pattern_explanation': 'Detected INVERSE_HEAD_AND_SHOULDERS pattern with confidence 0.813'}, 'experiment_name': 'ChartPattern_v1.0_Conf40', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:22,048 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:22,483 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:22,483 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:22,988 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:22,988 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:22,989 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 57071.35, 'sl': 56946.45, 'tp': 57280.4}
+2026-07-29 09:45:23,024 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 57071.35, 'sl': 56946.45, 'tp': 57280.4}
+2026-07-29 09:45:23,044 - INFO - 💰 Position size [INVERSE_HEAD_AND_SHOULDERS|UNKNOWN|conf=81]: frac=0.005 → ₹5,000 (risk/unit=0.22%)
+2026-07-29 09:45:23,076 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 56946.45 TP: 57280.40
+2026-07-29 09:45:23,076 - INFO - 👻 [ChartPattern_v1.0_Conf40] CF DOUBLE_BOTTOM NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION']
+2026-07-29 09:45:23,076 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf40', 'signal': 'BUY CALL', 'price': 57071.35, 'stop_loss': 56008.17, 'take_profit': 58666.12, 'tp1': 58666.12, 'rr_ratio': 1.5, 'strategy': 'DOUBLE_BOTTOM', 'confidence': 74.2, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION'], 'timestamp': datetime.datetime(2026, 7, 29, 9, 45, 5, 895992, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.544, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 56216.0, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': 58228.65, 'tp_measured_move': 57598.65, 'tp_extended_1618': 57598.65, 'pattern_explanation': 'Detected DOUBLE_BOTTOM pattern with confidence 0.742'}, 'experiment_name': 'ChartPattern_v1.0_Conf40', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 09:45:23,083 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 09:45:23,481 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:23,481 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:23,993 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:23,993 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:23,993 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 57071.35, 'sl': 56008.17, 'tp': 58666.12}
+2026-07-29 09:45:24,025 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 57071.35, 'sl': 56008.17, 'tp': 58666.12}
+2026-07-29 09:45:24,046 - INFO - 💰 Position size [DOUBLE_BOTTOM|UNKNOWN|conf=74]: frac=0.004 → ₹5,000 (risk/unit=1.86%)
+2026-07-29 09:45:24,081 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTYBANK-INDEX BUY CALL @ 57071.35 | SL: 56008.17 TP: 58666.12
+2026-07-29 09:45:24,081 - INFO - 👻 [Gap_v1.0] CF GAP_FILL NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL']
+2026-07-29 09:45:24,082 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_GAP_FILL_57071.35_20260729_094505_Gap_v1.0, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'GAP_FILL', 'price': 57071.35, 'stop_loss': 57142.42, 'take_profit': 56755.6, 'tp1': 56964.75, 'rr_ratio': 4.44, 'timestamp': '2026-07-29T09:45:05.895992+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL'], 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_GAP_FILL_57071.35_20260729_094505_Gap_v1.0', 'confidence': 0.5, 'diagnostics': {'gap_pct': 0.654, 'today_open': 57126.6, 'prev_close': 56755.6, 'minutes_since_open': 30.1, 'rvol': 0.6, 'atr': 105.46, 'move_efficiency': 0.512}, 'experiment_name': 'Gap_v1.0', 'strategy_id': 'gap', 'version': 'v1.0'}
+2026-07-29 09:45:24,492 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:24,492 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:25,003 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100PE']
+2026-07-29 09:45:25,004 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:25,005 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_GAP_FILL_57071.35_20260729_094505_Gap_v1.0, payload={'price': 57071.35, 'sl': 57142.42, 'tp': 56755.6}
+2026-07-29 09:45:25,041 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_GAP_FILL_57071.35_20260729_094505_Gap_v1.0, payload={'price': 57071.35, 'sl': 57142.42, 'tp': 56755.6}
+2026-07-29 09:45:25,061 - INFO - 💰 Position size [GAP_FILL|UNKNOWN|conf=0]: frac=0.003 → ₹5,000 (risk/unit=0.12%)
+2026-07-29 09:45:25,092 - INFO - 🟢 ENTRY [CF|Gap_v1.0|0729_094505_Gap_v1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57071.35 | SL: 57142.42 TP: 56755.60
+2026-07-29 09:45:25,092 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-29 09:45:25,508 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:25,509 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:26,008 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:26,008 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:26,008 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTYBANK-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:1.00']
+2026-07-29 09:45:26,501 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:26,501 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:27,001 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 09:45:27,001 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:45:27,001 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTYBANK-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:1.00']
+2026-07-29 09:45:27,519 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:45:27,519 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:45:28,033 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057300CE']
+2026-07-29 09:45:28,033 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY2673057300CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:05,035 - INFO - --- 09:50:05 Market Pulse ---
+2026-07-29 09:50:05,156 - INFO - --- 09:50:05 Market Pulse ---
+2026-07-29 09:50:05,249 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:50:05,338 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:50:05,420 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:50:05,420 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 09:50:05,521 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:50:05,626 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:50:05,729 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 09:50:05,730 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 09:50:05,730 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 09:50:06,081 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24218.0, 'old_sl': 23736.0, 'new_sl': 23741.8, 'old_tp': None, 'new_tp': 24926.5, 'reason': 'TRAILING_SL'}
+2026-07-29 09:50:06,140 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX @ 24218.00 | SL→23741.80 TP→24926.50
+2026-07-29 09:50:06,140 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24218.0, 'old_sl': 23952.4, 'new_sl': 23958.2, 'old_tp': None, 'new_tp': 24601.9, 'reason': 'TRAILING_SL'}
+2026-07-29 09:50:06,182 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX @ 24218.00 | SL→23958.20 TP→24601.90
+2026-07-29 09:50:06,182 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24218.0, 'old_sl': 23736.0, 'new_sl': 23741.8, 'old_tp': None, 'new_tp': 24926.5, 'reason': 'TRAILING_SL'}
+2026-07-29 09:50:06,220 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX @ 24218.00 | SL→23741.80 TP→24926.50
+2026-07-29 09:50:06,220 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24218.0, 'old_sl': 23952.4, 'new_sl': 23958.2, 'old_tp': None, 'new_tp': 24601.9, 'reason': 'TRAILING_SL'}
+2026-07-29 09:50:06,255 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX @ 24218.00 | SL→23958.20 TP→24601.90
+2026-07-29 09:50:06,255 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_GAP_FILL_57071.35_20260729_094505_Gap_v1.0, payload={'price': 57043.05, 'old_sl': 57142.42, 'new_sl': 57114.12, 'old_tp': None, 'new_tp': 56755.6, 'reason': 'TRAILING_SL'}
+2026-07-29 09:50:06,287 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGap_v1.0|0729_094505_Gap_v1.0]: NSE:NIFTYBANK-INDEX @ 57043.05 | SL→57114.12 TP→56755.60
+2026-07-29 09:50:07,639 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Gap_v1.0]
+2026-07-29 09:50:07,639 - INFO -    Entry: 24218.0 | SL: 24171.43 | TP: 24311.14 (RR: 2.0)
+2026-07-29 09:50:07,639 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_Gap_v1.0_1785298805, candidate_id=cand_NSE_NIFTY50_INDEX_GAP_AND_GO_24218.00_20260729_095005_Gap_v1.0, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY CALL', 'strategy': 'GAP_AND_GO', 'price': 24218.0, 'stop_loss': 24171.43, 'take_profit': 24311.14, 'tp1': 24287.85, 'rr_ratio': 2.0, 'timestamp': '2026-07-29T09:50:05.035663+05:30', 'accepted': True, 'rejection_reasons': [], 'candidate_id': 'cand_NSE_NIFTY50_INDEX_GAP_AND_GO_24218.00_20260729_095005_Gap_v1.0', 'confidence': 0.85, 'diagnostics': {'gap_pct': 0.798, 'today_open': 24176.65, 'prev_close': 23985.35, 'minutes_since_open': 35.1, 'rvol': 1.2, 'atr': 34.79, 'move_efficiency': 0.803}, 'experiment_name': 'Gap_v1.0', 'strategy_id': 'gap', 'version': 'v1.0'}
+2026-07-29 09:50:07,709 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:50:07,709 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:08,232 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:50:08,233 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:08,233 - CRITICAL - 🛑 No valid option contract resolved for NSE:NIFTY50-INDEX; SKIPPING real entry (refusing to trade on a fabricated/unknown premium).
+2026-07-29 09:50:08,234 - INFO - 📊 EXECUTION AUDIT [ENTRY_ABORTED]: trade_id=trade_NSE_NIFTY50_INDEX_Gap_v1.0_1785298805, candidate_id=cand_NSE_NIFTY50_INDEX_GAP_AND_GO_24218.00_20260729_095005_Gap_v1.0, payload={'reason': 'OPTION_UNRESOLVED'}
+2026-07-29 09:50:08,271 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX BULL_CALL_SPREAD | [VerticalSpread_v1.0]
+2026-07-29 09:50:08,747 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:50:08,748 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:09,249 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:50:09,249 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:09,249 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTY50-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.98']
+2026-07-29 09:50:09,767 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:50:09,768 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:10,268 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 09:50:10,268 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:10,269 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTY50-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.98']
+2026-07-29 09:50:10,768 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 09:50:10,769 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:11,277 - WARNING - No quotes data available for ['NSE:NIFTY2673024300CE']
+2026-07-29 09:50:11,278 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY2673024300CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:12,593 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.02']
+2026-07-29 09:50:12,593 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'CONFLUENCE_BOUNCE', 'price': 57043.05, 'stop_loss': 57095.96, 'take_profit': 57041.96, 'tp1': 56963.69, 'rr_ratio': 0.02, 'timestamp': '2026-07-29T09:50:05.035663+05:30', 'zone_band_low': 57039.85, 'zone_band_high': 57054.2, 'zone_direction': 'RESISTANCE', 'zone_component_count': 1, 'accepted': False, 'rejection_reasons': ['LOW_RR:0.02'], 'stop_loss_distance': 52.9, 'atr': 105.81, 'confidence': 0.557, 'diagnostics': {'zone_score': 52.9, 'zone_explanation': 'PDH RESISTANCE ROUND NUMBER @ 57047.18 (±7.2pts, score=52)', 'dist_to_zone': 0.0, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 09:50:12,669 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:12,669 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:13,202 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057000PE']
+2026-07-29 09:50:13,202 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:13,202 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score35, payload={'price': 57043.05, 'sl': 57095.96, 'tp': 57041.96}
+2026-07-29 09:50:13,239 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score35, payload={'price': 57043.05, 'sl': 57095.96, 'tp': 57041.96}
+2026-07-29 09:50:13,259 - INFO - 💰 Position size [CONFLUENCE_BOUNCE|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 09:50:13,292 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 57043.05 | SL: 57095.96 TP: 57041.96
+2026-07-29 09:50:13,292 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.02']
+2026-07-29 09:50:13,292 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'TRENDLINE_RETEST', 'price': 57043.05, 'stop_loss': 57091.32, 'take_profit': 57041.96, 'tp1': 56970.64, 'rr_ratio': 0.02, 'timestamp': '2026-07-29T09:50:05.035663+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:0.02'], 'stop_loss_distance': 48.27, 'atr': 105.81, 'confidence': 0.692, 'diagnostics': {'trendline_id': 'tl_9b69a9675079f6bc', 'trendline_confidence': 0.742, 'trendline_r2': 0.996, 'trendline_touches': 28, 'trendline_price_at_now': 56913.85, 'dist_pct': 0.00226, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 09:50:13,699 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:13,700 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:14,204 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057000PE']
+2026-07-29 09:50:14,205 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:14,206 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score35, payload={'price': 57043.05, 'sl': 57091.32, 'tp': 57041.96}
+2026-07-29 09:50:14,238 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score35, payload={'price': 57043.05, 'sl': 57091.32, 'tp': 57041.96}
+2026-07-29 09:50:14,262 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.08%)
+2026-07-29 09:50:14,295 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 57043.05 | SL: 57091.32 TP: 57041.96
+2026-07-29 09:50:14,295 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.02']
+2026-07-29 09:50:14,295 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'CONFLUENCE_BOUNCE', 'price': 57043.05, 'stop_loss': 57095.96, 'take_profit': 57041.96, 'tp1': 56963.69, 'rr_ratio': 0.02, 'timestamp': '2026-07-29T09:50:05.035663+05:30', 'zone_band_low': 57039.85, 'zone_band_high': 57054.2, 'zone_direction': 'RESISTANCE', 'zone_component_count': 1, 'accepted': False, 'rejection_reasons': ['LOW_RR:0.02'], 'stop_loss_distance': 52.9, 'atr': 105.81, 'confidence': 0.557, 'diagnostics': {'zone_score': 52.9, 'zone_explanation': 'PDH RESISTANCE ROUND NUMBER @ 57047.18 (±7.2pts, score=52)', 'dist_to_zone': 0.0, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 09:50:14,715 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:14,716 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:15,217 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057000PE']
+2026-07-29 09:50:15,218 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:15,218 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score50, payload={'price': 57043.05, 'sl': 57095.96, 'tp': 57041.96}
+2026-07-29 09:50:15,249 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score50, payload={'price': 57043.05, 'sl': 57095.96, 'tp': 57041.96}
+2026-07-29 09:50:15,269 - INFO - 💰 Position size [CONFLUENCE_BOUNCE|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 09:50:15,301 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY PUT @ 57043.05 | SL: 57095.96 TP: 57041.96
+2026-07-29 09:50:15,301 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.02']
+2026-07-29 09:50:15,301 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'TRENDLINE_RETEST', 'price': 57043.05, 'stop_loss': 57091.32, 'take_profit': 57041.96, 'tp1': 56970.64, 'rr_ratio': 0.02, 'timestamp': '2026-07-29T09:50:05.035663+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:0.02'], 'stop_loss_distance': 48.27, 'atr': 105.81, 'confidence': 0.692, 'diagnostics': {'trendline_id': 'tl_9b69a9675079f6bc', 'trendline_confidence': 0.742, 'trendline_r2': 0.996, 'trendline_touches': 28, 'trendline_price_at_now': 56913.85, 'dist_pct': 0.00226, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 09:50:15,744 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:15,744 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:16,223 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057000PE']
+2026-07-29 09:50:16,223 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057000PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:16,224 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score50, payload={'price': 57043.05, 'sl': 57091.32, 'tp': 57041.96}
+2026-07-29 09:50:16,253 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score50, payload={'price': 57043.05, 'sl': 57091.32, 'tp': 57041.96}
+2026-07-29 09:50:16,274 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.08%)
+2026-07-29 09:50:16,308 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY PUT @ 57043.05 | SL: 57091.32 TP: 57041.96
+2026-07-29 09:50:16,308 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-29 09:50:16,742 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:16,742 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:17,255 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057000CE']
+2026-07-29 09:50:17,256 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY2673057000CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:17,256 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTYBANK-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:1.00']
+2026-07-29 09:50:17,755 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:17,756 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:18,268 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057000CE']
+2026-07-29 09:50:18,268 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY2673057000CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 09:50:18,269 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTYBANK-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:1.00']
+2026-07-29 09:50:18,764 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 09:50:18,765 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 09:50:19,269 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 09:50:19,269 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:41,765 - INFO - --- 10:17:41 Market Pulse ---
+2026-07-29 10:17:42,222 - INFO - --- 10:17:42 Market Pulse ---
+2026-07-29 10:17:42,361 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:17:42,456 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:17:42,564 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:17:42,564 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 10:17:42,590 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24221.3, 'old_sl': 23741.8, 'new_sl': 23745.1, 'old_tp': None, 'new_tp': 24926.5, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,658 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:17:42,668 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX @ 24221.30 | SL→23745.10 TP→24926.50
+2026-07-29 10:17:42,668 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24221.3, 'old_sl': 23958.2, 'new_sl': 23961.5, 'old_tp': None, 'new_tp': 24601.9, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,707 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX @ 24221.30 | SL→23961.50 TP→24601.90
+2026-07-29 10:17:42,707 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24221.3, 'old_sl': 23741.8, 'new_sl': 23745.1, 'old_tp': None, 'new_tp': 24926.5, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,743 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX @ 24221.30 | SL→23745.10 TP→24926.50
+2026-07-29 10:17:42,743 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24221.3, 'old_sl': 23958.2, 'new_sl': 23961.5, 'old_tp': None, 'new_tp': 24601.9, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,743 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:17:42,777 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX @ 24221.30 | SL→23961.50 TP→24601.90
+2026-07-29 10:17:42,778 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_PDHL_BREAKOUT_57071.35_20260729_094505_PrevDay_Extremes_RVOL1.2, payload={'price': 57172.35, 'old_sl': 57018.619999999995, 'new_sl': 57132.8025, 'old_tp': None, 'new_tp': 57598.65, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,811 - INFO - 🟡 UPDATE (TRAILING_SL) [CFPrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→57132.80 TP→57598.65
+2026-07-29 10:17:42,811 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score35, payload={'price': 57172.35, 'old_sl': 56968.73, 'new_sl': 57069.73, 'old_tp': 57046.13, 'new_tp': 57148.74999999999, 'reason': 'TP_EXPANSION'}
+2026-07-29 10:17:42,844 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→57069.73 TP→57148.75
+2026-07-29 10:17:42,844 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score50, payload={'price': 57172.35, 'old_sl': 56968.73, 'new_sl': 57069.73, 'old_tp': 57046.13, 'new_tp': 57148.74999999999, 'reason': 'TP_EXPANSION'}
+2026-07-29 10:17:42,874 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→57069.73 TP→57148.75
+2026-07-29 10:17:42,874 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 57172.35, 'old_sl': 56946.45, 'new_sl': 57047.45, 'old_tp': None, 'new_tp': 57280.4, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,904 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→57047.45 TP→57280.40
+2026-07-29 10:17:42,904 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 57172.35, 'old_sl': 56008.17, 'new_sl': 56109.17, 'old_tp': None, 'new_tp': 58666.12, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,937 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→56109.17 TP→58666.12
+2026-07-29 10:17:42,937 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 57172.35, 'old_sl': 56946.45, 'new_sl': 57047.45, 'old_tp': None, 'new_tp': 57280.4, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,969 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→57047.45 TP→57280.40
+2026-07-29 10:17:42,969 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 57172.35, 'old_sl': 56008.17, 'new_sl': 56109.17, 'old_tp': None, 'new_tp': 58666.12, 'reason': 'TRAILING_SL'}
+2026-07-29 10:17:42,988 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:17:42,988 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 10:17:42,988 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 10:17:43,000 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTYBANK-INDEX @ 57172.35 | SL→56109.17 TP→58666.12
+2026-07-29 10:17:43,001 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_GAP_FILL_57071.35_20260729_094505_Gap_v1.0, payload={'exit_price': 57172.75, 'exit_reason': 'TRAILING_SL', 'pnl_r': -1.4767623469818751, 'duration_minutes': 32.59781091666667, 'bars_held': 2}
+2026-07-29 10:17:43,032 - INFO - 🔴 EXIT (TRAILING_SL) [CFGap_v1.0|0729_094505_Gap_v1.0]: NSE:NIFTYBANK-INDEX @ 57172.75 | PnL -1.48R | MFE 0.40R | Capture -371% | 2bars HoldEff -0.738R/bar
+2026-07-29 10:17:43,032 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score35, payload={'exit_price': 57172.75, 'exit_reason': 'INITIAL_SL', 'pnl_r': -2.5013324513325714, 'duration_minutes': 27.612149733333336, 'bars_held': 1}
+2026-07-29 10:17:43,063 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57172.75 | PnL -2.50R | MFE 0.00R | Capture N/A | 1bars HoldEff -2.501R/bar
+2026-07-29 10:17:43,064 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score35, payload={'exit_price': 57172.75, 'exit_reason': 'INITIAL_SL', 'pnl_r': -2.736969131966142, 'duration_minutes': 27.612149733333336, 'bars_held': 1}
+2026-07-29 10:17:43,095 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57172.75 | PnL -2.74R | MFE 0.00R | Capture N/A | 1bars HoldEff -2.737R/bar
+2026-07-29 10:17:43,095 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_CONFLUENCE_BOUNCE_57043.05_202607290950_Geometry_v1.0_Score50, payload={'exit_price': 57172.75, 'exit_reason': 'INITIAL_SL', 'pnl_r': -2.5013324513325714, 'duration_minutes': 27.612149733333336, 'bars_held': 1}
+2026-07-29 10:17:43,127 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57172.75 | PnL -2.50R | MFE 0.00R | Capture N/A | 1bars HoldEff -2.501R/bar
+2026-07-29 10:17:43,127 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57043.05_202607290950_Geometry_v1.0_Score50, payload={'exit_price': 57172.75, 'exit_reason': 'INITIAL_SL', 'pnl_r': -2.736969131966142, 'duration_minutes': 27.612149733333336, 'bars_held': 1}
+2026-07-29 10:17:43,159 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57172.75 | PnL -2.74R | MFE 0.00R | Capture N/A | 1bars HoldEff -2.737R/bar
+2026-07-29 10:17:44,534 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTY50-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-07-29 10:17:44,597 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:17:44,597 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:45,118 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 10:17:45,118 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:45,118 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTY50-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.96']
+2026-07-29 10:17:45,618 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:17:45,619 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:46,122 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 10:17:46,123 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:46,123 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTY50-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.96']
+2026-07-29 10:17:46,632 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:17:46,632 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:47,136 - WARNING - No quotes data available for ['NSE:NIFTY2673024300CE']
+2026-07-29 10:17:47,137 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY2673024300CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:48,553 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-29 10:17:48,569 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-29 10:17:48,575 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-29 10:17:48,575 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-29 10:17:48,575 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY CALL', 'strategy': 'BREAKOUT', 'price': 57172.35, 'stop_loss': 57121.891071428574, 'take_profit': 57676.93928571428, 'tp1': 57248.03839285714, 'rr_ratio': 10.0, 'timestamp': '2026-07-29T10:10:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS'], 'features': {'date': '2026-07-29', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.42, 'atr': 100.92, 'distance_from_supply': 1056.3, 'distance_from_demand': 1148.75, 'nearest_supply_strength': 87.1, 'nearest_demand_strength': 86.0, 'distance_to_liquidity_pool': 1148.75, 'liquidity_score': 4.2, 'indicator_snapshot': {'rvol_tod': 0.42, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.6666, 'wickiness': 0.5153, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000', 'ema20': 56986.39, 'ema50': 56925.78, 'move_efficiency_h1': 0.3691, 'ema_bullish': True, 'rsi14': 71.19, 'distance_to_vwap': 0.0022, 'atr_percentile': 0.9643, 'dist_prev_high': 0.0021, 'dist_prev_low': 0.0088}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-29 10:17:48,653 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:48,653 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:49,166 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 10:17:49,167 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:49,183 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL1.0, payload={'price': 57172.35, 'sl': 57121.891071428574, 'tp': 57676.93928571428}
+2026-07-29 10:17:49,215 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL1.0, payload={'price': 57172.35, 'sl': 57121.891071428574, 'tp': 57676.93928571428}
+2026-07-29 10:17:49,235 - INFO - 💰 Position size [BREAKOUT|RANGE_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 10:17:49,266 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 57172.35 | SL: 57121.89 TP: 57676.94
+2026-07-29 10:17:49,266 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-29 10:17:49,266 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-29 10:17:49,266 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY CALL', 'strategy': 'BREAKOUT', 'price': 57172.35, 'stop_loss': 57121.891071428574, 'take_profit': 57676.93928571428, 'tp1': 57248.03839285714, 'rr_ratio': 10.0, 'timestamp': '2026-07-29T10:10:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS'], 'features': {'date': '2026-07-29', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.42, 'atr': 100.92, 'distance_from_supply': 1056.3, 'distance_from_demand': 1148.75, 'nearest_supply_strength': 87.1, 'nearest_demand_strength': 86.0, 'distance_to_liquidity_pool': 1148.75, 'liquidity_score': 4.2, 'indicator_snapshot': {'rvol_tod': 0.42, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.6666, 'wickiness': 0.5153, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000', 'ema20': 56986.39, 'ema50': 56925.78, 'move_efficiency_h1': 0.3691, 'ema_bullish': True, 'rsi14': 71.19, 'distance_to_vwap': 0.0022, 'atr_percentile': 0.9643, 'dist_prev_high': 0.0021, 'dist_prev_low': 0.0088}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-29 10:17:49,663 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:49,664 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:50,185 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 10:17:50,185 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:50,186 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL0.8, payload={'price': 57172.35, 'sl': 57121.891071428574, 'tp': 57676.93928571428}
+2026-07-29 10:17:50,253 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL0.8, payload={'price': 57172.35, 'sl': 57121.891071428574, 'tp': 57676.93928571428}
+2026-07-29 10:17:50,269 - INFO - 💰 Position size [BREAKOUT|RANGE_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 10:17:50,297 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY CALL @ 57172.35 | SL: 57121.89 TP: 57676.94
+2026-07-29 10:17:50,297 - INFO - 👻 [ChartPattern_v1.0_Conf55] CF ASCENDING_TRIANGLE NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 10:17:50,297 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf55, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf55', 'signal': 'BUY CALL', 'price': 57172.35, 'stop_loss': 56919.17, 'take_profit': 57552.13, 'tp1': 57552.13, 'rr_ratio': 1.5, 'strategy': 'ASCENDING_TRIANGLE', 'confidence': 80.0, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 10, 17, 41, 764647, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.673, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 56857.9, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': 58228.65, 'tp_measured_move': 57052.6, 'tp_extended_1618': 57172.92, 'pattern_explanation': 'Detected ASCENDING_TRIANGLE pattern with confidence 0.8'}, 'experiment_name': 'ChartPattern_v1.0_Conf55', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 10:17:50,303 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 10:17:50,685 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:50,685 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:51,190 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 10:17:51,191 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:51,191 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf55, payload={'price': 57172.35, 'sl': 56919.17, 'tp': 57552.13}
+2026-07-29 10:17:51,228 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf55, payload={'price': 57172.35, 'sl': 56919.17, 'tp': 57552.13}
+2026-07-29 10:17:51,249 - INFO - 💰 Position size [ASCENDING_TRIANGLE|UNKNOWN|conf=80]: frac=0.005 → ₹5,000 (risk/unit=0.44%)
+2026-07-29 10:17:51,280 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTYBANK-INDEX BUY CALL @ 57172.35 | SL: 56919.17 TP: 57552.13
+2026-07-29 10:17:51,281 - INFO - 👻 [ChartPattern_v1.0_Conf40] CF ASCENDING_TRIANGLE NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE']
+2026-07-29 10:17:51,281 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf40, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf40', 'signal': 'BUY CALL', 'price': 57172.35, 'stop_loss': 56919.17, 'take_profit': 57552.13, 'tp1': 57552.13, 'rr_ratio': 1.5, 'strategy': 'ASCENDING_TRIANGLE', 'confidence': 80.0, 'accepted': False, 'rejection_reasons': ['NO_CANDLESTICK_CONFIRMATION', 'NO_ZONE_CONFLUENCE'], 'timestamp': datetime.datetime(2026, 7, 29, 10, 17, 41, 764647, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.673, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 56857.9, 'candlestick_pattern': None, 'candlestick_strength': None, 'tp_nearest_zone': 58228.65, 'tp_measured_move': 57052.6, 'tp_extended_1618': 57172.92, 'pattern_explanation': 'Detected ASCENDING_TRIANGLE pattern with confidence 0.8'}, 'experiment_name': 'ChartPattern_v1.0_Conf40', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 10:17:51,289 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 10:17:51,698 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:51,699 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:52,198 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 10:17:52,198 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:52,199 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf40, payload={'price': 57172.35, 'sl': 56919.17, 'tp': 57552.13}
+2026-07-29 10:17:52,234 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf40, payload={'price': 57172.35, 'sl': 56919.17, 'tp': 57552.13}
+2026-07-29 10:17:52,255 - INFO - 💰 Position size [ASCENDING_TRIANGLE|UNKNOWN|conf=80]: frac=0.005 → ₹5,000 (risk/unit=0.44%)
+2026-07-29 10:17:52,286 - INFO - 🟢 ENTRY [CF|ChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTYBANK-INDEX BUY CALL @ 57172.35 | SL: 56919.17 TP: 57552.13
+2026-07-29 10:17:52,286 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_RVOL']
+2026-07-29 10:17:52,718 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:52,718 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:53,208 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 10:17:53,209 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:53,209 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTYBANK-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.96']
+2026-07-29 10:17:53,699 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:53,699 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:54,212 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057200CE']
+2026-07-29 10:17:54,212 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY2673057200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:17:54,212 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTYBANK-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.96']
+2026-07-29 10:17:54,726 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:17:54,727 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:17:55,228 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057400CE']
+2026-07-29 10:17:55,229 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY2673057400CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:05,233 - INFO - --- 10:20:05 Market Pulse ---
+2026-07-29 10:20:05,993 - INFO - --- 10:20:05 Market Pulse ---
+2026-07-29 10:20:06,095 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:20:06,178 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:20:06,267 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:20:06,267 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 10:20:06,356 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:20:06,446 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:20:06,522 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:20:06,522 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 10:20:06,523 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 10:20:07,426 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTY50-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-29 10:20:07,491 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:20:07,492 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:08,029 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 10:20:08,029 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:08,030 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTY50-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.95']
+2026-07-29 10:20:08,520 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:20:08,520 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:09,027 - WARNING - No quotes data available for ['NSE:NIFTY2673024200CE']
+2026-07-29 10:20:09,027 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY2673024200CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:09,027 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTY50-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.95']
+2026-07-29 10:20:09,537 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:20:09,537 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:10,051 - WARNING - No quotes data available for ['NSE:NIFTY2673024300CE']
+2026-07-29 10:20:10,051 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY2673024300CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:11,490 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF TRAP NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL']
+2026-07-29 10:20:11,490 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'TRAP', 'price': 57137.0, 'stop_loss': 57187.95, 'take_profit': 56665.196428571435, 'tp1': 57060.575000000004, 'rr_ratio': 9.26, 'timestamp': '2026-07-29T10:15:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL'], 'features': {'date': '2026-07-29', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.55, 'atr': 94.36, 'distance_from_supply': 1091.65, 'distance_from_demand': 1113.4, 'nearest_supply_strength': 87.1, 'nearest_demand_strength': 86.0, 'distance_to_liquidity_pool': 1113.4000000000015, 'liquidity_score': 5.5, 'indicator_snapshot': {'rvol_tod': 0.55, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.4629, 'wickiness': 0.3946, 'fft_score': 1.0, 'setup_type': 'TRAP', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500', 'ema20': 57000.74, 'ema50': 56934.06, 'move_efficiency_h1': 0.3002, 'ema_bullish': True, 'rsi14': 79.71, 'distance_to_vwap': 0.0015, 'atr_percentile': 0.8978, 'dist_prev_high': 0.0015, 'dist_prev_low': 0.0082}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-29 10:20:11,559 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:20:11,560 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:12,085 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100PE']
+2026-07-29 10:20:12,085 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:12,086 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL1.0, payload={'price': 57137.0, 'sl': 57187.95, 'tp': 56665.196428571435}
+2026-07-29 10:20:12,122 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL1.0, payload={'price': 57137.0, 'sl': 57187.95, 'tp': 56665.196428571435}
+2026-07-29 10:20:12,144 - INFO - 💰 Position size [TRAP|RANGE_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 10:20:12,180 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57137.00 | SL: 57187.95 TP: 56665.20
+2026-07-29 10:20:12,180 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF TRAP NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL']
+2026-07-29 10:20:12,180 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'TRAP', 'price': 57137.0, 'stop_loss': 57187.95, 'take_profit': 56665.196428571435, 'tp1': 57060.575000000004, 'rr_ratio': 9.26, 'timestamp': '2026-07-29T10:15:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL'], 'features': {'date': '2026-07-29', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.55, 'atr': 94.36, 'distance_from_supply': 1091.65, 'distance_from_demand': 1113.4, 'nearest_supply_strength': 87.1, 'nearest_demand_strength': 86.0, 'distance_to_liquidity_pool': 1113.4000000000015, 'liquidity_score': 5.5, 'indicator_snapshot': {'rvol_tod': 0.55, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.4629, 'wickiness': 0.3946, 'fft_score': 1.0, 'setup_type': 'TRAP', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500', 'ema20': 57000.74, 'ema50': 56934.06, 'move_efficiency_h1': 0.3002, 'ema_bullish': True, 'rsi14': 79.71, 'distance_to_vwap': 0.0015, 'atr_percentile': 0.8978, 'dist_prev_high': 0.0015, 'dist_prev_low': 0.0082}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-29 10:20:12,605 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:20:12,605 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:13,109 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100PE']
+2026-07-29 10:20:13,110 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY2673057100PE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY2673057100PE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:13,111 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL0.8, payload={'price': 57137.0, 'sl': 57187.95, 'tp': 56665.196428571435}
+2026-07-29 10:20:13,148 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL0.8, payload={'price': 57137.0, 'sl': 57187.95, 'tp': 56665.196428571435}
+2026-07-29 10:20:13,169 - INFO - 💰 Position size [TRAP|RANGE_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.09%)
+2026-07-29 10:20:13,213 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57137.00 | SL: 57187.95 TP: 56665.20
+2026-07-29 10:20:13,214 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-29 10:20:13,617 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:20:13,617 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:14,154 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 10:20:14,154 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:14,155 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTYBANK-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.90']
+2026-07-29 10:20:14,648 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:20:14,648 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:15,168 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 10:20:15,169 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:20:15,169 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTYBANK-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.90']
+2026-07-29 10:20:15,652 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:20:15,652 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:20:16,166 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057300CE']
+2026-07-29 10:20:16,166 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY2673057300CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:05,177 - INFO - --- 10:25:05 Market Pulse ---
+2026-07-29 10:25:05,532 - INFO - --- 10:25:05 Market Pulse ---
+2026-07-29 10:25:05,785 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:25:05,881 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:25:05,962 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:25:05,962 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-29 10:25:06,051 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:25:06,092 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24228.9, 'old_sl': 23745.1, 'new_sl': 23752.7, 'old_tp': None, 'new_tp': 24926.5, 'reason': 'TRAILING_SL'}
+2026-07-29 10:25:06,166 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX @ 24228.90 | SL→23752.70 TP→24926.50
+2026-07-29 10:25:06,166 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55, payload={'price': 24228.9, 'old_sl': 23961.5, 'new_sl': 23969.100000000002, 'old_tp': None, 'new_tp': 24601.9, 'reason': 'TRAILING_SL'}
+2026-07-29 10:25:06,207 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf55|tPattern_v1.0_Conf55]: NSE:NIFTY50-INDEX @ 24228.90 | SL→23969.10 TP→24601.90
+2026-07-29 10:25:06,207 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24228.9, 'old_sl': 23745.1, 'new_sl': 23752.7, 'old_tp': None, 'new_tp': 24926.5, 'reason': 'TRAILING_SL'}
+2026-07-29 10:25:06,243 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX @ 24228.90 | SL→23752.70 TP→24926.50
+2026-07-29 10:25:06,243 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40, payload={'price': 24228.9, 'old_sl': 23961.5, 'new_sl': 23969.100000000002, 'old_tp': None, 'new_tp': 24601.9, 'reason': 'TRAILING_SL'}
+2026-07-29 10:25:06,275 - INFO - 🟡 UPDATE (TRAILING_SL) [CFChartPattern_v1.0_Conf40|tPattern_v1.0_Conf40]: NSE:NIFTY50-INDEX @ 24228.90 | SL→23969.10 TP→24601.90
+2026-07-29 10:25:06,275 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_PDHL_BREAKOUT_57071.35_20260729_094505_PrevDay_Extremes_RVOL1.2, payload={'exit_price': 57132.8025, 'exit_reason': 'TRAILING_SL', 'pnl_r': 1.11541816802571, 'duration_minutes': 39.988020633333335, 'bars_held': 4}
+2026-07-29 10:25:06,305 - INFO - 🔴 EXIT (TRAILING_SL) [CFPrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 57132.80 | PnL +1.12R | MFE 1.92R | Capture 58% | 4bars HoldEff +0.279R/bar
+2026-07-29 10:25:06,323 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:25:06,421 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-29 10:25:06,421 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-29 10:25:06,421 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-29 10:25:07,650 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:1.46']
+2026-07-29 10:25:07,650 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY CALL', 'strategy': 'TRENDLINE_RETEST', 'price': 24228.9, 'stop_loss': 24214.45, 'take_profit': 24250.0, 'tp1': 24250.57, 'rr_ratio': 1.46, 'timestamp': '2026-07-29T10:25:05.177230+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:1.46'], 'stop_loss_distance': 14.45, 'atr': 33.97, 'confidence': 0.69, 'diagnostics': {'trendline_id': 'tl_926c106edef3df61', 'trendline_confidence': 0.738, 'trendline_r2': 1.0, 'trendline_touches': 23, 'trendline_price_at_now': 24238.05, 'dist_pct': 0.00038, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 10:25:07,729 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:07,730 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:08,251 - WARNING - No quotes data available for ['NSE:NIFTY2673024250CE']
+2026-07-29 10:25:08,251 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:08,252 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score35, payload={'price': 24228.9, 'sl': 24214.45, 'tp': 24250.0}
+2026-07-29 10:25:08,286 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score35, payload={'price': 24228.9, 'sl': 24214.45, 'tp': 24250.0}
+2026-07-29 10:25:08,307 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.06%)
+2026-07-29 10:25:08,338 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24228.90 | SL: 24214.45 TP: 24250.00
+2026-07-29 10:25:08,338 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:1.46']
+2026-07-29 10:25:08,338 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY CALL', 'strategy': 'TRENDLINE_RETEST', 'price': 24228.9, 'stop_loss': 24214.45, 'take_profit': 24250.0, 'tp1': 24250.57, 'rr_ratio': 1.46, 'timestamp': '2026-07-29T10:25:05.177230+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:1.46'], 'stop_loss_distance': 14.45, 'atr': 33.97, 'confidence': 0.69, 'diagnostics': {'trendline_id': 'tl_926c106edef3df61', 'trendline_confidence': 0.738, 'trendline_r2': 1.0, 'trendline_touches': 23, 'trendline_price_at_now': 24238.05, 'dist_pct': 0.00038, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-29 10:25:08,752 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:08,752 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:09,271 - WARNING - No quotes data available for ['NSE:NIFTY2673024250CE']
+2026-07-29 10:25:09,271 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:09,272 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score50, payload={'price': 24228.9, 'sl': 24214.45, 'tp': 24250.0}
+2026-07-29 10:25:09,307 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score50, payload={'price': 24228.9, 'sl': 24214.45, 'tp': 24250.0}
+2026-07-29 10:25:09,327 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.06%)
+2026-07-29 10:25:09,360 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY CALL @ 24228.90 | SL: 24214.45 TP: 24250.00
+2026-07-29 10:25:09,360 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [ChartPattern_v1.0_Conf55]
+2026-07-29 10:25:09,360 - INFO -    Entry: 24228.9 | SL: 23588.6 | TP: 25189.35 (RR: 1.5)
+2026-07-29 10:25:09,360 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_ChartPattern_v1.0_Conf55_1785300905, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24228.90_20260729_102505_ChartPattern_v1.0_Conf55, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24228.90_20260729_102505_ChartPattern_v1.0_Conf55', 'signal': 'BUY CALL', 'price': 24228.9, 'stop_loss': 23588.6, 'take_profit': 25189.35, 'tp1': 25189.35, 'rr_ratio': 1.5, 'strategy': 'DOUBLE_BOTTOM', 'confidence': 61.7, 'accepted': True, 'rejection_reasons': [], 'timestamp': datetime.datetime(2026, 7, 29, 10, 25, 5, 177230, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.304, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 23652.25, 'candlestick_pattern': 'BULLISH_ENGULFING', 'candlestick_strength': 1.0, 'tp_nearest_zone': None, 'tp_measured_move': 24398.75, 'tp_extended_1618': 24398.75, 'pattern_explanation': 'Detected DOUBLE_BOTTOM pattern with confidence 0.617'}, 'experiment_name': 'ChartPattern_v1.0_Conf55', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 10:25:09,367 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 10:25:09,777 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:09,777 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:10,280 - WARNING - No quotes data available for ['NSE:NIFTY2673024250CE']
+2026-07-29 10:25:10,280 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:10,281 - CRITICAL - 🛑 No valid option contract resolved for NSE:NIFTY50-INDEX; SKIPPING real entry (refusing to trade on a fabricated/unknown premium).
+2026-07-29 10:25:10,281 - INFO - 📊 EXECUTION AUDIT [ENTRY_ABORTED]: trade_id=trade_NSE_NIFTY50_INDEX_ChartPattern_v1.0_Conf55_1785300905, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24228.90_20260729_102505_ChartPattern_v1.0_Conf55, payload={'reason': 'OPTION_UNRESOLVED'}
+2026-07-29 10:25:10,317 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [ChartPattern_v1.0_Conf40]
+2026-07-29 10:25:10,317 - INFO -    Entry: 24228.9 | SL: 23588.6 | TP: 25189.35 (RR: 1.5)
+2026-07-29 10:25:10,318 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_ChartPattern_v1.0_Conf40_1785300905, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24228.90_20260729_102505_ChartPattern_v1.0_Conf40, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24228.90_20260729_102505_ChartPattern_v1.0_Conf40', 'signal': 'BUY CALL', 'price': 24228.9, 'stop_loss': 23588.6, 'take_profit': 25189.35, 'tp1': 25189.35, 'rr_ratio': 1.5, 'strategy': 'DOUBLE_BOTTOM', 'confidence': 61.7, 'accepted': True, 'rejection_reasons': [], 'timestamp': datetime.datetime(2026, 7, 29, 10, 25, 5, 177230, tzinfo=zoneinfo.ZoneInfo(key='Asia/Kolkata')), 'diagnostics': {'pattern_state': 'BREAKOUT', 'pattern_quality_score': 0.304, 'pattern_completion_pct': 1.0, 'pattern_trigger_quality': 0.0, 'breakout_level': 23652.25, 'candlestick_pattern': 'BULLISH_ENGULFING', 'candlestick_strength': 1.0, 'tp_nearest_zone': None, 'tp_measured_move': 24398.75, 'tp_extended_1618': 24398.75, 'pattern_explanation': 'Detected DOUBLE_BOTTOM pattern with confidence 0.617'}, 'experiment_name': 'ChartPattern_v1.0_Conf40', 'strategy_id': 'chart_pattern', 'version': 'v1.0'}
+2026-07-29 10:25:10,329 - ERROR - ❌ Failed to save execution event: Object of type datetime is not JSON serializable
+2026-07-29 10:25:11,041 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:11,041 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:11,347 - WARNING - No quotes data available for ['NSE:NIFTY2673024250CE']
+2026-07-29 10:25:11,347 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1293, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 318, in resolve
+    elif self.strike_policy == "OTM_1":
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 285, in resolve_premium
+    def __init__(self, db: PostgresDatabase, data_provider, strike_policy: str = "ATM"):
+ValueError: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:11,347 - CRITICAL - 🛑 No valid option contract resolved for NSE:NIFTY50-INDEX; SKIPPING real entry (refusing to trade on a fabricated/unknown premium).
+2026-07-29 10:25:11,347 - INFO - 📊 EXECUTION AUDIT [ENTRY_ABORTED]: trade_id=trade_NSE_NIFTY50_INDEX_ChartPattern_v1.0_Conf40_1785300905, candidate_id=cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24228.90_20260729_102505_ChartPattern_v1.0_Conf40, payload={'reason': 'OPTION_UNRESOLVED'}
+2026-07-29 10:25:11,374 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTY50-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-07-29 10:25:11,974 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:11,974 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:12,361 - WARNING - No quotes data available for ['NSE:NIFTY2673024250CE']
+2026-07-29 10:25:12,361 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:12,361 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTY50-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.94']
+2026-07-29 10:25:12,856 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:12,856 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:13,383 - WARNING - No quotes data available for ['NSE:NIFTY2673024250CE']
+2026-07-29 10:25:13,383 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY2673024250CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:13,383 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTY50-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.94']
+2026-07-29 10:25:13,752 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX']
+2026-07-29 10:25:13,753 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:14,263 - WARNING - No quotes data available for ['NSE:NIFTY2673024350CE']
+2026-07-29 10:25:14,263 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY2673024350CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:15,723 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BULL_CALL_SPREAD NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-29 10:25:15,787 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:25:15,787 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:25:16,300 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 10:25:16,300 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BULL_CALL_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:25:16,300 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTYBANK-INDEX LONG_STRADDLE | Rejected: ['NO_COMPRESSION:0.87']
+2026-07-29 10:25:16,815 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX']
+2026-07-29 10:25:16,815 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:40:43,783 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057100CE']
+2026-07-29 10:40:43,783 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY2673057100CE (DB warehouse miss/stale AND live quote failed)
+2026-07-29 10:40:43,783 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTYBANK-INDEX LONG_STRANGLE | Rejected: ['NO_COMPRESSION:0.87']
+2026-07-29 10:40:44,394 - WARNING - No quotes data available for ['NSE:BANKNIFTY2672957100CE', 'NSE:BANKNIFTY2673057100CE', 'NSE:BANKNIFTY2673157100CE', 'NSE:BANKNIFTY2680157100CE', 'NSE:BANKNIFTY2680257100CE', 'NSE:BANKNIFTY2680357100CE', 'NSE:BANKNIFTY2680457100CE', 'NSE:BANKNIFTY2680557100CE', 'NSE:BANKNIFTY2680657100CE']
+2026-07-29 10:40:44,888 - WARNING - No quotes data available for ['NSE:BANKNIFTY26JUL57100CE']
+2026-07-29 10:40:45,404 - WARNING - No quotes data available for ['NSE:BANKNIFTY26JUN56800CE', 'NSE:BANKNIFTY26JUN56800PE', 'NSE:BANKNIFTY26JUN56900CE', 'NSE:BANKNIFTY26JUN56900PE', 'NSE:BANKNIFTY26JUN57000CE', 'NSE:BANKNIFTY26JUN57000PE', 'NSE:BANKNIFTY26JUN57100CE', 'NSE:BANKNIFTY26JUN57100PE', 'NSE:BANKNIFTY26JUN57200CE', 'NSE:BANKNIFTY26JUN57200PE', 'NSE:BANKNIFTY26JUN57300CE', 'NSE:BANKNIFTY26JUN57300PE', 'NSE:BANKNIFTY26JUN57400CE', 'NSE:BANKNIFTY26JUN57400PE']
+2026-07-29 10:40:45,404 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26730 (2026-07-30)
+2026-07-29 10:40:45,922 - WARNING - No quotes data available for ['NSE:BANKNIFTY2673057300CE']
+2026-07-29 10:40:45,923 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY2673057300CE (DB warehouse miss/stale AND live quote failed)

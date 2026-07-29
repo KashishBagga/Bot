@@ -1,0 +1,22 @@
+2026-07-26 12:20:12,379 - INFO - 🗓️ Risk day rolled to 2026-07-26 — daily counters reset.
+2026-07-26 12:20:12,380 - INFO - --- 12:20:12 Market Pulse ---
+2026-07-26 12:20:12,479 - INFO - 🗓️ Risk day rolled to 2026-07-26 — daily counters reset.
+2026-07-26 12:20:12,480 - INFO - --- 12:20:12 Market Pulse ---
+2026-07-26 12:20:12,497 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,575 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,597 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,691 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,696 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,697 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-26 12:20:12,781 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,781 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-26 12:20:12,862 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,959 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:12,965 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:13,051 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:13,052 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-26 12:20:13,052 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-26 12:20:13,226 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:13,323 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-26 12:20:13,323 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-26 12:20:13,323 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)

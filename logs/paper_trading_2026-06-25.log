@@ -1,0 +1,1152 @@
+2026-06-25 09:12:10,525 - INFO - --- 09:12:10 Market Pulse ---
+2026-06-25 09:12:11,361 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:12:11,897 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:12:12,071 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:12:12,071 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 09:12:12,196 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:12:12,281 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:12:12,371 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:12:12,371 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 09:12:12,371 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 09:21:02,090 - INFO - --- 09:21:02 Market Pulse ---
+2026-06-25 09:21:02,987 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:21:03,168 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:21:03,252 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:21:03,252 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 09:21:03,326 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:21:03,409 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:21:03,577 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:21:03,577 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 09:21:03,577 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 09:36:58,350 - INFO - --- 09:36:58 Market Pulse ---
+2026-06-25 09:36:59,056 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:36:59,345 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:36:59,453 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:36:59,454 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 09:36:59,546 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:36:59,734 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:36:59,902 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:36:59,902 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 09:36:59,902 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 09:52:41,646 - INFO - --- 09:52:41 Market Pulse ---
+2026-06-25 09:52:41,881 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:52:41,972 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:52:42,168 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:52:42,169 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 09:52:42,524 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:52:42,701 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:52:42,826 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 09:52:42,829 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 09:52:42,829 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 10:02:21,535 - INFO - --- 10:02:21 Market Pulse ---
+2026-06-25 10:02:22,349 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:02:22,744 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:02:22,839 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:02:22,840 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 10:02:23,040 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:02:23,132 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:02:23,296 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:02:23,296 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 10:02:23,296 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 10:07:23,297 - INFO - --- 10:07:23 Market Pulse ---
+2026-06-25 10:07:23,505 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:07:23,626 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:07:23,749 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:07:23,749 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 10:07:24,036 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:07:24,130 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:07:24,240 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:07:24,241 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 10:07:24,241 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 10:12:24,455 - INFO - --- 10:12:24 Market Pulse ---
+2026-06-25 10:12:24,585 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:12:24,679 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:12:24,777 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:12:24,777 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-06-25 10:12:24,954 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:12:25,050 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:12:25,339 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-06-25 10:12:25,340 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-06-25 10:12:25,340 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-25 10:17:24,216 - INFO - 🔑 Access token loaded from environment
+2026-06-25 10:17:24,390 - INFO - ✅ Fyers client initialized successfully
+2026-06-25 10:17:24,464 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:17:24,479 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:17:24,710 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:17:24,711 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-25 10:17:24,711 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-25 10:17:24,757 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:17:24,765 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:17:24,791 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:17:24,810 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:17:24,817 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:17:24,847 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:17:24,847 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-25 10:17:24,847 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-25 10:17:24,858 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-06-25 10:17:24,868 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-06-25 10:17:24,888 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:17:24,895 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:17:24,921 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:17:24,921 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-25 10:17:24,921 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-25 10:17:24,932 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-06-25 10:17:24,943 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-06-25 10:17:24,951 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-06-25 10:17:24,962 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-06-25 10:17:24,970 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-06-25 10:17:24,982 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-06-25 10:17:24,991 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-06-25 10:17:25,001 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-06-25 10:17:25,010 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-06-25 10:17:25,021 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-06-25 10:17:25,029 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-06-25 10:17:25,040 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-06-25 10:17:25,048 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-06-25 10:17:25,059 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-06-25 10:17:25,060 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-06-25 10:17:25,067 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-06-25 10:17:25,078 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=5b54205496d059aa git=97aaa84]
+2026-06-25 10:17:25,078 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-06-25 10:17:25,086 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-06-25 10:17:25,097 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-06-25 10:17:25,097 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.45, imbalance>=0.45]
+2026-06-25 10:17:25,106 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=db8c841e65c2c062 git=97aaa84
+2026-06-25 10:17:25,116 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=db8c841e65c2c062 git=97aaa84]
+2026-06-25 10:17:25,296 - INFO - 🔄 Recovered 15 active counterfactual positions: ['cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57074.90_20260624_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23784.95_20260624_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57074.90_20260624_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23784.95_20260624_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618']
+2026-06-25 10:17:25,296 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-25 10:17:25,296 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-25 10:17:25,296 - INFO - --- 10:17:25 Market Pulse ---
+2026-06-25 10:17:26,138 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58450.30 | SL→58414.85 TP→57839.95
+2026-06-25 10:17:26,177 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57585.69 | PnL -0.92R | MFE 0.13R | Capture -728% | 2bars HoldEff -0.462R/bar
+2026-06-25 10:17:26,214 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 23893.24 | PnL -0.78R | MFE 0.27R | Capture -284% | 2bars HoldEff -0.388R/bar
+2026-06-25 10:17:26,246 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57585.69 | PnL -0.92R | MFE 0.13R | Capture -728% | 2bars HoldEff -0.462R/bar
+2026-06-25 10:17:26,271 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 23897.71 | PnL -0.88R | MFE 0.17R | Capture -514% | 2bars HoldEff -0.440R/bar
+2026-06-25 10:17:26,293 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 24092.66 | PnL -0.53R | MFE 0.52R | Capture -103% | 2bars HoldEff -0.266R/bar
+2026-06-25 10:17:26,314 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58450.30 | SL→58428.41 TP→57946.59
+2026-06-25 10:17:27,824 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:17:27,864 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24177.95 | SL: 24188.96 TP: 24067.90
+2026-06-25 10:17:27,864 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:17:27,886 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24177.95 | SL: 24188.96 TP: 24067.90
+2026-06-25 10:17:29,218 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:17:29,241 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58450.30 | SL: 58483.13 TP: 58122.03
+2026-06-25 10:17:29,241 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:17:29,263 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58450.30 | SL: 58483.13 TP: 58122.03
+2026-06-25 10:18:29,747 - INFO - 🔑 Access token loaded from environment
+2026-06-25 10:18:29,906 - INFO - ✅ Fyers client initialized successfully
+2026-06-25 10:18:29,964 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:18:29,975 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:18:30,011 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:18:30,011 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-25 10:18:30,011 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-25 10:18:30,031 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:18:30,038 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:18:30,067 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:18:30,087 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:18:30,095 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:18:30,122 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:18:30,122 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-25 10:18:30,122 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-25 10:18:30,138 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-06-25 10:18:30,150 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-06-25 10:18:30,171 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:18:30,179 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:18:30,207 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:18:30,207 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-25 10:18:30,207 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-25 10:18:30,219 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-06-25 10:18:30,230 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-06-25 10:18:30,242 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-06-25 10:18:30,253 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-06-25 10:18:30,265 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-06-25 10:18:30,276 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-06-25 10:18:30,286 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-06-25 10:18:30,297 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-06-25 10:18:30,308 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-06-25 10:18:30,318 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-06-25 10:18:30,329 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-06-25 10:18:30,340 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-06-25 10:18:30,350 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-06-25 10:18:30,361 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-06-25 10:18:30,361 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-06-25 10:18:30,372 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-06-25 10:18:30,383 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=5b54205496d059aa git=97aaa84]
+2026-06-25 10:18:30,383 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-06-25 10:18:30,393 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-06-25 10:18:30,404 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-06-25 10:18:30,404 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.45, imbalance>=0.45]
+2026-06-25 10:18:30,415 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=db8c841e65c2c062 git=97aaa84
+2026-06-25 10:18:30,426 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=db8c841e65c2c062 git=97aaa84]
+2026-06-25 10:18:30,580 - INFO - 🔄 Recovered 14 active counterfactual positions: ['cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23784.95_20260624_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24003.25_20260625_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24003.25_20260625_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58093.95_20260625_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58093.95_20260625_Structural_v3.2_RVOL0.8']
+2026-06-25 10:18:30,580 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-25 10:18:30,580 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-25 10:18:30,580 - INFO - --- 10:18:30 Market Pulse ---
+2026-06-25 10:18:31,801 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58414.85 | PnL +25.19R | MFE 26.24R | Capture 96% | 2bars HoldEff +12.596R/bar
+2026-06-25 10:18:31,833 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 23897.71 | PnL -0.88R | MFE 0.17R | Capture -514% | 2bars HoldEff -0.440R/bar
+2026-06-25 10:18:31,858 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 24089.07 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 10:18:31,881 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58428.41 | PnL +22.96R | MFE 24.01R | Capture 96% | 2bars HoldEff +11.480R/bar
+2026-06-25 10:18:31,902 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24170.45 | SL→24181.46 TP→24067.90
+2026-06-25 10:18:31,923 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24170.45 | SL→24181.46 TP→24067.90
+2026-06-25 10:18:31,944 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58411.10 | SL→58443.93 TP→58122.03
+2026-06-25 10:18:31,966 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58411.10 | SL→58443.93 TP→58122.03
+2026-06-25 10:18:33,402 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:18:33,424 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24170.45 | SL: 24181.69 TP: 24058.09
+2026-06-25 10:18:33,424 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:18:33,446 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24170.45 | SL: 24181.69 TP: 24058.09
+2026-06-25 10:18:34,915 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:18:34,937 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58411.10 | SL: 58445.35 TP: 58068.64
+2026-06-25 10:18:34,937 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:18:34,958 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58411.10 | SL: 58445.35 TP: 58068.64
+2026-06-25 10:19:08,232 - INFO - 🔑 Access token loaded from environment
+2026-06-25 10:19:08,598 - INFO - ✅ Fyers client initialized successfully
+2026-06-25 10:19:08,672 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:19:08,685 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:19:08,721 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:19:08,722 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-25 10:19:08,722 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-25 10:19:08,742 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:19:08,750 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:19:08,778 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:19:08,798 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:19:08,805 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:19:08,832 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:19:08,832 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-25 10:19:08,832 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-25 10:19:08,850 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-06-25 10:19:08,861 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-06-25 10:19:08,881 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-25 10:19:08,889 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-25 10:19:08,913 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-25 10:19:08,913 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-25 10:19:08,913 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-25 10:19:08,922 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-06-25 10:19:08,932 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-06-25 10:19:08,941 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-06-25 10:19:08,951 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-06-25 10:19:08,960 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-06-25 10:19:08,971 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-06-25 10:19:08,980 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-06-25 10:19:08,991 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-06-25 10:19:08,999 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-06-25 10:19:09,010 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-06-25 10:19:09,018 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-06-25 10:19:09,029 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-06-25 10:19:09,037 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-06-25 10:19:09,048 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-06-25 10:19:09,048 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-06-25 10:19:09,057 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-06-25 10:19:09,067 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=5b54205496d059aa git=97aaa84]
+2026-06-25 10:19:09,068 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-06-25 10:19:09,076 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-06-25 10:19:09,088 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-06-25 10:19:09,088 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.45, imbalance>=0.45]
+2026-06-25 10:19:09,096 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=db8c841e65c2c062 git=97aaa84
+2026-06-25 10:19:09,107 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=db8c841e65c2c062 git=97aaa84]
+2026-06-25 10:19:09,261 - INFO - 🔄 Recovered 14 active counterfactual positions: ['cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24003.25_20260625_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24003.25_20260625_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58093.95_20260625_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58093.95_20260625_Structural_v3.2_RVOL0.8']
+2026-06-25 10:19:09,261 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-25 10:19:09,261 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-25 10:19:09,262 - INFO - --- 10:19:09 Market Pulse ---
+2026-06-25 10:19:10,009 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58410.90 | SL→58376.01 TP→57839.39
+2026-06-25 10:19:10,045 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 24063.98 | PnL +0.77R | MFE 1.82R | Capture 42% | 2bars HoldEff +0.384R/bar
+2026-06-25 10:19:10,076 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58410.90 | SL→58388.24 TP→57953.41
+2026-06-25 10:19:10,103 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58410.90 | SL→58445.15 TP→58068.64
+2026-06-25 10:19:10,126 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58410.90 | SL→58445.15 TP→58068.64
+2026-06-25 10:19:11,574 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:19:11,596 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24173.75 | SL: 24184.99 TP: 24061.39
+2026-06-25 10:19:11,596 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:19:11,618 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24173.75 | SL: 24184.99 TP: 24061.39
+2026-06-25 10:19:12,918 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:19:12,944 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58410.90 | SL: 58445.15 TP: 58068.44
+2026-06-25 10:19:12,944 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:19:12,970 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58410.90 | SL: 58445.15 TP: 58068.44
+2026-06-25 10:24:10,020 - INFO - --- 10:24:10 Market Pulse ---
+2026-06-25 10:24:11,250 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58397.40 | SL→58376.01 TP→57874.28
+2026-06-25 10:24:11,285 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58397.40 | SL→58388.24 TP→57976.06
+2026-06-25 10:24:11,310 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24170.55 | SL→24181.79 TP→24061.39
+2026-06-25 10:24:11,338 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24170.55 | SL→24181.79 TP→24061.39
+2026-06-25 10:24:11,364 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58397.40 | SL→58431.65 TP→58068.44
+2026-06-25 10:24:11,389 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58397.40 | SL→58431.65 TP→58068.44
+2026-06-25 10:24:14,208 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 10:24:14,230 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 58397.40 | SL: 58363.69 TP: 58464.83
+2026-06-25 10:24:14,231 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 10:24:14,252 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY CALL @ 58397.40 | SL: 58363.69 TP: 58464.83
+2026-06-25 10:29:15,238 - INFO - --- 10:29:15 Market Pulse ---
+2026-06-25 10:29:16,074 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58404.95 | SL→58376.01 TP→57909.17
+2026-06-25 10:29:16,119 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58404.95 | SL→58388.24 TP→57998.72
+2026-06-25 10:29:16,158 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58404.95 | SL→58371.24 TP→58464.83
+2026-06-25 10:29:16,190 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58404.95 | SL→58371.24 TP→58464.83
+2026-06-25 10:29:17,695 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 10:29:17,723 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24170.65 | SL: 24160.67 TP: 24190.61
+2026-06-25 10:29:17,723 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 10:29:17,748 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24170.65 | SL: 24160.67 TP: 24190.61
+2026-06-25 10:29:17,748 - INFO - 👻 [ORB_15m_RVOL1.2] CF ORB_15M NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-06-25 10:29:17,773 - INFO - 🟢 ENTRY [CF|ORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX BUY CALL @ 24170.65 | SL: 24160.67 TP: 24230.53
+2026-06-25 10:29:17,773 - INFO - 👻 [ORB_30m_RVOL1.2] CF ORB_30M NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-06-25 10:29:17,801 - INFO - 🟢 ENTRY [CF|ORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX BUY CALL @ 24170.65 | SL: 24160.67 TP: 24230.53
+2026-06-25 10:34:19,326 - INFO - --- 10:34:19 Market Pulse ---
+2026-06-25 10:34:20,116 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58432.05 | SL→58397.16 TP→57944.06
+2026-06-25 10:34:20,153 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58432.05 | SL→58409.39 TP→58021.37
+2026-06-25 10:34:20,190 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24168.50 | SL→24179.74 TP→24061.39
+2026-06-25 10:34:20,221 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24168.50 | SL→24179.74 TP→24061.39
+2026-06-25 10:34:20,255 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58431.65 | PnL -0.66R | MFE 0.39R | Capture -166% | 3bars HoldEff -0.219R/bar
+2026-06-25 10:34:20,284 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58431.65 | PnL -0.66R | MFE 0.39R | Capture -166% | 3bars HoldEff -0.219R/bar
+2026-06-25 10:34:20,314 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58432.05 | SL→58398.34 TP→58464.83
+2026-06-25 10:34:20,338 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58432.05 | SL→58398.34 TP→58464.83
+2026-06-25 10:34:23,346 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:34:23,370 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58432.05 | SL: 58461.81 TP: 58134.43
+2026-06-25 10:34:23,370 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:34:23,393 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58432.05 | SL: 58461.81 TP: 58134.43
+2026-06-25 10:39:23,613 - INFO - --- 10:39:23 Market Pulse ---
+2026-06-25 10:39:24,622 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58437.45 | SL→58402.56 TP→57978.95
+2026-06-25 10:39:24,659 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58437.45 | SL→58414.79 TP→58044.03
+2026-06-25 10:39:24,686 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58437.45 | SL→58403.74 TP→58464.83
+2026-06-25 10:39:24,708 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58437.45 | SL→58403.74 TP→58464.83
+2026-06-25 10:44:28,095 - INFO - --- 10:44:28 Market Pulse ---
+2026-06-25 10:44:28,985 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58440.10 | SL→58405.21 TP→58013.84
+2026-06-25 10:44:29,025 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58440.10 | SL→58417.44 TP→58066.68
+2026-06-25 10:44:29,060 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58440.10 | SL→58406.39 TP→58464.83
+2026-06-25 10:44:29,092 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58440.10 | SL→58406.39 TP→58464.83
+2026-06-25 10:44:29,121 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24179.65 | SL→24169.67 TP→24190.61
+2026-06-25 10:44:29,146 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24179.65 | SL→24169.67 TP→24190.61
+2026-06-25 10:44:29,169 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24179.65 | SL→24169.67 TP→24230.53
+2026-06-25 10:44:29,191 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24179.65 | SL→24169.67 TP→24230.53
+2026-06-25 10:49:32,318 - INFO - --- 10:49:32 Market Pulse ---
+2026-06-25 10:49:33,599 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58465.55 | SL→58430.66 TP→58048.73
+2026-06-25 10:49:33,634 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58465.55 | SL→58442.89 TP→58089.34
+2026-06-25 10:49:33,666 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24179.74 | PnL -0.58R | MFE 0.47R | Capture -125% | 6bars HoldEff -0.097R/bar
+2026-06-25 10:49:33,698 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24179.74 | PnL -0.58R | MFE 0.47R | Capture -125% | 6bars HoldEff -0.097R/bar
+2026-06-25 10:49:33,729 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58465.55 | SL→58431.84 TP→58498.54
+2026-06-25 10:49:33,756 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58465.55 | SL→58431.84 TP→58498.54
+2026-06-25 10:49:33,784 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24194.60 | SL→24184.62 TP→24200.59
+2026-06-25 10:49:33,812 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24194.60 | SL→24184.62 TP→24200.59
+2026-06-25 10:49:33,836 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24194.60 | SL→24184.62 TP→24230.53
+2026-06-25 10:49:33,860 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24194.60 | SL→24184.62 TP→24230.53
+2026-06-25 10:49:33,884 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58461.81 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-06-25 10:49:33,910 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58461.81 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-06-25 10:49:36,905 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:49:36,929 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58465.55 | SL: 58492.42 TP: 58196.85
+2026-06-25 10:49:36,930 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 10:49:36,952 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58465.55 | SL: 58492.42 TP: 58196.85
+2026-06-25 10:54:37,025 - INFO - --- 10:54:37 Market Pulse ---
+2026-06-25 10:54:37,904 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 58430.66 | PnL +27.08R | MFE 28.13R | Capture 96% | 9bars HoldEff +3.009R/bar
+2026-06-25 10:54:37,952 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 58442.89 | PnL +22.56R | MFE 23.61R | Capture 96% | 8bars HoldEff +2.820R/bar
+2026-06-25 10:54:37,988 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58431.84 | PnL +0.97R | MFE 2.02R | Capture 48% | 6bars HoldEff +0.162R/bar
+2026-06-25 10:54:38,023 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58431.84 | PnL +0.97R | MFE 2.02R | Capture 48% | 6bars HoldEff +0.162R/bar
+2026-06-25 10:54:38,053 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24184.62 | PnL +1.35R | MFE 2.40R | Capture 56% | 5bars HoldEff +0.270R/bar
+2026-06-25 10:54:38,078 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24184.62 | PnL +1.35R | MFE 2.40R | Capture 56% | 5bars HoldEff +0.270R/bar
+2026-06-25 10:54:38,102 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24184.62 | PnL +1.35R | MFE 2.40R | Capture 56% | 5bars HoldEff +0.270R/bar
+2026-06-25 10:54:38,123 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24184.62 | PnL +1.35R | MFE 2.40R | Capture 56% | 5bars HoldEff +0.270R/bar
+2026-06-25 10:54:38,145 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58414.40 | SL→58441.27 TP→58196.85
+2026-06-25 10:54:38,165 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58414.40 | SL→58441.27 TP→58196.85
+2026-06-25 10:54:39,794 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 10:54:39,818 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24183.00 | SL: 24173.92 TP: 24201.15
+2026-06-25 10:54:39,818 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 10:54:39,839 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24183.00 | SL: 24173.92 TP: 24201.15
+2026-06-25 10:59:41,689 - INFO - --- 10:59:41 Market Pulse ---
+2026-06-25 10:59:42,527 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58403.90 | SL→58430.77 TP→58196.85
+2026-06-25 10:59:42,561 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58403.90 | SL→58430.77 TP→58196.85
+2026-06-25 10:59:42,588 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24194.60 | SL→24185.52 TP→24201.15
+2026-06-25 10:59:42,613 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24194.60 | SL→24185.52 TP→24201.15
+2026-06-25 10:59:44,219 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [OrderFlow_v1.0]
+2026-06-25 10:59:44,219 - INFO -    Entry: 24194.6 | SL: 24185.154 | TP: 24247.519999999997 (RR: 5.6)
+2026-06-25 10:59:44,277 - INFO - 🟢 ENTRY [OrderFlow_v1.0|INDEX_1782365381]: NSE:NIFTY50-INDEX BUY CALL @ 24194.60 | SL: 24185.15 TP: 24247.52
+2026-06-25 10:59:45,653 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 10:59:45,677 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 58403.90 | SL: 58266.37 TP: 58672.25
+2026-06-25 11:04:46,035 - INFO - --- 11:04:46 Market Pulse ---
+2026-06-25 11:04:47,056 - INFO - 🔴 EXIT (INITIAL_SL) [OrderFlow_v1.0|51059_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24185.15 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 11:04:47,087 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24185.52 | PnL +0.23R | MFE 1.28R | Capture 18% | 2bars HoldEff +0.114R/bar
+2026-06-25 11:04:47,113 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24185.52 | PnL +0.23R | MFE 1.28R | Capture 18% | 2bars HoldEff +0.114R/bar
+2026-06-25 11:04:47,137 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58421.15 | SL→58283.62 TP→58672.25
+2026-06-25 11:04:48,765 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 11:04:48,790 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24181.85 | SL: 24173.01 TP: 24199.53
+2026-06-25 11:04:48,790 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 11:04:48,817 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24181.85 | SL: 24173.01 TP: 24199.53
+2026-06-25 11:04:48,818 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [OrderFlow_v1.0]
+2026-06-25 11:04:48,818 - INFO -    Entry: 24181.85 | SL: 24190.451999999997 | TP: 24164.58 (RR: 2.01)
+2026-06-25 11:04:48,842 - INFO - 🟢 ENTRY [OrderFlow_v1.0|INDEX_1782365686]: NSE:NIFTY50-INDEX BUY PUT @ 24181.85 | SL: 24190.45 TP: 24164.58
+2026-06-25 11:09:50,390 - INFO - --- 11:09:50 Market Pulse ---
+2026-06-25 11:09:51,461 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58430.77 | PnL +1.24R | MFE 2.29R | Capture 54% | 4bars HoldEff +0.311R/bar
+2026-06-25 11:09:51,486 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58430.77 | PnL +1.24R | MFE 2.29R | Capture 54% | 4bars HoldEff +0.311R/bar
+2026-06-25 11:09:51,511 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58458.50 | SL→58320.97 TP→58672.25
+2026-06-25 11:09:51,532 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24187.90 | SL→24179.06 TP→24199.53
+2026-06-25 11:09:51,552 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24187.90 | SL→24179.06 TP→24199.53
+2026-06-25 11:09:54,564 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 11:09:54,588 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58458.50 | SL: 58486.07 TP: 58182.80
+2026-06-25 11:09:54,588 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 11:09:54,609 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58458.50 | SL: 58486.07 TP: 58182.80
+2026-06-25 11:14:55,576 - INFO - --- 11:14:55 Market Pulse ---
+2026-06-25 11:14:56,591 - INFO - 🔴 EXIT (INITIAL_SL) [OrderFlow_v1.0|51104_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24190.45 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-06-25 11:14:56,622 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24195.70 | SL→24186.86 TP→24199.53
+2026-06-25 11:14:56,648 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24195.70 | SL→24186.86 TP→24199.53
+2026-06-25 11:14:56,668 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58449.15 | SL→58476.72 TP→58182.80
+2026-06-25 11:14:56,687 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58449.15 | SL→58476.72 TP→58182.80
+2026-06-25 11:14:58,334 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.46']
+2026-06-25 11:14:58,355 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24195.70 | SL: 24185.15 TP: 24200.55
+2026-06-25 11:20:00,665 - INFO - --- 11:20:00 Market Pulse ---
+2026-06-25 11:20:01,655 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24195.85 | SL→24187.01 TP→24199.53
+2026-06-25 11:20:01,691 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24195.85 | SL→24187.01 TP→24199.53
+2026-06-25 11:20:01,717 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58421.25 | SL→58448.82 TP→58182.80
+2026-06-25 11:20:01,740 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58421.25 | SL→58448.82 TP→58182.80
+2026-06-25 11:20:01,760 - INFO - 🟡 UPDATE (TRAILING_SL) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24195.85 | SL→24185.30 TP→24200.55
+2026-06-25 11:20:03,458 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:03,473 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:03,477 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:03,477 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:03,477 - INFO - 👻 [VWAP_Reversion_1.5ATR_RVOL1.0] CF REVERSION NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH']
+2026-06-25 11:20:03,499 - INFO - 🟢 ENTRY [CF|VWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24195.85 | SL: 24203.57 TP: 24164.44
+2026-06-25 11:20:04,942 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:04,956 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:04,960 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:20:04,960 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 11:25:05,827 - INFO - --- 11:25:05 Market Pulse ---
+2026-06-25 11:25:06,858 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58419.15 | SL→58446.72 TP→58182.80
+2026-06-25 11:25:06,888 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58419.15 | SL→58446.72 TP→58182.80
+2026-06-25 11:25:06,911 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24190.85 | SL→24198.57 TP→24164.44
+2026-06-25 11:25:08,598 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.04']
+2026-06-25 11:25:08,613 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.04']
+2026-06-25 11:25:08,616 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.04']
+2026-06-25 11:25:08,617 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.04']
+2026-06-25 11:25:10,028 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.13']
+2026-06-25 11:25:10,042 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.13']
+2026-06-25 11:25:10,045 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.13']
+2026-06-25 11:25:10,045 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.13']
+2026-06-25 11:30:11,047 - INFO - --- 11:30:11 Market Pulse ---
+2026-06-25 11:30:13,833 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:13,847 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:13,851 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:13,851 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:15,300 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:15,315 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:15,318 - ERROR - [AtrSqueezeStrategy] Error evaluating NSE:NIFTYBANK-INDEX: unsupported operand type(s) for -: 'NoneType' and 'float'
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/strategies/atr_squeeze.py", line 129, in evaluate
+    if abs(take_profit - price) > max_tp_dist:
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'float'
+2026-06-25 11:30:15,320 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"] (4.2ms)
+2026-06-25 11:30:15,320 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:15,320 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:30:15,320 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"]
+2026-06-25 11:30:15,321 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:1.43']
+2026-06-25 11:30:15,343 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 58441.15 | SL: 58434.95 TP: 58450.00
+2026-06-25 11:35:16,309 - INFO - --- 11:35:16 Market Pulse ---
+2026-06-25 11:35:17,065 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58446.72 | PnL +0.38R | MFE 1.43R | Capture 26% | 5bars HoldEff +0.075R/bar
+2026-06-25 11:35:17,091 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58446.72 | PnL +0.38R | MFE 1.43R | Capture 26% | 5bars HoldEff +0.075R/bar
+2026-06-25 11:35:17,116 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24188.35 | SL→24196.07 TP→24164.44
+2026-06-25 11:35:17,141 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58448.05 | SL→58441.85 TP→58450.00
+2026-06-25 11:35:18,895 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.06']
+2026-06-25 11:35:18,910 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.06']
+2026-06-25 11:35:18,914 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.06']
+2026-06-25 11:35:18,914 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.06']
+2026-06-25 11:35:18,914 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [Geometry_v1.0_Score35]
+2026-06-25 11:35:18,914 - INFO -    Entry: 24188.35 | SL: 24191.42 | TP: 24175.75 (RR: 4.11)
+2026-06-25 11:35:18,936 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1782367516]: NSE:NIFTY50-INDEX BUY PUT @ 24188.35 | SL: 24191.42 TP: 24175.75
+2026-06-25 11:35:20,421 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.05']
+2026-06-25 11:35:20,436 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.05']
+2026-06-25 11:35:20,439 - ERROR - [AtrSqueezeStrategy] Error evaluating NSE:NIFTYBANK-INDEX: unsupported operand type(s) for -: 'NoneType' and 'float'
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/strategies/atr_squeeze.py", line 129, in evaluate
+    if abs(take_profit - price) > max_tp_dist:
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'float'
+2026-06-25 11:35:20,440 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"] (2.6ms)
+2026-06-25 11:35:20,440 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.05']
+2026-06-25 11:35:20,440 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 11:35:20,462 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58448.05 | SL: 58467.97 TP: 58248.85
+2026-06-25 11:35:20,462 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.05']
+2026-06-25 11:35:20,462 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 11:35:20,483 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58448.05 | SL: 58467.97 TP: 58248.85
+2026-06-25 11:35:20,483 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"]
+2026-06-25 11:40:21,401 - INFO - --- 11:40:21 Market Pulse ---
+2026-06-25 11:40:22,268 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24191.42 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 11:40:22,306 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24196.50 | SL→24187.66 TP→24199.53
+2026-06-25 11:40:22,336 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24196.50 | SL→24187.66 TP→24199.53
+2026-06-25 11:40:22,365 - INFO - 🟡 UPDATE (TRAILING_SL) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24196.50 | SL→24185.95 TP→24200.55
+2026-06-25 11:40:22,393 - INFO - 🔴 EXIT (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24196.07 | PnL -0.08R | MFE 0.97R | Capture -8% | 4bars HoldEff -0.020R/bar
+2026-06-25 11:40:22,418 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58453.85 | SL→58447.65 TP→58456.20
+2026-06-25 11:40:24,248 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:40:24,262 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:40:24,266 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:40:24,266 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:40:25,734 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:40:25,748 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:40:25,751 - ERROR - [AtrSqueezeStrategy] Error evaluating NSE:NIFTYBANK-INDEX: unsupported operand type(s) for -: 'NoneType' and 'float'
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/strategies/atr_squeeze.py", line 129, in evaluate
+    if abs(take_profit - price) > max_tp_dist:
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'float'
+2026-06-25 11:40:25,751 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"] (2.4ms)
+2026-06-25 11:40:25,752 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:40:25,752 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:40:25,752 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"]
+2026-06-25 11:45:26,735 - INFO - --- 11:45:26 Market Pulse ---
+2026-06-25 11:45:27,813 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58464.05 | SL→58326.52 TP→58672.25
+2026-06-25 11:45:27,838 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58464.05 | SL→58457.85 TP→58462.40
+2026-06-25 11:45:29,624 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.08']
+2026-06-25 11:45:29,639 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.08']
+2026-06-25 11:45:29,643 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.08']
+2026-06-25 11:45:29,643 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.08']
+2026-06-25 11:45:31,177 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.18']
+2026-06-25 11:45:31,191 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.18']
+2026-06-25 11:45:31,195 - ERROR - [AtrSqueezeStrategy] Error evaluating NSE:NIFTYBANK-INDEX: unsupported operand type(s) for -: 'NoneType' and 'float'
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/strategies/atr_squeeze.py", line 129, in evaluate
+    if abs(take_profit - price) > max_tp_dist:
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'float'
+2026-06-25 11:45:31,195 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"] (2.4ms)
+2026-06-25 11:45:31,195 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.18']
+2026-06-25 11:45:31,195 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.18']
+2026-06-25 11:45:31,195 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"]
+2026-06-25 11:50:32,080 - INFO - --- 11:50:32 Market Pulse ---
+2026-06-25 11:50:33,144 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58497.45 | SL→58359.92 TP→58672.25
+2026-06-25 11:50:33,174 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24205.45 | SL→24196.61 TP→24208.37
+2026-06-25 11:50:33,200 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24205.45 | SL→24196.61 TP→24208.37
+2026-06-25 11:50:33,223 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24205.45 | SL→24194.90 TP→24211.10
+2026-06-25 11:50:33,245 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58497.45 | SL→58491.25 TP→58468.60
+2026-06-25 11:50:33,267 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58467.97 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-06-25 11:50:33,286 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58467.97 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-06-25 11:50:35,203 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:50:35,218 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:50:35,222 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:50:35,222 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.14']
+2026-06-25 11:50:36,724 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:50:36,738 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:50:36,741 - ERROR - [AtrSqueezeStrategy] Error evaluating NSE:NIFTYBANK-INDEX: unsupported operand type(s) for -: 'NoneType' and 'float'
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/strategies/atr_squeeze.py", line 129, in evaluate
+    if abs(take_profit - price) > max_tp_dist:
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'float'
+2026-06-25 11:50:36,741 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"] (2.5ms)
+2026-06-25 11:50:36,741 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:50:36,741 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 11:50:36,763 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58497.45 | SL: 58516.61 TP: 58305.86
+2026-06-25 11:50:36,763 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.07']
+2026-06-25 11:50:36,763 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 11:50:36,785 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58497.45 | SL: 58516.61 TP: 58305.86
+2026-06-25 11:50:36,785 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"]
+2026-06-25 11:55:37,690 - INFO - --- 11:55:37 Market Pulse ---
+2026-06-25 11:55:38,646 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58498.85 | SL→58361.32 TP→58672.25
+2026-06-25 11:55:38,684 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24209.45 | SL→24200.61 TP→24217.21
+2026-06-25 11:55:38,714 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24209.45 | SL→24200.61 TP→24217.21
+2026-06-25 11:55:38,739 - INFO - 🟡 UPDATE (TRAILING_SL) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24209.45 | SL→24198.90 TP→24211.10
+2026-06-25 11:55:38,761 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58498.85 | SL→58492.65 TP→58474.80
+2026-06-25 11:55:40,689 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.28']
+2026-06-25 11:55:40,703 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.28']
+2026-06-25 11:55:40,707 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.28']
+2026-06-25 11:55:40,707 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.28']
+2026-06-25 11:55:42,286 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.11']
+2026-06-25 11:55:42,301 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.11']
+2026-06-25 11:55:42,304 - ERROR - [AtrSqueezeStrategy] Error evaluating NSE:NIFTYBANK-INDEX: unsupported operand type(s) for -: 'NoneType' and 'float'
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/strategies/atr_squeeze.py", line 129, in evaluate
+    if abs(take_profit - price) > max_tp_dist:
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'float'
+2026-06-25 11:55:42,304 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"] (2.6ms)
+2026-06-25 11:55:42,304 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.11']
+2026-06-25 11:55:42,304 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.11']
+2026-06-25 11:55:42,304 - WARNING - ⚡ [ATR_Squeeze_RVOL1.0] errors: ["ENGINE_ERROR:TypeError:unsupported operand type(s) for -: 'NoneType' and 'float'"]
+2026-06-25 12:00:43,258 - INFO - --- 12:00:43 Market Pulse ---
+2026-06-25 12:00:44,622 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58628.10 | SL→58490.57 TP→58672.25
+2026-06-25 12:00:44,660 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24245.05 | SL→24236.21 TP→24226.05
+2026-06-25 12:00:44,695 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24245.05 | SL→24236.21 TP→24226.05
+2026-06-25 12:00:44,727 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24245.05 | SL→24234.50 TP→24221.65
+2026-06-25 12:00:44,756 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58628.10 | SL→58621.90 TP→58481.00
+2026-06-25 12:00:44,785 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58516.61 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-06-25 12:00:44,812 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58516.61 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-06-25 12:00:46,798 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.27']
+2026-06-25 12:00:46,812 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.27']
+2026-06-25 12:00:46,816 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.27']
+2026-06-25 12:00:46,816 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.27']
+2026-06-25 12:00:48,351 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.41']
+2026-06-25 12:00:48,366 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.41']
+2026-06-25 12:00:48,370 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.41']
+2026-06-25 12:00:48,370 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:00:48,392 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58628.10 | SL: 58648.92 TP: 58419.92
+2026-06-25 12:00:48,392 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.41']
+2026-06-25 12:00:48,392 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:00:48,413 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58628.10 | SL: 58648.92 TP: 58419.92
+2026-06-25 12:05:49,259 - INFO - --- 12:05:49 Market Pulse ---
+2026-06-25 12:05:50,129 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24246.70 | SL→24237.86 TP→24234.89
+2026-06-25 12:05:50,167 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24246.70 | SL→24237.86 TP→24234.89
+2026-06-25 12:05:50,200 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24246.70 | SL→24236.15 TP→24232.20
+2026-06-25 12:05:50,230 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58621.90 | PnL +29.10R | MFE 30.15R | Capture 97% | 7bars HoldEff +4.158R/bar
+2026-06-25 12:05:50,259 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58621.25 | SL→58642.07 TP→58419.92
+2026-06-25 12:05:50,285 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58621.25 | SL→58642.07 TP→58419.92
+2026-06-25 12:05:52,238 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.26']
+2026-06-25 12:05:52,253 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.26']
+2026-06-25 12:05:52,257 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.26']
+2026-06-25 12:05:52,257 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.26']
+2026-06-25 12:05:53,836 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.21']
+2026-06-25 12:05:53,851 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.21']
+2026-06-25 12:05:53,854 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.21']
+2026-06-25 12:05:53,854 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.21']
+2026-06-25 12:10:54,824 - INFO - --- 12:10:54 Market Pulse ---
+2026-06-25 12:10:55,626 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58663.30 | SL→58525.77 TP→58672.25
+2026-06-25 12:10:55,660 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24251.50 | SL→24242.66 TP→24243.72
+2026-06-25 12:10:55,691 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24251.50 | SL→24242.66 TP→24243.72
+2026-06-25 12:10:55,719 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24251.50 | SL→24240.95 TP→24242.75
+2026-06-25 12:10:55,747 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58642.07 | PnL -0.72R | MFE 0.33R | Capture -219% | 2bars HoldEff -0.360R/bar
+2026-06-25 12:10:55,775 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58642.07 | PnL -0.72R | MFE 0.33R | Capture -219% | 2bars HoldEff -0.360R/bar
+2026-06-25 12:10:57,659 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:10:57,673 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:10:57,677 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:10:57,677 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:10:57,677 - INFO - 👻 [VWAP_Reversion_1.5ATR_RVOL1.0] CF REVERSION NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:10:57,699 - INFO - 🟢 ENTRY [CF|VWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24251.50 | SL: 24258.40 TP: 24182.45
+2026-06-25 12:10:59,233 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.39']
+2026-06-25 12:10:59,248 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.39']
+2026-06-25 12:10:59,251 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.39']
+2026-06-25 12:10:59,251 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:10:59,273 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58663.30 | SL: 58684.27 TP: 58453.57
+2026-06-25 12:10:59,273 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.39']
+2026-06-25 12:10:59,273 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:10:59,295 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58663.30 | SL: 58684.27 TP: 58453.57
+2026-06-25 12:16:00,265 - INFO - --- 12:16:00 Market Pulse ---
+2026-06-25 12:16:01,195 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58686.25 | SL→58548.72 TP→58809.78
+2026-06-25 12:16:01,231 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24250.95 | SL→24242.66 TP→24252.56
+2026-06-25 12:16:01,263 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24250.95 | SL→24242.66 TP→24252.56
+2026-06-25 12:16:01,293 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24250.95 | SL→24240.95 TP→24253.30
+2026-06-25 12:16:01,317 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24250.95 | SL→24257.85 TP→24182.45
+2026-06-25 12:16:01,339 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58684.27 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 12:16:01,357 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58684.27 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 12:16:03,269 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.23']
+2026-06-25 12:16:03,284 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.23']
+2026-06-25 12:16:03,288 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.23']
+2026-06-25 12:16:03,288 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.23']
+2026-06-25 12:16:04,862 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.20']
+2026-06-25 12:16:04,876 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.20']
+2026-06-25 12:16:04,880 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.20']
+2026-06-25 12:16:04,880 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:16:04,902 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58686.25 | SL: 58707.32 TP: 58475.54
+2026-06-25 12:16:04,902 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.20']
+2026-06-25 12:16:04,902 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 12:16:04,924 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58686.25 | SL: 58707.32 TP: 58475.54
+2026-06-25 12:21:05,854 - INFO - --- 12:21:05 Market Pulse ---
+2026-06-25 12:21:07,793 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58687.55 | SL→58550.02 TP→58809.78
+2026-06-25 12:21:07,828 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24244.75 | SL→24251.65 TP→24182.45
+2026-06-25 12:21:09,786 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-06-25 12:21:09,801 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-06-25 12:21:09,805 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-06-25 12:21:09,805 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-06-25 12:21:11,395 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.31']
+2026-06-25 12:21:11,410 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.31']
+2026-06-25 12:21:11,414 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.31']
+2026-06-25 12:21:11,414 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.31']
+2026-06-25 12:26:12,272 - INFO - --- 12:26:12 Market Pulse ---
+2026-06-25 12:26:13,317 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24242.66 | PnL +6.83R | MFE 7.88R | Capture 87% | 16bars HoldEff +0.427R/bar
+2026-06-25 12:26:13,344 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24242.66 | PnL +6.83R | MFE 7.88R | Capture 87% | 16bars HoldEff +0.427R/bar
+2026-06-25 12:26:13,367 - INFO - 🔴 EXIT (TRAILING_SL) [CFOrderFlow_v1.0|51114_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24240.95 | PnL +4.24R | MFE 5.29R | Capture 80% | 14bars HoldEff +0.303R/bar
+2026-06-25 12:26:13,387 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24221.30 | SL→24228.20 TP→24182.45
+2026-06-25 12:26:13,406 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58616.70 | SL→58637.77 TP→58475.54
+2026-06-25 12:26:13,425 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58616.70 | SL→58637.77 TP→58475.54
+2026-06-25 12:26:15,481 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.48']
+2026-06-25 12:26:15,495 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.48']
+2026-06-25 12:26:15,498 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.48']
+2026-06-25 12:26:15,499 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-06-25 12:26:15,520 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24221.30 | SL: 24213.71 TP: 24236.49
+2026-06-25 12:26:15,520 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.48']
+2026-06-25 12:26:15,520 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-06-25 12:26:15,539 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24221.30 | SL: 24213.71 TP: 24236.49
+2026-06-25 12:26:17,146 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.44']
+2026-06-25 12:26:17,161 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.44']
+2026-06-25 12:26:17,165 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.44']
+2026-06-25 12:26:17,165 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.44']
+2026-06-25 12:31:18,092 - INFO - --- 12:31:18 Market Pulse ---
+2026-06-25 12:31:18,922 - INFO - 🔴 EXIT (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58550.02 | PnL +1.01R | MFE 2.06R | Capture 49% | 18bars HoldEff +0.056R/bar
+2026-06-25 12:31:18,960 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24203.85 | SL→24210.75 TP→24182.45
+2026-06-25 12:31:18,995 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58532.65 | SL→58553.72 TP→58475.54
+2026-06-25 12:31:19,026 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58532.65 | SL→58553.72 TP→58475.54
+2026-06-25 12:31:19,055 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24213.71 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 12:31:19,084 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24213.71 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 12:31:21,194 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 12:31:21,216 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24203.85 | SL: 24195.69 TP: 24220.18
+2026-06-25 12:31:21,216 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 12:31:21,236 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24203.85 | SL: 24195.69 TP: 24220.18
+2026-06-25 12:31:21,236 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 12:31:21,256 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24203.85 | SL: 24159.39 TP: 24285.50
+2026-06-25 12:31:22,967 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 12:31:22,989 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 58532.65 | SL: 58506.46 TP: 58585.03
+2026-06-25 12:31:22,989 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 12:31:23,008 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY CALL @ 58532.65 | SL: 58506.46 TP: 58585.03
+2026-06-25 12:31:23,008 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-06-25 12:31:23,027 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 58532.65 | SL: 58404.07 TP: 58789.80
+2026-06-25 12:36:23,896 - INFO - --- 12:36:23 Market Pulse ---
+2026-06-25 12:36:24,768 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24197.85 | SL→24204.75 TP→24182.45
+2026-06-25 12:36:24,795 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58527.20 | SL→58548.27 TP→58475.54
+2026-06-25 12:36:24,826 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58527.20 | SL→58548.27 TP→58475.54
+2026-06-25 12:36:26,889 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.46']
+2026-06-25 12:36:26,904 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.46']
+2026-06-25 12:36:26,908 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.46']
+2026-06-25 12:36:26,908 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.46']
+2026-06-25 12:36:28,542 - INFO - 👻 [ORB_30m_RVOL1.2] CF ORB_30M NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-06-25 12:36:28,564 - INFO - 🟢 ENTRY [CF|ORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX BUY CALL @ 58527.20 | SL: 58499.00 TP: 58696.37
+2026-06-25 12:41:29,459 - INFO - --- 12:41:29 Market Pulse ---
+2026-06-25 12:41:31,242 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58548.27 | PnL +6.50R | MFE 7.55R | Capture 86% | 5bars HoldEff +1.300R/bar
+2026-06-25 12:41:31,281 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58548.27 | PnL +6.50R | MFE 7.55R | Capture 86% | 5bars HoldEff +1.300R/bar
+2026-06-25 12:41:31,313 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58553.60 | SL→58527.41 TP→58585.03
+2026-06-25 12:41:31,342 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58553.60 | SL→58527.41 TP→58585.03
+2026-06-25 12:41:31,369 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58553.60 | SL→58425.02 TP→58789.80
+2026-06-25 12:41:31,396 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58553.60 | SL→58525.40 TP→58696.37
+2026-06-25 12:46:36,059 - INFO - --- 12:46:36 Market Pulse ---
+2026-06-25 12:46:36,914 - INFO - 🟡 UPDATE (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24189.20 | SL→24196.10 TP→24182.45
+2026-06-25 12:46:36,952 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24195.69 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-06-25 12:46:36,984 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24195.69 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-06-25 12:46:37,015 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58527.41 | PnL -0.25R | MFE 0.80R | Capture -31% | 3bars HoldEff -0.083R/bar
+2026-06-25 12:46:37,043 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58527.41 | PnL -0.25R | MFE 0.80R | Capture -31% | 3bars HoldEff -0.083R/bar
+2026-06-25 12:46:37,071 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58525.40 | PnL -0.11R | MFE 0.94R | Capture -12% | 2bars HoldEff -0.057R/bar
+2026-06-25 12:46:39,195 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 12:46:39,216 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24189.20 | SL: 24198.93 TP: 24091.91
+2026-06-25 12:46:39,216 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 12:46:39,235 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24189.20 | SL: 24198.93 TP: 24091.91
+2026-06-25 12:46:40,899 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 12:46:40,920 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 58519.15 | SL: 58488.58 TP: 58580.29
+2026-06-25 12:46:40,920 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-06-25 12:46:40,941 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY CALL @ 58519.15 | SL: 58488.58 TP: 58580.29
+2026-06-25 12:51:41,833 - INFO - --- 12:51:41 Market Pulse ---
+2026-06-25 12:51:42,889 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58538.60 | SL→58508.03 TP→58580.29
+2026-06-25 12:51:42,914 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58538.60 | SL→58508.03 TP→58580.29
+2026-06-25 12:56:47,631 - INFO - --- 12:56:47 Market Pulse ---
+2026-06-25 12:56:48,707 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58545.15 | SL→58514.58 TP→58580.29
+2026-06-25 12:56:48,733 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58545.15 | SL→58514.58 TP→58580.29
+2026-06-25 12:56:52,550 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:56:52,564 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:56:52,567 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 12:56:52,567 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 13:01:53,546 - INFO - --- 13:01:53 Market Pulse ---
+2026-06-25 13:01:54,411 - INFO - 🔴 EXIT (TRAILING_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24196.10 | PnL +7.97R | MFE 9.02R | Capture 88% | 10bars HoldEff +0.797R/bar
+2026-06-25 13:01:54,448 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58558.20 | SL→58429.62 TP→58789.80
+2026-06-25 13:01:54,479 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58558.20 | SL→58527.63 TP→58580.29
+2026-06-25 13:01:54,509 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58558.20 | SL→58527.63 TP→58580.29
+2026-06-25 13:01:58,355 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.33']
+2026-06-25 13:01:58,370 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.33']
+2026-06-25 13:01:58,374 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.33']
+2026-06-25 13:01:58,374 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.33']
+2026-06-25 13:06:59,329 - INFO - --- 13:06:59 Market Pulse ---
+2026-06-25 13:07:00,700 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58576.50 | SL→58447.92 TP→58789.80
+2026-06-25 13:07:00,736 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24198.93 | PnL -1.05R | MFE 0.00R | Capture N/A | 4bars HoldEff -0.263R/bar
+2026-06-25 13:07:00,767 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24198.93 | PnL -1.05R | MFE 0.00R | Capture N/A | 4bars HoldEff -0.263R/bar
+2026-06-25 13:07:00,797 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58576.50 | SL→58545.93 TP→58580.29
+2026-06-25 13:07:00,825 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58576.50 | SL→58545.93 TP→58580.29
+2026-06-25 13:07:03,036 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:07:03,058 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24201.50 | SL: 24211.02 TP: 24106.29
+2026-06-25 13:07:03,058 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:07:03,078 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24201.50 | SL: 24211.02 TP: 24106.29
+2026-06-25 13:07:04,827 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 13:07:04,842 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 13:07:04,846 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 13:07:04,846 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.35']
+2026-06-25 13:12:05,807 - INFO - --- 13:12:05 Market Pulse ---
+2026-06-25 13:12:07,049 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58545.93 | PnL +0.83R | MFE 1.88R | Capture 44% | 5bars HoldEff +0.165R/bar
+2026-06-25 13:12:07,075 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58545.93 | PnL +0.83R | MFE 1.88R | Capture 44% | 5bars HoldEff +0.165R/bar
+2026-06-25 13:12:07,101 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24188.05 | SL→24197.57 TP→24106.29
+2026-06-25 13:12:07,131 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24188.05 | SL→24197.57 TP→24106.29
+2026-06-25 13:12:09,294 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NARRATIVE_BIAS_BULLISH']
+2026-06-25 13:12:09,316 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24188.05 | SL: 24192.17 TP: 24181.05
+2026-06-25 13:12:09,316 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NARRATIVE_BIAS_BULLISH', 'LOW_RR:1.7']
+2026-06-25 13:12:09,336 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24188.05 | SL: 24192.17 TP: 24181.05
+2026-06-25 13:12:11,104 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-06-25 13:12:11,127 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 58543.00 | SL: 58512.94 TP: 58603.12
+2026-06-25 13:12:11,127 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-06-25 13:12:11,148 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY CALL @ 58543.00 | SL: 58512.94 TP: 58603.12
+2026-06-25 13:17:12,055 - INFO - --- 13:17:12 Market Pulse ---
+2026-06-25 13:17:13,365 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24176.65 | SL→24186.17 TP→24106.29
+2026-06-25 13:17:13,397 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24176.65 | SL→24186.17 TP→24106.29
+2026-06-25 13:17:13,424 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24176.65 | SL→24180.77 TP→24176.93
+2026-06-25 13:17:13,450 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24176.65 | SL→24180.77 TP→24176.93
+2026-06-25 13:17:13,476 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58512.94 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 13:17:13,501 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58512.94 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 13:17:15,772 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NARRATIVE_BIAS_BEARISH', 'LOW_RR:0.8']
+2026-06-25 13:17:15,793 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24176.65 | SL: 24168.14 TP: 24183.46
+2026-06-25 13:17:15,793 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NARRATIVE_BIAS_BEARISH', 'LOW_RR:0.8']
+2026-06-25 13:17:15,813 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY CALL @ 24176.65 | SL: 24168.14 TP: 24183.46
+2026-06-25 13:17:17,610 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:17:17,633 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58488.20 | SL: 58519.31 TP: 58177.09
+2026-06-25 13:17:17,634 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:17:17,656 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58488.20 | SL: 58519.31 TP: 58177.09
+2026-06-25 13:22:18,600 - INFO - --- 13:22:18 Market Pulse ---
+2026-06-25 13:22:19,593 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24186.17 | PnL +1.56R | MFE 2.61R | Capture 60% | 3bars HoldEff +0.520R/bar
+2026-06-25 13:22:19,629 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24186.17 | PnL +1.56R | MFE 2.61R | Capture 60% | 3bars HoldEff +0.520R/bar
+2026-06-25 13:22:19,654 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24180.77 | PnL +1.72R | MFE 2.77R | Capture 62% | 2bars HoldEff +0.859R/bar
+2026-06-25 13:22:19,676 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24180.77 | PnL +1.72R | MFE 2.77R | Capture 62% | 2bars HoldEff +0.859R/bar
+2026-06-25 13:22:19,695 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24186.35 | SL→24177.84 TP→24191.97
+2026-06-25 13:22:19,714 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24186.35 | SL→24177.84 TP→24191.97
+2026-06-25 13:22:21,967 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 13:22:21,988 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24186.35 | SL: 24197.17 TP: 24078.15
+2026-06-25 13:22:21,988 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 13:22:22,006 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24186.35 | SL: 24197.17 TP: 24078.15
+2026-06-25 13:22:22,006 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:1.43']
+2026-06-25 13:22:22,024 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24186.35 | SL: 24192.50 TP: 24177.55
+2026-06-25 13:22:22,024 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:1.43']
+2026-06-25 13:22:22,042 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24186.35 | SL: 24192.50 TP: 24177.55
+2026-06-25 13:22:23,874 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.45']
+2026-06-25 13:22:23,895 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 58498.75 | SL: 58509.65 TP: 58493.85
+2026-06-25 13:27:24,822 - INFO - --- 13:27:24 Market Pulse ---
+2026-06-25 13:27:25,733 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24183.70 | SL→24194.52 TP→24078.15
+2026-06-25 13:27:25,771 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24183.70 | SL→24194.52 TP→24078.15
+2026-06-25 13:27:25,802 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24183.70 | SL→24189.85 TP→24177.55
+2026-06-25 13:27:25,832 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24183.70 | SL→24189.85 TP→24177.55
+2026-06-25 13:32:30,903 - INFO - --- 13:32:30 Market Pulse ---
+2026-06-25 13:32:32,263 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24183.60 | SL→24194.42 TP→24078.15
+2026-06-25 13:32:32,299 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24183.60 | SL→24194.42 TP→24078.15
+2026-06-25 13:32:32,333 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24183.60 | SL→24189.75 TP→24177.55
+2026-06-25 13:32:32,363 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24183.60 | SL→24189.75 TP→24177.55
+2026-06-25 13:32:32,391 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58495.70 | SL→58506.60 TP→58493.85
+2026-06-25 13:37:37,417 - INFO - --- 13:37:37 Market Pulse ---
+2026-06-25 13:37:38,539 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24192.20 | SL→24183.69 TP→24200.48
+2026-06-25 13:37:38,567 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24192.20 | SL→24183.69 TP→24200.48
+2026-06-25 13:37:38,591 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58519.31 | PnL -1.05R | MFE 0.00R | Capture N/A | 4bars HoldEff -0.263R/bar
+2026-06-25 13:37:38,612 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58519.31 | PnL -1.05R | MFE 0.00R | Capture N/A | 4bars HoldEff -0.263R/bar
+2026-06-25 13:37:38,632 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24189.75 | PnL -0.60R | MFE 0.45R | Capture -135% | 3bars HoldEff -0.201R/bar
+2026-06-25 13:37:38,653 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24189.75 | PnL -0.60R | MFE 0.45R | Capture -135% | 3bars HoldEff -0.201R/bar
+2026-06-25 13:37:38,671 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58506.60 | PnL -0.77R | MFE 0.28R | Capture -275% | 3bars HoldEff -0.257R/bar
+2026-06-25 13:37:42,805 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-06-25 13:37:42,820 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-06-25 13:37:42,842 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-06-25 13:37:42,842 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:37:42,865 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58523.30 | SL: 58552.35 TP: 58232.78
+2026-06-25 13:37:42,865 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-06-25 13:37:42,865 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:37:42,885 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58523.30 | SL: 58552.35 TP: 58232.78
+2026-06-25 13:42:43,803 - INFO - --- 13:42:43 Market Pulse ---
+2026-06-25 13:42:44,677 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24207.20 | SL→24162.74 TP→24285.50
+2026-06-25 13:42:44,712 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24207.20 | SL→24198.69 TP→24208.99
+2026-06-25 13:42:44,744 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24207.20 | SL→24198.69 TP→24208.99
+2026-06-25 13:42:44,775 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24194.42 | PnL -0.80R | MFE 0.25R | Capture -313% | 4bars HoldEff -0.199R/bar
+2026-06-25 13:42:44,804 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24194.42 | PnL -0.80R | MFE 0.25R | Capture -313% | 4bars HoldEff -0.199R/bar
+2026-06-25 13:42:44,829 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58552.35 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 13:42:44,853 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58552.35 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 13:42:47,171 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 13:42:47,191 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24207.20 | SL: 24216.66 TP: 24112.65
+2026-06-25 13:42:47,191 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 13:42:47,209 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24207.20 | SL: 24216.66 TP: 24112.65
+2026-06-25 13:42:49,074 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:42:49,096 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58561.15 | SL: 58588.99 TP: 58282.76
+2026-06-25 13:42:49,096 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 13:42:49,117 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58561.15 | SL: 58588.99 TP: 58282.76
+2026-06-25 13:47:50,099 - INFO - --- 13:47:50 Market Pulse ---
+2026-06-25 13:47:51,024 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24204.25 | SL→24213.71 TP→24112.65
+2026-06-25 13:47:51,060 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24204.25 | SL→24213.71 TP→24112.65
+2026-06-25 13:47:51,092 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58550.95 | SL→58578.79 TP→58282.76
+2026-06-25 13:47:51,122 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58550.95 | SL→58578.79 TP→58282.76
+2026-06-25 13:52:56,264 - INFO - --- 13:52:56 Market Pulse ---
+2026-06-25 13:52:57,327 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24203.80 | SL→24213.26 TP→24112.65
+2026-06-25 13:52:57,352 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24203.80 | SL→24213.26 TP→24112.65
+2026-06-25 13:52:57,375 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58533.90 | SL→58561.74 TP→58282.76
+2026-06-25 13:52:57,396 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58533.90 | SL→58561.74 TP→58282.76
+2026-06-25 13:58:02,670 - INFO - --- 13:58:02 Market Pulse ---
+2026-06-25 13:58:03,691 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24198.69 | PnL +2.54R | MFE 3.59R | Capture 71% | 8bars HoldEff +0.318R/bar
+2026-06-25 13:58:03,721 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24198.69 | PnL +2.54R | MFE 3.59R | Capture 71% | 8bars HoldEff +0.318R/bar
+2026-06-25 13:58:03,745 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24176.95 | SL→24186.41 TP→24112.65
+2026-06-25 13:58:03,766 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24176.95 | SL→24186.41 TP→24112.65
+2026-06-25 13:58:03,785 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58453.60 | SL→58481.44 TP→58282.76
+2026-06-25 13:58:03,803 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58453.60 | SL→58481.44 TP→58282.76
+2026-06-25 13:58:06,285 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:0.26']
+2026-06-25 13:58:06,304 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24176.95 | SL: 24180.20 TP: 24176.11
+2026-06-25 14:03:09,271 - INFO - --- 14:03:09 Market Pulse ---
+2026-06-25 14:03:10,729 - INFO - 🔴 EXIT (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58447.92 | PnL -0.71R | MFE 0.34R | Capture -208% | 18bars HoldEff -0.039R/bar
+2026-06-25 14:03:10,766 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58438.40 | SL→58466.24 TP→58282.76
+2026-06-25 14:03:10,801 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58438.40 | SL→58466.24 TP→58282.76
+2026-06-25 14:08:16,186 - INFO - --- 14:08:16 Market Pulse ---
+2026-06-25 14:08:17,265 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24176.30 | SL→24185.76 TP→24112.65
+2026-06-25 14:08:17,291 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24176.30 | SL→24185.76 TP→24112.65
+2026-06-25 14:08:17,316 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58397.00 | SL→58424.84 TP→58282.76
+2026-06-25 14:08:17,338 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58397.00 | SL→58424.84 TP→58282.76
+2026-06-25 14:08:17,359 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24176.30 | SL→24179.55 TP→24176.11
+2026-06-25 14:13:22,810 - INFO - --- 14:13:22 Market Pulse ---
+2026-06-25 14:13:23,895 - INFO - 🔴 EXIT (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24162.74 | PnL -0.97R | MFE 0.08R | Capture -1293% | 20bars HoldEff -0.049R/bar
+2026-06-25 14:13:23,921 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24150.15 | SL→24159.61 TP→24112.65
+2026-06-25 14:13:23,945 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24150.15 | SL→24159.61 TP→24112.65
+2026-06-25 14:13:23,967 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58312.55 | SL→58340.39 TP→58282.76
+2026-06-25 14:13:23,987 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58312.55 | SL→58340.39 TP→58282.76
+2026-06-25 14:13:24,006 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24150.15 | SL→24153.40 TP→24172.86
+2026-06-25 14:13:28,554 - INFO - 👻 [ORB_15m_RVOL1.2] CF ORB_15M NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'TP_CAPPED']
+2026-06-25 14:13:28,576 - INFO - 🟢 ENTRY [CF|ORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTYBANK-INDEX BUY PUT @ 58312.55 | SL: 58376.03 TP: 58022.90
+2026-06-25 14:13:28,577 - INFO - 👻 [ORB_30m_RVOL1.2] CF ORB_30M NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'TP_CAPPED']
+2026-06-25 14:13:28,597 - INFO - 🟢 ENTRY [CF|ORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX BUY PUT @ 58312.55 | SL: 58376.03 TP: 58022.90
+2026-06-25 14:13:28,597 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.19']
+2026-06-25 14:13:28,616 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 58312.55 | SL: 58379.94 TP: 58300.00
+2026-06-25 14:13:28,616 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.19']
+2026-06-25 14:13:28,635 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY PUT @ 58312.55 | SL: 58379.94 TP: 58300.00
+2026-06-25 14:18:29,643 - INFO - --- 14:18:29 Market Pulse ---
+2026-06-25 14:18:31,050 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24126.45 | SL→24135.91 TP→24112.65
+2026-06-25 14:18:31,087 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24126.45 | SL→24135.91 TP→24112.65
+2026-06-25 14:18:31,117 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58247.45 | SL→58275.29 TP→58254.92
+2026-06-25 14:18:31,147 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58247.45 | SL→58275.29 TP→58254.92
+2026-06-25 14:18:31,176 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24126.45 | SL→24129.70 TP→24169.61
+2026-06-25 14:18:31,202 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58247.45 | SL→58310.93 TP→58022.90
+2026-06-25 14:18:31,229 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58247.45 | SL→58310.93 TP→58022.90
+2026-06-25 14:18:31,255 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58247.45 | SL→58314.84 TP→58232.61
+2026-06-25 14:18:31,281 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 58247.45 | SL→58314.84 TP→58232.61
+2026-06-25 14:18:35,833 - INFO - 🚀 SIGNAL: NSE:NIFTYBANK-INDEX BUY PUT | [Geometry_v1.0_Score35]
+2026-06-25 14:18:35,833 - INFO -    Entry: 58247.45 | SL: 58265.63 | TP: 58200.0 (RR: 2.61)
+2026-06-25 14:18:35,854 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1782377309]: NSE:NIFTYBANK-INDEX BUY PUT @ 58247.45 | SL: 58265.63 TP: 58200.00
+2026-06-25 14:23:36,827 - INFO - --- 14:23:36 Market Pulse ---
+2026-06-25 14:23:37,891 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24115.65 | SL→24125.11 TP→24112.65
+2026-06-25 14:23:37,916 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24115.65 | SL→24125.11 TP→24112.65
+2026-06-25 14:23:37,939 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58249.00 | SL→58275.29 TP→58227.08
+2026-06-25 14:23:37,960 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58249.00 | SL→58275.29 TP→58227.08
+2026-06-25 14:23:37,980 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24115.65 | SL→24118.90 TP→24166.36
+2026-06-25 14:28:43,429 - INFO - --- 14:28:43 Market Pulse ---
+2026-06-25 14:28:44,271 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58233.03 TP→58200.00
+2026-06-25 14:28:44,300 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24097.05 | SL→24106.51 TP→24103.19
+2026-06-25 14:28:44,324 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24097.05 | SL→24106.51 TP→24103.19
+2026-06-25 14:28:44,345 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58242.69 TP→58199.24
+2026-06-25 14:28:44,366 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58242.69 TP→58199.24
+2026-06-25 14:28:44,388 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24097.05 | SL→24100.30 TP→24163.11
+2026-06-25 14:28:44,412 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58278.33 TP→58022.90
+2026-06-25 14:28:44,434 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58278.33 TP→58022.90
+2026-06-25 14:28:44,455 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58282.24 TP→58165.22
+2026-06-25 14:28:44,475 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 58214.85 | SL→58282.24 TP→58165.22
+2026-06-25 14:28:47,031 - INFO - 👻 [ORB_15m_RVOL1.2] CF ORB_15M NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 14:28:47,051 - INFO - 🟢 ENTRY [CF|ORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX BUY PUT @ 24097.05 | SL: 24113.85 TP: 23996.15
+2026-06-25 14:28:47,051 - INFO - 👻 [ORB_30m_RVOL1.2] CF ORB_30M NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 14:28:47,069 - INFO - 🟢 ENTRY [CF|ORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX BUY PUT @ 24097.05 | SL: 24113.85 TP: 23996.15
+2026-06-25 14:28:47,069 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NARRATIVE_BIAS_BULLISH', 'LOW_RR:-0.01']
+2026-06-25 14:28:47,087 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24097.05 | SL: 24114.93 TP: 24097.15
+2026-06-25 14:28:47,087 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NARRATIVE_BIAS_BULLISH', 'LOW_RR:-0.01']
+2026-06-25 14:28:47,106 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24097.05 | SL: 24114.93 TP: 24097.15
+2026-06-25 14:28:49,171 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.9']
+2026-06-25 14:28:49,192 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 58214.85 | SL: 58231.29 TP: 58200.00
+2026-06-25 14:33:50,066 - INFO - --- 14:33:50 Market Pulse ---
+2026-06-25 14:33:50,891 - INFO - 🔴 EXIT (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58233.03 | PnL +0.74R | MFE 1.79R | Capture 41% | 3bars HoldEff +0.248R/bar
+2026-06-25 14:33:50,929 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24106.51 | PnL +10.60R | MFE 11.65R | Capture 91% | 10bars HoldEff +1.060R/bar
+2026-06-25 14:33:50,955 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24106.51 | PnL +10.60R | MFE 11.65R | Capture 91% | 10bars HoldEff +1.060R/bar
+2026-06-25 14:33:50,980 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58242.69 | PnL +11.39R | MFE 12.44R | Capture 92% | 10bars HoldEff +1.139R/bar
+2026-06-25 14:33:51,005 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58242.69 | PnL +11.39R | MFE 12.44R | Capture 92% | 10bars HoldEff +1.139R/bar
+2026-06-25 14:33:51,030 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24100.30 | PnL +23.53R | MFE 24.58R | Capture 96% | 7bars HoldEff +3.362R/bar
+2026-06-25 14:33:51,055 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58231.29 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:33:53,560 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 14:33:53,579 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24108.20 | SL: 24118.41 TP: 24006.07
+2026-06-25 14:33:53,579 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 14:33:53,598 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24108.20 | SL: 24118.41 TP: 24006.07
+2026-06-25 14:33:53,598 - INFO - 👻 [VWAP_Reversion_1.5ATR_RVOL1.0] CF REVERSION NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL']
+2026-06-25 14:33:53,616 - INFO - 🟢 ENTRY [CF|VWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24108.20 | SL: 24097.99 TP: 24178.32
+2026-06-25 14:33:55,664 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 14:33:55,686 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58243.15 | SL: 58273.90 TP: 57935.63
+2026-06-25 14:33:55,687 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-06-25 14:33:55,708 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58243.15 | SL: 58273.90 TP: 57935.63
+2026-06-25 14:33:55,708 - INFO - 🚀 SIGNAL: NSE:NIFTYBANK-INDEX BUY PUT | [Geometry_v1.0_Score35]
+2026-06-25 14:33:55,708 - INFO -    Entry: 58243.15 | SL: 58265.57 | TP: 58200.0 (RR: 1.92)
+2026-06-25 14:33:55,727 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1782378230]: NSE:NIFTYBANK-INDEX BUY PUT @ 58243.15 | SL: 58265.57 TP: 58200.00
+2026-06-25 14:33:55,727 - INFO - 🚀 SIGNAL: NSE:NIFTYBANK-INDEX BUY PUT | [Geometry_v1.0_Score50]
+2026-06-25 14:33:55,727 - INFO -    Entry: 58243.15 | SL: 58265.57 | TP: 58200.0 (RR: 1.92)
+2026-06-25 14:33:55,746 - INFO - 🟢 ENTRY [Geometry_v1.0_Score50|INDEX_1782378230]: NSE:NIFTYBANK-INDEX BUY PUT @ 58243.15 | SL: 58265.57 TP: 58200.00
+2026-06-25 14:38:56,656 - INFO - --- 14:38:56 Market Pulse ---
+2026-06-25 14:38:58,309 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58265.57 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:38:58,338 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 58265.57 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:38:58,362 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24105.50 | SL→24115.71 TP→24006.07
+2026-06-25 14:38:58,387 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24105.50 | SL→24115.71 TP→24006.07
+2026-06-25 14:39:03,058 - INFO - 👻 [PrevDay_Extremes_RVOL1.2] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['BIAS_MISMATCH']
+2026-06-25 14:39:03,078 - INFO - 🟢 ENTRY [CF|PrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX BUY CALL @ 58266.55 | SL: 58234.69 TP: 58457.74
+2026-06-25 14:44:03,949 - INFO - --- 14:44:03 Market Pulse ---
+2026-06-25 14:44:04,851 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58173.40 | SL→58236.88 TP→58022.90
+2026-06-25 14:44:04,891 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58173.40 | SL→58236.88 TP→58022.90
+2026-06-25 14:44:04,923 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58173.40 | SL→58240.79 TP→58165.22
+2026-06-25 14:44:04,954 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 58173.40 | SL→58240.79 TP→58165.22
+2026-06-25 14:44:04,980 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24076.25 | SL→24093.05 TP→23996.15
+2026-06-25 14:44:05,005 - INFO - 🟡 UPDATE (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24076.25 | SL→24093.05 TP→23996.15
+2026-06-25 14:44:05,025 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24076.25 | SL→24094.13 TP→24079.27
+2026-06-25 14:44:05,044 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24076.25 | SL→24094.13 TP→24079.27
+2026-06-25 14:44:05,062 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24076.25 | SL→24086.46 TP→24006.07
+2026-06-25 14:44:05,081 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24076.25 | SL→24086.46 TP→24006.07
+2026-06-25 14:44:05,099 - INFO - 🔴 EXIT (INITIAL_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24097.99 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-06-25 14:44:05,117 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58173.40 | SL→58204.15 TP→57935.63
+2026-06-25 14:44:05,135 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58173.40 | SL→58204.15 TP→57935.63
+2026-06-25 14:44:05,153 - INFO - 🔴 EXIT (INITIAL_SL) [CFPrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58234.69 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:44:07,798 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:0.58']
+2026-06-25 14:44:07,816 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|51444_OrderFlow_v1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24076.25 | SL: 24093.56 TP: 24066.25
+2026-06-25 14:49:10,876 - INFO - --- 14:49:10 Market Pulse ---
+2026-06-25 14:49:11,889 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24086.46 | PnL +2.08R | MFE 3.13R | Capture 66% | 3bars HoldEff +0.693R/bar
+2026-06-25 14:49:11,924 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24086.46 | PnL +2.08R | MFE 3.13R | Capture 66% | 3bars HoldEff +0.693R/bar
+2026-06-25 14:49:14,508 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 14:49:14,527 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24088.00 | SL: 24100.24 TP: 23965.55
+2026-06-25 14:49:14,527 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 14:49:14,545 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24088.00 | SL: 24100.24 TP: 23965.55
+2026-06-25 14:54:17,509 - INFO - --- 14:54:17 Market Pulse ---
+2026-06-25 14:54:19,112 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58236.88 | PnL +1.14R | MFE 2.19R | Capture 52% | 8bars HoldEff +0.143R/bar
+2026-06-25 14:54:19,147 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58236.88 | PnL +1.14R | MFE 2.19R | Capture 52% | 8bars HoldEff +0.143R/bar
+2026-06-25 14:54:19,178 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58240.79 | PnL +1.01R | MFE 2.06R | Capture 49% | 8bars HoldEff +0.127R/bar
+2026-06-25 14:54:19,207 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 58240.79 | PnL +1.01R | MFE 2.06R | Capture 49% | 8bars HoldEff +0.127R/bar
+2026-06-25 14:54:19,236 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_15m_RVOL1.2|0625_ORB_15m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24093.05 | PnL +0.19R | MFE 1.24R | Capture 15% | 5bars HoldEff +0.038R/bar
+2026-06-25 14:54:19,263 - INFO - 🔴 EXIT (TRAILING_SL) [CFORB_30m_RVOL1.2|0625_ORB_30m_RVOL1.2]: NSE:NIFTY50-INDEX @ 24093.05 | PnL +0.19R | MFE 1.24R | Capture 15% | 5bars HoldEff +0.038R/bar
+2026-06-25 14:54:19,290 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24094.13 | PnL +0.11R | MFE 1.16R | Capture 10% | 5bars HoldEff +0.023R/bar
+2026-06-25 14:54:19,316 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24094.13 | PnL +0.11R | MFE 1.16R | Capture 10% | 5bars HoldEff +0.023R/bar
+2026-06-25 14:54:19,342 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58204.15 | PnL +1.22R | MFE 2.27R | Capture 54% | 4bars HoldEff +0.304R/bar
+2026-06-25 14:54:19,366 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58204.15 | PnL +1.22R | MFE 2.27R | Capture 54% | 4bars HoldEff +0.304R/bar
+2026-06-25 14:54:19,391 - INFO - 🔴 EXIT (INITIAL_SL) [CFOrderFlow_v1.0|51444_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24093.56 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-06-25 14:54:19,414 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24100.24 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:54:19,436 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24100.24 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:54:22,076 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 14:54:22,095 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24110.00 | SL: 24123.37 TP: 23976.32
+2026-06-25 14:54:22,096 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 14:54:22,113 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24110.00 | SL: 24123.37 TP: 23976.32
+2026-06-25 14:54:22,113 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [PrevDay_Extremes_RVOL1.2]
+2026-06-25 14:54:22,113 - INFO -    Entry: 24110.0 | SL: 24082.70541806555 | TP: 24190.22 (RR: 2.94)
+2026-06-25 14:54:22,132 - INFO - 🟢 ENTRY [PrevDay_Extremes_RVOL1.2|INDEX_1782379457]: NSE:NIFTY50-INDEX BUY CALL @ 24110.00 | SL: 24082.71 TP: 24190.22
+2026-06-25 14:54:22,132 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Geometry_v1.0_Score35]
+2026-06-25 14:54:22,132 - INFO -    Entry: 24110.0 | SL: 24108.94 | TP: 24127.95 (RR: 16.92)
+2026-06-25 14:54:22,150 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1782379457]: NSE:NIFTY50-INDEX BUY CALL @ 24110.00 | SL: 24108.94 TP: 24127.95
+2026-06-25 14:54:24,386 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 14:54:24,407 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58260.15 | SL: 58297.71 TP: 57884.58
+2026-06-25 14:54:24,407 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-06-25 14:54:24,426 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58260.15 | SL: 58297.71 TP: 57884.58
+2026-06-25 14:54:24,426 - INFO - 👻 [PrevDay_Extremes_RVOL1.2] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH']
+2026-06-25 14:54:24,445 - INFO - 🟢 ENTRY [CF|PrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX BUY CALL @ 58260.15 | SL: 58222.60 TP: 58485.48
+2026-06-25 14:54:24,445 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.04']
+2026-06-25 14:54:24,463 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 58260.15 | SL: 58130.13 TP: 58255.13
+2026-06-25 14:54:24,463 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.04']
+2026-06-25 14:54:24,481 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY CALL @ 58260.15 | SL: 58130.13 TP: 58255.13
+2026-06-25 14:59:25,388 - INFO - --- 14:59:25 Market Pulse ---
+2026-06-25 14:59:26,643 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24108.94 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:59:26,673 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24086.00 | SL→24099.37 TP→23976.32
+2026-06-25 14:59:26,697 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24086.00 | SL→24099.37 TP→23976.32
+2026-06-25 14:59:26,718 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58195.85 | SL→58233.41 TP→57884.58
+2026-06-25 14:59:26,740 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58195.85 | SL→58233.41 TP→57884.58
+2026-06-25 14:59:26,762 - INFO - 🔴 EXIT (INITIAL_SL) [CFPrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTYBANK-INDEX @ 58222.60 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-25 14:59:29,434 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:-0.55']
+2026-06-25 14:59:29,453 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24086.00 | SL: 24115.35 TP: 24102.00
+2026-06-25 14:59:29,453 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:-0.55']
+2026-06-25 14:59:29,471 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24086.00 | SL: 24115.35 TP: 24102.00
+2026-06-25 14:59:29,471 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:0.08']
+2026-06-25 14:59:29,489 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|51459_OrderFlow_v1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24086.00 | SL: 24115.58 TP: 24083.55
+2026-06-25 15:04:32,624 - INFO - --- 15:04:32 Market Pulse ---
+2026-06-25 15:04:33,517 - INFO - 🔴 EXIT (INITIAL_SL) [PrevDay_Extremes_RVOL1.2|Day_Extremes_RVOL1.2]: NSE:NIFTY50-INDEX @ 24082.71 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-06-25 15:04:33,546 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24057.10 | SL→24070.47 TP→23976.32
+2026-06-25 15:04:33,572 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24057.10 | SL→24070.47 TP→23976.32
+2026-06-25 15:04:33,597 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58151.15 | SL→58188.71 TP→57884.58
+2026-06-25 15:04:33,621 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58151.15 | SL→58188.71 TP→57884.58
+2026-06-25 15:04:33,644 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24057.10 | SL→24086.45 TP→24072.65
+2026-06-25 15:04:33,666 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24057.10 | SL→24086.45 TP→24072.65
+2026-06-25 15:04:33,685 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51459_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24057.10 | SL→24086.68 TP→24053.97
+2026-06-25 15:09:39,386 - INFO - --- 15:09:39 Market Pulse ---
+2026-06-25 15:09:40,430 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24058.40 | SL→24086.45 TP→24043.30
+2026-06-25 15:09:40,455 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24058.40 | SL→24086.45 TP→24043.30
+2026-06-25 15:14:46,205 - INFO - --- 15:14:46 Market Pulse ---
+2026-06-25 15:14:47,049 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58188.71 | PnL +1.85R | MFE 2.90R | Capture 64% | 4bars HoldEff +0.463R/bar
+2026-06-25 15:14:47,086 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58188.71 | PnL +1.85R | MFE 2.90R | Capture 64% | 4bars HoldEff +0.463R/bar
+2026-06-25 15:14:51,987 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 15:14:52,010 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58190.25 | SL: 58231.67 TP: 57776.02
+2026-06-25 15:14:52,010 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-06-25 15:14:52,031 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58190.25 | SL: 58231.67 TP: 57776.02
+2026-06-25 15:19:52,984 - INFO - --- 15:19:52 Market Pulse ---
+2026-06-25 15:19:53,977 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24053.55 | SL→24066.92 TP→23976.32
+2026-06-25 15:19:54,010 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24053.55 | SL→24066.92 TP→23976.32
+2026-06-25 15:19:54,037 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24053.55 | SL→24082.90 TP→24043.30
+2026-06-25 15:19:54,059 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24053.55 | SL→24082.90 TP→24043.30
+2026-06-25 15:19:54,079 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|51459_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24053.55 | SL→24083.13 TP→24024.39
+2026-06-25 15:24:59,921 - INFO - --- 15:24:59 Market Pulse ---
+2026-06-25 15:25:00,769 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24046.25 | SL→24059.62 TP→23976.32
+2026-06-25 15:25:00,805 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24046.25 | SL→24059.62 TP→23976.32
+2026-06-25 15:25:00,835 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24046.25 | SL→24075.60 TP→24043.30
+2026-06-25 15:25:00,865 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24046.25 | SL→24075.60 TP→24043.30
+2026-06-25 15:25:00,894 - INFO - 🟡 UPDATE (TRAILING_SL) [CFOrderFlow_v1.0|51459_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24046.25 | SL→24075.83 TP→24024.39
+2026-06-25 15:25:03,642 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:03,655 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:03,659 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:03,659 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:05,999 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:06,012 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:06,016 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:25:06,016 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-06-25 15:30:06,921 - INFO - --- 15:30:06 Market Pulse ---
+2026-06-25 15:30:07,920 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24052.95 | PnL +4.22R | MFE 4.77R | Capture 88% | 7bars HoldEff +0.603R/bar
+2026-06-25 15:30:07,957 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24052.95 | PnL +4.22R | MFE 4.77R | Capture 88% | 7bars HoldEff +0.603R/bar
+2026-06-25 15:30:07,983 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 58193.20 | PnL -0.56R | MFE 0.00R | Capture N/A | 7bars HoldEff -0.081R/bar
+2026-06-25 15:30:08,005 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 58193.20 | PnL -0.56R | MFE 0.00R | Capture N/A | 7bars HoldEff -0.081R/bar
+2026-06-25 15:30:08,025 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24052.95 | PnL +1.08R | MFE 1.35R | Capture 79% | 6bars HoldEff +0.179R/bar
+2026-06-25 15:30:08,045 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24052.95 | PnL +1.08R | MFE 1.35R | Capture 79% | 6bars HoldEff +0.179R/bar
+2026-06-25 15:30:08,063 - INFO - 🔴 EXIT (SESSION_END) [CFOrderFlow_v1.0|51459_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24052.95 | PnL +1.07R | MFE 1.34R | Capture 79% | 6bars HoldEff +0.178R/bar
+2026-06-25 15:30:08,081 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 58193.20 | PnL -0.12R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.040R/bar
+2026-06-25 15:30:08,099 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 58193.20 | PnL -0.12R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.040R/bar
+2026-06-25 15:30:08,100 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-25 15:30:08,117 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-25 cf=42 expectancy=3.118109610463892
+2026-06-25 15:30:08,131 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-25 cf=34 expectancy=1.022402629694518
+2026-06-25 15:30:08,145 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-25 cf=3 expectancy=-0.22373404105504355
+2026-06-25 15:30:08,160 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-25 cf=3 expectancy=2.2813166777292886
+2026-06-25 15:30:08,177 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-25 cf=2 expectancy=-1.0499999523162842
+2026-06-25 15:30:08,194 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-25 cf=3 expectancy=0.8932212193806967
+2026-06-25 15:30:08,212 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-25 cf=4 expectancy=0.6414999719709158
+2026-06-25 15:30:08,230 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-25 cf=0 expectancy=None
+2026-06-25 15:30:08,247 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-25 cf=7 expectancy=7.781670834336962
+2026-06-25 15:30:08,264 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-25 cf=3 expectancy=1.2180130084355671
+2026-06-25 15:30:08,282 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-06-25 cf=3 expectancy=1.4187381267547607
+2026-06-25 15:35:09,172 - INFO - --- 15:35:09 Market Pulse ---
+2026-06-25 15:35:10,267 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-25 15:35:10,307 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-25 cf=42 expectancy=3.118109610463892
+2026-06-25 15:35:10,330 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-25 cf=34 expectancy=1.022402629694518
+2026-06-25 15:35:10,349 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-25 cf=3 expectancy=-0.22373404105504355
+2026-06-25 15:35:10,366 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-25 cf=3 expectancy=2.2813166777292886
+2026-06-25 15:35:10,382 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-25 cf=2 expectancy=-1.0499999523162842
+2026-06-25 15:35:10,397 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-25 cf=3 expectancy=0.8932212193806967
+2026-06-25 15:35:10,412 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-25 cf=4 expectancy=0.6414999719709158
+2026-06-25 15:35:10,429 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-25 cf=0 expectancy=None
+2026-06-25 15:35:10,446 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-25 cf=7 expectancy=7.781670834336962
+2026-06-25 15:35:10,463 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-25 cf=3 expectancy=1.2180130084355671
+2026-06-25 15:35:10,479 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-06-25 cf=3 expectancy=1.4187381267547607
+2026-06-25 15:35:10,488 - INFO - 📝 Generating EOD report for 2026-06-25…
+2026-06-25 15:35:10,502 - INFO -    Rolling data: 5d filters=26, 20d filters=26, total CF=391
+2026-06-25 15:35:10,985 - INFO -    ✓ executive_summary
+2026-06-25 15:35:11,337 - INFO -    ✓ market_narrative
+2026-06-25 15:35:11,452 - INFO -    ✓ trade_review
+2026-06-25 15:35:11,470 - INFO -    ✓ losing_trades
+2026-06-25 15:35:11,488 - INFO -    ✓ missed_opportunities
+2026-06-25 15:35:11,503 - INFO -    ✓ counterfactual_insights
+2026-06-25 15:35:11,530 - INFO -    ✓ experiment_ranking
+2026-06-25 15:35:11,545 - INFO -    ✓ thesis_analysis
+2026-06-25 15:35:11,575 - INFO -    ✓ market_behaviour
+2026-06-25 15:35:11,816 - INFO -    ✓ tomorrow_outlook
+2026-06-25 15:35:11,838 - INFO -    ✓ research_queue
+2026-06-25 15:35:11,872 - INFO -    ✓ strategy_health
+2026-06-25 15:35:11,877 - INFO - 📄 Report written: reports/2026-06-25.md
+2026-06-25 15:35:11,877 - INFO - 📊 Analytics written: reports/2026-06-25.json
+2026-06-25 15:35:11,877 - INFO - 📝 EOD report: reports/2026-06-25.md
+2026-06-25 15:40:12,763 - INFO - --- 15:40:12 Market Pulse ---
+2026-06-25 15:40:13,707 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-25 15:40:13,757 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-25 cf=42 expectancy=3.118109610463892
+2026-06-25 15:40:13,786 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-25 cf=34 expectancy=1.022402629694518
+2026-06-25 15:40:13,805 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-25 cf=3 expectancy=-0.22373404105504355
+2026-06-25 15:40:13,823 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-25 cf=3 expectancy=2.2813166777292886
+2026-06-25 15:40:13,838 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-25 cf=2 expectancy=-1.0499999523162842
+2026-06-25 15:40:13,854 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-25 cf=3 expectancy=0.8932212193806967
+2026-06-25 15:40:13,868 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-25 cf=4 expectancy=0.6414999719709158
+2026-06-25 15:40:13,882 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-25 cf=0 expectancy=None
+2026-06-25 15:40:13,897 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-25 cf=7 expectancy=7.781670834336962
+2026-06-25 15:40:13,911 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-25 cf=3 expectancy=1.2180130084355671
+2026-06-25 15:40:13,925 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-06-25 cf=3 expectancy=1.4187381267547607
+2026-06-25 15:45:14,787 - INFO - --- 15:45:14 Market Pulse ---
+2026-06-25 15:45:15,780 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-25 15:45:15,825 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-25 cf=42 expectancy=3.118109610463892
+2026-06-25 15:45:15,846 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-25 cf=34 expectancy=1.022402629694518
+2026-06-25 15:45:15,864 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-25 cf=3 expectancy=-0.22373404105504355
+2026-06-25 15:45:15,881 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-25 cf=3 expectancy=2.2813166777292886
+2026-06-25 15:45:15,897 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-25 cf=2 expectancy=-1.0499999523162842
+2026-06-25 15:45:15,911 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-25 cf=3 expectancy=0.8932212193806967
+2026-06-25 15:45:15,926 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-25 cf=4 expectancy=0.6414999719709158
+2026-06-25 15:45:15,940 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-25 cf=0 expectancy=None
+2026-06-25 15:45:15,954 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-25 cf=7 expectancy=7.781670834336962
+2026-06-25 15:45:15,969 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-25 cf=3 expectancy=1.2180130084355671
+2026-06-25 15:45:15,983 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-06-25 cf=3 expectancy=1.4187381267547607
+2026-06-25 15:50:16,799 - INFO - --- 15:50:16 Market Pulse ---
+2026-06-25 15:50:17,470 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-25 15:50:17,520 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-25 cf=42 expectancy=3.118109610463892
+2026-06-25 15:50:17,549 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-25 cf=34 expectancy=1.022402629694518
+2026-06-25 15:50:17,573 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-25 cf=3 expectancy=-0.22373404105504355
+2026-06-25 15:50:17,594 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-25 cf=3 expectancy=2.2813166777292886
+2026-06-25 15:50:17,614 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-25 cf=2 expectancy=-1.0499999523162842
+2026-06-25 15:50:17,632 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-25 cf=3 expectancy=0.8932212193806967
+2026-06-25 15:50:17,651 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-25 cf=4 expectancy=0.6414999719709158
+2026-06-25 15:50:17,671 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-25 cf=0 expectancy=None
+2026-06-25 15:50:17,690 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-25 cf=7 expectancy=7.781670834336962
+2026-06-25 15:50:17,709 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-25 cf=3 expectancy=1.2180130084355671
+2026-06-25 15:50:17,728 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-06-25 cf=3 expectancy=1.4187381267547607
+2026-06-25 15:55:18,613 - INFO - --- 15:55:18 Market Pulse ---
+2026-06-25 15:55:19,565 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-25 15:55:19,615 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-25 cf=42 expectancy=3.118109610463892
+2026-06-25 15:55:19,643 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-25 cf=34 expectancy=1.022402629694518
+2026-06-25 15:55:19,663 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-25 cf=3 expectancy=-0.22373404105504355
+2026-06-25 15:55:19,680 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-25 cf=3 expectancy=2.2813166777292886
+2026-06-25 15:55:19,695 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-25 cf=2 expectancy=-1.0499999523162842
+2026-06-25 15:55:19,710 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-25 cf=3 expectancy=0.8932212193806967
+2026-06-25 15:55:19,725 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-25 cf=4 expectancy=0.6414999719709158
+2026-06-25 15:55:19,739 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-25 cf=0 expectancy=None
+2026-06-25 15:55:19,753 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-25 cf=7 expectancy=7.781670834336962
+2026-06-25 15:55:19,768 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-25 cf=3 expectancy=1.2180130084355671
+2026-06-25 15:55:19,782 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-06-25 cf=3 expectancy=1.4187381267547607

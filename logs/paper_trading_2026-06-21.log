@@ -1,0 +1,212 @@
+2026-06-21 18:17:48,347 - INFO - 🔑 Access token loaded from environment
+2026-06-21 18:17:48,521 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-21 18:17:48,585 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:17:48,596 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:17:48,651 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:17:48,668 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:17:48,675 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:17:48,700 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:17:48,700 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:17:48,700 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-21 18:17:48,723 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=c8e305e
+2026-06-21 18:17:48,734 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=c8e305e]
+2026-06-21 18:17:48,751 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:17:48,759 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:17:48,786 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:17:48,786 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:17:48,786 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-21 18:17:48,798 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=c8e305e
+2026-06-21 18:17:48,810 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=c8e305e]
+2026-06-21 18:17:49,325 - INFO - 🔄 Recovered 50 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23977.80_20260616', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57646.15_20260617', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24097.40_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24139.65_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24189.25_20260619', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58021.25_20260619', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619']
+2026-06-21 18:17:49,325 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-21 18:17:49,325 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-21 18:39:27,172 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:27,183 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:27,241 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:27,297 - INFO - 🔑 Access token loaded from environment
+2026-06-21 18:39:27,411 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-21 18:39:27,440 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:27,449 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:27,482 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:27,501 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:27,508 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:27,536 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:27,536 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:39:27,536 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-21 18:39:27,561 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=c8e305e
+2026-06-21 18:39:27,572 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=c8e305e]
+2026-06-21 18:39:27,589 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:27,596 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:27,621 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:27,621 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:39:27,621 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-21 18:39:27,634 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=c8e305e
+2026-06-21 18:39:27,644 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=c8e305e]
+2026-06-21 18:39:27,675 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Structural_v3.2_RVOL1.0')]
+2026-06-21 18:39:28,205 - INFO - 🔄 Recovered 51 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23977.80_20260616', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57646.15_20260617', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24097.40_20260617', 'cand_banknifty_test_cf', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24139.65_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24189.25_20260619', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58021.25_20260619', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619']
+2026-06-21 18:39:28,205 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-21 18:39:53,322 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:53,330 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:53,359 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:53,400 - INFO - 🔑 Access token loaded from environment
+2026-06-21 18:39:53,495 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-21 18:39:53,521 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:53,530 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:53,560 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:53,577 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:53,584 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:53,608 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:53,608 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:39:53,609 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-21 18:39:53,625 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=c8e305e
+2026-06-21 18:39:53,636 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=c8e305e]
+2026-06-21 18:39:53,652 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:39:53,659 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:39:53,684 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:39:53,684 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:39:53,684 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-21 18:39:53,696 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=c8e305e
+2026-06-21 18:39:53,706 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=c8e305e]
+2026-06-21 18:39:53,727 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Structural_v3.2_RVOL1.0')]
+2026-06-21 18:39:54,234 - INFO - 🔄 Recovered 51 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23977.80_20260616', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57646.15_20260617', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24097.40_20260617', 'cand_banknifty_test_cf', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24139.65_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24189.25_20260619', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_58021.25_20260619', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619']
+2026-06-21 18:39:54,234 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-21 18:39:54,269 - INFO - 🔴 EXIT (TRAILING_SL) [Structural_v3.2_RVOL1.0|_nifty_test_recovery]: NSE:NIFTY50-INDEX @ 21900.00 | PnL -0.55R | MFE 0.50R | Capture -110% | 6bars HoldEff -0.092R/bar
+2026-06-21 18:39:54,288 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_23977.80_20260616]: NSE:NIFTY50-INDEX @ 23931.68 | PnL +0.48R | MFE 1.53R | Capture 31% | 2bars HoldEff +0.238R/bar
+2026-06-21 18:39:54,307 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24066.48 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:39:54,326 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57537.89 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:39:54,345 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_57646.15_20260617]: NSE:NIFTYBANK-INDEX @ 57522.26 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:39:54,367 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24097.40_20260617]: NSE:NIFTY50-INDEX @ 24077.75 | PnL -0.38R | MFE 0.67R | Capture -58% | 2bars HoldEff -0.192R/bar
+2026-06-21 18:39:54,387 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|nd_banknifty_test_cf]: NSE:NIFTYBANK-INDEX @ 48200.00 | PnL -1.05R | MFE 0.50R | Capture -210% | 4bars HoldEff -0.263R/bar
+2026-06-21 18:39:54,408 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57895.64 | PnL -0.26R | MFE 0.79R | Capture -33% | 2bars HoldEff -0.132R/bar
+2026-06-21 18:39:54,429 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_24139.65_20260618]: NSE:NIFTY50-INDEX @ 24101.64 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:39:54,447 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21858.44 TP→23072.54
+2026-06-21 18:39:54,467 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57949.19 | PnL -0.55R | MFE 0.50R | Capture -111% | 2bars HoldEff -0.277R/bar
+2026-06-21 18:39:54,488 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24189.25_20260619]: NSE:NIFTY50-INDEX @ 23949.62 | PnL +0.20R | MFE 1.25R | Capture 16% | 2bars HoldEff +0.101R/bar
+2026-06-21 18:39:54,510 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_58021.25_20260619]: NSE:NIFTYBANK-INDEX @ 57609.64 | PnL +0.71R | MFE 1.76R | Capture 40% | 2bars HoldEff +0.356R/bar
+2026-06-21 18:39:54,531 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_23938.75_20260619]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21859.72 TP→23062.33
+2026-06-21 18:40:48,498 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:40:48,507 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:40:48,538 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:40:48,580 - INFO - 🔑 Access token loaded from environment
+2026-06-21 18:40:48,674 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-21 18:40:48,699 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:40:48,708 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:40:48,737 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:40:48,754 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:40:48,760 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:40:48,785 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:40:48,785 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:40:48,786 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-21 18:40:48,801 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=c8e305e
+2026-06-21 18:40:48,811 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=c8e305e]
+2026-06-21 18:40:48,829 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 18:40:48,835 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 18:40:48,860 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 18:40:48,860 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 18:40:48,860 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-21 18:40:48,872 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=c8e305e
+2026-06-21 18:40:48,882 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=c8e305e]
+2026-06-21 18:40:48,903 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Structural_v3.2_RVOL1.0')]
+2026-06-21 18:40:49,339 - INFO - 🔄 Recovered 41 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23977.80_20260616', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24139.65_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619', 'cand_banknifty_test_cf']
+2026-06-21 18:40:49,339 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-21 18:40:49,373 - INFO - 🔴 EXIT (TRAILING_SL) [Structural_v3.2_RVOL1.0|_nifty_test_recovery]: NSE:NIFTY50-INDEX @ 21900.00 | PnL -0.55R | MFE 0.50R | Capture -110% | 6bars HoldEff -0.092R/bar
+2026-06-21 18:40:49,393 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_23977.80_20260616]: NSE:NIFTY50-INDEX @ 23931.97 | PnL +0.17R | MFE 1.22R | Capture 14% | 2bars HoldEff +0.086R/bar
+2026-06-21 18:40:49,413 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24071.88 | PnL -0.65R | MFE 0.40R | Capture -165% | 2bars HoldEff -0.327R/bar
+2026-06-21 18:40:49,435 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57537.06 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:40:49,457 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57890.34 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:40:49,477 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_24139.65_20260618]: NSE:NIFTY50-INDEX @ 24101.28 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 18:40:49,496 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21858.44 TP→23064.10
+2026-06-21 18:40:49,517 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57940.75 | PnL +5.05R | MFE 6.10R | Capture 83% | 6bars HoldEff +0.841R/bar
+2026-06-21 18:40:49,536 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_23938.75_20260619]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21859.72 TP→23052.62
+2026-06-21 18:40:49,558 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|nd_banknifty_test_cf]: NSE:NIFTYBANK-INDEX @ 48200.00 | PnL -1.05R | MFE 0.50R | Capture -210% | 4bars HoldEff -0.263R/bar
+2026-06-21 19:39:11,822 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:11,834 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:11,882 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:11,929 - INFO - 🔑 Access token loaded from environment
+2026-06-21 19:39:12,026 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-21 19:39:12,053 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:12,169 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:12,220 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:12,238 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:12,244 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:12,271 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:12,271 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 19:39:12,271 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-21 19:39:12,296 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=c8e305e
+2026-06-21 19:39:12,306 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=c8e305e]
+2026-06-21 19:39:12,324 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:12,331 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:12,357 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:12,357 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 19:39:12,357 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-21 19:39:12,368 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=c8e305e
+2026-06-21 19:39:12,379 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=c8e305e]
+2026-06-21 19:39:12,390 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=c8e305e
+2026-06-21 19:39:12,400 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=c8e305e]
+2026-06-21 19:39:12,411 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=c8e305e
+2026-06-21 19:39:12,422 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=c8e305e]
+2026-06-21 19:39:12,433 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=c8e305e
+2026-06-21 19:39:12,443 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=c8e305e]
+2026-06-21 19:39:12,454 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=c8e305e
+2026-06-21 19:39:12,465 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=c8e305e]
+2026-06-21 19:39:12,476 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=c8e305e
+2026-06-21 19:39:12,487 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=c8e305e]
+2026-06-21 19:39:12,497 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=c8e305e
+2026-06-21 19:39:12,509 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=c8e305e]
+2026-06-21 19:39:12,530 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Structural_v3.2_RVOL1.0')]
+2026-06-21 19:39:12,866 - INFO - 🔄 Recovered 35 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_banknifty_test_cf', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24139.65_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619']
+2026-06-21 19:39:12,866 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-21 19:39:12,898 - INFO - 🔴 EXIT (TRAILING_SL) [Structural_v3.2_RVOL1.0|_nifty_test_recovery]: NSE:NIFTY50-INDEX @ 21900.00 | PnL -0.55R | MFE 0.50R | Capture -110% | 6bars HoldEff -0.092R/bar
+2026-06-21 19:39:12,917 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24070.63 | PnL -0.42R | MFE 0.63R | Capture -68% | 2bars HoldEff -0.212R/bar
+2026-06-21 19:39:12,939 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57576.44 | PnL +0.14R | MFE 1.19R | Capture 12% | 2bars HoldEff +0.072R/bar
+2026-06-21 19:39:12,962 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|nd_banknifty_test_cf]: NSE:NIFTYBANK-INDEX @ 48200.00 | PnL -1.05R | MFE 0.50R | Capture -210% | 4bars HoldEff -0.263R/bar
+2026-06-21 19:39:12,981 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57888.89 | PnL +0.09R | MFE 1.14R | Capture 8% | 2bars HoldEff +0.046R/bar
+2026-06-21 19:39:12,999 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_24139.65_20260618]: NSE:NIFTY50-INDEX @ 24120.61 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 19:39:13,018 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21858.44 TP→23055.66
+2026-06-21 19:39:13,037 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57845.54 | PnL +0.39R | MFE 1.44R | Capture 27% | 2bars HoldEff +0.193R/bar
+2026-06-21 19:39:13,056 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_23938.75_20260619]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21859.72 TP→23042.90
+2026-06-21 19:39:23,854 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:23,863 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:23,893 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:23,933 - INFO - 🔑 Access token loaded from environment
+2026-06-21 19:39:24,029 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-06-21 19:39:24,051 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:24,060 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:24,088 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:24,106 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:24,112 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:24,138 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:24,138 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 19:39:24,138 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-21 19:39:24,154 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=c8e305e
+2026-06-21 19:39:24,165 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=c8e305e]
+2026-06-21 19:39:24,183 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-21 19:39:24,190 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-21 19:39:24,214 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-21 19:39:24,214 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-21 19:39:24,214 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-21 19:39:24,225 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=c8e305e
+2026-06-21 19:39:24,235 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=c8e305e]
+2026-06-21 19:39:24,245 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=c8e305e
+2026-06-21 19:39:24,256 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=c8e305e]
+2026-06-21 19:39:24,266 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=c8e305e
+2026-06-21 19:39:24,277 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=c8e305e]
+2026-06-21 19:39:24,287 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=c8e305e
+2026-06-21 19:39:24,298 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=c8e305e]
+2026-06-21 19:39:24,309 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=c8e305e
+2026-06-21 19:39:24,319 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=c8e305e]
+2026-06-21 19:39:24,330 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=c8e305e
+2026-06-21 19:39:24,340 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=c8e305e]
+2026-06-21 19:39:24,351 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=c8e305e
+2026-06-21 19:39:24,363 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=c8e305e]
+2026-06-21 19:39:24,384 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Structural_v3.2_RVOL1.0')]
+2026-06-21 19:39:24,669 - INFO - 🔄 Recovered 30 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_banknifty_test_cf', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619']
+2026-06-21 19:39:24,669 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-21 19:39:24,699 - INFO - 🔴 EXIT (TRAILING_SL) [Structural_v3.2_RVOL1.0|_nifty_test_recovery]: NSE:NIFTY50-INDEX @ 21900.00 | PnL -0.55R | MFE 0.50R | Capture -110% | 6bars HoldEff -0.092R/bar
+2026-06-21 19:39:24,718 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24064.17 | PnL -0.54R | MFE 0.51R | Capture -106% | 2bars HoldEff -0.270R/bar
+2026-06-21 19:39:24,737 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57533.45 | PnL -0.27R | MFE 0.78R | Capture -35% | 2bars HoldEff -0.136R/bar
+2026-06-21 19:39:24,757 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|nd_banknifty_test_cf]: NSE:NIFTYBANK-INDEX @ 48200.00 | PnL -1.05R | MFE 0.50R | Capture -210% | 4bars HoldEff -0.263R/bar
+2026-06-21 19:39:24,777 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57862.73 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 19:39:24,796 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21858.44 TP→23047.22
+2026-06-21 19:39:24,815 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57830.96 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-06-21 19:39:24,833 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_23938.75_20260619]: NSE:NIFTY50-INDEX @ 21850.00 | SL→21859.72 TP→23033.18

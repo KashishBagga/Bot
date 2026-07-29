@@ -1,0 +1,356 @@
+{
+  "date": "2026-06-16",
+  "generated_at": "2026-06-21 18:17:05",
+  "sections": {
+    "executive_summary": {
+      "date": "2026-06-16",
+      "market": {
+        "nifty": null,
+        "banknifty": null,
+        "vix": {
+          "value": null
+        },
+        "day_type": "Unknown"
+      },
+      "real": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "win_rate": 0.0,
+        "total_pnl_r": 0.0,
+        "expectancy": 0.0
+      },
+      "cf": {
+        "total": 9,
+        "positive": 1,
+        "negative": 8,
+        "positive_rate": 0.11,
+        "expectancy": -0.5,
+        "total_pnl_r": -4.53
+      },
+      "experiments": []
+    },
+    "market_narrative": {
+      "gap": {
+        "direction": "Unknown",
+        "pct": 0.0
+      },
+      "opening_range_pts": null,
+      "trend_quality": null,
+      "close_position": null,
+      "session_high": null,
+      "session_low": null,
+      "session_open": null,
+      "session_close": null,
+      "bullets": [],
+      "regime_from_cf": null
+    },
+    "trade_review": {
+      "trades": [],
+      "count": 0
+    },
+    "losing_trades": {
+      "losers": [],
+      "count": 0
+    },
+    "missed_opportunities": {
+      "opportunities": [
+        {
+          "candidate_id": "cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57101.20_20260616",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY PUT",
+          "setup": "BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "BIAS_MISMATCH",
+            "LOW_EFFICIENCY",
+            "HIGH_WICKINESS"
+          ],
+          "entry_price": 57269.25,
+          "sl": 57173.67,
+          "sl_dist": 32.92,
+          "mfe_r": 3.9,
+          "mae_r": 0.24,
+          "final_pnl_r": 2.85,
+          "capture_rate": 0.731,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "priority_stars": 1,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        }
+      ],
+      "count": 1
+    },
+    "counterfactual_insights": {
+      "filters": [
+        {
+          "name": "LOW_RVOL",
+          "today_count": 9,
+          "today_expectancy": -0.5,
+          "today_wins": 1,
+          "today_win_rate": 0.11,
+          "avg_mfe": 0.55,
+          "rolling_5d_count": 9,
+          "rolling_5d_expectancy": -0.5,
+          "rolling_20d_count": 9,
+          "rolling_20d_expectancy": -0.5,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        }
+      ],
+      "count": 1
+    },
+    "experiment_ranking": {
+      "rankings": []
+    },
+    "thesis_analysis": {
+      "theses": [
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 5,
+          "net_pnl_today": -0.56,
+          "avg_pnl_today": -0.11,
+          "verdict": "woodchopper_neutral",
+          "verdict_text": "\ud83d\udfe0 Repeated entries, marginal outcome \u2014 monitor",
+          "recurring_5d": false,
+          "priority": 3
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 9,
+          "net_pnl_today": 39.03,
+          "avg_pnl_today": 4.34,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 2,
+          "net_pnl_today": 5.02,
+          "avg_pnl_today": 2.51,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 1,
+          "net_pnl_today": -1.05,
+          "avg_pnl_today": -1.05,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        }
+      ],
+      "flagged": [
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 5,
+          "net_pnl_today": -0.56,
+          "avg_pnl_today": -0.11,
+          "verdict": "woodchopper_neutral",
+          "verdict_text": "\ud83d\udfe0 Repeated entries, marginal outcome \u2014 monitor",
+          "recurring_5d": false,
+          "priority": 3
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 9,
+          "net_pnl_today": 39.03,
+          "avg_pnl_today": 4.34,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        }
+      ]
+    },
+    "market_behaviour": {
+      "total_cf": 9,
+      "choppiness": 0.78,
+      "initial_sl_rate": 0.78,
+      "setup_summary": {
+        "BREAKOUT": {
+          "total": 9,
+          "success_rate": 0.22,
+          "avg_pnl": -0.5
+        }
+      },
+      "trend_score": 2,
+      "mean_reversion_score": 8,
+      "breakout_success_pct": 0.22,
+      "sweep_success_pct": 0,
+      "hourly_performance": [
+        {
+          "hour": 10,
+          "trades": 2,
+          "avg_pnl": -1.05,
+          "wins": 0,
+          "win_rate": 0.0
+        },
+        {
+          "hour": 11,
+          "trades": 6,
+          "avg_pnl": -0.23,
+          "wins": 1,
+          "win_rate": 0.17
+        },
+        {
+          "hour": 12,
+          "trades": 1,
+          "avg_pnl": -1.05,
+          "wins": 0,
+          "win_rate": 0.0
+        }
+      ]
+    },
+    "tomorrow_outlook": {
+      "nifty": null,
+      "banknifty": null,
+      "best_signal_today": "BUY PUT",
+      "scenarios": [
+        {
+          "name": "Continuation",
+          "pct": 55,
+          "desc": "Further downside if bearish structure holds"
+        },
+        {
+          "name": "Bounce",
+          "pct": 45,
+          "desc": "Dead-cat bounce or reversal from oversold levels"
+        }
+      ],
+      "observations": [
+        "Market data unavailable \u2014 structural analysis based on CF patterns only",
+        "CF patterns showed bearish edge today"
+      ],
+      "watch_levels": [],
+      "avoid": "Opening breakout trades before 09:45 \u2014 market needs time to show direction",
+      "prefer": "Pullback entries once opening range (09:15\u201309:45) is established"
+    },
+    "research_queue": {
+      "queue": []
+    },
+    "strategy_health": {
+      "execution": {
+        "score": 10,
+        "loop_errors": 0,
+        "detail": "No crashes"
+      },
+      "data_quality": {
+        "score": 8,
+        "fetch_errors": 2,
+        "detail": "2 MTF fetch warning(s) \u2014 transient API hiccup"
+      },
+      "strategy": {
+        "score": 3,
+        "avg_20d_expectancy": -0.5,
+        "avg_5d_expectancy": -0.5,
+        "trend": "Negative \u2014 investigate",
+        "detail": "20d avg: -0.50R, 5d avg: -0.50R"
+      },
+      "research": {
+        "stars": 0,
+        "confidence": "Low",
+        "total_cf": 9,
+        "cf_last_5d": 9,
+        "detail": "Need 91 more CF trades for HIGH confidence."
+      },
+      "recommendation": "\ud83d\udfe1 Monitor. No changes today, but review Research Queue.",
+      "equity_curve": [
+        {
+          "date": "2026-06-16",
+          "cumulative_pnl": -4.53
+        },
+        {
+          "date": "2026-06-17",
+          "cumulative_pnl": 11.35
+        },
+        {
+          "date": "2026-06-18",
+          "cumulative_pnl": 46.08
+        },
+        {
+          "date": "2026-06-19",
+          "cumulative_pnl": 120.54
+        }
+      ]
+    }
+  },
+  "equity_curve": [
+    {
+      "date": "2026-06-16",
+      "cumulative_pnl": -4.53
+    },
+    {
+      "date": "2026-06-17",
+      "cumulative_pnl": 11.35
+    },
+    {
+      "date": "2026-06-18",
+      "cumulative_pnl": 46.08
+    },
+    {
+      "date": "2026-06-19",
+      "cumulative_pnl": 120.54
+    }
+  ],
+  "filter_stats": [
+    {
+      "name": "LOW_RVOL",
+      "today_count": 9,
+      "today_expectancy": -0.5,
+      "today_wins": 1,
+      "today_win_rate": 0.11,
+      "avg_mfe": 0.55,
+      "rolling_5d_count": 9,
+      "rolling_5d_expectancy": -0.5,
+      "rolling_20d_count": 9,
+      "rolling_20d_expectancy": -0.5,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    }
+  ],
+  "trade_distribution": [
+    {
+      "hour": 10,
+      "trades": 2,
+      "avg_pnl": -1.05,
+      "wins": 0,
+      "win_rate": 0.0
+    },
+    {
+      "hour": 11,
+      "trades": 6,
+      "avg_pnl": -0.23,
+      "wins": 1,
+      "win_rate": 0.17
+    },
+    {
+      "hour": 12,
+      "trades": 1,
+      "avg_pnl": -1.05,
+      "wins": 0,
+      "win_rate": 0.0
+    }
+  ],
+  "experiment_rankings": [],
+  "research_queue": []
+}

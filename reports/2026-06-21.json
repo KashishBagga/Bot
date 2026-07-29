@@ -1,0 +1,266 @@
+{
+  "date": "2026-06-21",
+  "generated_at": "2026-06-21 18:17:11",
+  "sections": {
+    "executive_summary": {
+      "date": "2026-06-21",
+      "market": {
+        "nifty": null,
+        "banknifty": null,
+        "vix": {
+          "value": null
+        },
+        "day_type": "Unknown"
+      },
+      "real": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "win_rate": 0.0,
+        "total_pnl_r": 0.0,
+        "expectancy": 0.0
+      },
+      "cf": {
+        "total": 0,
+        "positive": 0,
+        "negative": 0,
+        "positive_rate": 0.0,
+        "expectancy": 0.0,
+        "total_pnl_r": 0.0
+      },
+      "experiments": []
+    },
+    "market_narrative": {
+      "gap": {
+        "direction": "Unknown",
+        "pct": 0.0
+      },
+      "opening_range_pts": null,
+      "trend_quality": null,
+      "close_position": null,
+      "session_high": null,
+      "session_low": null,
+      "session_open": null,
+      "session_close": null,
+      "bullets": [],
+      "regime_from_cf": null
+    },
+    "trade_review": {
+      "trades": [],
+      "count": 0
+    },
+    "losing_trades": {
+      "losers": [],
+      "count": 0
+    },
+    "missed_opportunities": {
+      "opportunities": [],
+      "count": 0
+    },
+    "counterfactual_insights": {
+      "filters": [],
+      "count": 0
+    },
+    "experiment_ranking": {
+      "rankings": []
+    },
+    "thesis_analysis": {
+      "theses": [],
+      "flagged": []
+    },
+    "market_behaviour": {
+      "total_cf": 0,
+      "choppiness": 0.0,
+      "initial_sl_rate": 0.0,
+      "setup_summary": {},
+      "trend_score": 0,
+      "mean_reversion_score": 10,
+      "breakout_success_pct": 0,
+      "sweep_success_pct": 0,
+      "hourly_performance": []
+    },
+    "tomorrow_outlook": {
+      "nifty": null,
+      "banknifty": null,
+      "best_signal_today": null,
+      "scenarios": [
+        {
+          "name": "Range",
+          "pct": 50,
+          "desc": "Continuation of ranging behaviour"
+        },
+        {
+          "name": "Breakout",
+          "pct": 50,
+          "desc": "Directional breakout once catalyst emerges"
+        }
+      ],
+      "observations": [
+        "Market data unavailable \u2014 structural analysis based on CF patterns only"
+      ],
+      "watch_levels": [],
+      "avoid": "Opening breakout trades before 09:45 \u2014 market needs time to show direction",
+      "prefer": "Pullback entries once opening range (09:15\u201309:45) is established"
+    },
+    "research_queue": {
+      "queue": [
+        {
+          "priority": 4,
+          "title": "Investigate `LOW_RVOL` filter threshold",
+          "description": "Shadow trades rejected for `LOW_RVOL` show rolling expectancy +1.01R over 104 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 4,
+          "confidence": "High",
+          "rolling_expectancy": 1.01,
+          "sample_count": 104,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_RVOL threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 4,
+          "title": "Investigate repeated thesis entries (Woodchopper)",
+          "description": "NSE:NIFTYBANK-INDEX BREAKOUT BUY PUT: 14 entries over 5 days, net -6.82R. Repeated failures on same structural level.",
+          "evidence_stars": 3,
+          "confidence": "Medium",
+          "rolling_expectancy": -0.49,
+          "sample_count": 14,
+          "status": "Needs experiment",
+          "next_step": "Implement `max_attempts_per_level = 2` in thesis deduplication. Shadow test."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `BIAS_MISMATCH` filter threshold",
+          "description": "Shadow trades rejected for `BIAS_MISMATCH` show rolling expectancy +2.07R over 5 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.07,
+          "sample_count": 5,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with BIAS_MISMATCH threshold loosened by 20%, run for 5 days."
+        },
+        {
+          "priority": 2,
+          "title": "Investigate `LOW_EFFICIENCY` filter threshold",
+          "description": "Shadow trades rejected for `LOW_EFFICIENCY` show rolling expectancy +2.48R over 3 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.48,
+          "sample_count": 3,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with LOW_EFFICIENCY threshold loosened by 20%, run for 5 days."
+        }
+      ]
+    },
+    "strategy_health": {
+      "execution": {
+        "score": 10,
+        "loop_errors": 0,
+        "detail": "No crashes"
+      },
+      "data_quality": {
+        "score": 10,
+        "fetch_errors": 0,
+        "detail": "All MTF data fetched cleanly"
+      },
+      "strategy": {
+        "score": 9,
+        "avg_20d_expectancy": 0.7,
+        "avg_5d_expectancy": 0.7,
+        "trend": "Strongly positive",
+        "detail": "20d avg: +0.70R, 5d avg: +0.70R"
+      },
+      "research": {
+        "stars": 4,
+        "confidence": "High",
+        "total_cf": 116,
+        "cf_last_5d": 107,
+        "detail": "Based on 116 cumulative shadow trades."
+      },
+      "recommendation": "\u2705 No strategy changes. System is performing as designed.",
+      "equity_curve": [
+        {
+          "date": "2026-06-16",
+          "cumulative_pnl": -4.53
+        },
+        {
+          "date": "2026-06-17",
+          "cumulative_pnl": 11.35
+        },
+        {
+          "date": "2026-06-18",
+          "cumulative_pnl": 46.08
+        },
+        {
+          "date": "2026-06-19",
+          "cumulative_pnl": 120.54
+        }
+      ]
+    }
+  },
+  "equity_curve": [
+    {
+      "date": "2026-06-16",
+      "cumulative_pnl": -4.53
+    },
+    {
+      "date": "2026-06-17",
+      "cumulative_pnl": 11.35
+    },
+    {
+      "date": "2026-06-18",
+      "cumulative_pnl": 46.08
+    },
+    {
+      "date": "2026-06-19",
+      "cumulative_pnl": 120.54
+    }
+  ],
+  "filter_stats": [],
+  "trade_distribution": [],
+  "experiment_rankings": [],
+  "research_queue": [
+    {
+      "priority": 4,
+      "title": "Investigate `LOW_RVOL` filter threshold",
+      "description": "Shadow trades rejected for `LOW_RVOL` show rolling expectancy +1.01R over 104 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 4,
+      "confidence": "High",
+      "rolling_expectancy": 1.01,
+      "sample_count": 104,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_RVOL threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 4,
+      "title": "Investigate repeated thesis entries (Woodchopper)",
+      "description": "NSE:NIFTYBANK-INDEX BREAKOUT BUY PUT: 14 entries over 5 days, net -6.82R. Repeated failures on same structural level.",
+      "evidence_stars": 3,
+      "confidence": "Medium",
+      "rolling_expectancy": -0.49,
+      "sample_count": 14,
+      "status": "Needs experiment",
+      "next_step": "Implement `max_attempts_per_level = 2` in thesis deduplication. Shadow test."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `BIAS_MISMATCH` filter threshold",
+      "description": "Shadow trades rejected for `BIAS_MISMATCH` show rolling expectancy +2.07R over 5 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.07,
+      "sample_count": 5,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with BIAS_MISMATCH threshold loosened by 20%, run for 5 days."
+    },
+    {
+      "priority": 2,
+      "title": "Investigate `LOW_EFFICIENCY` filter threshold",
+      "description": "Shadow trades rejected for `LOW_EFFICIENCY` show rolling expectancy +2.48R over 3 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.48,
+      "sample_count": 3,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with LOW_EFFICIENCY threshold loosened by 20%, run for 5 days."
+    }
+  ]
+}

@@ -1,0 +1,1188 @@
+2026-07-20 09:11:43,764 - INFO - 🔑 Access token loaded from environment
+2026-07-20 09:11:43,868 - INFO - ✅ Fyers client initialized successfully
+2026-07-20 09:11:43,884 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,884 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-20 09:11:43,884 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-20 09:11:43,885 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,885 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,885 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-20 09:11:43,885 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-20 09:11:43,897 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-07-20 09:11:43,898 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,899 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,899 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-20 09:11:43,899 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-20 09:11:43,907 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-07-20 09:11:43,908 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,916 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-07-20 09:11:43,917 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,926 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-07-20 09:11:43,927 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,934 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-07-20 09:11:43,936 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,943 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-07-20 09:11:43,945 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,952 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-07-20 09:11:43,953 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,960 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-07-20 09:11:43,961 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,962 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-20 09:11:43,968 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-07-20 09:11:43,969 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,969 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-20 09:11:43,977 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-07-20 09:11:43,978 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,978 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.45, imbalance>=0.45]
+2026-07-20 09:11:43,985 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=db8c841e65c2c062 git=97aaa84
+2026-07-20 09:11:43,986 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,987 - ERROR - ❌ Failed to fetch open positions: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,987 - ERROR - ❌ Failed to fetch open counterfactuals: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:43,987 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-20 09:11:43,987 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-07-20 09:11:43,987 - INFO - --- 09:11:43 Market Pulse ---
+2026-07-20 09:11:44,755 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,756 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,757 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,757 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,758 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,759 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,759 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,760 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,761 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,761 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,762 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,763 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,763 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,764 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,764 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,765 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,766 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,766 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:44,767 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,766 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,766 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,767 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,767 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,768 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,769 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,769 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,770 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,770 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,771 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,772 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,772 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,773 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,777 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,782 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,786 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,788 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 09:11:45,789 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,791 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,791 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24346.70 | SL: 24337.78 TP: 24364.53
+2026-07-20 09:11:45,791 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 09:11:45,791 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,792 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,792 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24346.70 | SL: 24337.78 TP: 24364.53
+2026-07-20 09:11:45,805 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,805 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,806 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,807 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,807 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,808 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,808 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,808 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,809 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,809 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,810 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,810 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,811 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,811 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,812 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,812 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,813 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,813 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,814 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,814 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,815 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,815 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,816 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:45,817 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,537 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,538 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,539 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,539 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,540 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,540 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,541 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,541 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,542 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,542 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,543 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,543 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,548 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,553 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,557 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,559 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-20 09:11:46,560 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,560 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,561 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 58576.00 | SL: 58611.31 TP: 58222.89
+2026-07-20 09:11:46,561 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-20 09:11:46,561 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,562 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:11:46,562 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 58576.00 | SL: 58611.31 TP: 58222.89
+2026-07-20 09:16:44,682 - INFO - --- 09:16:44 Market Pulse ---
+2026-07-20 09:16:45,995 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:45,998 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:45,999 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24337.78 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:16:46,001 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,003 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,003 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24337.78 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:16:46,004 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,005 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,005 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57734.85 | SL→57770.16 TP→58187.58
+2026-07-20 09:16:46,006 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,008 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,008 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57734.85 | SL→57770.16 TP→58187.58
+2026-07-20 09:16:46,032 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,033 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,033 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,034 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,035 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,036 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,036 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,037 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,038 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,038 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,039 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,039 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,040 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,041 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,041 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,042 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:46,042 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,033 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,033 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,034 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,034 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,035 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,035 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,036 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,037 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,037 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,038 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,038 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,039 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,039 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,043 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,049 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,052 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,056 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['TIME_FILTER', 'LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 09:16:47,056 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,057 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,057 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24195.15 | SL: 24183.29 TP: 24218.88
+2026-07-20 09:16:47,057 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['TIME_FILTER', 'LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 09:16:47,058 - ERROR - ❌ Failed to save counterfactual event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,058 - ERROR - ❌ Failed to save counterfactual result: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,058 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24195.15 | SL: 24183.29 TP: 24218.88
+2026-07-20 09:16:47,071 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,072 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,072 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,073 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,073 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,074 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,074 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,075 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,075 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,076 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,077 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,077 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,078 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,078 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,079 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,079 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,080 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,080 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,795 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,795 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,796 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,796 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,797 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,797 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,798 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,798 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,799 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,800 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,800 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,801 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,801 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,802 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,802 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,803 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,803 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,804 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,804 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,805 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,805 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,806 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,806 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,807 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,811 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,817 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:16:47,820 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-07-20 09:21:13,719 - INFO - 🔑 Access token loaded from environment
+2026-07-20 09:21:13,828 - INFO - ✅ Fyers client initialized successfully
+2026-07-20 09:21:13,879 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:13,892 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:13,926 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:13,926 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-20 09:21:13,926 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-20 09:21:13,949 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:13,960 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:13,988 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:14,015 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:14,024 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:14,052 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:14,052 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-20 09:21:14,052 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-20 09:21:14,066 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-07-20 09:21:14,078 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-07-20 09:21:14,102 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:14,111 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:14,136 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:14,137 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-20 09:21:14,137 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-20 09:21:14,148 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-07-20 09:21:14,160 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-07-20 09:21:14,171 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-07-20 09:21:14,182 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-07-20 09:21:14,192 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-07-20 09:21:14,203 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-07-20 09:21:14,214 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-07-20 09:21:14,224 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-07-20 09:21:14,235 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-07-20 09:21:14,246 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-07-20 09:21:14,256 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-07-20 09:21:14,268 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-07-20 09:21:14,278 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-07-20 09:21:14,289 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-07-20 09:21:14,289 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-20 09:21:14,300 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-07-20 09:21:14,310 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=5b54205496d059aa git=97aaa84]
+2026-07-20 09:21:14,310 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-20 09:21:14,321 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-07-20 09:21:14,331 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-07-20 09:21:14,331 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.45, imbalance>=0.45]
+2026-07-20 09:21:14,342 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=db8c841e65c2c062 git=97aaa84
+2026-07-20 09:21:14,353 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=db8c841e65c2c062 git=97aaa84]
+2026-07-20 09:21:14,396 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-20 09:21:14,396 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-07-20 09:21:14,396 - INFO - --- 09:21:14 Market Pulse ---
+2026-07-20 09:21:16,497 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.30']
+2026-07-20 09:21:16,521 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.30']
+2026-07-20 09:21:16,525 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.30']
+2026-07-20 09:21:16,525 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['TIME_FILTER', 'LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 09:21:16,550 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24194.10 | SL: 24182.69 TP: 24216.91
+2026-07-20 09:21:16,550 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.30']
+2026-07-20 09:21:16,550 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['TIME_FILTER', 'LOW_RVOL', 'BIAS_MISMATCH', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 09:21:16,571 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24194.10 | SL: 24182.69 TP: 24216.91
+2026-07-20 09:21:17,764 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['TIME_FILTER', 'BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-20 09:21:17,784 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57752.65 | SL: 57796.32 TP: 57456.10
+2026-07-20 09:21:17,785 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['TIME_FILTER', 'BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-20 09:21:17,807 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57752.65 | SL: 57796.32 TP: 57456.10
+2026-07-20 09:21:39,063 - INFO - 🔑 Access token loaded from environment
+2026-07-20 09:21:39,174 - INFO - ✅ Fyers client initialized successfully
+2026-07-20 09:21:39,234 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:39,248 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:39,282 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:39,282 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-20 09:21:39,283 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-20 09:21:39,308 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:39,317 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:39,343 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:39,369 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:39,378 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:39,402 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:39,403 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-20 09:21:39,403 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-20 09:21:39,412 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-07-20 09:21:39,423 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-07-20 09:21:39,448 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-20 09:21:39,458 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-20 09:21:39,482 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-20 09:21:39,482 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-20 09:21:39,482 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-20 09:21:39,491 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-07-20 09:21:39,502 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-07-20 09:21:39,510 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-07-20 09:21:39,521 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-07-20 09:21:39,530 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-07-20 09:21:39,541 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-07-20 09:21:39,549 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-07-20 09:21:39,560 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-07-20 09:21:39,569 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-07-20 09:21:39,580 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-07-20 09:21:39,588 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-07-20 09:21:39,599 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-07-20 09:21:39,607 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-07-20 09:21:39,618 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-07-20 09:21:39,619 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-20 09:21:39,627 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-07-20 09:21:39,638 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=5b54205496d059aa git=97aaa84]
+2026-07-20 09:21:39,638 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-20 09:21:39,646 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-07-20 09:21:39,657 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-07-20 09:21:39,658 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.45, imbalance>=0.45]
+2026-07-20 09:21:39,666 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=db8c841e65c2c062 git=97aaa84
+2026-07-20 09:21:39,677 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=db8c841e65c2c062 git=97aaa84]
+2026-07-20 09:21:39,745 - INFO - 🔄 Recovered 4 active counterfactual positions: ['cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57542.15_20260720_092000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57542.15_20260720_092000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24367.30_20260720_092000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24367.30_20260720_092000_Structural_v3.2_RVOL0.8']
+2026-07-20 09:21:39,745 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-20 09:21:39,745 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-07-20 09:21:39,745 - INFO - --- 09:21:39 Market Pulse ---
+2026-07-20 09:21:40,745 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57747.65 | SL→57791.33 TP→57456.10
+2026-07-20 09:21:40,788 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57747.65 | SL→57791.33 TP→57456.10
+2026-07-20 09:21:42,274 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 09:21:42,288 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 09:21:42,292 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 09:21:42,292 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 09:21:43,485 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['TIME_FILTER:OPEN', 'LOW_RR:0.61']
+2026-07-20 09:21:43,510 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 57747.65 | SL: 57763.10 TP: 57738.25
+2026-07-20 09:26:40,600 - INFO - --- 09:26:40 Market Pulse ---
+2026-07-20 09:26:41,389 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24202.30 | SL→24190.89 TP→24216.91
+2026-07-20 09:26:41,429 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24202.30 | SL→24190.89 TP→24216.91
+2026-07-20 09:26:42,826 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['TIME_FILTER', 'LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 09:26:42,848 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24202.30 | SL: 24214.43 TP: 24178.04
+2026-07-20 09:26:42,848 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['TIME_FILTER', 'LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 09:26:42,869 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24202.30 | SL: 24214.43 TP: 24178.04
+2026-07-20 09:26:44,040 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['TIME_FILTER', 'LOW_RR:0.18']
+2026-07-20 09:26:44,063 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|92640_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57753.35 | SL: 57788.32 TP: 57747.20
+2026-07-20 09:31:44,183 - INFO - --- 09:31:44 Market Pulse ---
+2026-07-20 09:31:45,435 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57647.30 | SL→57690.98 TP→57456.10
+2026-07-20 09:31:45,469 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57647.30 | SL→57690.98 TP→57456.10
+2026-07-20 09:31:45,501 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24190.89 | PnL -0.33R | MFE 0.72R | Capture -46% | 3bars HoldEff -0.110R/bar
+2026-07-20 09:31:45,532 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24190.89 | PnL -0.33R | MFE 0.72R | Capture -46% | 3bars HoldEff -0.110R/bar
+2026-07-20 09:31:45,561 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57647.30 | SL→57662.75 TP→57722.80
+2026-07-20 09:31:45,588 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24180.45 | SL→24192.58 TP→24178.04
+2026-07-20 09:31:45,615 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24180.45 | SL→24192.58 TP→24178.04
+2026-07-20 09:31:45,641 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|92640_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57647.30 | SL→57682.27 TP→57712.23
+2026-07-20 09:31:47,028 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 09:31:47,043 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 09:31:47,046 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 09:31:47,046 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 09:36:48,231 - INFO - --- 09:36:48 Market Pulse ---
+2026-07-20 09:36:49,126 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57653.60 | SL→57662.75 TP→57707.35
+2026-07-20 09:36:49,166 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|92640_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57653.60 | SL→57682.27 TP→57677.27
+2026-07-20 09:36:50,514 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:36:50,527 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:36:50,530 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:36:50,530 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:36:50,531 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Geometry_v1.0_Score35]
+2026-07-20 09:36:50,531 - INFO -    Entry: 24190.65 | SL: 24186.26 | TP: 24266.52 (RR: 17.27)
+2026-07-20 09:36:50,555 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1784520408]: NSE:NIFTY50-INDEX BUY CALL @ 24190.65 | SL: 24186.26 TP: 24266.52
+2026-07-20 09:36:50,555 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:-0.22']
+2026-07-20 09:36:50,576 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24190.65 | SL: 24172.11 TP: 24186.50
+2026-07-20 09:36:50,576 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:-0.22']
+2026-07-20 09:36:50,596 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY CALL @ 24190.65 | SL: 24172.11 TP: 24186.50
+2026-07-20 09:36:51,722 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:0.43']
+2026-07-20 09:36:51,745 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 57653.60 | SL: 57635.50 TP: 57661.35
+2026-07-20 09:36:51,745 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:0.17']
+2026-07-20 09:36:51,767 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 57653.60 | SL: 57606.65 TP: 57661.35
+2026-07-20 09:36:51,767 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:0.17']
+2026-07-20 09:36:51,787 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY CALL @ 57653.60 | SL: 57606.65 TP: 57661.35
+2026-07-20 09:41:51,797 - INFO - --- 09:41:51 Market Pulse ---
+2026-07-20 09:41:52,652 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24186.26 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:41:52,685 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57576.50 | SL→57620.18 TP→57456.10
+2026-07-20 09:41:52,716 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57576.50 | SL→57620.18 TP→57456.10
+2026-07-20 09:41:52,746 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57576.50 | SL→57591.95 TP→57691.90
+2026-07-20 09:41:52,776 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24166.40 | SL→24178.53 TP→24165.91
+2026-07-20 09:41:52,805 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24166.40 | SL→24178.53 TP→24165.91
+2026-07-20 09:41:52,831 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|92640_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57576.50 | SL→57611.47 TP→57642.30
+2026-07-20 09:41:52,856 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24172.11 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:41:52,877 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24172.11 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:41:52,897 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57635.50 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:41:52,916 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57606.65 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:41:52,938 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57606.65 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 09:41:54,306 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:41:54,319 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:41:54,322 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:41:54,322 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.48']
+2026-07-20 09:59:17,108 - INFO - --- 09:59:17 Market Pulse ---
+2026-07-20 09:59:17,993 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57620.18 | PnL +2.98R | MFE 4.03R | Capture 74% | 6bars HoldEff +0.497R/bar
+2026-07-20 09:59:18,025 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57620.18 | PnL +2.98R | MFE 4.03R | Capture 74% | 6bars HoldEff +0.497R/bar
+2026-07-20 09:59:18,052 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57591.95 | PnL +10.03R | MFE 11.08R | Capture 91% | 5bars HoldEff +2.006R/bar
+2026-07-20 09:59:18,074 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24178.53 | PnL +1.91R | MFE 2.96R | Capture 65% | 4bars HoldEff +0.477R/bar
+2026-07-20 09:59:18,094 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24178.53 | PnL +1.91R | MFE 2.96R | Capture 65% | 4bars HoldEff +0.477R/bar
+2026-07-20 09:59:18,114 - INFO - 🔴 EXIT (TRAILING_SL) [CFOrderFlow_v1.0|92640_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57611.47 | PnL +4.01R | MFE 5.06R | Capture 79% | 4bars HoldEff +1.002R/bar
+2026-07-20 09:59:19,495 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'NO_TARGET_ZONE']
+2026-07-20 09:59:19,517 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24195.05 | SL: 24208.57 TP: 24168.01
+2026-07-20 09:59:19,517 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NO_TARGET_ZONE']
+2026-07-20 09:59:19,536 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24195.05 | SL: 24208.57 TP: 24168.01
+2026-07-20 09:59:19,536 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.2']
+2026-07-20 09:59:19,556 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24195.05 | SL: 24170.69 TP: 24200.00
+2026-07-20 09:59:19,556 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.2']
+2026-07-20 09:59:19,575 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY CALL @ 24195.05 | SL: 24170.69 TP: 24200.00
+2026-07-20 09:59:20,777 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-20 09:59:20,798 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57671.05 | SL: 57721.35 TP: 57456.10
+2026-07-20 09:59:20,798 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-20 09:59:20,817 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57671.05 | SL: 57721.35 TP: 57456.10
+2026-07-20 09:59:20,817 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.12']
+2026-07-20 09:59:20,839 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 57671.05 | SL: 57587.81 TP: 57661.35
+2026-07-20 09:59:20,839 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.12']
+2026-07-20 09:59:20,864 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY CALL @ 57671.05 | SL: 57587.81 TP: 57661.35
+2026-07-20 10:16:53,596 - INFO - --- 10:16:53 Market Pulse ---
+2026-07-20 10:16:54,658 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24208.57 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:16:54,691 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24208.57 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:16:54,724 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24219.60 | SL→24195.24 TP→24224.36
+2026-07-20 10:16:54,752 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24219.60 | SL→24195.24 TP→24224.36
+2026-07-20 10:16:54,781 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57721.35 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:16:54,814 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57721.35 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:16:54,847 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57739.10 | SL→57655.86 TP→57744.59
+2026-07-20 10:16:54,877 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57739.10 | SL→57655.86 TP→57744.59
+2026-07-20 10:16:56,460 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 10:16:56,479 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24219.60 | SL: 24234.10 TP: 24190.60
+2026-07-20 10:16:56,479 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-20 10:16:56,499 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24219.60 | SL: 24234.10 TP: 24190.60
+2026-07-20 10:16:57,766 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS']
+2026-07-20 10:16:57,792 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57739.10 | SL: 57787.79 TP: 57456.10
+2026-07-20 10:16:57,792 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS']
+2026-07-20 10:16:57,812 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57739.10 | SL: 57787.79 TP: 57456.10
+2026-07-20 10:16:57,812 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:0.07']
+2026-07-20 10:16:57,834 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 57739.10 | SL: 57701.40 TP: 57741.78
+2026-07-20 10:16:57,834 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:0.07']
+2026-07-20 10:16:57,856 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY CALL @ 57739.10 | SL: 57701.40 TP: 57741.78
+2026-07-20 10:22:17,180 - INFO - --- 10:22:17 Market Pulse ---
+2026-07-20 10:22:18,069 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24225.50 | SL→24201.14 TP→24248.72
+2026-07-20 10:22:18,098 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24225.50 | SL→24201.14 TP→24248.72
+2026-07-20 10:22:18,126 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57823.15 | SL→57739.91 TP→57827.83
+2026-07-20 10:22:18,153 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57823.15 | SL→57739.91 TP→57827.83
+2026-07-20 10:22:18,176 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57787.79 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:22:18,204 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57787.79 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:22:18,229 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57823.15 | SL→57785.45 TP→57779.48
+2026-07-20 10:22:18,256 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57823.15 | SL→57785.45 TP→57779.48
+2026-07-20 10:22:19,726 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL']
+2026-07-20 10:22:19,748 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24225.50 | SL: 24250.23 TP: 24176.04
+2026-07-20 10:22:21,017 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-20 10:22:21,036 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57823.15 | SL: 57874.04 TP: 57456.10
+2026-07-20 10:22:21,036 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'HIGH_WICKINESS']
+2026-07-20 10:22:21,056 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57823.15 | SL: 57874.04 TP: 57456.10
+2026-07-20 10:22:21,056 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:0.25']
+2026-07-20 10:22:21,076 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|02217_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 57823.15 | SL: 57759.68 TP: 57839.00
+2026-07-20 10:27:21,105 - INFO - --- 10:27:21 Market Pulse ---
+2026-07-20 10:27:21,868 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57797.90 | SL→57785.45 TP→57817.18
+2026-07-20 10:27:21,909 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57797.90 | SL→57785.45 TP→57817.18
+2026-07-20 10:27:21,945 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24223.00 | SL→24247.73 TP→24176.04
+2026-07-20 10:27:21,977 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57797.90 | SL→57848.79 TP→57456.10
+2026-07-20 10:27:22,003 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57797.90 | SL→57848.79 TP→57456.10
+2026-07-20 10:27:23,460 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.5']
+2026-07-20 10:27:23,482 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24223.00 | SL: 24219.32 TP: 24224.83
+2026-07-20 10:27:23,482 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.5']
+2026-07-20 10:27:23,504 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY CALL @ 24223.00 | SL: 24219.32 TP: 24224.83
+2026-07-20 10:32:25,683 - INFO - --- 10:32:25 Market Pulse ---
+2026-07-20 10:32:26,607 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24229.55 | SL→24205.19 TP→24248.72
+2026-07-20 10:32:26,648 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24229.55 | SL→24205.19 TP→24248.72
+2026-07-20 10:32:26,680 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24229.55 | SL→24225.87 TP→24228.51
+2026-07-20 10:32:26,710 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24229.55 | SL→24225.87 TP→24228.51
+2026-07-20 10:37:29,595 - INFO - --- 10:37:29 Market Pulse ---
+2026-07-20 10:37:30,630 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24219.40 | SL→24233.90 TP→24190.60
+2026-07-20 10:37:30,660 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24219.40 | SL→24233.90 TP→24190.60
+2026-07-20 10:37:30,684 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57785.45 | PnL +1.18R | MFE 2.23R | Capture 53% | 4bars HoldEff +0.295R/bar
+2026-07-20 10:37:30,705 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57785.45 | PnL +1.18R | MFE 2.23R | Capture 53% | 4bars HoldEff +0.295R/bar
+2026-07-20 10:37:30,726 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24219.40 | SL→24244.13 TP→24176.04
+2026-07-20 10:37:30,748 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57747.50 | SL→57798.39 TP→57456.10
+2026-07-20 10:37:30,767 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57747.50 | SL→57798.39 TP→57456.10
+2026-07-20 10:37:30,787 - INFO - 🔴 EXIT (INITIAL_SL) [CFOrderFlow_v1.0|02217_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57759.68 | PnL -1.05R | MFE 0.00R | Capture N/A | 3bars HoldEff -0.350R/bar
+2026-07-20 10:37:30,806 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24225.87 | PnL +0.73R | MFE 1.78R | Capture 41% | 2bars HoldEff +0.365R/bar
+2026-07-20 10:37:30,825 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24225.87 | PnL +0.73R | MFE 1.78R | Capture 41% | 2bars HoldEff +0.365R/bar
+2026-07-20 10:42:33,683 - INFO - --- 10:42:33 Market Pulse ---
+2026-07-20 10:42:34,612 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24215.70 | SL→24230.20 TP→24190.60
+2026-07-20 10:42:34,652 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24215.70 | SL→24230.20 TP→24190.60
+2026-07-20 10:42:34,683 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24215.70 | SL→24240.43 TP→24176.04
+2026-07-20 10:42:36,196 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NARRATIVE_BIAS_BULLISH', 'LOW_RR:0.67']
+2026-07-20 10:42:36,217 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24215.70 | SL: 24221.20 TP: 24212.03
+2026-07-20 10:42:36,217 - INFO - 👻 [Geometry_v1.0_Score50] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NARRATIVE_BIAS_BULLISH', 'LOW_RR:0.67']
+2026-07-20 10:42:36,238 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24215.70 | SL: 24221.20 TP: 24212.03
+2026-07-20 10:42:37,471 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.17']
+2026-07-20 10:42:37,493 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 57752.55 | SL: 57804.81 TP: 57743.60
+2026-07-20 10:42:37,493 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.17']
+2026-07-20 10:42:37,516 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY PUT @ 57752.55 | SL: 57804.81 TP: 57743.60
+2026-07-20 10:42:37,516 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.16']
+2026-07-20 10:42:37,537 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57752.55 | SL: 57785.96 TP: 57747.20
+2026-07-20 10:47:37,557 - INFO - --- 10:47:37 Market Pulse ---
+2026-07-20 10:47:38,457 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24221.20 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:47:38,494 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24221.20 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 10:47:40,079 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Geometry_v1.0_Score35]
+2026-07-20 10:47:40,079 - INFO -    Entry: 24225.1 | SL: 24220.82 | TP: 24282.43 (RR: 13.41)
+2026-07-20 10:47:40,103 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1784524657]: NSE:NIFTY50-INDEX BUY CALL @ 24225.10 | SL: 24220.82 TP: 24282.43
+2026-07-20 11:03:38,083 - INFO - --- 11:03:38 Market Pulse ---
+2026-07-20 11:03:39,189 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57739.91 | PnL +0.78R | MFE 1.83R | Capture 43% | 8bars HoldEff +0.097R/bar
+2026-07-20 11:03:39,223 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57739.91 | PnL +0.78R | MFE 1.83R | Capture 43% | 8bars HoldEff +0.097R/bar
+2026-07-20 11:03:39,251 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57678.25 | SL→57729.14 TP→57456.10
+2026-07-20 11:03:39,274 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57678.25 | SL→57729.14 TP→57456.10
+2026-07-20 11:03:39,297 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57678.25 | SL→57730.51 TP→57691.34
+2026-07-20 11:03:39,319 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57678.25 | SL→57730.51 TP→57691.34
+2026-07-20 11:03:39,343 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57678.25 | SL→57711.66 TP→57713.79
+2026-07-20 11:20:29,854 - INFO - --- 11:20:29 Market Pulse ---
+2026-07-20 11:20:31,768 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24220.82 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-07-20 11:20:31,810 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57668.15 | SL→57719.04 TP→57456.10
+2026-07-20 11:20:31,843 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57668.15 | SL→57719.04 TP→57456.10
+2026-07-20 11:20:31,874 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57668.15 | SL→57720.41 TP→57639.08
+2026-07-20 11:20:31,904 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57668.15 | SL→57720.41 TP→57639.08
+2026-07-20 11:20:31,940 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57668.15 | SL→57701.56 TP→57680.37
+2026-07-20 11:20:33,677 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.14']
+2026-07-20 11:20:33,692 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.14']
+2026-07-20 11:20:33,696 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.14']
+2026-07-20 11:20:33,696 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.14']
+2026-07-20 11:20:35,000 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 11:20:35,013 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 11:20:35,016 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 11:20:35,016 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-20 11:20:35,017 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.25']
+2026-07-20 11:35:34,872 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY CALL @ 57668.15 | SL: 57640.98 TP: 57661.35
+2026-07-20 11:35:34,872 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RR:-0.25']
+2026-07-20 11:35:34,904 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY CALL @ 57668.15 | SL: 57640.98 TP: 57661.35
+2026-07-20 11:53:16,259 - INFO - --- 11:53:16 Market Pulse ---
+2026-07-20 11:53:17,131 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24205.19 | PnL +0.37R | MFE 1.42R | Capture 26% | 10bars HoldEff +0.037R/bar
+2026-07-20 11:53:17,167 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24205.19 | PnL +0.37R | MFE 1.42R | Capture 26% | 10bars HoldEff +0.037R/bar
+2026-07-20 11:53:17,197 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24187.90 | SL→24202.40 TP→24176.10
+2026-07-20 11:53:17,221 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24187.90 | SL→24202.40 TP→24176.10
+2026-07-20 11:53:17,245 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24187.90 | SL→24212.63 TP→24176.04
+2026-07-20 11:53:17,273 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57659.10 | SL→57709.99 TP→57456.10
+2026-07-20 11:53:17,297 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57659.10 | SL→57709.99 TP→57456.10
+2026-07-20 11:53:17,319 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57659.10 | SL→57711.36 TP→57639.08
+2026-07-20 11:53:17,341 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57659.10 | SL→57711.36 TP→57639.08
+2026-07-20 11:53:17,362 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57659.10 | SL→57692.51 TP→57646.96
+2026-07-20 11:53:20,490 - INFO - 👻 [ATR_Squeeze_RVOL1.0] CF SQUEEZE_BREAKOUT NSE:NIFTYBANK-INDEX None | Rejected: ['TP_CAPPED']
+2026-07-20 11:53:20,515 - ERROR - ❌ Error in market loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 583, in market_loop
+    self._enter_position(sig, now, trade_key, is_counterfactual=True)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 907, in _enter_position
+    f"🟢 ENTRY [CF|{experiment_name}|{cand_short}]: "
+TypeError: unsupported format string passed to NoneType.__format__
+2026-07-20 12:11:17,237 - INFO - --- 12:11:17 Market Pulse ---
+2026-07-20 12:11:18,554 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24187.45 | SL→24201.95 TP→24176.10
+2026-07-20 12:11:18,593 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24187.45 | SL→24201.95 TP→24176.10
+2026-07-20 12:11:18,623 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24187.45 | SL→24212.18 TP→24176.04
+2026-07-20 12:11:18,653 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57648.80 | SL→57699.69 TP→57456.10
+2026-07-20 12:11:18,707 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57648.80 | SL→57699.69 TP→57456.10
+2026-07-20 12:11:18,740 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57648.80 | SL→57701.06 TP→57639.08
+2026-07-20 12:11:18,781 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57648.80 | SL→57701.06 TP→57639.08
+2026-07-20 12:11:18,814 - INFO - 🟡 UPDATE (TRAILING_SL) [CFOrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57648.80 | SL→57682.21 TP→57646.96
+2026-07-20 12:11:20,473 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.44']
+2026-07-20 12:11:20,490 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.44']
+2026-07-20 12:11:20,494 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.44']
+2026-07-20 12:11:20,494 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.44']
+2026-07-20 12:11:20,494 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.47']
+2026-07-20 12:11:20,520 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24187.45 | SL: 24186.18 TP: 24188.05
+2026-07-20 12:11:20,520 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.05']
+2026-07-20 12:11:20,546 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY CALL @ 24187.45 | SL: 24176.25 TP: 24188.05
+2026-07-20 12:11:20,546 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.05']
+2026-07-20 12:11:20,569 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY CALL @ 24187.45 | SL: 24176.25 TP: 24188.05
+2026-07-20 12:11:21,897 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.23']
+2026-07-20 12:11:21,911 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.23']
+2026-07-20 12:11:21,915 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.23']
+2026-07-20 12:11:21,916 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.23']
+2026-07-20 12:27:13,145 - INFO - --- 12:27:13 Market Pulse ---
+2026-07-20 12:27:13,982 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24177.65 | SL→24192.15 TP→24176.10
+2026-07-20 12:27:14,022 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24177.65 | SL→24192.15 TP→24176.10
+2026-07-20 12:27:14,057 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24177.65 | SL→24202.38 TP→24176.04
+2026-07-20 12:27:14,090 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24186.18 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 12:27:15,897 - INFO - 👻 [VWAP_Reversion_1.5ATR_RVOL1.0] CF REVERSION NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH']
+2026-07-20 12:27:15,918 - INFO - 🟢 ENTRY [CF|VWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24177.65 | SL: 24170.37 TP: 24201.85
+2026-07-20 12:27:15,918 - INFO - 👻 [ATR_Squeeze_RVOL1.0] CF SQUEEZE_BREAKOUT NSE:NIFTY50-INDEX None | Rejected: ['LOW_RVOL', 'TP_CAPPED']
+2026-07-20 12:27:15,938 - ERROR - ❌ Error in market loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 583, in market_loop
+    self._enter_position(sig, now, trade_key, is_counterfactual=True)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 907, in _enter_position
+    f"🟢 ENTRY [CF|{experiment_name}|{cand_short}]: "
+TypeError: unsupported format string passed to NoneType.__format__
+2026-07-20 12:43:47,616 - INFO - --- 12:43:47 Market Pulse ---
+2026-07-20 12:43:48,435 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24159.65 | SL→24174.15 TP→24161.60
+2026-07-20 12:43:48,472 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24159.65 | SL→24174.15 TP→24161.60
+2026-07-20 12:43:48,505 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24159.65 | SL→24184.38 TP→24151.30
+2026-07-20 12:43:48,549 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57607.70 | SL→57658.59 TP→57456.10
+2026-07-20 12:43:48,582 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57607.70 | SL→57658.59 TP→57456.10
+2026-07-20 12:43:48,613 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57607.70 | SL→57659.96 TP→57586.82
+2026-07-20 12:43:48,644 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57607.70 | SL→57659.96 TP→57586.82
+2026-07-20 12:43:48,675 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFOrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57607.70 | SL→57641.11 TP→57613.55
+2026-07-20 12:43:48,702 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57640.98 | PnL -1.05R | MFE 0.00R | Capture N/A | 4bars HoldEff -0.263R/bar
+2026-07-20 12:43:48,730 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57640.98 | PnL -1.05R | MFE 0.00R | Capture N/A | 4bars HoldEff -0.263R/bar
+2026-07-20 12:43:48,767 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24176.25 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-07-20 12:43:48,796 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24176.25 | PnL -1.05R | MFE 0.00R | Capture N/A | 2bars HoldEff -0.525R/bar
+2026-07-20 12:43:48,826 - INFO - 🔴 EXIT (INITIAL_SL) [CFVWAP_Reversion_1.5ATR_RVOL1.0|rsion_1.5ATR_RVOL1.0]: NSE:NIFTY50-INDEX @ 24170.37 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 12:43:52,330 - INFO - 🚀 SIGNAL: NSE:NIFTYBANK-INDEX BUY PUT | [ATR_Squeeze_RVOL1.0]
+2026-07-20 12:43:52,330 - INFO -    Entry: 57607.7 | SL: 57630.39 | TP: 57456.100000000006 (RR: 6.68)
+2026-07-20 12:43:52,351 - INFO - 🟢 ENTRY [ATR_Squeeze_RVOL1.0|INDEX_1784531627]: NSE:NIFTYBANK-INDEX BUY PUT @ 57607.70 | SL: 57630.39 TP: 57456.10
+2026-07-20 13:01:14,786 - INFO - --- 13:01:14 Market Pulse ---
+2026-07-20 13:01:16,170 - INFO - 🔴 EXIT (INITIAL_SL) [ATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57630.39 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:01:16,210 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24174.15 | PnL +3.08R | MFE 4.13R | Capture 75% | 13bars HoldEff +0.237R/bar
+2026-07-20 13:01:16,242 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24174.15 | PnL +3.08R | MFE 4.13R | Capture 75% | 13bars HoldEff +0.237R/bar
+2026-07-20 13:01:16,270 - INFO - 🔴 EXIT (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24184.38 | PnL +1.61R | MFE 2.66R | Capture 61% | 12bars HoldEff +0.134R/bar
+2026-07-20 13:01:16,293 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57658.59 | PnL +3.18R | MFE 4.23R | Capture 75% | 12bars HoldEff +0.265R/bar
+2026-07-20 13:01:16,314 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57658.59 | PnL +3.18R | MFE 4.23R | Capture 75% | 12bars HoldEff +0.265R/bar
+2026-07-20 13:01:16,336 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57659.96 | PnL +1.72R | MFE 2.77R | Capture 62% | 8bars HoldEff +0.215R/bar
+2026-07-20 13:01:16,357 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57659.96 | PnL +1.72R | MFE 2.77R | Capture 62% | 8bars HoldEff +0.215R/bar
+2026-07-20 13:01:16,376 - INFO - 🔴 EXIT (TRAILING_SL) [CFOrderFlow_v1.0|04233_OrderFlow_v1.0]: NSE:NIFTYBANK-INDEX @ 57641.11 | PnL +3.29R | MFE 4.34R | Capture 76% | 8bars HoldEff +0.411R/bar
+2026-07-20 13:01:18,348 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.18']
+2026-07-20 13:01:18,361 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.18']
+2026-07-20 13:01:18,364 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.18']
+2026-07-20 13:01:18,364 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 13:01:18,384 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24185.30 | SL: 24193.45 TP: 24169.00
+2026-07-20 13:01:18,384 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.18']
+2026-07-20 13:01:18,384 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 13:01:18,412 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24185.30 | SL: 24193.45 TP: 24169.00
+2026-07-20 13:01:18,412 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-20 13:01:18,433 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24185.30 | SL: 24208.25 TP: 24139.40
+2026-07-20 13:01:25,068 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 13:01:25,082 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 13:01:25,086 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 13:01:25,086 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY']
+2026-07-20 13:01:25,107 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57681.15 | SL: 57707.63 TP: 57456.10
+2026-07-20 13:01:25,107 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.42']
+2026-07-20 13:01:25,107 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY']
+2026-07-20 13:01:25,128 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57681.15 | SL: 57707.63 TP: 57456.10
+2026-07-20 13:01:25,128 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY']
+2026-07-20 13:01:25,149 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57681.15 | SL: 57768.92 TP: 57456.10
+2026-07-20 13:17:29,652 - INFO - --- 13:17:29 Market Pulse ---
+2026-07-20 13:17:30,540 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24193.45 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:17:30,568 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24193.45 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:17:30,596 - INFO - 🔴 EXIT (INITIAL_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24208.25 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:17:30,622 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57707.63 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:17:30,648 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57707.63 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:17:30,673 - INFO - 🔴 EXIT (INITIAL_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57768.92 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:17:32,778 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 13:17:32,799 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24217.40 | SL: 24227.13 TP: 24197.94
+2026-07-20 13:17:32,799 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 13:17:32,820 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24217.40 | SL: 24227.13 TP: 24197.94
+2026-07-20 13:17:39,540 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-20 13:17:39,561 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57787.45 | SL: 57817.24 TP: 57489.52
+2026-07-20 13:17:39,562 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-20 13:17:39,580 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57787.45 | SL: 57817.24 TP: 57489.52
+2026-07-20 13:33:04,075 - INFO - --- 13:33:04 Market Pulse ---
+2026-07-20 13:33:05,247 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24227.13 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:33:05,274 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24227.13 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:33:05,299 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57817.24 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:33:05,322 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57817.24 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 13:33:07,431 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'NO_TARGET_ZONE']
+2026-07-20 13:33:07,451 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24237.45 | SL: 24247.38 TP: 24217.59
+2026-07-20 13:33:07,451 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['NO_TARGET_ZONE']
+2026-07-20 13:33:07,470 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24237.45 | SL: 24247.38 TP: 24217.59
+2026-07-20 13:33:07,470 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [Geometry_v1.0_Score35]
+2026-07-20 13:33:07,470 - INFO -    Entry: 24237.45 | SL: 24242.18 | TP: 24177.87 (RR: 12.6)
+2026-07-20 13:33:07,489 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1784534584]: NSE:NIFTY50-INDEX BUY PUT @ 24237.45 | SL: 24242.18 TP: 24177.87
+2026-07-20 13:33:07,489 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:-1.89']
+2026-07-20 13:33:07,508 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24237.45 | SL: 24249.48 TP: 24260.22
+2026-07-20 13:33:07,508 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [Geometry_v1.0_Score50]
+2026-07-20 13:33:07,508 - INFO -    Entry: 24237.45 | SL: 24242.18 | TP: 24177.87 (RR: 12.6)
+2026-07-20 13:33:07,528 - INFO - 🟢 ENTRY [Geometry_v1.0_Score50|INDEX_1784534584]: NSE:NIFTY50-INDEX BUY PUT @ 24237.45 | SL: 24242.18 TP: 24177.87
+2026-07-20 13:33:07,528 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:-1.89']
+2026-07-20 13:33:07,548 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24237.45 | SL: 24249.48 TP: 24260.22
+2026-07-20 13:44:47,141 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'TP_CAPPED']
+2026-07-20 13:44:47,162 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57852.80 | SL: 57882.51 TP: 57555.73
+2026-07-20 13:44:47,162 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'TP_CAPPED']
+2026-07-20 13:44:47,185 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57852.80 | SL: 57882.51 TP: 57555.73
+2026-07-20 14:04:53,795 - INFO - --- 14:04:53 Market Pulse ---
+2026-07-20 14:04:55,105 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24242.18 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,143 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24242.18 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,179 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24247.38 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,214 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24247.38 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,246 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24249.48 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,277 - INFO - 🔴 EXIT (INITIAL_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24249.48 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,307 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57882.51 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:55,338 - INFO - 🔴 EXIT (INITIAL_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57882.51 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:04:57,576 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 14:04:57,597 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24261.30 | SL: 24271.40 TP: 24241.09
+2026-07-20 14:04:57,597 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-20 14:04:57,617 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24261.30 | SL: 24271.40 TP: 24241.09
+2026-07-20 14:04:57,617 - INFO - 👻 [OrderFlow_v1.0] CF LIQUIDITY_SWEEP NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RR:0.69']
+2026-07-20 14:04:57,637 - INFO - 🟢 ENTRY [CF|OrderFlow_v1.0|40453_OrderFlow_v1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24261.30 | SL: 24257.19 TP: 24264.15
+2026-07-20 14:21:57,238 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'TP_CAPPED']
+2026-07-20 14:21:57,258 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57983.65 | SL: 58011.47 TP: 57705.45
+2026-07-20 14:21:57,258 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['BIAS_MISMATCH', 'TP_CAPPED']
+2026-07-20 14:21:57,278 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57983.65 | SL: 58011.47 TP: 57705.45
+2026-07-20 14:39:00,990 - INFO - --- 14:39:00 Market Pulse ---
+2026-07-20 14:39:01,990 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24232.20 | SL→24242.30 TP→24230.99
+2026-07-20 14:39:02,017 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24232.20 | SL→24242.30 TP→24230.99
+2026-07-20 14:39:02,043 - INFO - 🔴 EXIT (INITIAL_SL) [CFOrderFlow_v1.0|40453_OrderFlow_v1.0]: NSE:NIFTY50-INDEX @ 24257.19 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 14:39:04,347 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-20 14:39:04,367 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24232.20 | SL: 24224.42 TP: 24309.99
+2026-07-20 14:39:04,367 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-20 14:39:04,387 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY CALL @ 24232.20 | SL: 24224.42 TP: 24309.99
+2026-07-20 14:39:04,387 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'TP_CAPPED']
+2026-07-20 14:39:04,406 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24232.20 | SL: 24221.78 TP: 24310.00
+2026-07-20 14:39:11,182 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:-0.76']
+2026-07-20 14:39:11,203 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 57990.35 | SL: 58039.67 TP: 58027.85
+2026-07-20 14:39:11,203 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:-0.76']
+2026-07-20 14:39:11,231 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX BUY PUT @ 57990.35 | SL: 58039.67 TP: 58027.85
+2026-07-20 14:45:46,948 - INFO - --- 14:45:46 Market Pulse ---
+2026-07-20 14:45:48,046 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57955.10 | SL→57982.92 TP→57705.45
+2026-07-20 14:45:48,076 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57955.10 | SL→57982.92 TP→57705.45
+2026-07-20 14:45:48,103 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24234.60 | SL→24226.82 TP→24309.99
+2026-07-20 14:45:48,128 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24234.60 | SL→24226.82 TP→24309.99
+2026-07-20 14:45:48,149 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24234.60 | SL→24224.18 TP→24310.00
+2026-07-20 14:45:48,171 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57955.10 | SL→58004.42 TP→57978.53
+2026-07-20 14:45:48,192 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57955.10 | SL→58004.42 TP→57978.53
+2026-07-20 14:45:50,445 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.16']
+2026-07-20 14:45:50,458 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.16']
+2026-07-20 14:45:50,462 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.16']
+2026-07-20 14:45:50,462 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.16']
+2026-07-20 14:45:50,462 - INFO - 👻 [ATR_Squeeze_RVOL1.0] CF SQUEEZE_BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'TP_CAPPED']
+2026-07-20 14:45:50,482 - INFO - 🟢 ENTRY [CF|ATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTY50-INDEX BUY CALL @ 24234.60 | SL: 24226.98 TP: 24310.75
+2026-07-20 14:45:50,483 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [Geometry_v1.0_Score35]
+2026-07-20 14:45:50,483 - INFO -    Entry: 24234.6 | SL: 24237.68 | TP: 24227.07 (RR: 2.44)
+2026-07-20 14:45:50,504 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1784538946]: NSE:NIFTY50-INDEX BUY PUT @ 24234.60 | SL: 24237.68 TP: 24227.07
+2026-07-20 14:45:52,300 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.21']
+2026-07-20 14:45:52,314 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.21']
+2026-07-20 14:45:52,317 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.21']
+2026-07-20 14:45:52,318 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.21']
+2026-07-20 14:45:52,318 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RR:0.74']
+2026-07-20 14:45:52,338 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX BUY PUT @ 57955.10 | SL: 57973.23 TP: 57941.61
+2026-07-20 15:02:18,929 - INFO - --- 15:02:18 Market Pulse ---
+2026-07-20 15:02:20,112 - INFO - 🔴 EXIT (INITIAL_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24237.68 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-20 15:02:20,144 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57944.20 | SL→57972.02 TP→57705.45
+2026-07-20 15:02:20,172 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57944.20 | SL→57972.02 TP→57705.45
+2026-07-20 15:02:20,198 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.30 | SL→24231.52 TP→24309.99
+2026-07-20 15:02:20,225 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24239.30 | SL→24231.52 TP→24309.99
+2026-07-20 15:02:20,251 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.30 | SL→24228.88 TP→24310.00
+2026-07-20 15:02:20,277 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57944.20 | SL→57993.52 TP→57929.21
+2026-07-20 15:02:20,303 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57944.20 | SL→57993.52 TP→57929.21
+2026-07-20 15:02:20,329 - INFO - 🟡 UPDATE (TRAILING_SL) [CFATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.30 | SL→24231.68 TP→24310.75
+2026-07-20 15:02:20,357 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57944.20 | SL→57962.33 TP→57941.61
+2026-07-20 15:02:29,652 - INFO - 👻 [EMA_Pullback_20_50_RVOL1.0] CF PULLBACK NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'TP_CAPPED']
+2026-07-20 15:02:29,672 - INFO - 🟢 ENTRY [CF|EMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 57944.20 | SL: 57866.14 TP: 58193.30
+2026-07-20 15:18:08,109 - INFO - --- 15:18:08 Market Pulse ---
+2026-07-20 15:18:09,296 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57941.45 | SL→57969.27 TP→57705.45
+2026-07-20 15:18:09,324 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57941.45 | SL→57969.27 TP→57705.45
+2026-07-20 15:18:09,349 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57941.45 | SL→57990.77 TP→57929.21
+2026-07-20 15:18:09,374 - INFO - 🟡 UPDATE (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57941.45 | SL→57990.77 TP→57929.21
+2026-07-20 15:18:09,396 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57941.45 | SL→57959.58 TP→57923.48
+2026-07-20 15:18:11,963 - INFO - 👻 [Geometry_v1.0_Score35] CF CONFLUENCE_BOUNCE NSE:NIFTY50-INDEX BUY PUT | Rejected: ['TIME_FILTER:CLOSE', 'LOW_RR:0.57']
+2026-07-20 15:18:11,984 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24236.40 | SL: 24241.19 TP: 24233.66
+2026-07-20 15:46:47,327 - INFO - --- 15:46:47 Market Pulse ---
+2026-07-20 15:46:48,109 - INFO - 🔴 EXIT (SESSION_END) [CFATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57975.35 | PnL -0.05R | MFE 0.00R | Capture N/A | 12bars HoldEff -0.004R/bar
+2026-07-20 15:46:48,139 - INFO - 🔴 EXIT (SESSION_END) [CFATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | PnL -0.05R | MFE 0.00R | Capture N/A | 10bars HoldEff -0.005R/bar
+2026-07-20 15:46:48,165 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | PnL +2.11R | MFE 2.88R | Capture 73% | 5bars HoldEff +0.421R/bar
+2026-07-20 15:46:48,187 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24239.50 | PnL +2.11R | MFE 2.88R | Capture 73% | 5bars HoldEff +0.421R/bar
+2026-07-20 15:46:48,213 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57969.27 | PnL +0.47R | MFE 1.52R | Capture 31% | 5bars HoldEff +0.093R/bar
+2026-07-20 15:46:48,237 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57969.27 | PnL +0.47R | MFE 1.52R | Capture 31% | 5bars HoldEff +0.093R/bar
+2026-07-20 15:46:48,264 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | SL→24231.72 TP→24309.99
+2026-07-20 15:46:48,288 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | PnL +0.89R | MFE 0.94R | Capture 95% | 4bars HoldEff +0.222R/bar
+2026-07-20 15:46:48,312 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24239.50 | SL→24231.72 TP→24309.99
+2026-07-20 15:46:48,336 - INFO - 🔴 EXIT (SESSION_END) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24239.50 | PnL +0.89R | MFE 0.94R | Capture 95% | 4bars HoldEff +0.222R/bar
+2026-07-20 15:46:48,360 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | SL→24229.08 TP→24310.00
+2026-07-20 15:46:48,381 - INFO - 🔴 EXIT (SESSION_END) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | PnL +0.65R | MFE 0.70R | Capture 93% | 4bars HoldEff +0.163R/bar
+2026-07-20 15:46:48,400 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57975.35 | PnL +0.25R | MFE 0.99R | Capture 26% | 4bars HoldEff +0.064R/bar
+2026-07-20 15:46:48,419 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTYBANK-INDEX @ 57975.35 | PnL +0.25R | MFE 0.99R | Capture 26% | 4bars HoldEff +0.064R/bar
+2026-07-20 15:46:48,440 - INFO - 🟡 UPDATE (TRAILING_SL) [CFATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | SL→24231.88 TP→24310.75
+2026-07-20 15:46:48,459 - INFO - 🔴 EXIT (SESSION_END) [CFATR_Squeeze_RVOL1.0|_ATR_Squeeze_RVOL1.0]: NSE:NIFTY50-INDEX @ 24239.50 | PnL +0.59R | MFE 0.64R | Capture 92% | 3bars HoldEff +0.198R/bar
+2026-07-20 15:46:48,478 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTYBANK-INDEX @ 57959.58 | PnL -0.30R | MFE 0.75R | Capture -39% | 3bars HoldEff -0.099R/bar
+2026-07-20 15:46:48,498 - INFO - 🟡 UPDATE (TRAILING_SL) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57975.35 | SL→57897.29 TP→58193.30
+2026-07-20 15:46:48,517 - INFO - 🔴 EXIT (SESSION_END) [CFEMA_Pullback_20_50_RVOL1.0|llback_20_50_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57975.35 | PnL +0.35R | MFE 0.40R | Capture 87% | 2bars HoldEff +0.174R/bar
+2026-07-20 15:46:48,537 - INFO - 🔴 EXIT (SESSION_END) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24239.50 | PnL -0.70R | MFE 0.00R | Capture N/A | 1bars HoldEff -0.697R/bar
+2026-07-20 15:46:48,537 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-20 15:46:48,569 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-20 cf=17 expectancy=0.2848941596115337
+2026-07-20 15:46:48,588 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-20 cf=17 expectancy=0.2848941596115337
+2026-07-20 15:46:48,607 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-20 cf=5 expectancy=0.10240310430526733
+2026-07-20 15:46:48,627 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-20 cf=1 expectancy=-1.0499999523162842
+2026-07-20 15:46:48,647 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-20 cf=0 expectancy=None
+2026-07-20 15:46:48,666 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-20 cf=0 expectancy=None
+2026-07-20 15:46:48,686 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-20 cf=0 expectancy=None
+2026-07-20 15:46:48,706 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-20 cf=1 expectancy=0.5934668183326721
+2026-07-20 15:46:48,728 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-20 cf=8 expectancy=0.9740898087620735
+2026-07-20 15:46:48,747 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-20 cf=3 expectancy=0.2864447832107544
+2026-07-20 15:46:48,767 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-20 cf=4 expectancy=1.298209309577942
+2026-07-20 15:46:48,777 - INFO - 📝 Generating EOD report for 2026-07-20…
+2026-07-20 15:46:48,798 - INFO -    Rolling data: 5d filters=36, 20d filters=45, total CF=1006
+2026-07-20 15:46:49,345 - INFO -    ✓ executive_summary
+2026-07-20 15:46:49,764 - INFO -    ✓ market_narrative
+2026-07-20 15:46:49,880 - INFO -    ✓ trade_review
+2026-07-20 15:46:49,904 - INFO -    ✓ losing_trades
+2026-07-20 15:46:49,920 - INFO -    ✓ missed_opportunities
+2026-07-20 15:46:49,937 - INFO -    ✓ counterfactual_insights
+2026-07-20 15:46:49,964 - INFO -    ✓ experiment_ranking
+2026-07-20 15:46:49,980 - INFO -    ✓ thesis_analysis
+2026-07-20 15:46:50,012 - INFO -    ✓ market_behaviour
+2026-07-20 15:46:50,228 - INFO -    ✓ tomorrow_outlook
+2026-07-20 15:46:50,253 - INFO -    ✓ research_queue
+2026-07-20 15:46:50,293 - INFO -    ✓ strategy_health
+2026-07-20 15:46:50,300 - INFO - 📄 Report written: reports/2026-07-20.md
+2026-07-20 15:46:50,300 - INFO - 📊 Analytics written: reports/2026-07-20.json
+2026-07-20 15:46:50,300 - INFO - 📝 EOD report: reports/2026-07-20.md

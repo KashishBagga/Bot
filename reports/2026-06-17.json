@@ -1,0 +1,536 @@
+{
+  "date": "2026-06-17",
+  "generated_at": "2026-06-21 18:17:06",
+  "sections": {
+    "executive_summary": {
+      "date": "2026-06-17",
+      "market": {
+        "nifty": null,
+        "banknifty": null,
+        "vix": {
+          "value": null
+        },
+        "day_type": "Unknown"
+      },
+      "real": {
+        "trades": 1,
+        "wins": 1,
+        "losses": 0,
+        "win_rate": 1.0,
+        "total_pnl_r": 0.39,
+        "expectancy": 0.39
+      },
+      "cf": {
+        "total": 16,
+        "positive": 7,
+        "negative": 9,
+        "positive_rate": 0.44,
+        "expectancy": 0.99,
+        "total_pnl_r": 15.89
+      },
+      "experiments": []
+    },
+    "market_narrative": {
+      "gap": {
+        "direction": "Unknown",
+        "pct": 0.0
+      },
+      "opening_range_pts": null,
+      "trend_quality": null,
+      "close_position": null,
+      "session_high": null,
+      "session_low": null,
+      "session_open": null,
+      "session_close": null,
+      "bullets": [],
+      "regime_from_cf": "RANGE"
+    },
+    "trade_review": {
+      "trades": [
+        {
+          "trade_id": "trade_NSE:NIFTY50-INDEX_1781669961",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY PUT",
+          "setup": "SWEEP",
+          "entry": 24064.4,
+          "exit": 24059.28,
+          "sl": 24059.28,
+          "tp": 24011.4,
+          "pnl_r": 0.39,
+          "mfe_r": 1.44,
+          "mae_r": 0.24,
+          "exit_reason": "TRAILING_SL",
+          "bars_held": 4,
+          "duration_min": 20.1,
+          "capture_rate": 0.27,
+          "holding_eff": 0.0,
+          "tp_expansions": 0,
+          "grade": "C",
+          "grade_desc": "Marginal winner",
+          "note": "Trailing SL locked in profits correctly"
+        }
+      ],
+      "count": 1
+    },
+    "losing_trades": {
+      "losers": [],
+      "count": 0
+    },
+    "missed_opportunities": {
+      "opportunities": [
+        {
+          "candidate_id": "cand_NSE_NIFTY50_INDEX_BREAKOUT_23977.80_20260616",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY CALL",
+          "setup": "BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "BIAS_MISMATCH",
+            "LOW_EFFICIENCY",
+            "HIGH_WICKINESS"
+          ],
+          "entry_price": 23933.75,
+          "sl": 24058.32,
+          "sl_dist": 8.88,
+          "mfe_r": 15.03,
+          "mae_r": 0.0,
+          "final_pnl_r": 13.98,
+          "capture_rate": 0.9301,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "priority_stars": 4,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        },
+        {
+          "candidate_id": "cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57321.35_20260616",
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "signal": "BUY CALL",
+          "setup": "BREAKOUT",
+          "primary_rejection": "LOW_RVOL",
+          "rejection_reasons": [
+            "LOW_RVOL",
+            "LOW_EFFICIENCY",
+            "HIGH_WICKINESS"
+          ],
+          "entry_price": 57178.6,
+          "sl": 57324.98,
+          "sl_dist": 28.68,
+          "mfe_r": 6.1,
+          "mae_r": 0.0,
+          "final_pnl_r": 5.05,
+          "capture_rate": 0.828,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "priority_stars": 2,
+          "blocking_hint": "RVOL below threshold (e.g. 0.44 vs 1.0)"
+        },
+        {
+          "candidate_id": "cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617",
+          "symbol": "NSE:NIFTY50-INDEX",
+          "signal": "BUY CALL",
+          "setup": "BREAKOUT",
+          "primary_rejection": "BIAS_MISMATCH",
+          "rejection_reasons": [
+            "BIAS_MISMATCH",
+            "LOW_EFFICIENCY",
+            "HIGH_WICKINESS",
+            "NO_TARGET_ZONE",
+            "LOW_RR"
+          ],
+          "entry_price": 24069.75,
+          "sl": 24090.5,
+          "sl_dist": 7.9,
+          "mfe_r": 3.63,
+          "mae_r": 0.0,
+          "final_pnl_r": 2.58,
+          "capture_rate": 0.7105,
+          "exit_reason": "TRAILING_SL",
+          "experiment": "Structural_v3.2_RVOL1.0",
+          "priority_stars": 1,
+          "blocking_hint": "Signal direction opposite to HTF bias"
+        }
+      ],
+      "count": 3
+    },
+    "counterfactual_insights": {
+      "filters": [
+        {
+          "name": "LOW_RVOL",
+          "today_count": 15,
+          "today_expectancy": 0.89,
+          "today_wins": 6,
+          "today_win_rate": 0.4,
+          "avg_mfe": 1.94,
+          "rolling_5d_count": 24,
+          "rolling_5d_expectancy": 0.37,
+          "rolling_20d_count": 24,
+          "rolling_20d_expectancy": 0.37,
+          "verdict": "neutral",
+          "verdict_text": "\u27a1\ufe0f Neutral \u2014 keep monitoring"
+        },
+        {
+          "name": "BIAS_MISMATCH",
+          "today_count": 1,
+          "today_expectancy": 2.58,
+          "today_wins": 1,
+          "today_win_rate": 1.0,
+          "avg_mfe": 3.63,
+          "rolling_5d_count": 1,
+          "rolling_5d_expectancy": 2.58,
+          "rolling_20d_count": 1,
+          "rolling_20d_expectancy": 2.58,
+          "verdict": "insufficient_data",
+          "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+        }
+      ],
+      "count": 2
+    },
+    "experiment_ranking": {
+      "rankings": []
+    },
+    "thesis_analysis": {
+      "theses": [
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 14,
+          "net_pnl_today": 30.22,
+          "avg_pnl_today": 2.16,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 10,
+          "net_pnl_today": 3.81,
+          "avg_pnl_today": 0.38,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 4,
+          "net_pnl_today": -1.56,
+          "avg_pnl_today": -0.39,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": true,
+          "priority": 0
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY PUT",
+          "attempts_today": 4,
+          "net_pnl_today": -2.39,
+          "avg_pnl_today": -0.6,
+          "verdict": "normal",
+          "verdict_text": "\u2705 Normal thesis frequency",
+          "recurring_5d": false,
+          "priority": 0
+        }
+      ],
+      "flagged": [
+        {
+          "symbol": "NSE:NIFTYBANK-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 14,
+          "net_pnl_today": 30.22,
+          "avg_pnl_today": 2.16,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        },
+        {
+          "symbol": "NSE:NIFTY50-INDEX",
+          "setup": "BREAKOUT",
+          "signal": "BUY CALL",
+          "attempts_today": 10,
+          "net_pnl_today": 3.81,
+          "avg_pnl_today": 0.38,
+          "verdict": "woodchopper_profitable",
+          "verdict_text": "\ud83d\udfe1 High-frequency profitable \u2014 absorbing chop to catch runner",
+          "recurring_5d": true,
+          "priority": 2
+        }
+      ]
+    },
+    "market_behaviour": {
+      "total_cf": 16,
+      "choppiness": 0.44,
+      "initial_sl_rate": 0.44,
+      "setup_summary": {
+        "BREAKOUT": {
+          "total": 16,
+          "success_rate": 0.56,
+          "avg_pnl": 0.99
+        }
+      },
+      "trend_score": 6,
+      "mean_reversion_score": 4,
+      "breakout_success_pct": 0.56,
+      "sweep_success_pct": 0,
+      "hourly_performance": [
+        {
+          "hour": 9,
+          "trades": 1,
+          "avg_pnl": -0.27,
+          "wins": 0,
+          "win_rate": 0.0
+        },
+        {
+          "hour": 10,
+          "trades": 2,
+          "avg_pnl": 9.52,
+          "wins": 2,
+          "win_rate": 1.0
+        },
+        {
+          "hour": 11,
+          "trades": 5,
+          "avg_pnl": 0.17,
+          "wins": 2,
+          "win_rate": 0.4
+        },
+        {
+          "hour": 12,
+          "trades": 1,
+          "avg_pnl": -1.05,
+          "wins": 0,
+          "win_rate": 0.0
+        },
+        {
+          "hour": 13,
+          "trades": 4,
+          "avg_pnl": -0.62,
+          "wins": 1,
+          "win_rate": 0.25
+        },
+        {
+          "hour": 14,
+          "trades": 2,
+          "avg_pnl": -0.15,
+          "wins": 1,
+          "win_rate": 0.5
+        },
+        {
+          "hour": 15,
+          "trades": 1,
+          "avg_pnl": 0.07,
+          "wins": 1,
+          "win_rate": 1.0
+        }
+      ]
+    },
+    "tomorrow_outlook": {
+      "nifty": null,
+      "banknifty": null,
+      "best_signal_today": "BUY CALL",
+      "scenarios": [
+        {
+          "name": "Continuation",
+          "pct": 55,
+          "desc": "Gap-up or pullback-continuation if structure holds"
+        },
+        {
+          "name": "Reversal",
+          "pct": 45,
+          "desc": "Mean reversion if today's move was extended"
+        }
+      ],
+      "observations": [
+        "Market data unavailable \u2014 structural analysis based on CF patterns only",
+        "CF patterns showed bullish edge today"
+      ],
+      "watch_levels": [],
+      "avoid": "Opening breakout trades before 09:45 \u2014 market needs time to show direction",
+      "prefer": "Pullback entries once opening range (09:15\u201309:45) is established"
+    },
+    "research_queue": {
+      "queue": [
+        {
+          "priority": 2,
+          "title": "Investigate `BIAS_MISMATCH` filter threshold",
+          "description": "Shadow trades rejected for `BIAS_MISMATCH` show rolling expectancy +2.58R over 1 trades. This suggests the filter may be too strict.",
+          "evidence_stars": 2,
+          "confidence": "Low",
+          "rolling_expectancy": 2.58,
+          "sample_count": 1,
+          "status": "Needs experiment",
+          "next_step": "Create Experiment with BIAS_MISMATCH threshold loosened by 20%, run for 5 days."
+        }
+      ]
+    },
+    "strategy_health": {
+      "execution": {
+        "score": 10,
+        "loop_errors": 0,
+        "detail": "No crashes"
+      },
+      "data_quality": {
+        "score": 5,
+        "fetch_errors": 6,
+        "detail": "6 MTF fetch warning(s) \u2014 transient API hiccup"
+      },
+      "strategy": {
+        "score": 7,
+        "avg_20d_expectancy": 0.24,
+        "avg_5d_expectancy": 0.24,
+        "trend": "Positive",
+        "detail": "20d avg: +0.24R, 5d avg: +0.24R"
+      },
+      "research": {
+        "stars": 1,
+        "confidence": "Low",
+        "total_cf": 25,
+        "cf_last_5d": 25,
+        "detail": "Need 75 more CF trades for HIGH confidence."
+      },
+      "recommendation": "\ud83d\udfe1 Monitor. No changes today, but review Research Queue.",
+      "equity_curve": [
+        {
+          "date": "2026-06-16",
+          "cumulative_pnl": -4.53
+        },
+        {
+          "date": "2026-06-17",
+          "cumulative_pnl": 11.35
+        },
+        {
+          "date": "2026-06-18",
+          "cumulative_pnl": 46.08
+        },
+        {
+          "date": "2026-06-19",
+          "cumulative_pnl": 120.54
+        }
+      ]
+    }
+  },
+  "equity_curve": [
+    {
+      "date": "2026-06-16",
+      "cumulative_pnl": -4.53
+    },
+    {
+      "date": "2026-06-17",
+      "cumulative_pnl": 11.35
+    },
+    {
+      "date": "2026-06-18",
+      "cumulative_pnl": 46.08
+    },
+    {
+      "date": "2026-06-19",
+      "cumulative_pnl": 120.54
+    }
+  ],
+  "filter_stats": [
+    {
+      "name": "LOW_RVOL",
+      "today_count": 15,
+      "today_expectancy": 0.89,
+      "today_wins": 6,
+      "today_win_rate": 0.4,
+      "avg_mfe": 1.94,
+      "rolling_5d_count": 24,
+      "rolling_5d_expectancy": 0.37,
+      "rolling_20d_count": 24,
+      "rolling_20d_expectancy": 0.37,
+      "verdict": "neutral",
+      "verdict_text": "\u27a1\ufe0f Neutral \u2014 keep monitoring"
+    },
+    {
+      "name": "BIAS_MISMATCH",
+      "today_count": 1,
+      "today_expectancy": 2.58,
+      "today_wins": 1,
+      "today_win_rate": 1.0,
+      "avg_mfe": 3.63,
+      "rolling_5d_count": 1,
+      "rolling_5d_expectancy": 2.58,
+      "rolling_20d_count": 1,
+      "rolling_20d_expectancy": 2.58,
+      "verdict": "insufficient_data",
+      "verdict_text": "\ud83d\udcca Insufficient data \u2014 keep monitoring"
+    }
+  ],
+  "trade_distribution": [
+    {
+      "hour": 9,
+      "trades": 1,
+      "avg_pnl": -0.27,
+      "wins": 0,
+      "win_rate": 0.0
+    },
+    {
+      "hour": 10,
+      "trades": 2,
+      "avg_pnl": 9.52,
+      "wins": 2,
+      "win_rate": 1.0
+    },
+    {
+      "hour": 11,
+      "trades": 5,
+      "avg_pnl": 0.17,
+      "wins": 2,
+      "win_rate": 0.4
+    },
+    {
+      "hour": 12,
+      "trades": 1,
+      "avg_pnl": -1.05,
+      "wins": 0,
+      "win_rate": 0.0
+    },
+    {
+      "hour": 13,
+      "trades": 4,
+      "avg_pnl": -0.62,
+      "wins": 1,
+      "win_rate": 0.25
+    },
+    {
+      "hour": 14,
+      "trades": 2,
+      "avg_pnl": -0.15,
+      "wins": 1,
+      "win_rate": 0.5
+    },
+    {
+      "hour": 15,
+      "trades": 1,
+      "avg_pnl": 0.07,
+      "wins": 1,
+      "win_rate": 1.0
+    }
+  ],
+  "experiment_rankings": [],
+  "research_queue": [
+    {
+      "priority": 2,
+      "title": "Investigate `BIAS_MISMATCH` filter threshold",
+      "description": "Shadow trades rejected for `BIAS_MISMATCH` show rolling expectancy +2.58R over 1 trades. This suggests the filter may be too strict.",
+      "evidence_stars": 2,
+      "confidence": "Low",
+      "rolling_expectancy": 2.58,
+      "sample_count": 1,
+      "status": "Needs experiment",
+      "next_step": "Create Experiment with BIAS_MISMATCH threshold loosened by 20%, run for 5 days."
+    }
+  ]
+}

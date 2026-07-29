@@ -1,0 +1,609 @@
+2026-07-22 09:21:04,756 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-22.json
+2026-07-22 09:21:04,867 - INFO - ✅ Fyers client initialized successfully
+2026-07-22 09:21:05,040 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 09:21:05,052 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 09:21:05,095 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 09:21:05,098 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 09:21:05,098 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 09:21:05,129 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 09:21:05,138 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 09:21:05,167 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 09:21:05,192 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 09:21:05,203 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 09:21:05,232 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 09:21:05,232 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 09:21:05,232 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-22 09:21:05,243 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-07-22 09:21:05,254 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-07-22 09:21:05,280 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 09:21:05,290 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 09:21:05,318 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 09:21:05,318 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 09:21:05,318 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-22 09:21:05,327 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-07-22 09:21:05,339 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-07-22 09:21:05,347 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-07-22 09:21:05,359 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-07-22 09:21:05,367 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-07-22 09:21:05,379 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-07-22 09:21:05,390 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-07-22 09:21:05,462 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-07-22 09:21:05,476 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-07-22 09:21:05,501 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-07-22 09:21:05,509 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-07-22 09:21:05,520 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-07-22 09:21:05,529 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-07-22 09:21:05,540 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-07-22 09:21:05,540 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-22 09:21:05,549 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=97aaa84
+2026-07-22 09:21:05,560 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=97aaa84]
+2026-07-22 09:21:05,560 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-22 09:21:05,568 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-07-22 09:21:05,580 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-07-22 09:21:05,580 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-22 09:21:05,590 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=97aaa84
+2026-07-22 09:21:05,603 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=97aaa84]
+2026-07-22 09:21:05,631 - INFO - 🧹 Self-Healed orphaned prior-day Real position: trade_NSE_NIFTY50_INDEX_1784607617 entered on 2026-07-21
+2026-07-22 09:21:05,642 - INFO - 🧹 Self-Healed orphaned prior-day Real position: trade_NSE_NIFTY50_INDEX_1784607626 entered on 2026-07-21
+2026-07-22 09:21:05,642 - INFO - 🔄 Recovered 2 active real positions: []
+2026-07-22 09:21:05,657 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-22 09:21:05,657 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 240s until 09:25:05 IST...
+2026-07-22 09:25:05,662 - INFO - ⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.
+2026-07-22 09:25:05,663 - INFO - --- 09:25:05 Market Pulse ---
+2026-07-22 09:25:07,743 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-07-22 09:25:07,758 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-07-22 09:25:07,762 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.00']
+2026-07-22 09:25:07,762 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.00']
+2026-07-22 09:25:07,762 - INFO - 👻 [Geometry_v1.0_Score35] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:-0.23']
+2026-07-22 09:25:07,762 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'TRENDLINE_RETEST', 'price': 24096.05, 'stop_loss': 24100.47, 'take_profit': 24097.08, 'tp1': 24089.42, 'rr_ratio': -0.23, 'timestamp': '2026-07-22T09:25:05.663366+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:-0.23'], 'stop_loss_distance': 4.42, 'atr': 21.78, 'confidence': 0.729, 'diagnostics': {'trendline_id': 'tl_24fe5b9854468ba4', 'trendline_confidence': 0.798, 'trendline_r2': 0.997, 'trendline_touches': 20, 'trendline_price_at_now': 24070.77, 'dist_pct': 0.00105, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-22 09:25:09,912 - INFO - Retrieved live premium from Fyers API: LTP=169.4 for NSE:NIFTY26JUL24100PE
+2026-07-22 09:25:09,912 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24100PE', strike=24100.0, expiry='26JUL', option_type='PE', premium=169.4, delta=0.5, bid=168.55, ask=168.85, volume=13972140, resolved_at=datetime.datetime(2026, 7, 22, 9, 25, 9, 912910))
+2026-07-22 09:25:09,913 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24100PE @ premium 169.4 (type: PE, strike: 24100.0)
+2026-07-22 09:25:09,913 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY26JUL24100PE', 'strike': 24100.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 09:25:09,949 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'premium': 169.4, 'bid': 168.55, 'ask': 168.85}
+2026-07-22 09:25:09,970 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'price': 24096.05, 'sl': 24100.47, 'tp': 24097.08}
+2026-07-22 09:25:09,986 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'price': 24096.05, 'sl': 24100.47, 'tp': 24097.08}
+2026-07-22 09:25:10,000 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.02%)
+2026-07-22 09:25:10,027 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX BUY PUT @ 24096.05 | SL: 24100.47 TP: 24097.08
+2026-07-22 09:25:10,027 - INFO - 👻 [Geometry_v1.0_Score50] CF TRENDLINE_RETEST NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RR:-0.23']
+2026-07-22 09:25:10,027 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'TRENDLINE_RETEST', 'price': 24096.05, 'stop_loss': 24100.47, 'take_profit': 24097.08, 'tp1': 24089.42, 'rr_ratio': -0.23, 'timestamp': '2026-07-22T09:25:05.663366+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': False, 'rejection_reasons': ['LOW_RR:-0.23'], 'stop_loss_distance': 4.42, 'atr': 21.78, 'confidence': 0.729, 'diagnostics': {'trendline_id': 'tl_24fe5b9854468ba4', 'trendline_confidence': 0.798, 'trendline_r2': 0.997, 'trendline_touches': 20, 'trendline_price_at_now': 24070.77, 'dist_pct': 0.00105, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-22 09:25:11,407 - INFO - Retrieved live premium from Fyers API: LTP=168.85 for NSE:NIFTY26JUL24100PE
+2026-07-22 09:25:11,407 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24100PE', strike=24100.0, expiry='26JUL', option_type='PE', premium=168.85, delta=0.5, bid=168.55, ask=168.95, volume=13983970, resolved_at=datetime.datetime(2026, 7, 22, 9, 25, 11, 407562))
+2026-07-22 09:25:11,407 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24100PE @ premium 168.85 (type: PE, strike: 24100.0)
+2026-07-22 09:25:11,407 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY26JUL24100PE', 'strike': 24100.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 09:25:11,440 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'premium': 168.85, 'bid': 168.55, 'ask': 168.95}
+2026-07-22 09:25:11,460 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'price': 24096.05, 'sl': 24100.47, 'tp': 24097.08}
+2026-07-22 09:25:11,475 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'price': 24096.05, 'sl': 24100.47, 'tp': 24097.08}
+2026-07-22 09:25:11,489 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.02%)
+2026-07-22 09:25:11,516 - INFO - 🟢 ENTRY [CF|Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX BUY PUT @ 24096.05 | SL: 24100.47 TP: 24097.08
+2026-07-22 09:25:12,628 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:25:12,642 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:25:12,646 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:25:12,646 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:30:05,823 - INFO - --- 09:30:05 Market Pulse ---
+2026-07-22 09:30:06,599 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'price': 24052.95, 'old_sl': 24100.47, 'new_sl': 24057.370000000003, 'old_tp': 24097.08, 'new_tp': 24092.66, 'reason': 'TP_EXPANSION'}
+2026-07-22 09:30:06,699 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24052.95 | SL→24057.37 TP→24092.66
+2026-07-22 09:30:06,699 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'price': 24052.95, 'old_sl': 24100.47, 'new_sl': 24057.370000000003, 'old_tp': 24097.08, 'new_tp': 24092.66, 'reason': 'TP_EXPANSION'}
+2026-07-22 09:30:06,750 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24052.95 | SL→24057.37 TP→24092.66
+2026-07-22 09:30:08,223 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:30:08,239 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:30:08,242 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:30:08,242 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:30:09,321 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:30:09,336 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:30:09,339 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:30:09,340 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:30:09,340 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-22 09:35:09,535 - INFO - --- 09:35:09 Market Pulse ---
+2026-07-22 09:35:10,607 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'price': 24022.05, 'old_sl': 24057.370000000003, 'new_sl': 24026.47, 'old_tp': 24092.66, 'new_tp': 24088.239999999998, 'reason': 'TP_EXPANSION'}
+2026-07-22 09:35:10,674 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24022.05 | SL→24026.47 TP→24088.24
+2026-07-22 09:35:10,674 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'price': 24022.05, 'old_sl': 24057.370000000003, 'new_sl': 24026.47, 'old_tp': 24092.66, 'new_tp': 24088.239999999998, 'reason': 'TP_EXPANSION'}
+2026-07-22 09:35:10,712 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24022.05 | SL→24026.47 TP→24088.24
+2026-07-22 09:35:12,079 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:35:12,097 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:35:12,100 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:35:12,100 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:35:13,161 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:35:13,179 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:35:13,182 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:35:13,182 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.01']
+2026-07-22 09:40:13,772 - INFO - --- 09:40:13 Market Pulse ---
+2026-07-22 09:40:14,591 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'price': 24023.85, 'old_sl': 24026.47, 'new_sl': 24026.47, 'old_tp': 24088.239999999998, 'new_tp': 24083.819999999996, 'reason': 'TP_EXPANSION'}
+2026-07-22 09:40:14,657 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24023.85 | SL→24026.47 TP→24083.82
+2026-07-22 09:40:14,657 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'price': 24023.85, 'old_sl': 24026.47, 'new_sl': 24026.47, 'old_tp': 24088.239999999998, 'new_tp': 24083.819999999996, 'reason': 'TP_EXPANSION'}
+2026-07-22 09:40:14,696 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24023.85 | SL→24026.47 TP→24083.82
+2026-07-22 09:40:16,044 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:40:16,060 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:40:16,064 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:40:16,064 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 09:40:17,153 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:40:17,170 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:40:17,173 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:40:17,173 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:40:17,173 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-22 09:45:17,775 - INFO - --- 09:45:17 Market Pulse ---
+2026-07-22 09:45:18,747 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score35, payload={'exit_price': 24026.47, 'exit_reason': 'TRAILING_SL', 'pnl_r': 15.692081447956635, 'duration_minutes': 20.20185443333333, 'bars_held': 4}
+2026-07-22 09:45:18,828 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24026.47 | PnL +15.69R | MFE 16.74R | Capture 94% | 4bars HoldEff +3.923R/bar
+2026-07-22 09:45:18,828 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24096.05_202607220925_Geometry_v1.0_Score50, payload={'exit_price': 24026.47, 'exit_reason': 'TRAILING_SL', 'pnl_r': 15.692081447956635, 'duration_minutes': 20.20185443333333, 'bars_held': 4}
+2026-07-22 09:45:18,866 - INFO - 🔴 EXIT (TRAILING_SL) [CFGeometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24026.47 | PnL +15.69R | MFE 16.74R | Capture 94% | 4bars HoldEff +3.923R/bar
+2026-07-22 09:45:20,360 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.04']
+2026-07-22 09:45:20,373 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.04']
+2026-07-22 09:45:20,376 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.04']
+2026-07-22 09:45:20,376 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.04']
+2026-07-22 09:45:20,376 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Geometry_v1.0_Score35]
+2026-07-22 09:45:20,376 - INFO -    Entry: 24030.0 | SL: 24023.81 | TP: 24050.0 (RR: 3.23)
+2026-07-22 09:45:20,376 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY CALL', 'strategy': 'TRENDLINE_RETEST', 'price': 24030.0, 'stop_loss': 24023.81, 'take_profit': 24050.0, 'tp1': 24039.29, 'rr_ratio': 3.23, 'timestamp': '2026-07-22T09:45:17.774632+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': True, 'rejection_reasons': [], 'stop_loss_distance': 6.19, 'atr': 24.61, 'confidence': 0.709, 'diagnostics': {'trendline_id': 'tl_19f2e2fad3e05a55', 'trendline_confidence': 0.767, 'trendline_r2': 0.992, 'trendline_touches': 36, 'trendline_price_at_now': 24070.49, 'dist_pct': 0.00168, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-22 09:45:21,507 - INFO - Retrieved live premium from Fyers API: LTP=150.75 for NSE:NIFTY26JUL24050CE
+2026-07-22 09:45:21,507 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24050CE', strike=24050.0, expiry='26JUL', option_type='CE', premium=150.75, delta=0.5, bid=150.5, ask=150.7, volume=11422775, resolved_at=datetime.datetime(2026, 7, 22, 9, 45, 21, 507748))
+2026-07-22 09:45:21,508 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24050CE @ premium 150.75 (type: CE, strike: 24050.0)
+2026-07-22 09:45:21,508 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY26JUL24050CE', 'strike': 24050.0, 'expiry': '26JUL', 'type': 'CE'}
+2026-07-22 09:45:21,541 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'premium': 150.75, 'bid': 150.5, 'ask': 150.7}
+2026-07-22 09:45:21,561 - INFO - 📊 EXECUTION AUDIT [ORDER_SUBMITTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'price': 24030.0, 'sl': 24023.81, 'tp': 24050.0}
+2026-07-22 09:45:21,576 - INFO - 📊 EXECUTION AUDIT [ORDER_FILLED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'price': 24030.0, 'sl': 24023.81, 'tp': 24050.0}
+2026-07-22 09:45:21,590 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.03%)
+2026-07-22 09:45:21,618 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1784693717]: NSE:NIFTY50-INDEX BUY CALL @ 24030.00 | SL: 24023.81 TP: 24050.00
+2026-07-22 09:45:21,619 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY CALL | [Geometry_v1.0_Score50]
+2026-07-22 09:45:21,619 - INFO -    Entry: 24030.0 | SL: 24023.81 | TP: 24050.0 (RR: 3.23)
+2026-07-22 09:45:21,619 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY CALL', 'strategy': 'TRENDLINE_RETEST', 'price': 24030.0, 'stop_loss': 24023.81, 'take_profit': 24050.0, 'tp1': 24039.29, 'rr_ratio': 3.23, 'timestamp': '2026-07-22T09:45:17.774632+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': True, 'rejection_reasons': [], 'stop_loss_distance': 6.19, 'atr': 24.61, 'confidence': 0.709, 'diagnostics': {'trendline_id': 'tl_19f2e2fad3e05a55', 'trendline_confidence': 0.767, 'trendline_r2': 0.992, 'trendline_touches': 36, 'trendline_price_at_now': 24070.49, 'dist_pct': 0.00168, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-22 09:45:23,012 - INFO - Retrieved live premium from Fyers API: LTP=150.7 for NSE:NIFTY26JUL24050CE
+2026-07-22 09:45:23,013 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24050CE', strike=24050.0, expiry='26JUL', option_type='CE', premium=150.7, delta=0.5, bid=150.45, ask=150.75, volume=11433045, resolved_at=datetime.datetime(2026, 7, 22, 9, 45, 23, 13026))
+2026-07-22 09:45:23,013 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24050CE @ premium 150.7 (type: CE, strike: 24050.0)
+2026-07-22 09:45:23,013 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY26JUL24050CE', 'strike': 24050.0, 'expiry': '26JUL', 'type': 'CE'}
+2026-07-22 09:45:23,036 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'premium': 150.7, 'bid': 150.45, 'ask': 150.75}
+2026-07-22 09:45:23,054 - INFO - 📊 EXECUTION AUDIT [ORDER_SUBMITTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'price': 24030.0, 'sl': 24023.81, 'tp': 24050.0}
+2026-07-22 09:45:23,070 - INFO - 📊 EXECUTION AUDIT [ORDER_FILLED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'price': 24030.0, 'sl': 24023.81, 'tp': 24050.0}
+2026-07-22 09:45:23,087 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.003 → ₹5,000 (risk/unit=0.03%)
+2026-07-22 09:45:23,124 - INFO - 🟢 ENTRY [Geometry_v1.0_Score50|INDEX_1784693717]: NSE:NIFTY50-INDEX BUY CALL @ 24030.00 | SL: 24023.81 TP: 24050.00
+2026-07-22 09:45:24,316 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:45:24,331 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:45:24,335 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:45:24,335 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 09:50:24,470 - INFO - --- 09:50:24 Market Pulse ---
+2026-07-22 09:50:25,422 - ERROR - ❌ Error in market loop: float division by zero
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 491, in market_loop
+    self._update_active_trades(current_prices, now)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 621, in _update_active_trades
+    is_closed = self._update_position(pos, current_prices[symbol], timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 740, in _update_position
+    self._exit_position(pos, exit_price, exit_reason, timestamp, pnl_r)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1258, in _exit_position
+    self.sizer.record_trade_result(pos['strategy'], pnl_r)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 122, in record_trade_result
+    stats.update(pnl)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 68, in update
+    self._update_kelly()
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 79, in _update_kelly
+    kelly = w - (1 - w) / r
+ZeroDivisionError: float division by zero
+2026-07-22 09:55:25,698 - INFO - --- 09:55:25 Market Pulse ---
+2026-07-22 09:55:26,272 - ERROR - ❌ Error in market loop: float division by zero
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 491, in market_loop
+    self._update_active_trades(current_prices, now)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 621, in _update_active_trades
+    is_closed = self._update_position(pos, current_prices[symbol], timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 740, in _update_position
+    self._exit_position(pos, exit_price, exit_reason, timestamp, pnl_r)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1258, in _exit_position
+    self.sizer.record_trade_result(pos['strategy'], pnl_r)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 122, in record_trade_result
+    stats.update(pnl)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 68, in update
+    self._update_kelly()
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 79, in _update_kelly
+    kelly = w - (1 - w) / r
+ZeroDivisionError: float division by zero
+2026-07-22 10:15:58,540 - INFO - --- 10:15:58 Market Pulse ---
+2026-07-22 10:15:59,766 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'price': 24030.05, 'old_sl': 24023.81, 'new_sl': 24023.86, 'old_tp': None, 'new_tp': 24050.0, 'reason': 'TRAILING_SL'}
+2026-07-22 10:15:59,835 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24030.05 | SL→24023.86 TP→24050.00
+2026-07-22 10:15:59,835 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'price': 24030.05, 'old_sl': 24023.81, 'new_sl': 24023.86, 'old_tp': None, 'new_tp': 24050.0, 'reason': 'TRAILING_SL'}
+2026-07-22 10:15:59,876 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24030.05 | SL→24023.86 TP→24050.00
+2026-07-22 10:16:01,493 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.10']
+2026-07-22 10:16:01,507 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.10']
+2026-07-22 10:16:01,510 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.10']
+2026-07-22 10:16:01,510 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-22 10:16:01,511 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 24030.05, 'stop_loss': 24043.0, 'take_profit': 24004.149999999998, 'tp1': 24010.625, 'rr_ratio': 2.0, 'timestamp': '2026-07-22T10:15:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.1, 'atr': 27.81, 'distance_from_supply': 337.25, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 80.5, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 9999.0, 'liquidity_score': 1.0, 'indicator_snapshot': {'rvol_tod': 0.1, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.0789, 'wickiness': 0.4437, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500', 'ema20': 24074.32, 'ema50': 24122.41, 'move_efficiency_h1': 0.4453, 'ema_bullish': False, 'rsi14': 18.21, 'distance_to_vwap': -0.0011, 'atr_percentile': 0.9289, 'dist_prev_high': -0.0096, 'dist_prev_low': -0.0044}, 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 10:16:02,626 - INFO - Retrieved live premium from Fyers API: LTP=171.7 for NSE:NIFTY26JUL24050PE
+2026-07-22 10:16:02,627 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24050PE', strike=24050.0, expiry='26JUL', option_type='PE', premium=171.7, delta=0.5, bid=171.7, ask=172.2, volume=29545750, resolved_at=datetime.datetime(2026, 7, 22, 10, 16, 2, 627272))
+2026-07-22 10:16:02,627 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24050PE @ premium 171.7 (type: PE, strike: 24050.0)
+2026-07-22 10:16:02,627 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTY26JUL24050PE', 'strike': 24050.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 10:16:02,661 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'premium': 171.7, 'bid': 171.7, 'ask': 172.2}
+2026-07-22 10:16:02,682 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 24030.05, 'sl': 24043.0, 'tp': 24004.149999999998}
+2026-07-22 10:16:02,701 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 24030.05, 'sl': 24043.0, 'tp': 24004.149999999998}
+2026-07-22 10:16:02,718 - INFO - 💰 Position size [BREAKOUT|RANGE_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.05%)
+2026-07-22 10:16:02,755 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 24030.05 | SL: 24043.00 TP: 24004.15
+2026-07-22 10:16:02,755 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.10']
+2026-07-22 10:16:02,756 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE']
+2026-07-22 10:16:02,756 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 24030.05, 'stop_loss': 24043.0, 'take_profit': 24004.149999999998, 'tp1': 24010.625, 'rr_ratio': 2.0, 'timestamp': '2026-07-22T10:15:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'NO_TARGET_ZONE'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.1, 'atr': 27.81, 'distance_from_supply': 337.25, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 80.5, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 9999.0, 'liquidity_score': 1.0, 'indicator_snapshot': {'rvol_tod': 0.1, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.0789, 'wickiness': 0.4437, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500', 'ema20': 24074.32, 'ema50': 24122.41, 'move_efficiency_h1': 0.4453, 'ema_bullish': False, 'rsi14': 18.21, 'distance_to_vwap': -0.0011, 'atr_percentile': 0.9289, 'dist_prev_high': -0.0096, 'dist_prev_low': -0.0044}, 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 10:32:22,179 - INFO - Retrieved live premium from Fyers API: LTP=189.95 for NSE:NIFTY26JUL24050PE
+2026-07-22 10:32:22,179 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24050PE', strike=24050.0, expiry='26JUL', option_type='PE', premium=189.95, delta=0.5, bid=189.45, ask=189.9, volume=37240385, resolved_at=datetime.datetime(2026, 7, 22, 10, 32, 22, 179860))
+2026-07-22 10:32:22,179 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24050PE @ premium 189.95 (type: PE, strike: 24050.0)
+2026-07-22 10:32:22,179 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTY26JUL24050PE', 'strike': 24050.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 10:32:22,218 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'premium': 189.95, 'bid': 189.45, 'ask': 189.9}
+2026-07-22 10:32:22,235 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 24030.05, 'sl': 24043.0, 'tp': 24004.149999999998}
+2026-07-22 10:32:22,250 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 24030.05, 'sl': 24043.0, 'tp': 24004.149999999998}
+2026-07-22 10:32:22,263 - INFO - 💰 Position size [BREAKOUT|RANGE_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.05%)
+2026-07-22 10:32:22,289 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 24030.05 | SL: 24043.00 TP: 24004.15
+2026-07-22 10:32:23,668 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.15']
+2026-07-22 10:32:23,683 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.15']
+2026-07-22 10:32:23,686 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.15']
+2026-07-22 10:32:23,686 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'LOW_RR']
+2026-07-22 10:32:23,686 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 57322.85, 'stop_loss': 57368.40535714286, 'take_profit': 57286.9, 'tp1': 57254.51696428571, 'rr_ratio': 0.79, 'timestamp': '2026-07-22T10:15:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'LOW_RR'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'TREND_DOWN_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'BULLISH', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.15, 'atr': 91.11, 'distance_from_supply': 1274.0, 'distance_from_demand': 35.95, 'nearest_supply_strength': 69.5, 'nearest_demand_strength': 50.0, 'distance_to_liquidity_pool': 1274.0, 'liquidity_score': 1.5, 'indicator_snapshot': {'rvol_tod': 0.15, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.0797, 'wickiness': 0.3105, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500', 'ema20': 57474.32, 'ema50': 57658.69, 'move_efficiency_h1': 0.5146, 'ema_bullish': False, 'rsi14': 20.83, 'distance_to_vwap': -0.001, 'atr_percentile': 0.8667, 'dist_prev_high': -0.0156, 'dist_prev_low': -0.0083}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 10:32:25,820 - INFO - Retrieved live premium from Fyers API: LTP=460.0 for NSE:BANKNIFTY26JUL57300PE
+2026-07-22 10:32:25,821 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:BANKNIFTY26JUL57300PE', strike=57300.0, expiry='26JUL', option_type='PE', premium=460.0, delta=0.5, bid=460.0, ask=460.95, volume=1358250, resolved_at=datetime.datetime(2026, 7, 22, 10, 32, 25, 821848))
+2026-07-22 10:32:25,822 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:BANKNIFTY26JUL57300PE @ premium 460.0 (type: PE, strike: 57300.0)
+2026-07-22 10:32:25,822 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:BANKNIFTY26JUL57300PE', 'strike': 57300.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 10:32:25,847 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'premium': 460.0, 'bid': 460.0, 'ask': 460.95}
+2026-07-22 10:32:25,865 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57322.85, 'sl': 57368.40535714286, 'tp': 57286.9}
+2026-07-22 10:32:25,883 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57322.85, 'sl': 57368.40535714286, 'tp': 57286.9}
+2026-07-22 10:32:25,900 - INFO - 💰 Position size [BREAKOUT|TREND_DOWN_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.08%)
+2026-07-22 10:32:25,931 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57322.85 | SL: 57368.41 TP: 57286.90
+2026-07-22 10:32:25,932 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.15']
+2026-07-22 10:32:25,932 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'LOW_RR']
+2026-07-22 10:32:25,932 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 57322.85, 'stop_loss': 57368.40535714286, 'take_profit': 57286.9, 'tp1': 57254.51696428571, 'rr_ratio': 0.79, 'timestamp': '2026-07-22T10:15:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'LOW_RR'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'TREND_DOWN_HIGH_VOL', 'day_type': 'RANGE_DAY', 'session_type': 'OPEN', 'daily_bias': 'BULLISH', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.15, 'atr': 91.11, 'distance_from_supply': 1274.0, 'distance_from_demand': 35.95, 'nearest_supply_strength': 69.5, 'nearest_demand_strength': 50.0, 'distance_to_liquidity_pool': 1274.0, 'liquidity_score': 1.5, 'indicator_snapshot': {'rvol_tod': 0.15, 'is_compressed': False, 'bos_count': 0}, 'move_efficiency': 0.0797, 'wickiness': 0.3105, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500', 'ema20': 57474.32, 'ema50': 57658.69, 'move_efficiency_h1': 0.5146, 'ema_bullish': False, 'rsi14': 20.83, 'distance_to_vwap': -0.001, 'atr_percentile': 0.8667, 'dist_prev_high': -0.0156, 'dist_prev_low': -0.0083}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 10:39:23,807 - INFO - Retrieved live premium from Fyers API: LTP=442.9 for NSE:BANKNIFTY26JUL57300PE
+2026-07-22 10:39:23,808 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:BANKNIFTY26JUL57300PE', strike=57300.0, expiry='26JUL', option_type='PE', premium=442.9, delta=0.5, bid=443.4, ask=444.75, volume=1448700, resolved_at=datetime.datetime(2026, 7, 22, 10, 39, 23, 808135))
+2026-07-22 10:39:23,808 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:BANKNIFTY26JUL57300PE @ premium 442.9 (type: PE, strike: 57300.0)
+2026-07-22 10:39:23,808 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:BANKNIFTY26JUL57300PE', 'strike': 57300.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 10:39:23,833 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'premium': 442.9, 'bid': 443.4, 'ask': 444.75}
+2026-07-22 10:39:23,844 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57322.85, 'sl': 57368.40535714286, 'tp': 57286.9}
+2026-07-22 10:39:23,856 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57322.85, 'sl': 57368.40535714286, 'tp': 57286.9}
+2026-07-22 10:39:23,866 - INFO - 💰 Position size [BREAKOUT|TREND_DOWN_HIGH_VOL|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.08%)
+2026-07-22 10:39:23,890 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57322.85 | SL: 57368.41 TP: 57286.90
+2026-07-22 10:58:13,206 - INFO - --- 10:58:13 Market Pulse ---
+2026-07-22 10:58:13,856 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 24029.05, 'old_sl': 24043.0, 'new_sl': 24042.0, 'old_tp': None, 'new_tp': 24004.149999999998, 'reason': 'TRAILING_SL'}
+2026-07-22 10:58:13,920 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24029.05 | SL→24042.00 TP→24004.15
+2026-07-22 10:58:13,920 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 24029.05, 'old_sl': 24043.0, 'new_sl': 24042.0, 'old_tp': None, 'new_tp': 24004.149999999998, 'reason': 'TRAILING_SL'}
+2026-07-22 10:58:13,964 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24029.05 | SL→24042.00 TP→24004.15
+2026-07-22 10:58:13,965 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57260.9, 'old_sl': 57368.40535714286, 'new_sl': 57306.45535714286, 'old_tp': 57286.9, 'new_tp': 57241.34464285714, 'reason': 'TP_EXPANSION'}
+2026-07-22 10:58:14,008 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57260.90 | SL→57306.46 TP→57241.34
+2026-07-22 10:58:14,008 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57260.9, 'old_sl': 57368.40535714286, 'new_sl': 57306.45535714286, 'old_tp': 57286.9, 'new_tp': 57241.34464285714, 'reason': 'TP_EXPANSION'}
+2026-07-22 10:58:14,054 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57260.90 | SL→57306.46 TP→57241.34
+2026-07-22 10:58:15,779 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 10:58:15,793 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 10:58:15,796 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 10:58:15,796 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 10:58:17,123 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-22 10:58:17,138 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-22 10:58:17,142 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-22 10:58:17,142 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.43']
+2026-07-22 11:15:46,844 - INFO - --- 11:15:46 Market Pulse ---
+2026-07-22 11:15:47,687 - ERROR - ❌ Error in market loop: float division by zero
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 491, in market_loop
+    self._update_active_trades(current_prices, now)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 621, in _update_active_trades
+    is_closed = self._update_position(pos, current_prices[symbol], timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 740, in _update_position
+    self._exit_position(pos, exit_price, exit_reason, timestamp, pnl_r)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1258, in _exit_position
+    self.sizer.record_trade_result(pos['strategy'], pnl_r)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 122, in record_trade_result
+    stats.update(pnl)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 68, in update
+    self._update_kelly()
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/position_sizer.py", line 79, in _update_kelly
+    kelly = w - (1 - w) / r
+ZeroDivisionError: float division by zero
+2026-07-22 11:32:56,389 - INFO - --- 11:32:56 Market Pulse ---
+2026-07-22 11:32:57,692 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'price': 24042.9, 'old_sl': 24023.86, 'new_sl': 24038.257500000003, 'old_tp': None, 'new_tp': 24050.0, 'reason': 'TRAILING_SL'}
+2026-07-22 11:32:57,762 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24042.90 | SL→24038.26 TP→24050.00
+2026-07-22 11:32:57,762 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'price': 24042.9, 'old_sl': 24023.86, 'new_sl': 24038.257500000003, 'old_tp': None, 'new_tp': 24050.0, 'reason': 'TRAILING_SL'}
+2026-07-22 11:32:57,802 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24042.90 | SL→24038.26 TP→24050.00
+2026-07-22 11:32:57,803 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL1.0, payload={'exit_price': 24042.0, 'exit_reason': 'TRAILING_SL', 'pnl_r': -0.9727799227799272, 'duration_minutes': 76.96414328333334, 'bars_held': 2}
+2026-07-22 11:32:57,834 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 24042.00 | PnL -0.97R | MFE 0.08R | Capture -1260% | 2bars HoldEff -0.486R/bar
+2026-07-22 11:32:57,834 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_24008.70_20260722_101500_Structural_v3.2_RVOL0.8, payload={'exit_price': 24042.0, 'exit_reason': 'TRAILING_SL', 'pnl_r': -0.9727799227799272, 'duration_minutes': 76.96414328333334, 'bars_held': 2}
+2026-07-22 11:32:57,864 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 24042.00 | PnL -0.97R | MFE 0.08R | Capture -1260% | 2bars HoldEff -0.486R/bar
+2026-07-22 11:32:57,864 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 11:48:24,609 - INFO - --- 11:48:24 Market Pulse ---
+2026-07-22 11:48:25,784 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'price': 24046.35, 'old_sl': 24038.257500000003, 'new_sl': 24041.7075, 'old_tp': None, 'new_tp': 24050.0, 'reason': 'TRAILING_SL'}
+2026-07-22 11:48:25,855 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24046.35 | SL→24041.71 TP→24050.00
+2026-07-22 11:48:25,855 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'price': 24046.35, 'old_sl': 24038.257500000003, 'new_sl': 24041.7075, 'old_tp': None, 'new_tp': 24050.0, 'reason': 'TRAILING_SL'}
+2026-07-22 11:48:25,902 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24046.35 | SL→24041.71 TP→24050.00
+2026-07-22 11:48:25,902 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 12:04:22,599 - INFO - --- 12:04:22 Market Pulse ---
+2026-07-22 12:04:23,545 - INFO - 📊 EXECUTION AUDIT [ORDER_EXITED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score35, payload={'exit_price': 24041.7075, 'exit_reason': 'TRAILING_SL', 'pnl_r': 1.8413570274641218, 'duration_minutes': 139.08040676666667, 'bars_held': 10}
+2026-07-22 12:04:23,618 - INFO - 🔴 EXIT (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 24041.71 | PnL +1.84R | MFE 2.64R | Capture 70% | 10bars HoldEff +0.184R/bar
+2026-07-22 12:04:23,618 - INFO - 📊 EXECUTION AUDIT [ORDER_EXITED]: trade_id=trade_NSE_NIFTY50_INDEX_1784693717, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24030.00_202607220945_Geometry_v1.0_Score50, payload={'exit_price': 24041.7075, 'exit_reason': 'TRAILING_SL', 'pnl_r': 1.8413570274641218, 'duration_minutes': 139.08040676666667, 'bars_held': 7}
+2026-07-22 12:04:23,657 - INFO - 🔴 EXIT (TRAILING_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 24041.71 | PnL +1.84R | MFE 2.64R | Capture 70% | 7bars HoldEff +0.263R/bar
+2026-07-22 12:04:23,657 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57123.7, 'old_sl': 57306.45535714286, 'new_sl': 57169.25535714286, 'old_tp': 57241.34464285714, 'new_tp': 57195.78928571428, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:04:23,697 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57123.70 | SL→57169.26 TP→57195.79
+2026-07-22 12:04:23,697 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57123.7, 'old_sl': 57306.45535714286, 'new_sl': 57169.25535714286, 'old_tp': 57241.34464285714, 'new_tp': 57195.78928571428, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:04:23,729 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57123.70 | SL→57169.26 TP→57195.79
+2026-07-22 12:04:23,729 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 12:04:23,729 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57123.7, 'old_sl': 57169.25535714286, 'new_sl': 57169.25535714286, 'old_tp': 57195.78928571428, 'new_tp': 57150.23392857142, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:04:23,760 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57123.70 | SL→57169.26 TP→57150.23
+2026-07-22 12:04:23,760 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57123.7, 'old_sl': 57169.25535714286, 'new_sl': 57169.25535714286, 'old_tp': 57195.78928571428, 'new_tp': 57150.23392857142, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:04:23,787 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57123.70 | SL→57169.26 TP→57150.23
+2026-07-22 12:20:55,316 - INFO - --- 12:20:55 Market Pulse ---
+2026-07-22 12:20:56,045 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57024.85, 'old_sl': 57169.25535714286, 'new_sl': 57070.40535714286, 'old_tp': 57150.23392857142, 'new_tp': 57104.67857142856, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:20:56,122 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57024.85 | SL→57070.41 TP→57104.68
+2026-07-22 12:20:56,122 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57024.85, 'old_sl': 57169.25535714286, 'new_sl': 57070.40535714286, 'old_tp': 57150.23392857142, 'new_tp': 57104.67857142856, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:20:56,170 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57024.85 | SL→57070.41 TP→57104.68
+2026-07-22 12:20:56,171 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 12:20:56,171 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57024.85, 'old_sl': 57070.40535714286, 'new_sl': 57070.40535714286, 'old_tp': 57104.67857142856, 'new_tp': 57059.1232142857, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:20:56,213 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57024.85 | SL→57070.41 TP→57059.12
+2026-07-22 12:20:56,214 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57024.85, 'old_sl': 57070.40535714286, 'new_sl': 57070.40535714286, 'old_tp': 57104.67857142856, 'new_tp': 57059.1232142857, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:20:56,252 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57024.85 | SL→57070.41 TP→57059.12
+2026-07-22 12:36:46,941 - INFO - --- 12:36:46 Market Pulse ---
+2026-07-22 12:36:47,729 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57006.4, 'old_sl': 57070.40535714286, 'new_sl': 57051.95535714286, 'old_tp': 57059.1232142857, 'new_tp': 57013.567857142836, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:36:47,794 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57006.40 | SL→57051.96 TP→57013.57
+2026-07-22 12:36:47,794 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57006.4, 'old_sl': 57070.40535714286, 'new_sl': 57051.95535714286, 'old_tp': 57059.1232142857, 'new_tp': 57013.567857142836, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:36:47,832 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57006.40 | SL→57051.96 TP→57013.57
+2026-07-22 12:36:47,833 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 12:36:47,833 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'price': 57006.4, 'old_sl': 57051.95535714286, 'new_sl': 57051.95535714286, 'old_tp': 57013.567857142836, 'new_tp': 56968.012499999975, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:36:47,868 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57006.40 | SL→57051.96 TP→56968.01
+2026-07-22 12:36:47,869 - INFO - 📊 EXECUTION AUDIT [CF_TP_EXPANDED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'price': 57006.4, 'old_sl': 57051.95535714286, 'new_sl': 57051.95535714286, 'old_tp': 57013.567857142836, 'new_tp': 56968.012499999975, 'reason': 'TP_EXPANSION'}
+2026-07-22 12:36:47,901 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57006.40 | SL→57051.96 TP→56968.01
+2026-07-22 12:57:18,252 - INFO - --- 12:57:18 Market Pulse ---
+2026-07-22 12:57:19,196 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL1.0, payload={'exit_price': 57051.95535714286, 'exit_reason': 'TRAILING_SL', 'pnl_r': 5.896493669396881, 'duration_minutes': 161.32852223333333, 'bars_held': 12}
+2026-07-22 12:57:19,259 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57051.96 | PnL +5.90R | MFE 6.95R | Capture 85% | 12bars HoldEff +0.491R/bar
+2026-07-22 12:57:19,260 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57248.90_20260722_101500_Structural_v3.2_RVOL0.8, payload={'exit_price': 57051.95535714286, 'exit_reason': 'TRAILING_SL', 'pnl_r': 5.896493669396881, 'duration_minutes': 161.32852223333333, 'bars_held': 12}
+2026-07-22 12:57:19,302 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57051.96 | PnL +5.90R | MFE 6.95R | Capture 85% | 12bars HoldEff +0.491R/bar
+2026-07-22 12:57:19,302 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 13:12:52,584 - INFO - --- 13:12:52 Market Pulse ---
+2026-07-22 13:12:53,669 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-22 13:30:14,403 - INFO - --- 13:30:14 Market Pulse ---
+2026-07-22 13:30:18,195 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 13:30:18,209 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 13:30:18,213 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 13:30:18,213 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-22 13:30:18,213 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 23980.45, 'stop_loss': 23987.703571428574, 'take_profit': 23965.942857142854, 'tp1': 23969.56964285714, 'rr_ratio': 2.0, 'timestamp': '2026-07-22T13:30:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE', 'day_type': 'RANGE_DAY', 'session_type': 'MID', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.03, 'atr': 14.51, 'distance_from_supply': 386.85, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 79.9, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 9999.0, 'liquidity_score': 0.3, 'indicator_snapshot': {'rvol_tod': 0.03, 'is_compressed': True, 'bos_count': 0}, 'move_efficiency': 0.5298, 'wickiness': 0.6894, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000', 'ema20': 23992.67, 'ema50': 24024.86, 'move_efficiency_h1': 0.3315, 'ema_bullish': False, 'rsi14': 46.0, 'distance_to_vwap': -0.0018, 'atr_percentile': 0.216, 'dist_prev_high': -0.0116, 'dist_prev_low': -0.0064}, 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 13:41:55,305 - INFO - Retrieved live premium from Fyers API: LTP=166.0 for NSE:NIFTY26JUL24000PE
+2026-07-22 13:41:55,305 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24000PE', strike=24000.0, expiry='26JUL', option_type='PE', premium=166.0, delta=0.5, bid=166.0, ask=166.35, volume=160882410, resolved_at=datetime.datetime(2026, 7, 22, 13, 41, 55, 305838))
+2026-07-22 13:41:55,305 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24000PE @ premium 166.0 (type: PE, strike: 24000.0)
+2026-07-22 13:41:55,306 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTY26JUL24000PE', 'strike': 24000.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 13:41:55,327 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0, payload={'premium': 166.0, 'bid': 166.0, 'ask': 166.35}
+2026-07-22 13:41:55,343 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0, payload={'price': 23980.45, 'sl': 23987.703571428574, 'tp': 23965.942857142854}
+2026-07-22 13:41:55,358 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0, payload={'price': 23980.45, 'sl': 23987.703571428574, 'tp': 23965.942857142854}
+2026-07-22 13:41:55,374 - INFO - 💰 Position size [BREAKOUT|RANGE|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.03%)
+2026-07-22 13:41:55,403 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX BUY PUT @ 23980.45 | SL: 23987.70 TP: 23965.94
+2026-07-22 13:41:55,404 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.03']
+2026-07-22 13:41:55,404 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTY50-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-22 13:41:55,404 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 23980.45, 'stop_loss': 23987.703571428574, 'take_profit': 23965.942857142854, 'tp1': 23969.56964285714, 'rr_ratio': 2.0, 'timestamp': '2026-07-22T13:30:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE', 'day_type': 'RANGE_DAY', 'session_type': 'MID', 'daily_bias': 'NEUTRAL', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.03, 'atr': 14.51, 'distance_from_supply': 386.85, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 79.9, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 9999.0, 'liquidity_score': 0.3, 'indicator_snapshot': {'rvol_tod': 0.03, 'is_compressed': True, 'bos_count': 0}, 'move_efficiency': 0.5298, 'wickiness': 0.6894, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000', 'ema20': 23992.67, 'ema50': 24024.86, 'move_efficiency_h1': 0.3315, 'ema_bullish': False, 'rsi14': 46.0, 'distance_to_vwap': -0.0018, 'atr_percentile': 0.216, 'dist_prev_high': -0.0116, 'dist_prev_low': -0.0064}, 'candidate_id': 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 13:41:57,023 - INFO - Retrieved live premium from Fyers API: LTP=166.0 for NSE:NIFTY26JUL24000PE
+2026-07-22 13:41:57,024 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24000PE', strike=24000.0, expiry='26JUL', option_type='PE', premium=166.0, delta=0.5, bid=166.0, ask=166.45, volume=160908410, resolved_at=datetime.datetime(2026, 7, 22, 13, 41, 57, 24056))
+2026-07-22 13:41:57,024 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24000PE @ premium 166.0 (type: PE, strike: 24000.0)
+2026-07-22 13:41:57,024 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTY26JUL24000PE', 'strike': 24000.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 13:41:57,052 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8, payload={'premium': 166.0, 'bid': 166.0, 'ask': 166.45}
+2026-07-22 13:41:57,079 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8, payload={'price': 23980.45, 'sl': 23987.703571428574, 'tp': 23965.942857142854}
+2026-07-22 13:41:57,102 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8, payload={'price': 23980.45, 'sl': 23987.703571428574, 'tp': 23965.942857142854}
+2026-07-22 13:41:57,119 - INFO - 💰 Position size [BREAKOUT|RANGE|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.03%)
+2026-07-22 13:41:57,151 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX BUY PUT @ 23980.45 | SL: 23987.70 TP: 23965.94
+2026-07-22 13:41:57,152 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [Geometry_v1.0_Score35]
+2026-07-22 13:41:57,152 - INFO -    Entry: 23980.45 | SL: 23983.68 | TP: 23973.7 (RR: 2.09)
+2026-07-22 13:41:57,152 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35', 'experiment_name': 'Geometry_v1.0_Score35', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'TRENDLINE_RETEST', 'price': 23980.45, 'stop_loss': 23983.68, 'take_profit': 23973.7, 'tp1': 23975.61, 'rr_ratio': 2.09, 'timestamp': '2026-07-22T13:30:14.403102+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': True, 'rejection_reasons': [], 'stop_loss_distance': 3.23, 'atr': 14.51, 'confidence': 0.747, 'diagnostics': {'trendline_id': 'tl_1879bb2697d16d85', 'trendline_confidence': 0.826, 'trendline_r2': 0.997, 'trendline_touches': 75, 'trendline_price_at_now': 23973.49, 'dist_pct': 0.00029, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-22 13:41:58,379 - INFO - Retrieved live premium from Fyers API: LTP=169.95 for NSE:NIFTY26JUL24000PE
+2026-07-22 13:41:58,380 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24000PE', strike=24000.0, expiry='26JUL', option_type='PE', premium=169.95, delta=0.5, bid=166.65, ask=166.95, volume=160918095, resolved_at=datetime.datetime(2026, 7, 22, 13, 41, 58, 380621))
+2026-07-22 13:41:58,380 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24000PE @ premium 169.95 (type: PE, strike: 24000.0)
+2026-07-22 13:41:58,381 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35, payload={'symbol': 'NSE:NIFTY26JUL24000PE', 'strike': 24000.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 13:41:58,415 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35, payload={'premium': 169.95, 'bid': 166.65, 'ask': 166.95}
+2026-07-22 13:41:58,435 - INFO - 📊 EXECUTION AUDIT [ORDER_SUBMITTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35, payload={'price': 23980.45, 'sl': 23983.68, 'tp': 23973.7}
+2026-07-22 13:41:58,450 - INFO - 📊 EXECUTION AUDIT [ORDER_FILLED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35, payload={'price': 23980.45, 'sl': 23983.68, 'tp': 23973.7}
+2026-07-22 13:41:58,463 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.012 → ₹5,000 (risk/unit=0.01%)
+2026-07-22 13:41:58,490 - INFO - 🟢 ENTRY [Geometry_v1.0_Score35|INDEX_1784707214]: NSE:NIFTY50-INDEX BUY PUT @ 23980.45 | SL: 23983.68 TP: 23973.70
+2026-07-22 13:41:58,490 - INFO - 🚀 SIGNAL: NSE:NIFTY50-INDEX BUY PUT | [Geometry_v1.0_Score50]
+2026-07-22 13:41:58,490 - INFO -    Entry: 23980.45 | SL: 23983.68 | TP: 23973.7 (RR: 2.09)
+2026-07-22 13:41:58,490 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY50-INDEX', 'candidate_id': 'cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50', 'experiment_name': 'Geometry_v1.0_Score50', 'strategy_id': 'geometry', 'version': 'v1.0', 'signal': 'BUY PUT', 'strategy': 'TRENDLINE_RETEST', 'price': 23980.45, 'stop_loss': 23983.68, 'take_profit': 23973.7, 'tp1': 23975.61, 'rr_ratio': 2.09, 'timestamp': '2026-07-22T13:30:14.403102+05:30', 'zone_band_low': None, 'zone_band_high': None, 'zone_direction': None, 'zone_component_count': 0, 'accepted': True, 'rejection_reasons': [], 'stop_loss_distance': 3.23, 'atr': 14.51, 'confidence': 0.747, 'diagnostics': {'trendline_id': 'tl_1879bb2697d16d85', 'trendline_confidence': 0.826, 'trendline_r2': 0.997, 'trendline_touches': 75, 'trendline_price_at_now': 23973.49, 'dist_pct': 0.00029, 'narrative_bias': 'CONTINUATION', 'bias_confidence': 0.6}, 'features': {}}
+2026-07-22 13:41:59,873 - INFO - Retrieved live premium from Fyers API: LTP=171.6 for NSE:NIFTY26JUL24000PE
+2026-07-22 13:41:59,873 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:NIFTY26JUL24000PE', strike=24000.0, expiry='26JUL', option_type='PE', premium=171.6, delta=0.5, bid=171.6, ask=172.0, volume=161004350, resolved_at=datetime.datetime(2026, 7, 22, 13, 41, 59, 873254))
+2026-07-22 13:41:59,873 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:NIFTY26JUL24000PE @ premium 171.6 (type: PE, strike: 24000.0)
+2026-07-22 13:41:59,873 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50, payload={'symbol': 'NSE:NIFTY26JUL24000PE', 'strike': 24000.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 13:41:59,905 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50, payload={'premium': 171.6, 'bid': 171.6, 'ask': 172.0}
+2026-07-22 13:41:59,924 - INFO - 📊 EXECUTION AUDIT [ORDER_SUBMITTED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50, payload={'price': 23980.45, 'sl': 23983.68, 'tp': 23973.7}
+2026-07-22 13:41:59,942 - INFO - 📊 EXECUTION AUDIT [ORDER_FILLED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50, payload={'price': 23980.45, 'sl': 23983.68, 'tp': 23973.7}
+2026-07-22 13:41:59,958 - INFO - 💰 Position size [TRENDLINE_RETEST|UNKNOWN|conf=1]: frac=0.012 → ₹5,000 (risk/unit=0.01%)
+2026-07-22 13:41:59,992 - INFO - 🟢 ENTRY [Geometry_v1.0_Score50|INDEX_1784707214]: NSE:NIFTY50-INDEX BUY PUT @ 23980.45 | SL: 23983.68 TP: 23973.70
+2026-07-22 13:42:01,864 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 13:42:01,878 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 13:42:01,882 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 13:42:01,882 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-22 13:42:01,882 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 57092.4, 'stop_loss': 57118.864285714284, 'take_profit': 57039.471428571436, 'tp1': 57052.703571428574, 'rr_ratio': 2.0, 'timestamp': '2026-07-22T13:30:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE', 'day_type': 'RANGE_DAY', 'session_type': 'MID', 'daily_bias': 'BULLISH', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.02, 'atr': 53.54, 'distance_from_supply': 1504.45, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 67.7, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 1504.449999999997, 'liquidity_score': 0.2, 'indicator_snapshot': {'rvol_tod': 0.02, 'is_compressed': True, 'bos_count': 0}, 'move_efficiency': 0.2117, 'wickiness': 0.7148, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000', 'ema20': 57108.62, 'ema50': 57245.82, 'move_efficiency_h1': 0.26, 'ema_bullish': False, 'rsi14': 47.96, 'distance_to_vwap': -0.0031, 'atr_percentile': 0.42, 'dist_prev_high': -0.0195, 'dist_prev_low': -0.0123}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 13:42:04,034 - INFO - Retrieved live premium from Fyers API: LTP=451.8 for NSE:BANKNIFTY26JUL57100PE
+2026-07-22 13:42:04,035 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:BANKNIFTY26JUL57100PE', strike=57100.0, expiry='26JUL', option_type='PE', premium=451.8, delta=0.5, bid=451.6, ask=452.9, volume=1993920, resolved_at=datetime.datetime(2026, 7, 22, 13, 42, 4, 35427))
+2026-07-22 13:42:04,035 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:BANKNIFTY26JUL57100PE @ premium 451.8 (type: PE, strike: 57100.0)
+2026-07-22 13:42:04,035 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:BANKNIFTY26JUL57100PE', 'strike': 57100.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 13:42:04,069 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0, payload={'premium': 451.8, 'bid': 451.6, 'ask': 452.9}
+2026-07-22 13:42:04,089 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0, payload={'price': 57092.4, 'sl': 57118.864285714284, 'tp': 57039.471428571436}
+2026-07-22 13:42:04,104 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0, payload={'price': 57092.4, 'sl': 57118.864285714284, 'tp': 57039.471428571436}
+2026-07-22 13:42:04,119 - INFO - 💰 Position size [BREAKOUT|RANGE|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.05%)
+2026-07-22 13:42:04,146 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY PUT @ 57092.40 | SL: 57118.86 TP: 57039.47
+2026-07-22 13:42:04,147 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.02']
+2026-07-22 13:42:04,147 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY PUT | Rejected: ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE']
+2026-07-22 13:42:04,147 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY PUT', 'strategy': 'BREAKOUT', 'price': 57092.4, 'stop_loss': 57118.864285714284, 'take_profit': 57039.471428571436, 'tp1': 57052.703571428574, 'rr_ratio': 2.0, 'timestamp': '2026-07-22T13:30:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'BIAS_MISMATCH', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'NO_TARGET_ZONE'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE', 'day_type': 'RANGE_DAY', 'session_type': 'MID', 'daily_bias': 'BULLISH', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.02, 'atr': 53.54, 'distance_from_supply': 1504.45, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 67.7, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 1504.449999999997, 'liquidity_score': 0.2, 'indicator_snapshot': {'rvol_tod': 0.02, 'is_compressed': True, 'bos_count': 0}, 'move_efficiency': 0.2117, 'wickiness': 0.7148, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000', 'ema20': 57108.62, 'ema50': 57245.82, 'move_efficiency_h1': 0.26, 'ema_bullish': False, 'rsi14': 47.96, 'distance_to_vwap': -0.0031, 'atr_percentile': 0.42, 'dist_prev_high': -0.0195, 'dist_prev_low': -0.0123}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 13:42:05,546 - INFO - Retrieved live premium from Fyers API: LTP=454.05 for NSE:BANKNIFTY26JUL57100PE
+2026-07-22 13:42:05,547 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:BANKNIFTY26JUL57100PE', strike=57100.0, expiry='26JUL', option_type='PE', premium=454.05, delta=0.5, bid=452.65, ask=454.05, volume=1994460, resolved_at=datetime.datetime(2026, 7, 22, 13, 42, 5, 547212))
+2026-07-22 13:42:05,547 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:BANKNIFTY26JUL57100PE @ premium 454.05 (type: PE, strike: 57100.0)
+2026-07-22 13:42:05,547 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:BANKNIFTY26JUL57100PE', 'strike': 57100.0, 'expiry': '26JUL', 'type': 'PE'}
+2026-07-22 13:42:05,580 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8, payload={'premium': 454.05, 'bid': 452.65, 'ask': 454.05}
+2026-07-22 13:42:05,598 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8, payload={'price': 57092.4, 'sl': 57118.864285714284, 'tp': 57039.471428571436}
+2026-07-22 13:42:05,613 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8, payload={'price': 57092.4, 'sl': 57118.864285714284, 'tp': 57039.471428571436}
+2026-07-22 13:42:05,627 - INFO - 💰 Position size [BREAKOUT|RANGE|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.05%)
+2026-07-22 13:42:05,654 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX BUY PUT @ 57092.40 | SL: 57118.86 TP: 57039.47
+2026-07-22 13:59:31,555 - INFO - --- 13:59:31 Market Pulse ---
+2026-07-22 13:59:32,567 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score35, payload={'price': 23977.1, 'old_sl': 23983.68, 'new_sl': 23980.329999999998, 'old_tp': None, 'new_tp': 23973.7, 'reason': 'TRAILING_SL'}
+2026-07-22 13:59:32,635 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score35|eometry_v1.0_Score35]: NSE:NIFTY50-INDEX @ 23977.10 | SL→23980.33 TP→23973.70
+2026-07-22 13:59:32,635 - INFO - 📊 EXECUTION AUDIT [SL_MODIFIED]: trade_id=trade_NSE_NIFTY50_INDEX_1784707214, candidate_id=cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_23980.45_202607221330_Geometry_v1.0_Score50, payload={'price': 23977.1, 'old_sl': 23983.68, 'new_sl': 23980.329999999998, 'old_tp': None, 'new_tp': 23973.7, 'reason': 'TRAILING_SL'}
+2026-07-22 13:59:32,674 - INFO - 🟡 UPDATE (TRAILING_SL) [Geometry_v1.0_Score50|eometry_v1.0_Score50]: NSE:NIFTY50-INDEX @ 23977.10 | SL→23980.33 TP→23973.70
+2026-07-22 13:59:32,674 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0, payload={'price': 23977.1, 'old_sl': 23987.703571428574, 'new_sl': 23984.35357142857, 'old_tp': None, 'new_tp': 23965.942857142854, 'reason': 'TRAILING_SL'}
+2026-07-22 13:59:32,709 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTY50-INDEX @ 23977.10 | SL→23984.35 TP→23965.94
+2026-07-22 13:59:32,710 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8, payload={'price': 23977.1, 'old_sl': 23987.703571428574, 'new_sl': 23984.35357142857, 'old_tp': None, 'new_tp': 23965.942857142854, 'reason': 'TRAILING_SL'}
+2026-07-22 13:59:32,741 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTY50-INDEX @ 23977.10 | SL→23984.35 TP→23965.94
+2026-07-22 13:59:32,741 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0, payload={'price': 57046.4, 'old_sl': 57118.864285714284, 'new_sl': 57066.24821428571, 'old_tp': None, 'new_tp': 57039.471428571436, 'reason': 'TRAILING_SL'}
+2026-07-22 13:59:32,771 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX @ 57046.40 | SL→57066.25 TP→57039.47
+2026-07-22 13:59:32,772 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8, payload={'price': 57046.4, 'old_sl': 57118.864285714284, 'new_sl': 57066.24821428571, 'old_tp': None, 'new_tp': 57039.471428571436, 'reason': 'TRAILING_SL'}
+2026-07-22 13:59:32,800 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL0.8|uctural_v3.2_RVOL0.8]: NSE:NIFTYBANK-INDEX @ 57046.40 | SL→57066.25 TP→57039.47
+2026-07-22 14:15:45,189 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 14:15:45,204 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 14:15:45,207 - INFO - ⚡ [Structural_v3.2_RVOL1.0] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 14:15:45,207 - INFO - 👻 [Structural_v3.2_RVOL1.0] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-22 14:15:45,207 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY CALL', 'strategy': 'BREAKOUT', 'price': 57046.4, 'stop_loss': 57022.04285714285, 'take_profit': 57289.97142857149, 'tp1': 57082.93571428573, 'rr_ratio': 10.0, 'timestamp': '2026-07-22T13:55:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE', 'day_type': 'RANGE_DAY', 'session_type': 'MID', 'daily_bias': 'BULLISH', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.45, 'atr': 49.33, 'distance_from_supply': 1550.45, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 67.7, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 1550.449999999997, 'liquidity_score': 4.5, 'indicator_snapshot': {'rvol_tod': 0.45, 'is_compressed': True, 'bos_count': 0}, 'move_efficiency': 0.0347, 'wickiness': 0.6027, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500', 'ema20': 57093.26, 'ema50': 57214.41, 'move_efficiency_h1': 0.1098, 'ema_bullish': False, 'rsi14': 35.87, 'distance_to_vwap': -0.0036, 'atr_percentile': 0.348, 'dist_prev_high': -0.0203, 'dist_prev_low': -0.0131}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0', 'experiment_name': 'Structural_v3.2_RVOL1.0', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 14:15:46,346 - INFO - Retrieved live premium from Fyers API: LTP=501.45 for NSE:BANKNIFTY26JUL57000CE
+2026-07-22 14:15:46,346 - INFO - Resolved index signal into option contract: OptionContract(symbol='NSE:BANKNIFTY26JUL57000CE', strike=57000.0, expiry='26JUL', option_type='CE', premium=501.45, delta=0.5, bid=500.85, ask=502.5, volume=2969850, resolved_at=datetime.datetime(2026, 7, 22, 14, 15, 46, 346814))
+2026-07-22 14:15:46,346 - INFO - ⚡ Option strike selection resolved index signal to contract NSE:BANKNIFTY26JUL57000CE @ premium 501.45 (type: CE, strike: 57000.0)
+2026-07-22 14:15:46,346 - INFO - 📊 EXECUTION AUDIT [STRIKE_SELECTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0, payload={'symbol': 'NSE:BANKNIFTY26JUL57000CE', 'strike': 57000.0, 'expiry': '26JUL', 'type': 'CE'}
+2026-07-22 14:15:46,374 - INFO - 📊 EXECUTION AUDIT [PREMIUM_RETRIEVED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0, payload={'premium': 501.45, 'bid': 500.85, 'ask': 502.5}
+2026-07-22 14:15:46,391 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0, payload={'price': 57046.4, 'sl': 57022.04285714285, 'tp': 57289.97142857149}
+2026-07-22 14:15:46,403 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0, payload={'price': 57046.4, 'sl': 57022.04285714285, 'tp': 57289.97142857149}
+2026-07-22 14:15:46,415 - INFO - 💰 Position size [BREAKOUT|RANGE|conf=70]: frac=0.004 → ₹5,000 (risk/unit=0.04%)
+2026-07-22 14:15:46,437 - INFO - 🟢 ENTRY [CF|Structural_v3.2_RVOL1.0|uctural_v3.2_RVOL1.0]: NSE:NIFTYBANK-INDEX BUY CALL @ 57046.40 | SL: 57022.04 TP: 57289.97
+2026-07-22 14:15:46,438 - INFO - ⚡ [Structural_v3.2_RVOL0.8] warnings: ['VERY_LOW_RVOL:0.45']
+2026-07-22 14:15:46,438 - INFO - 👻 [Structural_v3.2_RVOL0.8] CF BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED']
+2026-07-22 14:15:46,438 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL0.8, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY CALL', 'strategy': 'BREAKOUT', 'price': 57046.4, 'stop_loss': 57022.04285714285, 'take_profit': 57289.97142857149, 'tp1': 57082.93571428573, 'rr_ratio': 10.0, 'timestamp': '2026-07-22T13:55:00+05:30', 'accepted': False, 'rejection_reasons': ['LOW_RVOL', 'LOW_EFFICIENCY', 'HIGH_WICKINESS', 'TP_CAPPED'], 'features': {'date': '2026-07-22', 'strategy_name': 'Structural_v3', 'strategy_version': 'v3.2', 'feature_version': 'v1.1', 'market_regime': 'RANGE', 'day_type': 'RANGE_DAY', 'session_type': 'MID', 'daily_bias': 'BULLISH', 'hourly_bias': 'NEUTRAL', 'trend_strength': 0.0, 'rvol': 0.45, 'atr': 49.33, 'distance_from_supply': 1550.45, 'distance_from_demand': 9999.0, 'nearest_supply_strength': 67.7, 'nearest_demand_strength': 0.0, 'distance_to_liquidity_pool': 1550.449999999997, 'liquidity_score': 4.5, 'indicator_snapshot': {'rvol_tod': 0.45, 'is_compressed': True, 'bos_count': 0}, 'move_efficiency': 0.0347, 'wickiness': 0.6027, 'fft_score': 0.0, 'setup_type': 'BREAKOUT', 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500', 'ema20': 57093.26, 'ema50': 57214.41, 'move_efficiency_h1': 0.1098, 'ema_bullish': False, 'rsi14': 35.87, 'distance_to_vwap': -0.0036, 'atr_percentile': 0.348, 'dist_prev_high': -0.0203, 'dist_prev_low': -0.0131}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL0.8', 'experiment_name': 'Structural_v3.2_RVOL0.8', 'strategy_id': 'structural', 'version': 'v3.2'}
+2026-07-22 19:57:30,863 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-22.json
+2026-07-22 19:57:30,993 - INFO - ✅ Fyers client initialized successfully
+2026-07-22 19:57:31,053 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 19:57:31,068 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 19:57:31,109 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 19:57:31,112 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 19:57:31,112 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 19:57:31,138 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 19:57:31,147 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 19:57:31,174 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 19:57:31,198 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 19:57:31,207 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 19:57:31,233 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 19:57:31,233 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 19:57:31,233 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-22 19:57:31,247 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=10ff6ea
+2026-07-22 19:57:31,319 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=10ff6ea]
+2026-07-22 19:57:31,368 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 19:57:31,377 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 19:57:31,403 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 19:57:31,404 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 19:57:31,404 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-22 19:57:31,413 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=10ff6ea
+2026-07-22 19:57:31,424 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=10ff6ea]
+2026-07-22 19:57:31,432 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=10ff6ea
+2026-07-22 19:57:31,445 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=10ff6ea]
+2026-07-22 19:57:31,453 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=10ff6ea
+2026-07-22 19:57:31,464 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=10ff6ea]
+2026-07-22 19:57:31,471 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=10ff6ea
+2026-07-22 19:57:31,483 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=10ff6ea]
+2026-07-22 19:57:31,491 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=10ff6ea
+2026-07-22 19:57:31,502 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=10ff6ea]
+2026-07-22 19:57:31,510 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=10ff6ea
+2026-07-22 19:57:31,521 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=10ff6ea]
+2026-07-22 19:57:31,529 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=10ff6ea
+2026-07-22 19:57:31,540 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=10ff6ea]
+2026-07-22 19:57:31,540 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-22 19:57:31,548 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=10ff6ea
+2026-07-22 19:57:31,559 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=10ff6ea]
+2026-07-22 19:57:31,560 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-22 19:57:31,568 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=10ff6ea
+2026-07-22 19:57:31,580 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=10ff6ea]
+2026-07-22 19:57:31,580 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-22 19:57:31,588 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=10ff6ea
+2026-07-22 19:57:31,599 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=10ff6ea]
+2026-07-22 19:57:31,623 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Geometry_v1.0_Score35')]
+2026-07-22 19:57:31,693 - INFO - 🔄 Recovered 5 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0']
+2026-07-22 19:57:31,693 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-22 19:57:31,693 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 154s until 20:00:05 IST...
+2026-07-22 21:42:06,254 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-22.json
+2026-07-22 21:42:06,387 - INFO - ✅ Fyers client initialized successfully
+2026-07-22 21:42:06,456 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:06,539 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:06,597 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:06,599 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-07-22 21:42:06,599 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 21:42:06,599 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 21:42:06,622 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:06,632 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:06,658 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:06,682 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:06,692 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:06,717 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:06,717 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 21:42:06,717 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-22 21:42:06,727 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=a9b22d6
+2026-07-22 21:42:06,737 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=a9b22d6]
+2026-07-22 21:42:06,762 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:06,772 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:06,795 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:06,795 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 21:42:06,795 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-22 21:42:06,803 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=a9b22d6
+2026-07-22 21:42:06,814 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=a9b22d6]
+2026-07-22 21:42:06,823 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=a9b22d6
+2026-07-22 21:42:06,834 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=a9b22d6]
+2026-07-22 21:42:06,845 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=a9b22d6
+2026-07-22 21:42:06,858 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=a9b22d6]
+2026-07-22 21:42:06,867 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=a9b22d6
+2026-07-22 21:42:06,877 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=a9b22d6]
+2026-07-22 21:42:06,886 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=a9b22d6
+2026-07-22 21:42:06,896 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=a9b22d6]
+2026-07-22 21:42:06,905 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=a9b22d6
+2026-07-22 21:42:06,919 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=a9b22d6]
+2026-07-22 21:42:06,929 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=a9b22d6
+2026-07-22 21:42:06,948 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=a9b22d6]
+2026-07-22 21:42:06,948 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-22 21:42:06,959 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=a9b22d6
+2026-07-22 21:42:06,973 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=a9b22d6]
+2026-07-22 21:42:06,973 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-22 21:42:06,985 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=a9b22d6
+2026-07-22 21:42:06,998 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=a9b22d6]
+2026-07-22 21:42:06,998 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-22 21:42:07,006 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=a9b22d6
+2026-07-22 21:42:07,019 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=a9b22d6]
+2026-07-22 21:42:07,045 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Geometry_v1.0_Score35')]
+2026-07-22 21:42:07,113 - INFO - 🔄 Recovered 5 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0']
+2026-07-22 21:42:07,113 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-22 21:42:13,955 - CRITICAL - 🛑 DAILY LOSS LIMIT hit: realized -6.10R <= -6.0R. Halting ALL new real entries for the day.
+2026-07-22 21:42:13,955 - INFO - 🗓️ Risk day rolled to 2026-07-22 — daily counters reset.
+2026-07-22 21:42:13,955 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=T, candidate_id=C, payload={'exit_price': 92.0, 'exit_reason': 'INITIAL_SL', 'pnl_r': -1.6500000000000001, 'duration_minutes': 0.0, 'bars_held': 1}
+2026-07-22 21:42:13,965 - INFO - 🔴 EXIT (INITIAL_SL) [CFx|C]: NSE:NIFTY50-INDEX @ 92.00 | PnL -1.65R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.650R/bar
+2026-07-22 21:42:13,965 - INFO - 📊 EXECUTION AUDIT [CF_EXITED]: trade_id=T, candidate_id=C, payload={'exit_price': 95.0, 'exit_reason': 'INITIAL_SL', 'pnl_r': -1.05, 'duration_minutes': 0.0, 'bars_held': 1}
+2026-07-22 21:42:13,974 - INFO - 🔴 EXIT (INITIAL_SL) [CFx|C]: NSE:NIFTY50-INDEX @ 95.00 | PnL -1.05R | MFE 0.00R | Capture N/A | 1bars HoldEff -1.050R/bar
+2026-07-22 21:42:13,974 - INFO - 📊 EXECUTION AUDIT [CF_SL_MODIFIED]: trade_id=T, candidate_id=C, payload={'price': 99.0, 'old_sl': 105.0, 'new_sl': 104.0, 'old_tp': None, 'new_tp': 85.0, 'reason': 'TRAILING_SL'}
+2026-07-22 21:42:13,984 - INFO - 🟡 UPDATE (TRAILING_SL) [CFx|C]: NSE:NIFTY50-INDEX @ 99.00 | SL→104.00 TP→85.00
+2026-07-22 21:42:48,244 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-22.json
+2026-07-22 21:42:48,355 - INFO - ✅ Fyers client initialized successfully
+2026-07-22 21:42:48,409 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:48,422 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:48,454 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:48,456 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-07-22 21:42:48,456 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 21:42:48,456 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-22 21:42:48,482 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:48,491 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:48,518 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:48,540 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:48,549 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:48,573 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:48,573 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 21:42:48,573 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-22 21:42:48,587 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=a9b22d6
+2026-07-22 21:42:48,598 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=a9b22d6]
+2026-07-22 21:42:48,622 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-22 21:42:48,631 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-22 21:42:48,655 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-22 21:42:48,655 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-22 21:42:48,655 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-22 21:42:48,663 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=a9b22d6
+2026-07-22 21:42:48,674 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=a9b22d6]
+2026-07-22 21:42:48,683 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=a9b22d6
+2026-07-22 21:42:48,693 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=a9b22d6]
+2026-07-22 21:42:48,702 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=a9b22d6
+2026-07-22 21:42:48,713 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=a9b22d6]
+2026-07-22 21:42:48,722 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=a9b22d6
+2026-07-22 21:42:48,733 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=a9b22d6]
+2026-07-22 21:42:48,741 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=a9b22d6
+2026-07-22 21:42:48,753 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=a9b22d6]
+2026-07-22 21:42:48,761 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=a9b22d6
+2026-07-22 21:42:48,772 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=a9b22d6]
+2026-07-22 21:42:48,780 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=a9b22d6
+2026-07-22 21:42:48,792 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=a9b22d6]
+2026-07-22 21:42:48,792 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-22 21:42:48,800 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=a9b22d6
+2026-07-22 21:42:48,810 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=a9b22d6]
+2026-07-22 21:42:48,810 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-22 21:42:48,818 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=a9b22d6
+2026-07-22 21:42:48,828 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=a9b22d6]
+2026-07-22 21:42:48,828 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-22 21:42:48,838 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=a9b22d6
+2026-07-22 21:42:48,848 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=a9b22d6]
+2026-07-22 21:42:48,872 - INFO - 🔄 Recovered 1 active real positions: [('NSE:NIFTY50-INDEX', 'Geometry_v1.0_Score35')]
+2026-07-22 21:42:48,934 - INFO - 🔄 Recovered 5 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23968.30_20260722_133000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL1.0', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57019.60_20260722_133000_Structural_v3.2_RVOL0.8', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57164.05_20260722_135500_Structural_v3.2_RVOL1.0']
+2026-07-22 21:42:48,934 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-22 21:42:48,934 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 137s until 21:45:05 IST...

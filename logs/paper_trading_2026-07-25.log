@@ -1,0 +1,52 @@
+2026-07-25 10:29:52,267 - INFO - 🗓️ Risk day rolled to 2026-07-25 — daily counters reset.
+2026-07-25 10:29:52,270 - INFO - --- 10:29:52 Market Pulse ---
+2026-07-25 10:29:52,661 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:53,031 - INFO - 🗓️ Risk day rolled to 2026-07-25 — daily counters reset.
+2026-07-25 10:29:53,033 - INFO - --- 10:29:53 Market Pulse ---
+2026-07-25 10:29:53,161 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:53,317 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:53,422 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:53,422 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-25 10:29:53,780 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:53,924 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:54,098 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:29:54,099 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-25 10:29:54,099 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-25 10:29:54,805 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:15,375 - ERROR - ❌ Fyers API error: local variable 'response' referenced before assignment
+2026-07-25 10:42:17,874 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-25 10:42:17,989 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:18,229 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:18,334 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:18,334 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-25 10:42:18,335 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-25 10:42:24,793 - INFO - --- 10:42:24 Market Pulse ---
+2026-07-25 10:42:24,925 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:25,052 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:25,164 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:25,164 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-25 10:42:25,272 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:25,376 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:25,506 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 10:42:25,507 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-25 10:42:25,507 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-25 13:45:21,764 - INFO - --- 13:45:21 Market Pulse ---
+2026-07-25 13:45:21,893 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:21,934 - INFO - --- 13:45:21 Market Pulse ---
+2026-07-25 13:45:21,983 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,028 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,072 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,073 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-25 13:45:22,119 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,166 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,203 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,203 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-25 13:45:22,258 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,294 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,367 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,367 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-25 13:45:22,367 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-07-25 13:45:22,387 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,481 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-25 13:45:22,481 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-25 13:45:22,481 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)

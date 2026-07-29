@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import ast,sys; ast.parse\\(open\\('src/core/risk_manager.py'\\).read\\(\\)\\); print\\('parses OK \\(syntax\\)'\\)\")",
+      "Bash(python3 -c \"import sys; sys.path.insert\\(0,'.'\\); import src.core.risk_manager\")",
+      "Bash(git checkout *)",
+      "Bash(python3 -m py_compile src/core/volume_engine.py src/core/quant_utils.py src/core/enhanced_strategy_engine.py src/core/position_sizer.py src/core/risk_manager.py src/models/postgres_database.py src/trading/indian_trader.py)",
+      "Bash(PYTHONPATH=__CMDSUB_OUTPUT__ python3 -c ' *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'feat\\(confluence\\): chart-pattern library + shared MarketView layer *)",
+      "Bash(git commit -q -m 'feat\\(execution\\): multi-leg STRADDLE/STRANGLE combos + register 5 experiments *)",
+      "Bash(git commit -q -m 'docs: STRATEGIES.md — all 16 experiments, triggers, filters, confluence model *)",
+      "Bash(gh pr create --base fix/live-readiness-review --head feat/strategies-confluence-dashboard --title 'feat: 10→16 strategies, chart-pattern confluence, straddle/strangle, live dashboard' --body ' *)",
+      "Bash(git commit -q -m 'feat\\(execution\\): persist + recover open STRADDLE/STRANGLE combos across restart *)",
+      "Bash(python3 -c \"from datetime import datetime; from zoneinfo import ZoneInfo; print\\(datetime.now\\(ZoneInfo\\('Asia/Kolkata'\\)\\).strftime\\('%Y-%m-%d %H:%M:%S %A'\\)\\)\")",
+      "Bash(ps -o pid,lstart,etime,command -p 11131,78026)",
+      "Bash(cd *)",
+      "Bash(python3 -c \"s=open\\('src/trading/indian_trader.py'\\).read\\(\\); print\\('watchdog present:', '_install_pulse_watchdog' in s, '| PULSE_TIMEOUT_S' , 'PULSE_TIMEOUT_S' in s\\)\")",
+      "Bash(awk 'NR==1||/Python/{print $1,$2,$4}')",
+      "Bash(python3 -)",
+      "Bash(ps -o pid,stat,etime,%cpu,rss -p 11131,78026)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

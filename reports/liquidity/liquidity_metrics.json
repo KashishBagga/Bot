@@ -1,0 +1,15 @@
+{
+    "timestamp": "2026-06-23T22:02:17.463962",
+    "imbalances": {
+        "total_detected": 21,
+        "mitigated_percentage": 33.33,
+        "fully_filled_percentage": 0.0
+    },
+    "sweeps": {
+        "total_detected": 27,
+        "reversal_percentage": 0.0,
+        "continuation_percentage": 0.0,
+        "timeout_percentage": 0.0,
+        "pending_percentage": 100.0
+    }
+}

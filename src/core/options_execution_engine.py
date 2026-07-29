@@ -78,7 +78,8 @@ class ExpiryResolver:
             logger.error(f"Error parsing expiry string {expiry}: {e}")
             return None
 
-    def date_to_fyers_expiry(self, d: date) -> str:
+    @staticmethod
+    def date_to_fyers_expiry(d: date) -> str:
         """Converts a date object to Fyers weekly or monthly expiry string."""
         yy = str(d.year)[-2:]
         month = d.month
@@ -143,20 +144,13 @@ class ExpiryResolver:
                 if cached:
                     return cached['expiry_str']
                     
-            # BUG FIX: Dynamically compute next Thursday instead of hardcoding "26JUL"
-            # Nifty/BankNifty weekly options expire every Thursday
+            # Dynamically compute next Thursday using date_to_fyers_expiry
             _today = date.today()
             days_until_thursday = (3 - _today.weekday()) % 7  # 3=Thursday (Mon=0)
             if days_until_thursday == 0:
                 days_until_thursday = 7  # Today is Thursday — use NEXT Thursday
             _next_thu = _today + timedelta(days=days_until_thursday)
-            _yy = str(_next_thu.year)[2:]
-            _m = _next_thu.month
-            # Fyers weekly month encoding: 1-9 as digits, Oct='O', Nov='N', Dec='D'
-            _month_chars = {10: 'O', 11: 'N', 12: 'D'}
-            _m_char = _month_chars.get(_m, str(_m))
-            _dd = f"{_next_thu.day:02d}"
-            dynamic_expiry = f"{_yy}{_m_char}{_dd}"
+            dynamic_expiry = self.date_to_fyers_expiry(_next_thu)
             logger.warning(
                 f"[ExpiryResolver] Both DB and API failed for {underlying}. "
                 f"Falling back to dynamically computed expiry: {dynamic_expiry} ({_next_thu})"
@@ -164,13 +158,11 @@ class ExpiryResolver:
             return dynamic_expiry
         except Exception as e:
             logger.error(f"Error resolving active expiry for {underlying}: {e}")
-            # Even on exception, compute a valid next-Thursday dynamically
             try:
                 _today = date.today()
                 days_until = (3 - _today.weekday()) % 7 or 7
                 _thu = _today + timedelta(days=days_until)
-                _mc = {10: 'O', 11: 'N', 12: 'D'}.get(_thu.month, str(_thu.month))
-                return f"{str(_thu.year)[2:]}{_mc}{_thu.day:02d}"
+                return self.date_to_fyers_expiry(_thu)
             except Exception:
                 return "26JUL"  # True last resort — should never reach here
 

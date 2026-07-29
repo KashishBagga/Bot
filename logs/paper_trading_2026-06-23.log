@@ -1,0 +1,2035 @@
+2026-06-23 10:49:56,186 - INFO - 🔑 Access token loaded from environment
+2026-06-23 10:49:56,315 - INFO - ✅ Fyers client initialized successfully
+2026-06-23 10:49:56,377 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-23 10:49:56,390 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-23 10:49:56,428 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-23 10:49:56,428 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-23 10:49:56,429 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-06-23 10:49:56,448 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-23 10:49:56,456 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-23 10:49:56,483 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-23 10:49:56,502 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-23 10:49:56,510 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-23 10:49:56,536 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-23 10:49:56,536 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-23 10:49:56,536 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-06-23 10:49:56,554 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=97aaa84
+2026-06-23 10:49:56,565 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=97aaa84]
+2026-06-23 10:49:56,586 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-06-23 10:49:56,594 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-06-23 10:49:56,618 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-06-23 10:49:56,618 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-06-23 10:49:56,618 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-06-23 10:49:56,628 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=97aaa84
+2026-06-23 10:49:56,638 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=97aaa84]
+2026-06-23 10:49:56,646 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=97aaa84
+2026-06-23 10:49:56,657 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=97aaa84]
+2026-06-23 10:49:56,666 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=97aaa84
+2026-06-23 10:49:56,677 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=97aaa84]
+2026-06-23 10:49:56,686 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=97aaa84
+2026-06-23 10:49:56,697 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=97aaa84]
+2026-06-23 10:49:56,705 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=97aaa84
+2026-06-23 10:49:56,716 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=97aaa84]
+2026-06-23 10:49:56,724 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=97aaa84
+2026-06-23 10:49:56,734 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=97aaa84]
+2026-06-23 10:49:56,742 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=97aaa84
+2026-06-23 10:49:56,753 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=97aaa84]
+2026-06-23 10:49:56,753 - INFO - 📐 GeometryStrategy initialized [score>=35.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-06-23 10:49:56,761 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=5b54205496d059aa git=97aaa84
+2026-06-23 10:49:56,772 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=5b54205496d059aa git=97aaa84]
+2026-06-23 10:49:56,772 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-06-23 10:49:56,780 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=97aaa84
+2026-06-23 10:49:56,790 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=97aaa84]
+2026-06-23 10:49:57,060 - INFO - 🔄 Recovered 25 active counterfactual positions: ['cand_NSE_NIFTY50_INDEX_BREAKOUT_24071.65_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57557.95_20260617', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57906.60_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_24036.95_20260618', 'cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57954.55_20260618', 'cand_NSE_NIFTY50_INDEX_BREAKOUT_23938.75_20260619']
+2026-06-23 10:49:57,060 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-06-23 10:49:57,060 - INFO - ⏱️ Scheduler started. Waiting for next 5-minute candle...
+2026-06-23 10:49:57,060 - INFO - --- 10:49:57 Market Pulse ---
+2026-06-23 10:49:58,037 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24099.80 | SL→24087.43 TP→24088.52
+2026-06-23 10:49:58,082 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57886.25 | SL→57851.06 TP→57839.69
+2026-06-23 10:49:58,120 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57886.25 | SL→57860.19 TP→57869.71
+2026-06-23 10:49:58,147 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24036.95_20260618]: NSE:NIFTY50-INDEX @ 21858.44 | PnL +267.22R | MFE 268.27R | Capture 100% | 5bars HoldEff +53.444R/bar
+2026-06-23 10:49:58,171 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57886.25 | SL→57864.00 TP→57889.65
+2026-06-23 10:49:58,193 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_23938.75_20260619]: NSE:NIFTY50-INDEX @ 21859.72 | PnL +216.15R | MFE 217.20R | Capture 100% | 5bars HoldEff +43.229R/bar
+2026-06-23 10:49:58,347 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 10:49:58,352 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 10:49:58,453 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 10:49:58,453 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 10:49:58,453 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 10:54:57,361 - INFO - --- 10:54:57 Market Pulse ---
+2026-06-23 10:54:58,155 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24099.55 | SL→24087.43 TP→24100.89
+2026-06-23 10:54:58,195 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57898.50 | SL→57863.31 TP→57874.88
+2026-06-23 10:54:58,228 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57898.50 | SL→57872.44 TP→57895.76
+2026-06-23 10:54:58,260 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57898.50 | SL→57876.25 TP→57911.91
+2026-06-23 10:54:58,440 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 10:54:58,440 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 10:54:58,548 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 10:54:58,548 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 10:54:58,548 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 10:59:59,378 - INFO - --- 10:59:59 Market Pulse ---
+2026-06-23 11:00:00,349 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57886.80 | SL→57863.31 TP→57910.07
+2026-06-23 11:00:00,535 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:00:00,535 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:00:00,632 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:00:00,632 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:00:00,632 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:05:01,624 - INFO - --- 11:05:01 Market Pulse ---
+2026-06-23 11:05:03,108 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57906.60_20260618]: NSE:NIFTYBANK-INDEX @ 57872.44 | PnL +1.06R | MFE 2.11R | Capture 50% | 4bars HoldEff +0.264R/bar
+2026-06-23 11:05:03,146 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57954.55_20260618]: NSE:NIFTYBANK-INDEX @ 57876.25 | PnL +1.35R | MFE 2.40R | Capture 56% | 5bars HoldEff +0.270R/bar
+2026-06-23 11:05:03,323 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:05:03,323 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:05:03,414 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:05:03,414 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:05:03,414 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:10:04,109 - INFO - --- 11:10:04 Market Pulse ---
+2026-06-23 11:10:05,241 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24101.40 | SL→24089.03 TP→24113.25
+2026-06-23 11:10:05,400 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:10:05,400 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:10:05,496 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:10:05,496 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:10:05,496 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:15:06,239 - INFO - --- 11:15:06 Market Pulse ---
+2026-06-23 11:15:07,253 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24115.80 | SL→24103.43 TP→24125.62
+2026-06-23 11:15:07,285 - INFO - 🟡 UPDATE (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57906.45 | SL→57871.26 TP→57910.07
+2026-06-23 11:15:07,404 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:15:07,404 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:15:07,507 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:15:07,507 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:15:07,507 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:20:08,279 - INFO - --- 11:20:08 Market Pulse ---
+2026-06-23 11:20:09,037 - INFO - 🟡 UPDATE (TP_EXPANSION) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24127.25 | SL→24114.88 TP→24137.99
+2026-06-23 11:20:09,206 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:20:09,207 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:20:09,315 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:20:09,315 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:20:09,315 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:25:09,966 - INFO - --- 11:25:09 Market Pulse ---
+2026-06-23 11:25:12,259 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:25:12,259 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:25:12,363 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:25:12,363 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:25:12,363 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:30:13,168 - INFO - --- 11:30:13 Market Pulse ---
+2026-06-23 11:30:14,123 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_24071.65_20260617]: NSE:NIFTY50-INDEX @ 24114.88 | PnL +3.08R | MFE 4.13R | Capture 75% | 9bars HoldEff +0.342R/bar
+2026-06-23 11:30:14,273 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:30:14,273 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:30:14,360 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:30:14,360 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:30:14,360 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:35:15,097 - INFO - --- 11:35:15 Market Pulse ---
+2026-06-23 11:35:16,035 - INFO - 🔴 EXIT (TRAILING_SL) [CFStructural_v3.2_RVOL1.0|UT_57557.95_20260617]: NSE:NIFTYBANK-INDEX @ 57871.26 | PnL +9.62R | MFE 10.67R | Capture 90% | 11bars HoldEff +0.874R/bar
+2026-06-23 11:35:16,193 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:35:16,193 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:35:16,303 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:35:16,303 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:35:16,303 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:40:17,071 - INFO - --- 11:40:17 Market Pulse ---
+2026-06-23 11:40:18,118 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:40:18,118 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:40:18,254 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:40:18,254 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:40:18,254 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:45:18,927 - INFO - --- 11:45:18 Market Pulse ---
+2026-06-23 11:45:20,005 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:45:20,006 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:45:20,165 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:45:20,166 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:45:20,166 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:50:20,905 - INFO - --- 11:50:20 Market Pulse ---
+2026-06-23 11:50:22,016 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:50:22,016 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:50:22,179 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:50:22,179 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:50:22,179 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 11:55:22,859 - INFO - --- 11:55:22 Market Pulse ---
+2026-06-23 11:55:23,917 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:55:23,917 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 11:55:24,086 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 11:55:24,086 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 11:55:24,086 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:00:24,851 - INFO - --- 12:00:24 Market Pulse ---
+2026-06-23 12:00:25,816 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:00:25,816 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:00:26,040 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:00:26,040 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:00:26,040 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:05:26,677 - INFO - --- 12:05:26 Market Pulse ---
+2026-06-23 12:05:27,850 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:05:27,850 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:05:28,062 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:05:28,062 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:05:28,062 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:10:28,762 - INFO - --- 12:10:28 Market Pulse ---
+2026-06-23 12:10:30,220 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:10:30,221 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:10:30,485 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:10:30,486 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:10:30,486 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:15:31,169 - INFO - --- 12:15:31 Market Pulse ---
+2026-06-23 12:15:32,165 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:15:32,166 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:15:32,386 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:15:32,386 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:15:32,386 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:20:33,162 - INFO - --- 12:20:33 Market Pulse ---
+2026-06-23 12:20:34,575 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:20:34,575 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:20:34,831 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:20:34,831 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:20:34,831 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:25:35,531 - INFO - --- 12:25:35 Market Pulse ---
+2026-06-23 12:25:36,605 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:25:36,605 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:25:36,853 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:25:36,854 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:25:36,854 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:30:37,636 - INFO - --- 12:30:37 Market Pulse ---
+2026-06-23 12:30:38,680 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:30:38,680 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:30:38,926 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:30:38,926 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:30:38,926 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:35:39,639 - INFO - --- 12:35:39 Market Pulse ---
+2026-06-23 12:35:40,657 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:35:40,657 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:35:40,913 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:35:40,914 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:35:40,914 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:40:41,759 - INFO - --- 12:40:41 Market Pulse ---
+2026-06-23 12:40:43,448 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:40:43,448 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:40:43,719 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:40:43,719 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:40:43,719 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:45:44,428 - INFO - --- 12:45:44 Market Pulse ---
+2026-06-23 12:45:45,947 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:45:45,948 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:45:46,224 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:45:46,225 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:45:46,225 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:50:46,944 - INFO - --- 12:50:46 Market Pulse ---
+2026-06-23 12:50:48,008 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:50:48,008 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:50:48,258 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:50:48,259 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:50:48,259 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 12:55:49,006 - INFO - --- 12:55:49 Market Pulse ---
+2026-06-23 12:55:50,120 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:55:50,120 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 12:55:50,371 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 12:55:50,371 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 12:55:50,371 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:00:51,117 - INFO - --- 13:00:51 Market Pulse ---
+2026-06-23 13:00:52,443 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:00:52,443 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:00:52,742 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:00:52,743 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:00:52,743 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:05:53,498 - INFO - --- 13:05:53 Market Pulse ---
+2026-06-23 13:05:54,727 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:05:54,727 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:05:54,999 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:05:54,999 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:05:54,999 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:10:55,731 - INFO - --- 13:10:55 Market Pulse ---
+2026-06-23 13:10:56,736 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:10:56,736 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:10:56,981 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:10:56,982 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:10:56,982 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:15:57,794 - INFO - --- 13:15:57 Market Pulse ---
+2026-06-23 13:15:59,062 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:15:59,063 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:15:59,338 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:15:59,338 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:15:59,338 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:21:00,126 - INFO - --- 13:21:00 Market Pulse ---
+2026-06-23 13:21:01,229 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:21:01,229 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:21:01,483 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:21:01,483 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:21:01,483 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:26:02,294 - INFO - --- 13:26:02 Market Pulse ---
+2026-06-23 13:26:03,665 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:26:03,665 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:26:03,946 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:26:03,947 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:26:03,947 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:31:04,644 - INFO - --- 13:31:04 Market Pulse ---
+2026-06-23 13:31:05,842 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:31:05,842 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:31:06,132 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:31:06,133 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:31:06,133 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:36:06,803 - INFO - --- 13:36:06 Market Pulse ---
+2026-06-23 13:36:07,971 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:36:07,972 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:36:08,261 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:36:08,262 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:36:08,262 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:41:08,971 - INFO - --- 13:41:08 Market Pulse ---
+2026-06-23 13:41:11,111 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:41:11,111 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:41:11,407 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:41:11,408 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:41:11,408 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:46:12,202 - INFO - --- 13:46:12 Market Pulse ---
+2026-06-23 13:46:13,644 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:46:13,644 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:46:13,939 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:46:13,940 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:46:13,940 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:51:14,716 - INFO - --- 13:51:14 Market Pulse ---
+2026-06-23 13:51:16,633 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:51:16,634 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:51:16,932 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:51:16,932 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:51:16,932 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 13:56:17,624 - INFO - --- 13:56:17 Market Pulse ---
+2026-06-23 13:56:19,103 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:56:19,104 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 13:56:19,405 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 13:56:19,406 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 13:56:19,406 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:01:20,121 - INFO - --- 14:01:20 Market Pulse ---
+2026-06-23 14:01:21,305 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:01:21,305 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:01:21,593 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:01:21,593 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:01:21,594 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:06:22,309 - INFO - --- 14:06:22 Market Pulse ---
+2026-06-23 14:06:23,498 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:06:23,498 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:06:23,796 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:06:23,797 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:06:23,797 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:11:24,583 - INFO - --- 14:11:24 Market Pulse ---
+2026-06-23 14:11:25,873 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:11:25,874 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:11:26,172 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:11:26,173 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:11:26,173 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:16:26,871 - INFO - --- 14:16:26 Market Pulse ---
+2026-06-23 14:16:28,640 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:16:28,640 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:16:28,920 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:16:28,920 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:16:28,921 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:21:29,649 - INFO - --- 14:21:29 Market Pulse ---
+2026-06-23 14:21:30,791 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:21:30,791 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:21:31,064 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:21:31,065 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:21:31,065 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:26:31,764 - INFO - --- 14:26:31 Market Pulse ---
+2026-06-23 14:26:32,807 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:26:32,808 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:26:33,058 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:26:33,058 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:26:33,058 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:31:33,791 - INFO - --- 14:31:33 Market Pulse ---
+2026-06-23 14:31:34,933 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:31:34,933 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:31:35,210 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:31:35,211 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:31:35,211 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:36:35,992 - INFO - --- 14:36:35 Market Pulse ---
+2026-06-23 14:36:37,107 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:36:37,107 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:36:37,388 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:36:37,389 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:36:37,389 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:41:38,199 - INFO - --- 14:41:38 Market Pulse ---
+2026-06-23 14:41:39,287 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:41:39,287 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:41:39,559 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:41:39,560 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:41:39,560 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:46:40,370 - INFO - --- 14:46:40 Market Pulse ---
+2026-06-23 14:46:41,433 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:46:41,433 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:46:41,698 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:46:41,699 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:46:41,699 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:51:42,278 - INFO - --- 14:51:42 Market Pulse ---
+2026-06-23 14:51:43,336 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:51:43,336 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:51:43,611 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:51:43,611 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:51:43,611 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 14:56:44,322 - INFO - --- 14:56:44 Market Pulse ---
+2026-06-23 14:56:45,583 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:56:45,583 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 14:56:45,858 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 14:56:45,859 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 14:56:45,859 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 15:01:46,559 - INFO - --- 15:01:46 Market Pulse ---
+2026-06-23 15:01:47,745 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:01:47,746 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 15:01:48,069 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:01:48,070 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 15:01:48,070 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 15:06:48,822 - INFO - --- 15:06:48 Market Pulse ---
+2026-06-23 15:06:49,934 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:06:49,934 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 15:06:50,236 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:06:50,236 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 15:06:50,236 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 15:11:51,043 - INFO - --- 15:11:51 Market Pulse ---
+2026-06-23 15:11:52,208 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:11:52,208 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 15:11:52,525 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:11:52,526 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 15:11:52,526 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 15:16:53,230 - INFO - --- 15:16:53 Market Pulse ---
+2026-06-23 15:16:54,360 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:16:54,360 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 15:16:54,663 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:16:54,663 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 15:16:54,663 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 15:21:55,328 - INFO - --- 15:21:55 Market Pulse ---
+2026-06-23 15:21:56,413 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTY50-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:21:56,413 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTY50-INDEX
+2026-06-23 15:21:56,707 - ERROR - [Pipeline] Snapshot computation failed for NSE:NIFTYBANK-INDEX: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 185, in compute
+    geometry_ctx = self._stage_geometry(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/indicator_pipeline.py", line 415, in _stage_geometry
+    trendlines, tl_events = self.trendline_engine.detect_trendlines(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 59, in detect_trendlines
+    candidates.extend(self._find_trendlines_for_role(
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trendline_engine.py", line 119, in _find_trendlines_for_role
+    x_a = TradingClock.trading_bar_id(s_a.timestamp)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 103, in trading_bar_id
+    return TradingClock.bars_between(epoch, ts, interval_minutes)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/trading_clock.py", line 32, in bars_between
+    if start_dt > end_dt:
+TypeError: can't compare offset-naive and offset-aware datetimes
+2026-06-23 15:21:56,707 - WARNING - ⚠️ Pipeline returned None for NSE:NIFTYBANK-INDEX
+2026-06-23 15:21:56,707 - INFO - 🧘 Status: Sidelined (No Institutional Alignment)
+2026-06-23 15:26:57,375 - INFO - --- 15:26:57 Market Pulse ---
+2026-06-23 15:26:58,138 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:26:58,187 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:26:58,213 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,235 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,255 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,276 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,295 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,313 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,331 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,349 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:26:58,369 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:31:59,118 - INFO - --- 15:31:59 Market Pulse ---
+2026-06-23 15:32:00,138 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:32:00,172 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:32:00,192 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,210 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,226 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,241 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,255 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,268 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,281 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,295 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:32:00,307 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:01,158 - INFO - --- 15:37:01 Market Pulse ---
+2026-06-23 15:37:02,006 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:37:02,054 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:37:02,082 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,105 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,127 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,148 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,167 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,185 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,201 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,217 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,232 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:37:02,237 - INFO - 📝 Generating EOD report for 2026-06-23…
+2026-06-23 15:37:02,251 - INFO -    Rolling data: 5d filters=5, 20d filters=5, total CF=147
+2026-06-23 15:37:02,907 - INFO -    ✓ executive_summary
+2026-06-23 15:37:03,191 - INFO -    ✓ market_narrative
+2026-06-23 15:37:03,215 - INFO -    ✓ trade_review
+2026-06-23 15:37:03,239 - INFO -    ✓ losing_trades
+2026-06-23 15:37:03,258 - INFO -    ✓ missed_opportunities
+2026-06-23 15:37:03,275 - INFO -    ✓ counterfactual_insights
+2026-06-23 15:37:03,306 - INFO -    ✓ experiment_ranking
+2026-06-23 15:37:03,321 - INFO -    ✓ thesis_analysis
+2026-06-23 15:37:03,351 - INFO -    ✓ market_behaviour
+2026-06-23 15:37:03,593 - INFO -    ✓ tomorrow_outlook
+2026-06-23 15:37:03,615 - INFO -    ✓ research_queue
+2026-06-23 15:37:03,654 - INFO -    ✓ strategy_health
+2026-06-23 15:37:03,657 - INFO - 📄 Report written: reports/2026-06-23.md
+2026-06-23 15:37:03,657 - INFO - 📊 Analytics written: reports/2026-06-23.json
+2026-06-23 15:37:03,657 - INFO - 📝 EOD report: reports/2026-06-23.md
+2026-06-23 15:42:04,403 - INFO - --- 15:42:04 Market Pulse ---
+2026-06-23 15:42:05,142 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:42:05,189 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:42:05,218 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,241 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,262 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,284 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,304 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,325 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,343 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,360 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:42:05,377 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:06,141 - INFO - --- 15:47:06 Market Pulse ---
+2026-06-23 15:47:07,362 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:47:07,404 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:47:07,431 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,453 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,476 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,496 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,515 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,533 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,551 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,568 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:47:07,586 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:08,340 - INFO - --- 15:52:08 Market Pulse ---
+2026-06-23 15:52:09,102 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:52:09,148 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:52:09,175 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,197 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,219 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,240 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,260 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,279 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,298 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,315 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:52:09,334 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:10,152 - INFO - --- 15:57:10 Market Pulse ---
+2026-06-23 15:57:11,024 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-06-23 15:57:11,071 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-06-23 cf=6 expectancy=83.07818593581517
+2026-06-23 15:57:11,099 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,123 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,144 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,164 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,180 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,196 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,212 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,225 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-06-23 cf=0 expectancy=None
+2026-06-23 15:57:11,238 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-06-23 cf=0 expectancy=None
