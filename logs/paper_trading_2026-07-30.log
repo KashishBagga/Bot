@@ -1,0 +1,1416 @@
+2026-07-30 09:00:05,687 - INFO - 🗓️ Risk day rolled to 2026-07-30 — daily counters reset.
+2026-07-30 09:00:05,691 - INFO - --- 09:00:05 Market Pulse ---
+2026-07-30 09:00:05,795 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:05,897 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:05,984 - INFO - 🗓️ Risk day rolled to 2026-07-30 — daily counters reset.
+2026-07-30 09:00:05,987 - INFO - --- 09:00:05 Market Pulse ---
+2026-07-30 09:00:05,989 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:05,989 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:00:06,092 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,093 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,184 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,184 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,274 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,275 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:00:06,275 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:00:06,276 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,276 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:00:06,356 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,444 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,533 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:00:06,534 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:00:06,534 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:05:05,275 - INFO - --- 09:05:05 Market Pulse ---
+2026-07-30 09:05:05,371 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,456 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,531 - INFO - --- 09:05:05 Market Pulse ---
+2026-07-30 09:05:05,540 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,540 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:05:05,619 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,626 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,700 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,712 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,787 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,787 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:05:05,787 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,787 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:05:05,788 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:05:05,873 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:05,963 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:06,054 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:05:06,054 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:05:06,054 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:10:05,055 - INFO - --- 09:10:05 Market Pulse ---
+2026-07-30 09:10:05,155 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,252 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,341 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,341 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:10:05,427 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,511 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,602 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,602 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:10:05,602 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:10:05,788 - INFO - --- 09:10:05 Market Pulse ---
+2026-07-30 09:10:05,878 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:05,962 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:06,049 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:06,049 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:10:06,143 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:06,235 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:06,322 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:10:06,322 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:10:06,322 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:12:13,980 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-30.json
+2026-07-30 09:12:14,103 - INFO - ✅ Fyers client initialized successfully
+2026-07-30 09:12:14,169 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 09:12:14,183 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 09:12:14,225 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 09:12:14,228 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-07-30 09:12:14,228 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-30 09:12:14,228 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-30 09:12:14,258 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 09:12:14,269 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 09:12:14,299 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 09:12:14,329 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 09:12:14,338 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 09:12:14,366 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 09:12:14,366 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-30 09:12:14,366 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-30 09:12:14,377 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=aaf1130
+2026-07-30 09:12:14,389 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=aaf1130]
+2026-07-30 09:12:14,418 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 09:12:14,429 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 09:12:14,456 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 09:12:14,456 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-30 09:12:14,456 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-30 09:12:14,464 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=aaf1130
+2026-07-30 09:12:14,475 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=aaf1130]
+2026-07-30 09:12:14,484 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=aaf1130
+2026-07-30 09:12:14,496 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=aaf1130]
+2026-07-30 09:12:14,505 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=aaf1130
+2026-07-30 09:12:14,516 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=aaf1130]
+2026-07-30 09:12:14,524 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=aaf1130
+2026-07-30 09:12:14,536 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=aaf1130]
+2026-07-30 09:12:14,544 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=aaf1130
+2026-07-30 09:12:14,556 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=aaf1130]
+2026-07-30 09:12:14,564 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=aaf1130
+2026-07-30 09:12:14,575 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=aaf1130]
+2026-07-30 09:12:14,583 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=aaf1130
+2026-07-30 09:12:14,594 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=aaf1130]
+2026-07-30 09:12:14,594 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-30 09:12:14,603 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=aaf1130
+2026-07-30 09:12:14,614 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=aaf1130]
+2026-07-30 09:12:14,614 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-30 09:12:14,623 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=aaf1130
+2026-07-30 09:12:14,634 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=aaf1130]
+2026-07-30 09:12:14,635 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-30 09:12:14,643 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=aaf1130
+2026-07-30 09:12:14,654 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=aaf1130]
+2026-07-30 09:12:14,654 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.55, candle_strength>=0.4, min_rr>=1.5]
+2026-07-30 09:12:14,662 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf55 [chart_pattern@v1.0] hash=ce9ab5b18515d260 git=aaf1130
+2026-07-30 09:12:14,673 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf55 [hash=ce9ab5b18515d260 git=aaf1130]
+2026-07-30 09:12:14,673 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.4, candle_strength>=0.3, min_rr>=1.3]
+2026-07-30 09:12:14,681 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf40 [chart_pattern@v1.0] hash=22ad684465d991ac git=aaf1130
+2026-07-30 09:12:14,692 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf40 [hash=22ad684465d991ac git=aaf1130]
+2026-07-30 09:12:14,700 - INFO - 📋 Registered experiment: VWAP_Reclaim_v1.0 [vwap_reclaim@v1.0] hash=2592ffc98e68bca5 git=aaf1130
+2026-07-30 09:12:14,710 - INFO - 📋 Experiment saved: VWAP_Reclaim_v1.0 [hash=2592ffc98e68bca5 git=aaf1130]
+2026-07-30 09:12:14,718 - INFO - 📋 Registered experiment: CPR_v1.0 [cpr@v1.0] hash=0d2ee99831362dc3 git=aaf1130
+2026-07-30 09:12:14,729 - INFO - 📋 Experiment saved: CPR_v1.0 [hash=0d2ee99831362dc3 git=aaf1130]
+2026-07-30 09:12:14,737 - INFO - 📋 Registered experiment: Gap_v1.0 [gap@v1.0] hash=b855c688d7bea446 git=aaf1130
+2026-07-30 09:12:14,750 - INFO - 📋 Experiment saved: Gap_v1.0 [hash=b855c688d7bea446 git=aaf1130]
+2026-07-30 09:12:14,758 - INFO - 📋 Registered experiment: ORB_60m_IB_RVOL1.2 [orb@v1.0] hash=fb43c099fbb7b444 git=aaf1130
+2026-07-30 09:12:14,769 - INFO - 📋 Experiment saved: ORB_60m_IB_RVOL1.2 [hash=fb43c099fbb7b444 git=aaf1130]
+2026-07-30 09:12:14,777 - INFO - 📋 Registered experiment: VerticalSpread_v1.0 [vertical_spread@v1.0] hash=ebcc2ee58dde4134 git=aaf1130
+2026-07-30 09:12:14,788 - INFO - 📋 Experiment saved: VerticalSpread_v1.0 [hash=ebcc2ee58dde4134 git=aaf1130]
+2026-07-30 09:12:14,796 - INFO - 📋 Registered experiment: Straddle_v1.0_VolCompression [straddle_strangle@v1.0] hash=5f6294f74dfd83c4 git=aaf1130
+2026-07-30 09:12:14,807 - INFO - 📋 Experiment saved: Straddle_v1.0_VolCompression [hash=5f6294f74dfd83c4 git=aaf1130]
+2026-07-30 09:12:14,815 - INFO - 📋 Registered experiment: Strangle_v1.0_VolCompression [straddle_strangle@v1.0] hash=f9e42ca23b1aa8eb git=aaf1130
+2026-07-30 09:12:14,825 - INFO - 📋 Experiment saved: Strangle_v1.0_VolCompression [hash=f9e42ca23b1aa8eb git=aaf1130]
+2026-07-30 09:12:14,883 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score35 entered on 2026-07-29
+2026-07-30 09:12:14,894 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_TRENDLINE_RETEST_57071.35_202607290945_Geometry_v1.0_Score50 entered on 2026-07-29
+2026-07-30 09:12:14,906 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf55 entered on 2026-07-29
+2026-07-30 09:12:14,918 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf40 entered on 2026-07-29
+2026-07-30 09:12:14,929 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf55 entered on 2026-07-29
+2026-07-30 09:12:14,941 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_DOUBLE_BOTTOM_57071.35_20260729_094505_ChartPattern_v1.0_Conf40 entered on 2026-07-29
+2026-07-30 09:12:14,953 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf55 entered on 2026-07-29
+2026-07-30 09:12:14,964 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_INVERSE_HEAD_AND_SHOULDERS_57071.35_20260729_094505_ChartPattern_v1.0_Conf40 entered on 2026-07-29
+2026-07-30 09:12:14,976 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL1.0 entered on 2026-07-29
+2026-07-30 09:12:14,988 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_BREAKOUT_57177.95_20260729_101000_Structural_v3.2_RVOL0.8 entered on 2026-07-29
+2026-07-30 09:12:14,998 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf55 entered on 2026-07-29
+2026-07-30 09:12:15,010 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_ASCENDING_TRIANGLE_57172.35_20260729_101741_ChartPattern_v1.0_Conf40 entered on 2026-07-29
+2026-07-30 09:12:15,021 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL1.0 entered on 2026-07-29
+2026-07-30 09:12:15,032 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTYBANK_INDEX_TRAP_57155.60_20260729_101500_Structural_v3.2_RVOL0.8 entered on 2026-07-29
+2026-07-30 09:12:15,044 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTY50_INDEX_DOUBLE_BOTTOM_24212.20_20260729_094505_ChartPattern_v1.0_Conf40 entered on 2026-07-29
+2026-07-30 09:12:15,055 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTY50_INDEX_INVERSE_HEAD_AND_SHOULDERS_24212.20_20260729_094505_ChartPattern_v1.0_Conf55 entered on 2026-07-29
+2026-07-30 09:12:15,067 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score35 entered on 2026-07-29
+2026-07-30 09:12:15,077 - INFO - 🧹 Self-Healed orphaned prior-day CF position: cand_NSE_NIFTY50_INDEX_TRENDLINE_RETEST_24228.90_202607291025_Geometry_v1.0_Score50 entered on 2026-07-29
+2026-07-30 09:12:15,077 - INFO - 🔄 Recovered 18 active counterfactual positions: []
+2026-07-30 09:12:15,096 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-30 09:12:15,096 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 170s until 09:15:05 IST...
+2026-07-30 09:15:05,099 - INFO - ⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.
+2026-07-30 09:15:05,100 - INFO - --- 09:15:05 Market Pulse ---
+2026-07-30 09:15:05,605 - INFO - --- 09:15:05 Market Pulse ---
+2026-07-30 09:15:05,703 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:15:05,707 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:15:05,794 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:15:05,884 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:15:05,885 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:15:05,987 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:15:06,078 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:15:06,169 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:15:06,169 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:15:06,170 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:20:05,170 - INFO - --- 09:20:05 Market Pulse ---
+2026-07-30 09:20:05,271 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:20:05,362 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:20:05,458 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:20:05,458 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:20:05,550 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:20:05,634 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:20:05,707 - INFO - --- 09:20:05 Market Pulse ---
+2026-07-30 09:20:05,723 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:20:05,724 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:20:05,724 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:20:06,450 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:25:05,448 - INFO - --- 09:25:05 Market Pulse ---
+2026-07-30 09:25:05,724 - INFO - --- 09:25:05 Market Pulse ---
+2026-07-30 09:25:05,842 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:25:05,929 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:25:06,020 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:25:06,020 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:25:06,035 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:25:06,110 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:25:06,234 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:25:06,420 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:25:06,421 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:25:06,421 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:30:05,034 - INFO - --- 09:30:05 Market Pulse ---
+2026-07-30 09:30:05,420 - INFO - --- 09:30:05 Market Pulse ---
+2026-07-30 09:30:05,513 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:30:05,603 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:30:05,687 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:30:05,688 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:30:05,695 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:30:05,795 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:30:05,893 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:30:05,986 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:30:05,987 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:30:05,987 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:35:05,695 - INFO - --- 09:35:05 Market Pulse ---
+2026-07-30 09:35:05,986 - INFO - --- 09:35:05 Market Pulse ---
+2026-07-30 09:35:06,088 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:35:06,172 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:35:06,250 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:35:06,250 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:35:06,328 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:35:06,431 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:35:06,467 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:35:06,533 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:35:06,534 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:35:06,534 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:40:05,466 - INFO - --- 09:40:05 Market Pulse ---
+2026-07-30 09:40:05,531 - INFO - --- 09:40:05 Market Pulse ---
+2026-07-30 09:40:05,629 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:40:05,736 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:40:05,826 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:40:05,826 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:40:05,942 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:40:06,036 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:40:06,121 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:40:06,122 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:40:06,122 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:40:06,163 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Weekly F&O expiry blackout (08:45–09:45 IST)
+2026-07-30 09:45:05,125 - INFO - --- 09:45:05 Market Pulse ---
+2026-07-30 09:45:05,161 - INFO - --- 09:45:05 Market Pulse ---
+2026-07-30 09:45:05,265 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:45:05,356 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:45:05,454 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:45:05,454 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:45:05,552 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:45:05,666 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:45:05,856 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:45:05,856 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:45:05,856 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 09:45:06,045 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 09:50:05,041 - INFO - --- 09:50:05 Market Pulse ---
+2026-07-30 09:50:05,734 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 09:50:05,857 - INFO - --- 09:50:05 Market Pulse ---
+2026-07-30 09:50:05,955 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:50:06,052 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:50:06,181 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:50:06,181 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:50:06,278 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:50:06,370 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:50:06,464 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:50:06,464 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:50:06,464 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 09:55:05,462 - INFO - --- 09:55:05 Market Pulse ---
+2026-07-30 09:55:05,574 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:55:05,719 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:55:05,731 - INFO - --- 09:55:05 Market Pulse ---
+2026-07-30 09:55:05,813 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:55:05,813 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 09:55:05,913 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:55:05,996 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:55:06,137 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 09:55:06,138 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 09:55:06,138 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 09:55:06,476 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:00:05,143 - INFO - --- 10:00:05 Market Pulse ---
+2026-07-30 10:00:05,240 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:00:05,331 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:00:05,471 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:00:05,471 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:00:05,476 - INFO - --- 10:00:05 Market Pulse ---
+2026-07-30 10:00:05,573 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:00:05,660 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:00:05,741 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:00:05,741 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:00:05,741 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:00:06,507 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:05:05,512 - INFO - --- 10:05:05 Market Pulse ---
+2026-07-30 10:05:05,739 - INFO - --- 10:05:05 Market Pulse ---
+2026-07-30 10:05:05,828 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:05:05,934 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:05:06,057 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:05:06,058 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:05:06,163 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:05:06,225 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:05:06,260 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:05:06,351 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:05:06,351 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:05:06,351 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:10:05,225 - INFO - --- 10:10:05 Market Pulse ---
+2026-07-30 10:10:05,353 - INFO - --- 10:10:05 Market Pulse ---
+2026-07-30 10:10:05,486 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:10:05,593 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:10:05,697 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:10:05,698 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:10:05,800 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:10:05,900 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:10:06,010 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:10:06,010 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:10:06,010 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:10:06,102 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:15:05,008 - INFO - --- 10:15:05 Market Pulse ---
+2026-07-30 10:15:05,103 - INFO - --- 10:15:05 Market Pulse ---
+2026-07-30 10:15:05,129 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:15:05,262 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:15:05,379 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:15:05,380 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:15:05,499 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:15:05,675 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:15:05,809 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:15:05,809 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:15:05,810 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:15:06,123 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:20:05,124 - INFO - --- 10:20:05 Market Pulse ---
+2026-07-30 10:20:05,807 - INFO - --- 10:20:05 Market Pulse ---
+2026-07-30 10:20:05,855 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:20:05,907 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:20:06,011 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:20:06,120 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:20:06,121 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:20:06,208 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:20:06,287 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:20:06,372 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:20:06,373 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:20:06,373 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:25:05,371 - INFO - --- 10:25:05 Market Pulse ---
+2026-07-30 10:25:05,468 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:25:05,554 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:25:05,654 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:25:05,654 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:25:05,801 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:25:05,856 - INFO - --- 10:25:05 Market Pulse ---
+2026-07-30 10:25:05,890 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:25:05,983 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:25:05,984 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:25:05,984 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:25:06,585 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:30:05,586 - INFO - --- 10:30:05 Market Pulse ---
+2026-07-30 10:30:05,985 - INFO - --- 10:30:05 Market Pulse ---
+2026-07-30 10:30:06,129 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:30:06,239 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:30:06,430 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:30:06,430 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:30:06,581 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:30:06,624 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:30:06,677 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:30:06,769 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:30:06,769 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:30:06,769 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:35:05,626 - INFO - --- 10:35:05 Market Pulse ---
+2026-07-30 10:35:05,767 - INFO - --- 10:35:05 Market Pulse ---
+2026-07-30 10:35:05,873 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:35:05,963 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:35:06,068 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:35:06,069 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:35:06,154 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:35:06,243 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:35:06,334 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:35:06,334 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:35:06,334 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:35:06,457 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:40:05,335 - INFO - --- 10:40:05 Market Pulse ---
+2026-07-30 10:40:05,452 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:40:05,453 - INFO - --- 10:40:05 Market Pulse ---
+2026-07-30 10:40:05,554 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:40:05,703 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:40:05,703 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:40:05,838 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:40:05,935 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:40:06,027 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:40:06,028 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:40:06,028 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:40:06,408 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:45:05,025 - INFO - --- 10:45:05 Market Pulse ---
+2026-07-30 10:45:05,158 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:45:05,260 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:45:05,369 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:45:05,370 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:45:05,407 - INFO - --- 10:45:05 Market Pulse ---
+2026-07-30 10:45:05,472 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:45:05,564 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:45:05,651 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:45:05,651 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:45:05,651 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:45:06,311 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:50:05,311 - INFO - --- 10:50:05 Market Pulse ---
+2026-07-30 10:50:05,651 - INFO - --- 10:50:05 Market Pulse ---
+2026-07-30 10:50:05,776 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:50:05,882 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:50:05,985 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:50:05,985 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:50:06,067 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:50:06,078 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:50:06,150 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:50:06,240 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:50:06,240 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:50:06,241 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:55:05,080 - INFO - --- 10:55:05 Market Pulse ---
+2026-07-30 10:55:05,241 - INFO - --- 10:55:05 Market Pulse ---
+2026-07-30 10:55:05,335 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:55:05,429 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:55:05,509 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:55:05,509 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 10:55:05,633 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:55:05,756 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:55:05,867 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 10:55:05,867 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 10:55:05,868 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 10:55:05,871 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:00:05,868 - INFO - --- 11:00:05 Market Pulse ---
+2026-07-30 11:00:05,872 - INFO - --- 11:00:05 Market Pulse ---
+2026-07-30 11:00:05,974 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:00:06,134 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:00:06,257 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:00:06,257 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:00:06,371 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:00:06,467 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:00:06,558 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:00:06,558 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:00:06,559 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:00:06,719 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:05:05,564 - INFO - --- 11:05:05 Market Pulse ---
+2026-07-30 11:05:05,714 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:05:05,724 - INFO - --- 11:05:05 Market Pulse ---
+2026-07-30 11:05:05,880 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:05:05,985 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:05:05,985 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:05:06,070 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:05:06,169 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:05:06,249 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:05:06,249 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:05:06,249 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:05:06,408 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:10:05,254 - INFO - --- 11:10:05 Market Pulse ---
+2026-07-30 11:10:05,401 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:10:05,410 - INFO - --- 11:10:05 Market Pulse ---
+2026-07-30 11:10:05,508 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:10:05,602 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:10:05,602 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:10:05,691 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:10:05,785 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:10:05,871 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:10:05,871 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:10:05,871 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:10:06,307 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:15:05,312 - INFO - --- 11:15:05 Market Pulse ---
+2026-07-30 11:15:05,876 - INFO - --- 11:15:05 Market Pulse ---
+2026-07-30 11:15:06,027 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:15:06,108 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:15:06,122 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:15:06,212 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:15:06,212 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:15:06,379 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:15:06,474 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:15:06,557 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:15:06,558 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:15:06,558 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:20:05,109 - INFO - --- 11:20:05 Market Pulse ---
+2026-07-30 11:20:05,563 - INFO - --- 11:20:05 Market Pulse ---
+2026-07-30 11:20:05,684 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:20:05,792 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:20:05,821 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:20:05,916 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:20:05,917 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:20:06,013 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:20:06,134 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:20:06,246 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:20:06,246 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:20:06,246 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:25:05,251 - INFO - --- 11:25:05 Market Pulse ---
+2026-07-30 11:25:05,360 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:25:05,480 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:25:05,574 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:25:05,574 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:25:05,663 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:25:05,755 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:25:05,826 - INFO - --- 11:25:05 Market Pulse ---
+2026-07-30 11:25:05,863 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:25:05,864 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:25:05,864 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:25:06,713 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 11:30:05,719 - INFO - --- 11:30:05 Market Pulse ---
+2026-07-30 11:30:05,869 - INFO - --- 11:30:05 Market Pulse ---
+2026-07-30 11:30:05,965 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:30:06,065 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:30:06,196 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:30:06,196 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:30:06,297 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:30:06,429 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:30:06,521 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:30:06,521 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:30:06,522 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:30:06,747 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:35:05,517 - INFO - --- 11:35:05 Market Pulse ---
+2026-07-30 11:35:05,614 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:35:05,751 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:35:05,752 - INFO - --- 11:35:05 Market Pulse ---
+2026-07-30 11:35:05,867 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:35:05,867 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:35:05,956 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:35:06,071 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:35:06,169 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:35:06,169 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:35:06,169 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:35:06,420 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:40:05,175 - INFO - --- 11:40:05 Market Pulse ---
+2026-07-30 11:40:05,277 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:40:05,368 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:40:05,424 - INFO - --- 11:40:05 Market Pulse ---
+2026-07-30 11:40:05,493 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:40:05,493 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:40:05,617 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:40:05,700 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:40:05,792 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:40:05,793 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:40:05,793 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:40:06,268 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:45:05,267 - INFO - --- 11:45:05 Market Pulse ---
+2026-07-30 11:45:05,795 - INFO - --- 11:45:05 Market Pulse ---
+2026-07-30 11:45:05,953 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:45:06,070 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:45:06,124 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:45:06,162 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:45:06,162 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:45:06,263 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:45:06,347 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:45:06,423 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:45:06,423 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:45:06,423 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:50:05,130 - INFO - --- 11:50:05 Market Pulse ---
+2026-07-30 11:50:05,428 - INFO - --- 11:50:05 Market Pulse ---
+2026-07-30 11:50:05,554 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:50:05,641 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:50:05,735 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:50:05,735 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:50:05,880 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:50:05,936 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:50:05,981 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:50:06,081 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:50:06,082 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:50:06,082 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:55:05,084 - INFO - --- 11:55:05 Market Pulse ---
+2026-07-30 11:55:05,186 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:55:05,277 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:55:05,367 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:55:05,367 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 11:55:05,464 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:55:05,549 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:55:05,668 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 11:55:05,668 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 11:55:05,668 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 11:55:05,939 - INFO - --- 11:55:05 Market Pulse ---
+2026-07-30 11:55:06,731 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:00:05,669 - INFO - --- 12:00:05 Market Pulse ---
+2026-07-30 12:00:05,736 - INFO - --- 12:00:05 Market Pulse ---
+2026-07-30 12:00:05,786 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:00:05,952 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:00:06,048 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:00:06,049 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:00:06,161 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:00:06,830 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:00:07,257 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:00:07,350 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:00:07,351 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:00:07,351 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:05:05,356 - INFO - --- 12:05:05 Market Pulse ---
+2026-07-30 12:05:05,452 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:05:05,571 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:05:05,667 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:05:05,667 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:05:05,759 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:05:05,835 - INFO - --- 12:05:05 Market Pulse ---
+2026-07-30 12:05:05,844 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:05:05,933 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:05:05,933 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:05:05,933 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:05:06,696 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:10:05,701 - INFO - --- 12:10:05 Market Pulse ---
+2026-07-30 12:10:05,939 - INFO - --- 12:10:05 Market Pulse ---
+2026-07-30 12:10:06,272 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:10:06,397 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:10:06,482 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:10:06,482 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:10:06,567 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:10:06,713 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:10:06,803 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:10:06,803 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:10:06,803 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:10:06,915 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:15:05,808 - INFO - --- 12:15:05 Market Pulse ---
+2026-07-30 12:15:05,921 - INFO - --- 12:15:05 Market Pulse ---
+2026-07-30 12:15:05,933 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:15:06,072 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:15:06,206 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:15:06,206 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:15:06,310 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:15:06,421 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:15:06,518 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:15:06,519 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:15:06,519 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:15:06,695 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:20:05,524 - INFO - --- 12:20:05 Market Pulse ---
+2026-07-30 12:20:05,622 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:20:05,696 - INFO - --- 12:20:05 Market Pulse ---
+2026-07-30 12:20:05,721 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:20:05,825 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:20:05,825 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:20:05,920 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:20:06,009 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:20:06,109 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:20:06,109 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:20:06,109 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:20:06,348 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:25:05,115 - INFO - --- 12:25:05 Market Pulse ---
+2026-07-30 12:25:05,209 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:25:05,313 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:25:05,354 - INFO - --- 12:25:05 Market Pulse ---
+2026-07-30 12:25:05,435 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:25:05,436 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:25:05,540 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:25:05,668 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:25:05,774 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:25:05,775 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:25:05,775 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:25:06,048 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:30:05,052 - INFO - --- 12:30:05 Market Pulse ---
+2026-07-30 12:30:05,772 - INFO - --- 12:30:05 Market Pulse ---
+2026-07-30 12:30:05,853 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:30:05,889 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:30:06,009 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:30:06,166 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:30:06,166 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:30:06,281 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:30:06,374 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:30:06,468 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:30:06,468 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:30:06,468 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:35:05,474 - INFO - --- 12:35:05 Market Pulse ---
+2026-07-30 12:35:05,579 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:35:05,677 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:35:05,776 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:35:05,776 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:35:05,857 - INFO - --- 12:35:05 Market Pulse ---
+2026-07-30 12:35:05,874 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:35:05,960 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:35:06,052 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:35:06,052 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:35:06,052 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:35:06,530 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:40:05,054 - INFO - --- 12:40:05 Market Pulse ---
+2026-07-30 12:40:05,165 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:40:05,258 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:40:05,355 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:40:05,356 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:40:05,494 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:40:05,530 - INFO - --- 12:40:05 Market Pulse ---
+2026-07-30 12:40:05,651 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:40:05,740 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:40:05,741 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:40:05,741 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:40:06,239 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:45:05,242 - INFO - --- 12:45:05 Market Pulse ---
+2026-07-30 12:45:05,746 - INFO - --- 12:45:05 Market Pulse ---
+2026-07-30 12:45:05,856 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:45:05,994 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:45:06,087 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:45:06,087 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:45:06,168 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:45:06,202 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:45:06,322 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:45:06,421 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:45:06,421 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:45:06,421 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:50:05,207 - INFO - --- 12:50:05 Market Pulse ---
+2026-07-30 12:50:05,426 - INFO - --- 12:50:05 Market Pulse ---
+2026-07-30 12:50:05,572 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:50:05,672 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:50:05,762 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:50:05,763 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:50:05,851 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:50:05,945 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:50:06,019 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:50:06,089 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:50:06,089 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:50:06,090 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:55:05,025 - INFO - --- 12:55:05 Market Pulse ---
+2026-07-30 12:55:05,093 - INFO - --- 12:55:05 Market Pulse ---
+2026-07-30 12:55:05,178 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:55:05,267 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:55:05,383 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:55:05,383 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 12:55:05,476 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:55:05,591 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:55:05,683 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 12:55:05,683 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 12:55:05,683 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 12:55:05,961 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:00:05,688 - INFO - --- 13:00:05 Market Pulse ---
+2026-07-30 13:00:05,838 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:00:05,967 - INFO - --- 13:00:05 Market Pulse ---
+2026-07-30 13:00:05,972 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:00:06,085 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:00:06,085 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:00:06,184 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:00:06,287 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:00:06,400 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:00:06,400 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:00:06,401 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:00:06,880 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:05:05,402 - INFO - --- 13:05:05 Market Pulse ---
+2026-07-30 13:05:05,548 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:05:05,644 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:05:05,729 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:05:05,729 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:05:05,822 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:05:05,885 - INFO - --- 13:05:05 Market Pulse ---
+2026-07-30 13:05:05,922 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:05:06,066 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:05:06,066 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:05:06,066 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:05:06,789 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:10:05,069 - INFO - --- 13:10:05 Market Pulse ---
+2026-07-30 13:10:05,167 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:10:05,256 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:10:05,378 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:10:05,379 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:10:05,494 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:10:05,596 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:10:05,702 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:10:05,702 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:10:05,702 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:10:05,785 - INFO - --- 13:10:05 Market Pulse ---
+2026-07-30 13:10:06,547 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:15:05,552 - INFO - --- 13:15:05 Market Pulse ---
+2026-07-30 13:15:05,703 - INFO - --- 13:15:05 Market Pulse ---
+2026-07-30 13:15:05,842 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:15:06,007 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:15:06,101 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:15:06,101 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:15:06,213 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:15:06,302 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:15:06,387 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:15:06,388 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:15:06,388 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:15:06,656 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:20:05,393 - INFO - --- 13:20:05 Market Pulse ---
+2026-07-30 13:20:05,521 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:20:05,608 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:20:05,657 - INFO - --- 13:20:05 Market Pulse ---
+2026-07-30 13:20:05,698 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:20:05,698 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:20:05,789 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:20:05,909 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:20:06,024 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:20:06,024 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:20:06,025 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:20:06,404 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:25:05,027 - INFO - --- 13:25:05 Market Pulse ---
+2026-07-30 13:25:05,125 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:25:05,219 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:25:05,310 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:25:05,310 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:25:05,404 - INFO - --- 13:25:05 Market Pulse ---
+2026-07-30 13:25:05,405 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:25:05,514 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:25:05,604 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:25:05,604 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:25:05,605 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:25:06,179 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Lunch-hour blackout (11:30–13:30 IST)
+2026-07-30 13:30:05,184 - INFO - --- 13:30:05 Market Pulse ---
+2026-07-30 13:30:05,600 - INFO - --- 13:30:05 Market Pulse ---
+2026-07-30 13:30:05,738 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:30:05,887 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:30:05,984 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:30:05,985 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:30:06,078 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:30:06,174 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:30:06,255 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:30:06,267 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:30:06,267 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:30:06,267 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:35:05,260 - INFO - --- 13:35:05 Market Pulse ---
+2026-07-30 13:35:05,273 - INFO - --- 13:35:05 Market Pulse ---
+2026-07-30 13:35:05,434 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:35:05,548 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:35:05,641 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:35:05,641 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:35:05,732 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:35:05,852 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:35:06,049 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:35:06,049 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:35:06,049 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:35:06,295 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:40:05,055 - INFO - --- 13:40:05 Market Pulse ---
+2026-07-30 13:40:05,160 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:40:05,264 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:40:05,301 - INFO - --- 13:40:05 Market Pulse ---
+2026-07-30 13:40:05,347 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:40:05,348 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:40:05,431 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:40:05,512 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:40:05,591 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:40:05,592 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:40:05,592 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:40:06,060 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:45:05,058 - INFO - --- 13:45:05 Market Pulse ---
+2026-07-30 13:45:05,597 - INFO - --- 13:45:05 Market Pulse ---
+2026-07-30 13:45:05,710 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:45:05,842 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:45:05,961 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:45:05,961 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:45:06,005 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:45:06,047 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:45:06,167 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:45:06,358 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:45:06,358 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:45:06,358 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:50:05,006 - INFO - --- 13:50:05 Market Pulse ---
+2026-07-30 13:50:05,358 - INFO - --- 13:50:05 Market Pulse ---
+2026-07-30 13:50:05,470 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:50:05,572 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:50:05,668 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:50:05,668 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:50:05,752 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:50:05,839 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:50:05,847 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:50:05,942 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:50:05,942 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:50:05,943 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:55:05,846 - INFO - --- 13:55:05 Market Pulse ---
+2026-07-30 13:55:05,939 - INFO - --- 13:55:05 Market Pulse ---
+2026-07-30 13:55:06,034 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:55:06,133 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:55:06,233 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:55:06,233 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 13:55:06,323 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:55:06,417 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:55:06,502 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 13:55:06,502 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 13:55:06,502 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 13:55:06,576 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:00:05,508 - INFO - --- 14:00:05 Market Pulse ---
+2026-07-30 14:00:05,579 - INFO - --- 14:00:05 Market Pulse ---
+2026-07-30 14:00:05,618 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:00:05,788 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:00:05,891 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:00:05,891 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:00:05,988 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:00:06,092 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:00:06,196 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:00:06,196 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:00:06,196 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:00:06,405 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:05:05,201 - INFO - --- 14:05:05 Market Pulse ---
+2026-07-30 14:05:05,294 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:05:05,401 - INFO - --- 14:05:05 Market Pulse ---
+2026-07-30 14:05:05,401 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:05:05,533 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:05:05,534 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:05:05,646 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:05:05,759 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:05:05,888 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:05:05,889 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:05:05,889 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:05:06,309 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:10:05,308 - INFO - --- 14:10:05 Market Pulse ---
+2026-07-30 14:10:05,888 - INFO - --- 14:10:05 Market Pulse ---
+2026-07-30 14:10:05,994 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:10:06,076 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:10:06,085 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:10:06,154 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:10:06,155 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:10:06,240 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:10:06,328 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:10:06,414 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:10:06,414 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:10:06,414 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:15:05,090 - INFO - --- 14:15:05 Market Pulse ---
+2026-07-30 14:15:05,419 - INFO - --- 14:15:05 Market Pulse ---
+2026-07-30 14:15:05,648 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:15:05,763 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:15:05,900 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:15:05,900 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:15:06,060 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:15:06,187 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:15:06,298 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:15:06,298 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:15:06,299 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:15:06,319 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:20:05,295 - INFO - --- 14:20:05 Market Pulse ---
+2026-07-30 14:20:05,325 - INFO - --- 14:20:05 Market Pulse ---
+2026-07-30 14:20:05,433 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:20:05,597 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:20:05,686 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:20:05,686 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:20:05,806 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:20:05,914 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:20:06,005 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:20:06,006 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:20:06,006 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:20:06,230 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:25:05,011 - INFO - --- 14:25:05 Market Pulse ---
+2026-07-30 14:25:05,114 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:25:05,233 - INFO - --- 14:25:05 Market Pulse ---
+2026-07-30 14:25:05,273 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:25:05,364 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:25:05,364 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:25:05,463 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:25:05,561 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:25:05,650 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:25:05,651 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:25:05,651 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:25:05,997 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:30:05,656 - INFO - --- 14:30:05 Market Pulse ---
+2026-07-30 14:30:05,781 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:30:05,884 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:30:05,989 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:30:05,989 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:30:06,002 - INFO - --- 14:30:06 Market Pulse ---
+2026-07-30 14:30:06,089 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:30:06,243 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:30:06,334 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:30:06,334 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:30:06,334 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:30:07,041 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:35:05,046 - INFO - --- 14:35:05 Market Pulse ---
+2026-07-30 14:35:05,335 - INFO - --- 14:35:05 Market Pulse ---
+2026-07-30 14:35:05,696 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:35:05,790 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:35:05,888 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:35:05,889 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:35:05,971 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:35:06,064 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:35:06,147 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:35:06,147 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:35:06,147 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:35:06,211 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:40:05,152 - INFO - --- 14:40:05 Market Pulse ---
+2026-07-30 14:40:05,217 - INFO - --- 14:40:05 Market Pulse ---
+2026-07-30 14:40:05,252 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:40:05,362 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:40:05,475 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:40:05,475 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:40:05,581 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:40:05,680 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:40:05,772 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:40:05,773 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:40:05,773 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:40:06,185 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:45:05,188 - INFO - --- 14:45:05 Market Pulse ---
+2026-07-30 14:45:05,769 - INFO - --- 14:45:05 Market Pulse ---
+2026-07-30 14:45:06,490 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:45:06,859 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:45:06,954 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:45:07,046 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:45:07,046 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:45:07,134 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:45:07,222 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:45:07,313 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:45:07,313 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:45:07,313 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:50:05,317 - INFO - --- 14:50:05 Market Pulse ---
+2026-07-30 14:50:05,425 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:50:05,489 - INFO - --- 14:50:05 Market Pulse ---
+2026-07-30 14:50:05,543 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:50:05,644 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:50:05,645 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:50:05,737 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:50:05,825 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:50:05,921 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:50:05,921 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:50:05,921 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:50:06,357 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:55:05,361 - INFO - --- 14:55:05 Market Pulse ---
+2026-07-30 14:55:05,926 - INFO - --- 14:55:05 Market Pulse ---
+2026-07-30 14:55:06,021 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:55:06,190 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:55:06,267 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 14:55:06,303 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:55:06,304 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 14:55:06,389 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:55:06,468 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:55:06,544 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 14:55:06,544 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 14:55:06,544 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:00:05,269 - INFO - --- 15:00:05 Market Pulse ---
+2026-07-30 15:00:05,550 - INFO - --- 15:00:05 Market Pulse ---
+2026-07-30 15:00:05,680 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:00:05,807 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:00:05,900 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:00:05,901 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:00:06,005 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:00:06,123 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:00:06,334 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:00:06,381 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:00:06,381 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:00:06,381 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:05:05,339 - INFO - --- 15:05:05 Market Pulse ---
+2026-07-30 15:05:05,386 - INFO - --- 15:05:05 Market Pulse ---
+2026-07-30 15:05:05,485 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:05:05,575 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:05:05,663 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:05:05,663 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:05:05,756 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:05:05,889 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:05:06,006 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:05:06,007 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:05:06,007 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:05:06,125 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:10:05,012 - INFO - --- 15:10:05 Market Pulse ---
+2026-07-30 15:10:05,118 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:10:05,124 - INFO - --- 15:10:05 Market Pulse ---
+2026-07-30 15:10:05,204 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:10:05,295 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:10:05,295 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:10:05,384 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:10:05,481 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:10:05,578 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:10:05,579 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:10:05,579 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:10:05,828 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:15:05,583 - INFO - --- 15:15:05 Market Pulse ---
+2026-07-30 15:15:05,715 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:15:05,829 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:15:05,834 - INFO - --- 15:15:05 Market Pulse ---
+2026-07-30 15:15:05,920 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:15:05,920 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:15:06,017 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:15:06,107 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:15:06,203 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:15:06,203 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:15:06,203 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:15:06,513 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:20:05,206 - INFO - --- 15:20:05 Market Pulse ---
+2026-07-30 15:20:05,320 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:20:05,426 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:20:05,518 - INFO - --- 15:20:05 Market Pulse ---
+2026-07-30 15:20:05,522 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:20:05,523 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:20:05,612 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:20:05,706 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:20:05,800 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:20:05,800 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:20:05,800 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:20:06,217 - INFO - 🚫 Expiry/Event blackout active — no new entries. Reason: Monthly F&O expiry blackout (2026-07-30)
+2026-07-30 15:25:05,223 - INFO - --- 15:25:05 Market Pulse ---
+2026-07-30 15:25:05,799 - INFO - --- 15:25:05 Market Pulse ---
+2026-07-30 15:25:05,891 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:25:05,955 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:25:05,978 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:25:06,019 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,044 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,065 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,066 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:25:06,066 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:25:06,086 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,106 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,124 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,144 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,163 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,173 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:25:06,186 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,207 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,227 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,248 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,268 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,270 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:25:06,286 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,304 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,321 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,338 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,347 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:25:06,347 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:25:06,347 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:25:06,361 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,374 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,385 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,399 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,409 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,418 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,436 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,453 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,472 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,491 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,511 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,531 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,552 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,573 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,595 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,618 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,639 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,659 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:25:06,681 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:05,414 - INFO - --- 15:30:05 Market Pulse ---
+2026-07-30 15:30:05,687 - INFO - --- 15:30:05 Market Pulse ---
+2026-07-30 15:30:05,793 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:30:05,901 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:30:05,988 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:30:05,989 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:30:06,075 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:30:06,123 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:30:06,160 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:30:06,178 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,204 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,224 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,239 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:30:06,239 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:30:06,239 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:30:06,247 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,259 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,266 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,281 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,287 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,301 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,305 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,323 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,326 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,346 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,347 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,368 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,368 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,392 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,392 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,412 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,412 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,435 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,435 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,457 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,458 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,478 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,479 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,498 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,498 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,518 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,519 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,539 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,539 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,558 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,559 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,578 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:30:06,579 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:05,576 - INFO - --- 15:35:05 Market Pulse ---
+2026-07-30 15:35:05,584 - INFO - --- 15:35:05 Market Pulse ---
+2026-07-30 15:35:05,693 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:05,789 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:05,877 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:05,877 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:35:05,967 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:06,055 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:06,160 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:06,160 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:35:06,160 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:35:06,211 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,234 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:35:06,240 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,263 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,263 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,286 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,288 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,311 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,311 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,334 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,334 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,358 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,358 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,381 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,383 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,406 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,408 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,430 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,430 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,453 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,453 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,479 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,479 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,504 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,504 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,526 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,527 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,549 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,549 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,572 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,572 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,572 - INFO - 📝 Generating EOD report for 2026-07-30…
+2026-07-30 15:35:06,594 - INFO -    Rolling data: 5d filters=3, 20d filters=39, total CF=1125
+2026-07-30 15:35:06,599 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,619 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,637 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,655 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,671 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,672 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:06,689 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:35:06,700 - INFO - 📝 Generating EOD report for 2026-07-30…
+2026-07-30 15:35:06,717 - INFO -    Rolling data: 5d filters=3, 20d filters=39, total CF=1125
+2026-07-30 15:35:06,747 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:06,802 - WARNING - No quotes data available for ['NSE:INDIA VIX-INDEX']
+2026-07-30 15:35:06,850 - INFO -    ✓ executive_summary
+2026-07-30 15:35:06,930 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:06,953 - WARNING - No quotes data available for ['NSE:INDIA VIX-INDEX']
+2026-07-30 15:35:07,010 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:07,012 - INFO -    ✓ executive_summary
+2026-07-30 15:35:07,026 - INFO -    ✓ market_narrative
+2026-07-30 15:35:07,041 - INFO -    ✓ trade_review
+2026-07-30 15:35:07,058 - INFO -    ✓ losing_trades
+2026-07-30 15:35:07,075 - INFO -    ✓ missed_opportunities
+2026-07-30 15:35:07,091 - INFO -    ✓ counterfactual_insights
+2026-07-30 15:35:07,115 - INFO -    ✓ experiment_ranking
+2026-07-30 15:35:07,128 - INFO -    ✓ thesis_analysis
+2026-07-30 15:35:07,156 - INFO -    ✓ market_behaviour
+2026-07-30 15:35:07,234 - INFO -    ✓ market_narrative
+2026-07-30 15:35:07,239 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:07,251 - INFO -    ✓ trade_review
+2026-07-30 15:35:07,268 - INFO -    ✓ losing_trades
+2026-07-30 15:35:07,283 - INFO -    ✓ missed_opportunities
+2026-07-30 15:35:07,300 - INFO -    ✓ counterfactual_insights
+2026-07-30 15:35:07,312 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:35:07,324 - INFO -    ✓ experiment_ranking
+2026-07-30 15:35:07,328 - INFO -    ✓ tomorrow_outlook
+2026-07-30 15:35:07,339 - INFO -    ✓ thesis_analysis
+2026-07-30 15:35:07,346 - INFO -    ✓ research_queue
+2026-07-30 15:35:07,379 - INFO -    ✓ market_behaviour
+2026-07-30 15:35:07,381 - INFO -    ✓ strategy_health
+2026-07-30 15:35:07,382 - INFO - 📄 Report written: reports/2026-07-30.md
+2026-07-30 15:35:07,382 - INFO - 📊 Analytics written: reports/2026-07-30.json
+2026-07-30 15:35:07,382 - INFO - 📝 EOD report: reports/2026-07-30.md
+2026-07-30 15:35:07,393 - INFO -    ✓ tomorrow_outlook
+2026-07-30 15:35:07,407 - INFO -    ✓ research_queue
+2026-07-30 15:35:07,436 - INFO -    ✓ strategy_health
+2026-07-30 15:35:07,440 - INFO - 📄 Report written: reports/2026-07-30.md
+2026-07-30 15:35:07,440 - INFO - 📊 Analytics written: reports/2026-07-30.json
+2026-07-30 15:35:07,440 - INFO - 📝 EOD report: reports/2026-07-30.md
+2026-07-30 15:40:05,388 - INFO - --- 15:40:05 Market Pulse ---
+2026-07-30 15:40:05,441 - INFO - --- 15:40:05 Market Pulse ---
+2026-07-30 15:40:06,547 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:40:06,625 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:40:06,709 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:40:06,709 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:40:06,797 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:40:06,897 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:40:06,983 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:40:06,984 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:40:06,984 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:40:07,037 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,043 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:40:07,069 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,074 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,097 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,097 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,120 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,120 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,142 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,142 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,166 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,166 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,189 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,189 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,213 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,214 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,239 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,239 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,263 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,263 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,288 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,289 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,316 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,316 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,339 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,339 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,363 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,363 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,387 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,388 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,410 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,411 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,432 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,453 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,473 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,493 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:40:07,513 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:05,416 - INFO - --- 15:45:05 Market Pulse ---
+2026-07-30 15:45:05,513 - INFO - --- 15:45:05 Market Pulse ---
+2026-07-30 15:45:05,533 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:45:05,626 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:45:05,716 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:45:05,716 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:45:05,855 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:45:05,939 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:45:06,028 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:45:06,028 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:45:06,029 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:45:06,082 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,109 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,131 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,140 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:45:06,158 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,166 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,183 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,191 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,211 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,215 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,237 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,237 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,260 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,260 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,286 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,286 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,310 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,312 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,338 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,338 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,361 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,361 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,385 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,385 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,407 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,407 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,429 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,429 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,452 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,452 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,472 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,493 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,516 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,537 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,556 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,574 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:45:06,592 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:05,454 - INFO - --- 15:50:05 Market Pulse ---
+2026-07-30 15:50:05,555 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:50:05,597 - INFO - --- 15:50:05 Market Pulse ---
+2026-07-30 15:50:05,643 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:50:05,727 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:50:05,727 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:50:05,809 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:50:05,892 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:50:05,988 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:50:05,988 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:50:05,988 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:50:06,042 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,069 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,092 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,113 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,136 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,159 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,179 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,199 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,221 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,243 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,255 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:50:06,271 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,276 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,298 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,298 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,321 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,322 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,344 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,344 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,371 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,371 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,395 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,395 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,416 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,435 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,456 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,478 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,500 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,519 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,540 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,563 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,584 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,606 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,626 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,645 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,663 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:50:06,680 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:05,397 - INFO - --- 15:55:05 Market Pulse ---
+2026-07-30 15:55:05,505 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:55:05,597 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:55:05,685 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:55:05,686 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTY50-INDEX
+2026-07-30 15:55:05,686 - INFO - --- 15:55:05 Market Pulse ---
+2026-07-30 15:55:05,775 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:55:05,864 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:55:05,953 - ERROR - ❌ Historical data request failed: {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-07-30 15:55:05,953 - WARNING - ⚠️ Could not fetch complete MTF data for NSE:NIFTYBANK-INDEX
+2026-07-30 15:55:05,953 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:55:06,002 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,029 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,049 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,068 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,089 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,108 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,125 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,145 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,164 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,183 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,202 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,219 - INFO - 📊 Daily metrics saved: [Reversal_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,237 - INFO - 📊 Daily metrics saved: [Continuation_Pattern_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,257 - INFO - 📊 Daily metrics saved: [RSI_Divergence_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,271 - INFO - 🔒 Session cutoff reached (15:25) — no new entries.
+2026-07-30 15:55:06,276 - INFO - 📊 Daily metrics saved: [Squeeze_Breakout_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,296 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,300 - INFO - 📊 Daily metrics saved: [Volatility_Straddle_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,315 - INFO - 📊 Daily metrics saved: [Structural_v3.2_RVOL0.8] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,333 - INFO - 📊 Daily metrics saved: [EMA_Pullback_20_50_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,353 - INFO - 📊 Daily metrics saved: [VWAP_Reversion_1.5ATR_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,372 - INFO - 📊 Daily metrics saved: [PrevDay_Extremes_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,391 - INFO - 📊 Daily metrics saved: [ORB_15m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,410 - INFO - 📊 Daily metrics saved: [ORB_30m_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,430 - INFO - 📊 Daily metrics saved: [ATR_Squeeze_RVOL1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,451 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score35] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,471 - INFO - 📊 Daily metrics saved: [Geometry_v1.0_Score50] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,492 - INFO - 📊 Daily metrics saved: [OrderFlow_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,513 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf55] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,534 - INFO - 📊 Daily metrics saved: [ChartPattern_v1.0_Conf40] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,554 - INFO - 📊 Daily metrics saved: [VWAP_Reclaim_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,574 - INFO - 📊 Daily metrics saved: [CPR_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,596 - INFO - 📊 Daily metrics saved: [Gap_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,616 - INFO - 📊 Daily metrics saved: [ORB_60m_IB_RVOL1.2] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,637 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,657 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 15:55:06,679 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
