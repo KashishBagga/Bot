@@ -23,6 +23,20 @@ from typing import Optional, List, Dict
 # Set up logger
 logger = logging.getLogger(__name__)
 
+# Patch Fyers SDK bug where network exceptions cause 'UnboundLocalError: local variable response referenced before assignment'
+try:
+    _orig_get_call = fyersModel.FyersServiceSync.get_call
+    def _safe_get_call(self, api, header, data=None, data_flag=False):
+        try:
+            return _orig_get_call(self, api, header, data=data, data_flag=data_flag)
+        except UnboundLocalError:
+            if hasattr(self, 'api_logger') and self.api_logger:
+                self.api_logger.error("Fyers SDK UnboundLocalError caught (network failure before response)")
+            return {"code": -1, "message": "Network connection failure before HTTP response", "s": "error"}
+    fyersModel.FyersServiceSync.get_call = _safe_get_call
+except Exception:
+    pass
+
 class FyersClient:
     """Fyers API client for authentication and trading."""
     
@@ -65,7 +79,7 @@ class FyersClient:
             else:
                 logger.warning("⚠️ No access token found in JSON cache or environment")        # Rate limiting
         self.last_api_call = 0
-        self.min_call_interval = 0.5  # Minimum 0.5 seconds between API calls to avoid rate limits
+        self.min_call_interval = 1.0  # Minimum 1.0 seconds between API calls to avoid 429 rate limits
         
         # Initialize session model
         self.session = fyersModel.SessionModel(
@@ -82,8 +96,7 @@ class FyersClient:
         current_time = time.time()
         time_since_last_call = current_time - self.last_api_call
         
-        # Increased minimum interval to reduce API pressure
-        min_interval = max(self.min_call_interval, 0.5)  # At least 500ms between calls
+        min_interval = max(self.min_call_interval, 1.0)  # At least 1s between calls
         
         if time_since_last_call < min_interval:
             sleep_time = min_interval - time_since_last_call
@@ -202,11 +215,12 @@ class FyersClient:
             return response
         except Exception as e:
             logger.error(f"Error fetching profile: {e}")
-    def get_quotes(self, symbols: List[str]) -> Optional[Dict]:
-        """Get quotes for multiple symbols.
+    def get_quotes(self, symbols: List[str], _retries: int = 3) -> Optional[Dict]:
+        """Get quotes for multiple symbols with automatic 429 retry.
         
         Args:
             symbols: List of trading symbols
+            _retries: Internal retry count for 429 backoff (do not set manually)
             
         Returns:
             dict: Quotes data or None if error
@@ -236,45 +250,49 @@ class FyersClient:
             
             if response and response.get("code") == 200:
                 return response.get("d", {})
-            else:
-                logger.warning(f"No quotes data available for {symbols}")
-                return None
+            
+            # ── 429 Rate Limit: back off and retry ───────────────────────
+            resp_code = response.get("code") if response else None
+            if resp_code == 429 and _retries > 0:
+                backoff = 2 ** (3 - _retries)  # 1s, 2s, 4s
+                logger.warning(
+                    f"⚠️ Rate limited (429) for {symbols}, backing off {backoff}s "
+                    f"({_retries} retries left)"
+                )
+                time.sleep(backoff)
+                return self.get_quotes(symbols, _retries=_retries - 1)
+            
+            # Non-retryable failure — log the actual response for diagnosis
+            logger.warning(
+                f"No quotes data available for {symbols} "
+                f"(code={resp_code}, message={response.get('message', 'N/A') if response else 'no response'})"
+            )
+            return None
                 
         except Exception as e:
             logger.error(f"Error fetching quotes for {symbols}: {e}")
             return None
 
 
-    def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, interval: str) -> Optional[Dict]:
-        """Get historical data for a symbol."""
+    def get_historical_data(self, symbol: str, start_date: datetime, end_date: datetime, interval: str, _retries: int = 3) -> Optional[Dict]:
+        """Get historical data for a symbol with rate limiting and automatic retry."""
         try:
             if not self.fyers:
                 logger.error("❌ Fyers client not initialized")
                 return None
             
-            # Convert dates to YYYY-MM-DD format
+            self._rate_limit()
+
             start_date_str = start_date.strftime("%Y-%m-%d")
             end_date_str = end_date.strftime("%Y-%m-%d")
             
-            # Map interval to Fyers format
             interval_map = {
-                "1": "1",
-                "1m": "1",
-                "5": "5",
-                "5m": "5", 
-                "15": "15",
-                "15m": "15",
-                "30": "30",
-                "30m": "30",
-                "60": "60",
-                "1h": "60",
-                "D": "D",
-                "1d": "D"
+                "1": "1", "1m": "1", "5": "5", "5m": "5",
+                "15": "15", "15m": "15", "30": "30", "30m": "30",
+                "60": "60", "1h": "60", "D": "D", "1d": "D"
             }
-            
             fyers_interval = interval_map.get(interval, interval)
             
-            # Make API call
             data = {
                 "symbol": symbol,
                 "resolution": fyers_interval,
@@ -284,26 +302,31 @@ class FyersClient:
                 "cont_flag": "1"
             }
             
-            # Try the correct Fyers API method
-            try:
-                response = self.fyers.history(data)
-                
-                if response and response.get("s") == "ok":
-                    return response
-                else:
-                    logger.error(f"❌ Historical data request failed: {response}")
-                    return None
-            except Exception as api_error:
-                logger.error(f"❌ Fyers API error: {api_error}")
-                # Try alternative method
+            for attempt in range(1, _retries + 1):
                 try:
-                    # Alternative: use the quotes method with historical data
-                    alt_response = self.fyers.quotes(data)
-                    return alt_response
-                except Exception as alt_error:
-                    logger.error(f"❌ Alternative method also failed: {alt_error}")
+                    response = self.fyers.history(data)
+                    if response and isinstance(response, dict) and response.get("s") == "ok":
+                        return response
+                    
+                    resp_code = response.get("code") if isinstance(response, dict) else None
+                    if resp_code == 429 and attempt < _retries:
+                        backoff = 2 ** attempt
+                        logger.warning(f"⚠️ Rate limited (429) on historical data for {symbol}, backing off {backoff}s...")
+                        time.sleep(backoff)
+                        continue
+                    
+                    logger.error(f"❌ Historical data request failed for {symbol} (attempt {attempt}/{_retries}): {response}")
+                    if attempt < _retries:
+                        time.sleep(1)
+                        continue
                     return None
-                
+                except Exception as api_error:
+                    logger.error(f"❌ Fyers API history error for {symbol} (attempt {attempt}/{_retries}): {api_error}")
+                    if attempt < _retries:
+                        time.sleep(1)
+                        continue
+                    return None
+            return None
         except Exception as e:
             logger.error(f"❌ Error getting historical data: {e}")
             return None

@@ -1414,3 +1414,71 @@
 2026-07-30 15:55:06,637 - INFO - 📊 Daily metrics saved: [VerticalSpread_v1.0] 2026-07-30 cf=0 expectancy=None
 2026-07-30 15:55:06,657 - INFO - 📊 Daily metrics saved: [Straddle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
 2026-07-30 15:55:06,679 - INFO - 📊 Daily metrics saved: [Strangle_v1.0_VolCompression] 2026-07-30 cf=0 expectancy=None
+2026-07-30 20:37:00,078 - INFO - 🔑 Loaded access token from local JSON cache: /Users/kashishbaggafeast/Desktop/Bot/tokens/token_2026-07-30.json
+2026-07-30 20:37:00,204 - INFO - ✅ Fyers client initialized successfully
+2026-07-30 20:37:00,290 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 20:37:00,304 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 20:37:00,361 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 20:37:00,364 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-07-30 20:37:00,364 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-30 20:37:00,364 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-07-30 20:37:00,390 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 20:37:00,400 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 20:37:00,432 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 20:37:00,460 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 20:37:00,470 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 20:37:00,497 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 20:37:00,498 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-30 20:37:00,498 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-07-30 20:37:00,515 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=9077686
+2026-07-30 20:37:00,528 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL1.0 [hash=e94c3fcc1fbc618d git=9077686]
+2026-07-30 20:37:00,554 - INFO - ✅ PostgreSQL tables and migrations checked/initialized
+2026-07-30 20:37:00,563 - INFO - ✅ Option snapshots & audits converted to hypertables, indexes generated
+2026-07-30 20:37:00,592 - INFO - ✅ PostgreSQL / TimescaleDB fully initialized
+2026-07-30 20:37:00,593 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-07-30 20:37:00,593 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-07-30 20:37:00,602 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=9077686
+2026-07-30 20:37:00,612 - INFO - 📋 Experiment saved: Structural_v3.2_RVOL0.8 [hash=40874fb174f2baa6 git=9077686]
+2026-07-30 20:37:00,621 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=0296a97f007a6675 git=9077686
+2026-07-30 20:37:00,631 - INFO - 📋 Experiment saved: EMA_Pullback_20_50_RVOL1.0 [hash=0296a97f007a6675 git=9077686]
+2026-07-30 20:37:00,640 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=9077686
+2026-07-30 20:37:00,651 - INFO - 📋 Experiment saved: VWAP_Reversion_1.5ATR_RVOL1.0 [hash=3d6d96cb21ff71cd git=9077686]
+2026-07-30 20:37:00,659 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=9077686
+2026-07-30 20:37:00,670 - INFO - 📋 Experiment saved: PrevDay_Extremes_RVOL1.2 [hash=952708070530c475 git=9077686]
+2026-07-30 20:37:00,679 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=9077686
+2026-07-30 20:37:00,691 - INFO - 📋 Experiment saved: ORB_15m_RVOL1.2 [hash=7977fff6d541cc39 git=9077686]
+2026-07-30 20:37:00,700 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=9077686
+2026-07-30 20:37:00,710 - INFO - 📋 Experiment saved: ORB_30m_RVOL1.2 [hash=a4c360e3a0cd8ef8 git=9077686]
+2026-07-30 20:37:00,718 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=9ad2746007bcc7e7 git=9077686
+2026-07-30 20:37:00,729 - INFO - 📋 Experiment saved: ATR_Squeeze_RVOL1.0 [hash=9ad2746007bcc7e7 git=9077686]
+2026-07-30 20:37:00,729 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-07-30 20:37:00,737 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=9077686
+2026-07-30 20:37:00,748 - INFO - 📋 Experiment saved: Geometry_v1.0_Score35 [hash=7edde6fe809a3b1a git=9077686]
+2026-07-30 20:37:00,749 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-07-30 20:37:00,757 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=9077686
+2026-07-30 20:37:00,767 - INFO - 📋 Experiment saved: Geometry_v1.0_Score50 [hash=431ce308e16d5c85 git=9077686]
+2026-07-30 20:37:00,768 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-07-30 20:37:00,776 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=9077686
+2026-07-30 20:37:00,787 - INFO - 📋 Experiment saved: OrderFlow_v1.0 [hash=be581b5e26fdcef5 git=9077686]
+2026-07-30 20:37:00,787 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.55, candle_strength>=0.4, min_rr>=1.5]
+2026-07-30 20:37:00,795 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf55 [chart_pattern@v1.0] hash=ce9ab5b18515d260 git=9077686
+2026-07-30 20:37:00,806 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf55 [hash=ce9ab5b18515d260 git=9077686]
+2026-07-30 20:37:00,806 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.4, candle_strength>=0.3, min_rr>=1.3]
+2026-07-30 20:37:00,814 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf40 [chart_pattern@v1.0] hash=22ad684465d991ac git=9077686
+2026-07-30 20:37:00,826 - INFO - 📋 Experiment saved: ChartPattern_v1.0_Conf40 [hash=22ad684465d991ac git=9077686]
+2026-07-30 20:37:00,834 - INFO - 📋 Registered experiment: VWAP_Reclaim_v1.0 [vwap_reclaim@v1.0] hash=2592ffc98e68bca5 git=9077686
+2026-07-30 20:37:00,845 - INFO - 📋 Experiment saved: VWAP_Reclaim_v1.0 [hash=2592ffc98e68bca5 git=9077686]
+2026-07-30 20:37:00,854 - INFO - 📋 Registered experiment: CPR_v1.0 [cpr@v1.0] hash=0d2ee99831362dc3 git=9077686
+2026-07-30 20:37:00,866 - INFO - 📋 Experiment saved: CPR_v1.0 [hash=0d2ee99831362dc3 git=9077686]
+2026-07-30 20:37:00,874 - INFO - 📋 Registered experiment: Gap_v1.0 [gap@v1.0] hash=b855c688d7bea446 git=9077686
+2026-07-30 20:37:00,886 - INFO - 📋 Experiment saved: Gap_v1.0 [hash=b855c688d7bea446 git=9077686]
+2026-07-30 20:37:00,894 - INFO - 📋 Registered experiment: ORB_60m_IB_RVOL1.2 [orb@v1.0] hash=fb43c099fbb7b444 git=9077686
+2026-07-30 20:37:00,905 - INFO - 📋 Experiment saved: ORB_60m_IB_RVOL1.2 [hash=fb43c099fbb7b444 git=9077686]
+2026-07-30 20:37:00,913 - INFO - 📋 Registered experiment: VerticalSpread_v1.0 [vertical_spread@v1.0] hash=ebcc2ee58dde4134 git=9077686
+2026-07-30 20:37:00,925 - INFO - 📋 Experiment saved: VerticalSpread_v1.0 [hash=ebcc2ee58dde4134 git=9077686]
+2026-07-30 20:37:00,933 - INFO - 📋 Registered experiment: Straddle_v1.0_VolCompression [straddle_strangle@v1.0] hash=5f6294f74dfd83c4 git=9077686
+2026-07-30 20:37:00,944 - INFO - 📋 Experiment saved: Straddle_v1.0_VolCompression [hash=5f6294f74dfd83c4 git=9077686]
+2026-07-30 20:37:00,953 - INFO - 📋 Registered experiment: Strangle_v1.0_VolCompression [straddle_strangle@v1.0] hash=f9e42ca23b1aa8eb git=9077686
+2026-07-30 20:37:00,965 - INFO - 📋 Experiment saved: Strangle_v1.0_VolCompression [hash=f9e42ca23b1aa8eb git=9077686]
+2026-07-30 20:37:01,033 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-07-30 20:37:01,033 - INFO - ⏱️ Aligning to 5-min candle boundary. Sleeping 184s until 20:40:05 IST...

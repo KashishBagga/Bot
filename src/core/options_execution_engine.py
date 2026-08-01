@@ -246,14 +246,14 @@ class PremiumResolver:
             
             if row:
                 ltp, bid, ask, volume, timestamp = row
-                # Check cache freshness (within 15 seconds)
-                if (datetime.now(timestamp.tzinfo) - timestamp) < timedelta(seconds=15):
+                # Check cache freshness (within 120 seconds — warehouse runs every 60s)
+                if (datetime.now(timestamp.tzinfo) - timestamp) < timedelta(seconds=120):
                     logger.debug(f"Retrieved cached premium from DB: LTP={ltp} for {symbol}")
                     return float(ltp), float(bid or 0.0), float(ask or 0.0), int(volume or 0)
         except Exception as e:
             logger.error(f"Error querying option premium from database: {e}")
 
-        # 2. Cache miss or stale -> Query Fyers client API
+        # 2. Cache miss or stale -> Query Fyers client API (quotes endpoint)
         try:
             if self.data_provider and self.data_provider.client:
                 quotes = self.data_provider.client.get_quotes([symbol])
@@ -270,10 +270,11 @@ class PremiumResolver:
         except Exception as e:
             logger.error(f"Failed to query live quote for option {symbol}: {e}")
 
-        # Both the DB warehouse and the live API failed. DO NOT fabricate a
-        # premium — a synthetic price (the old dummy 100.0) silently sizes and
-        # "fills" a real order against a made-up number. Fail loudly so the
-        # caller skips the trade instead.
+        # Both the DB warehouse and the live quotes API failed. DO NOT fabricate
+        # a premium — a synthetic price silently sizes and "fills" a real order
+        # against a made-up number. Fail loudly so the caller skips the trade.
+        # NOTE: Fyers history API does not support option symbols, so there is
+        # no third fallback available.
         raise ValueError(
             f"Could not resolve a real premium for {symbol} "
             f"(DB warehouse miss/stale AND live quote failed)"

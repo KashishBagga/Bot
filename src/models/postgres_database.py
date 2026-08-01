@@ -29,6 +29,8 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         elif isinstance(obj, (np.bool_,)):
             return bool(obj)
+        elif hasattr(obj, 'isoformat'):
+            return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
 class PostgresDatabase:
@@ -1064,9 +1066,19 @@ class PostgresDatabase:
             combo['valid'] = is_valid
             combo['validation_errors'] = "; ".join(errs) if errs else None
 
+            # Filter database columns to prevent schema conflicts from extra keys
+            ALLOWED_COLUMNS = {
+                'combo_id', 'entry_time', 'exit_time', 'symbol', 'experiment_name',
+                'strategy_id', 'version', 'combo_type', 'setup_type',
+                'underlying_entry_price', 'underlying_exit_price', 'legs',
+                'net_premium_paid', 'max_loss', 'max_profit', 'target_r', 'stop_r',
+                'current_pnl_r', 'final_pnl_r', 'exit_reason', 'duration_minutes',
+                'confidence', 'diagnostics', 'valid', 'validation_errors'
+            }
+
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
-                    c = dict(combo)
+                    c = {k: v for k, v in combo.items() if k in ALLOWED_COLUMNS}
                     if 'legs' in c:
                         c['legs'] = json.dumps(c['legs'], cls=NumpyEncoder)
                     if 'diagnostics' in c:
@@ -1122,9 +1134,20 @@ class PostgresDatabase:
             combo['valid'] = is_valid
             combo['validation_errors'] = "; ".join(errs) if errs else None
 
+            # Filter database columns to prevent schema conflicts from extra keys
+            ALLOWED_COLUMNS = {
+                'combo_id', 'entry_time', 'exit_time', 'symbol', 'experiment_name',
+                'strategy_id', 'version', 'combo_type', 'setup_type',
+                'rejection_reasons', 'primary_rejection_reason',
+                'underlying_entry_price', 'underlying_exit_price', 'legs',
+                'net_premium_paid', 'max_loss', 'max_profit', 'target_r', 'stop_r',
+                'current_pnl_r', 'final_pnl_r', 'exit_reason', 'duration_minutes',
+                'confidence', 'diagnostics', 'valid', 'validation_errors'
+            }
+
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
-                    c = dict(combo)
+                    c = {k: v for k, v in combo.items() if k in ALLOWED_COLUMNS}
                     if 'legs' in c:
                         c['legs'] = json.dumps(c['legs'], cls=NumpyEncoder)
                     if 'rejection_reasons' in c:
