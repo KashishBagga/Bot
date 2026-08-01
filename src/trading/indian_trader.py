@@ -785,16 +785,17 @@ class StructuralPaperTrader:
                         logger.error(f"❌ EOD report generation failed: {e}", exc_info=True)
                 return
 
-            # 3b. Expiry / event blackout gate (Bug 18 fix)
-            # Blocks new entries on weekly expiry Thursdays, monthly expiry, RBI MPC, Budget
-            is_blackout, blackout_reason = self.expiry_blackout.is_blackout()
-            if is_blackout:
-                logger.info(f"🚫 Expiry/Event blackout active — no new entries. Reason: {blackout_reason}")
-                # Positions were already updated in step 2 above; do NOT update
-                # again here. The old double-call inflated bars_held / duration /
-                # holding_efficiency on every blackout candle (lunch 11:30–13:30
-                # daily + all Thursdays), corrupting those metrics for most trades.
-                return
+            # 3b. Expiry / event blackout gate (Bug 18 fix) — DISABLED as of 2026-07-30
+            # (lunch-hour + weekly/monthly expiry + RBI/Budget windows were blocking
+            # too much of the session; re-enable by uncommenting below)
+            # is_blackout, blackout_reason = self.expiry_blackout.is_blackout()
+            # if is_blackout:
+            #     logger.info(f"🚫 Expiry/Event blackout active — no new entries. Reason: {blackout_reason}")
+            #     # Positions were already updated in step 2 above; do NOT update
+            #     # again here. The old double-call inflated bars_held / duration /
+            #     # holding_efficiency on every blackout candle (lunch 11:30–13:30
+            #     # daily + all Thursdays), corrupting those metrics for most trades.
+            #     return
 
             # 4. Compute snapshot + run experiments per symbol
             total_signals = 0
