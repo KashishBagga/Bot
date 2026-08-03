@@ -54,24 +54,24 @@ class ExpiryResolver:
                 month = self.WEEKLY_MONTH_MAP.get(m_char, int(m_char) if m_char.isdigit() else 1)
                 return date(year, month, dd)
 
-            # 2. Monthly format (e.g. 26JUL -> Year 2026, Month July, last Thursday)
+            # 2. Monthly format (e.g. 26JUL -> Year 2026, Month July, last Tuesday)
             monthly_match = re.match(r"^(\d{2})([A-Z]{3})$", expiry)
             if monthly_match:
                 yy = int(monthly_match.group(1))
                 mmm = monthly_match.group(2)
                 year = 2000 + yy
                 month = self.MONTH_MAP.get(mmm, 1)
-                # Find last Thursday of the month
+                # Find last Tuesday of the month (weekday 1)
                 # Start from last day of the month and count backwards
                 next_month = month + 1 if month < 12 else 1
                 next_month_year = year if month < 12 else year + 1
                 first_of_next = date(next_month_year, next_month, 1)
                 last_day = first_of_next - timedelta(days=1)
                 
-                # Backtrack to Thursday (weekday 3 in python, Mon=0 ... Sun=6)
-                days_to_subtract = (last_day.weekday() - 3) % 7
-                last_thursday = last_day - timedelta(days=days_to_subtract)
-                return last_thursday
+                # Backtrack to Tuesday (weekday 1 in python, Mon=0 ... Sun=6)
+                days_to_subtract = (last_day.weekday() - 1) % 7
+                last_tuesday = last_day - timedelta(days=days_to_subtract)
+                return last_tuesday
                 
             return None
         except Exception as e:
@@ -84,16 +84,16 @@ class ExpiryResolver:
         yy = str(d.year)[-2:]
         month = d.month
         
-        # Check if d is the last Thursday of the month
+        # Check if d is the last Tuesday of the month (weekday 1)
         next_month = month + 1 if month < 12 else 1
         next_month_year = d.year if month < 12 else d.year + 1
         first_of_next = date(next_month_year, next_month, 1)
         last_day = first_of_next - timedelta(days=1)
         
-        days_to_subtract = (last_day.weekday() - 3) % 7
-        last_thursday = last_day - timedelta(days=days_to_subtract)
+        days_to_subtract = (last_day.weekday() - 1) % 7
+        last_tuesday = last_day - timedelta(days=days_to_subtract)
         
-        if d == last_thursday:
+        if d == last_tuesday:
             months = ["", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
             mmm = months[month]
             return f"{yy}{mmm}"
@@ -144,16 +144,31 @@ class ExpiryResolver:
                 if cached:
                     return cached['expiry_str']
                     
-            # Dynamically compute next Thursday using date_to_fyers_expiry
+            # Dynamically compute next Tuesday (for Nifty) or last Tuesday of current/next month (for Bank Nifty)
             _today = date.today()
-            days_until_thursday = (3 - _today.weekday()) % 7  # 3=Thursday (Mon=0)
-            if days_until_thursday == 0:
-                days_until_thursday = 7  # Today is Thursday — use NEXT Thursday
-            _next_thu = _today + timedelta(days=days_until_thursday)
-            dynamic_expiry = self.date_to_fyers_expiry(_next_thu)
+            if "BANK" in underlying:
+                def get_last_tuesday(yr, mo):
+                    nm = mo + 1 if mo < 12 else 1
+                    ny = yr if mo < 12 else yr + 1
+                    last_d = date(ny, nm, 1) - timedelta(days=1)
+                    sub = (last_d.weekday() - 1) % 7
+                    return last_d - timedelta(days=sub)
+                
+                lt = get_last_tuesday(_today.year, _today.month)
+                if _today > lt:
+                    lt = get_last_tuesday(_today.year if _today.month < 12 else _today.year + 1,
+                                          _today.month + 1 if _today.month < 12 else 1)
+                _next_expiry_date = lt
+            else:
+                days_until_tuesday = (1 - _today.weekday()) % 7
+                if days_until_tuesday == 0:
+                    days_until_tuesday = 7
+                _next_expiry_date = _today + timedelta(days=days_until_tuesday)
+
+            dynamic_expiry = self.date_to_fyers_expiry(_next_expiry_date)
             logger.warning(
                 f"[ExpiryResolver] Both DB and API failed for {underlying}. "
-                f"Falling back to dynamically computed expiry: {dynamic_expiry} ({_next_thu})"
+                f"Falling back to dynamically computed expiry: {dynamic_expiry} ({_next_expiry_date})"
             )
             return dynamic_expiry
         except Exception as e:

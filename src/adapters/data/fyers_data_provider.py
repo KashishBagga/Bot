@@ -122,17 +122,35 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
                     if val and val.get('lp') is not None:
                         return date_map[symbol_name]
             
-            # Fallback to monthly format check (e.g. 26JUL)
+            # Fallback to monthly format check (e.g. 26AUG instead of expired 26JUL)
             yy = str(now.year)[-2:]
-            mmm = now.strftime("%b").upper()
-            monthly_expiry_str = f"{yy}{mmm}"
+            
+            def get_last_tuesday(yr, mo):
+                nm = mo + 1 if mo < 12 else 1
+                ny = yr if mo < 12 else yr + 1
+                last_d = date(ny, nm, 1) - timedelta(days=1)
+                sub = (last_d.weekday() - 1) % 7
+                return last_d - timedelta(days=sub)
+
+            now_date = now.date()
+            lt_this_month = get_last_tuesday(now.year, now.month)
+            if now_date > lt_this_month:
+                # This month's monthly expired -> use next month
+                active_monthly_date = get_last_tuesday(
+                    now.year if now.month < 12 else now.year + 1,
+                    now.month + 1 if now.month < 12 else 1
+                )
+            else:
+                active_monthly_date = lt_this_month
+
+            monthly_expiry_str = ExpiryResolver.date_to_fyers_expiry(active_monthly_date)
             monthly_symbol = f"NSE:{base}{monthly_expiry_str}{atm_strike}CE"
             
             quotes = self.client.get_quotes([monthly_symbol])
             if quotes and isinstance(quotes, list):
                 val = quotes[0].get('v', {})
-                if val and val.get('lp') is not None:
-                    return monthly_expiry_str, f"20{yy}-{now.month:02d}-25"
+                if val and val.get('lp') is not None and float(val.get('lp', 0.0)) > 0:
+                    return monthly_expiry_str, active_monthly_date.strftime("%Y-%m-%d")
             
             return None
         except Exception as e:
