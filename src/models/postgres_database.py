@@ -545,6 +545,28 @@ class PostgresDatabase:
                     cursor.execute("ALTER TABLE market_events ADD COLUMN IF NOT EXISTS research_id VARCHAR(24)")
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_events_research_id ON market_events(research_id) WHERE research_id IS NOT NULL")
 
+                    # Persistent S/R zone tracker (Option B).
+                    # Written by the trader each candle via upsert_sr_zone().
+                    # Unlike market_state.zones (overwritten every candle),
+                    # this table survives across sessions and tracks touch counts.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS sr_zones (
+                            zone_id      TEXT PRIMARY KEY,
+                            symbol       TEXT        NOT NULL,
+                            zone_type    TEXT        NOT NULL,
+                            price_low    REAL        NOT NULL,
+                            price_high   REAL        NOT NULL,
+                            strength     REAL        DEFAULT 1.0,
+                            touch_count  INTEGER     DEFAULT 1,
+                            first_seen   TIMESTAMPTZ NOT NULL,
+                            last_seen    TIMESTAMPTZ NOT NULL,
+                            last_tested  TIMESTAMPTZ,
+                            active       BOOLEAN     DEFAULT TRUE
+                        )
+                    ''')
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_sr_zones_symbol ON sr_zones(symbol, active)")
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_sr_zones_price ON sr_zones(symbol, price_low, price_high)")
+
                 conn.commit()
 
                 logger.info("✅ PostgreSQL tables and migrations checked/initialized")
@@ -1408,3 +1430,140 @@ class PostgresDatabase:
                 )
         except Exception as e:
             logger.error(f"❌ Failed to save experiment daily metrics for {experiment_name}: {e}")
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # S/R Zone Persistence (Option B)
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def upsert_sr_zone(self, zone: Dict[str, Any]) -> None:
+        """Insert or update a support/resistance zone.
+
+        zone keys:
+            zone_id   (str)   — stable hash of symbol+type+rounded price
+            symbol    (str)
+            zone_type (str)   — 'SUPPLY', 'DEMAND', 'OI_RESISTANCE', 'OI_SUPPORT'
+            price_low (float)
+            price_high (float)
+            strength  (float) — optional, default 1.0
+            now       (datetime) — used for first_seen/last_seen
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    now = zone.get("now") or datetime.now(timezone.utc)
+                    cursor.execute("""
+                        INSERT INTO sr_zones
+                            (zone_id, symbol, zone_type, price_low, price_high,
+                             strength, touch_count, first_seen, last_seen, active)
+                        VALUES
+                            (%(zone_id)s, %(symbol)s, %(zone_type)s, %(price_low)s,
+                             %(price_high)s, %(strength)s, 1, %(now)s, %(now)s, TRUE)
+                        ON CONFLICT (zone_id) DO UPDATE SET
+                            price_low   = EXCLUDED.price_low,
+                            price_high  = EXCLUDED.price_high,
+                            strength    = GREATEST(sr_zones.strength, EXCLUDED.strength),
+                            touch_count = sr_zones.touch_count + 1,
+                            last_seen   = EXCLUDED.last_seen,
+                            active      = TRUE
+                    """, {**zone, "now": now})
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Failed to upsert sr_zone {zone.get('zone_id')}: {e}")
+
+    def get_sr_zones(
+        self,
+        symbol: str,
+        active_only: bool = True,
+        zone_types: Optional[List[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return S/R zones for a symbol, newest-touched first."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    conditions = ["symbol = %s"]
+                    params: List[Any] = [symbol]
+                    if active_only:
+                        conditions.append("active = TRUE")
+                    if zone_types:
+                        conditions.append("zone_type = ANY(%s)")
+                        params.append(zone_types)
+                    where = " AND ".join(conditions)
+                    cursor.execute(
+                        f"SELECT zone_id, symbol, zone_type, price_low, price_high, "
+                        f"strength, touch_count, first_seen, last_seen, last_tested, active "
+                        f"FROM sr_zones WHERE {where} ORDER BY last_seen DESC",
+                        params,
+                    )
+                    cols = [
+                        "zone_id", "symbol", "zone_type", "price_low", "price_high",
+                        "strength", "touch_count", "first_seen", "last_seen",
+                        "last_tested", "active",
+                    ]
+                    return [dict(zip(cols, row)) for row in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"❌ Failed to get sr_zones for {symbol}: {e}")
+            return []
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Option Chain Snapshot Query
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def get_option_chain_snapshot(
+        self,
+        underlying: str,
+        expiry: Optional[str] = None,
+        as_of: Optional[Any] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return the latest option chain snapshot for one underlying.
+
+        Args:
+            underlying: e.g. "NSE:NIFTY50-INDEX"
+            expiry:     "YYYY-MM-DD" string to filter; None = latest expiry in DB
+            as_of:      datetime ceiling (default = now); useful for historical views
+
+        Returns:
+            List of rows with: strike, option_type, ltp, bid, ask, volume, oi, oi_change
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    if as_of is None:
+                        as_of_clause = "AND time <= NOW()"
+                        params: Dict[str, Any] = {"underlying": underlying}
+                    else:
+                        as_of_clause = "AND time <= %(as_of)s"
+                        params = {"underlying": underlying, "as_of": as_of}
+
+                    if expiry:
+                        expiry_clause = "AND expiry = %(expiry)s"
+                        params["expiry"] = expiry
+                    else:
+                        # pick whichever expiry has the most recent snapshot
+                        expiry_clause = ""
+
+                    # Latest snapshot per (strike, option_type) combination
+                    cursor.execute(f"""
+                        WITH ranked AS (
+                            SELECT DISTINCT ON (strike, option_type)
+                                strike, option_type, ltp, bid, ask, volume, oi, oi_change,
+                                expiry, time
+                            FROM option_snapshots
+                            WHERE underlying = %(underlying)s
+                              {as_of_clause}
+                              {expiry_clause}
+                            ORDER BY strike, option_type, time DESC
+                        )
+                        SELECT strike, option_type, ltp, bid, ask, volume, oi, oi_change,
+                               expiry, time
+                        FROM ranked
+                        ORDER BY strike
+                    """, params)
+
+                    cols = [
+                        "strike", "option_type", "ltp", "bid", "ask",
+                        "volume", "oi", "oi_change", "expiry", "time",
+                    ]
+                    return [dict(zip(cols, row)) for row in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"❌ Failed to get option chain snapshot: {e}")
+            return []

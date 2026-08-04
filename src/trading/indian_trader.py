@@ -120,9 +120,12 @@ class StructuralPaperTrader:
         self.DAILY_LOSS_LIMIT_R    = -6.0   # halt new real entries once realized R for the day <= this
         self.MAX_CONCURRENT_REAL   = 6      # max simultaneous real positions (all experiments/symbols)
         self.MAX_DEPLOYED_FRACTION = 0.40   # max fraction of capital deployed across open real trades
+        self.MAX_ATTEMPTS_PER_LEVEL = 2     # woodchopper: max real entries per (symbol, direction, price-bucket) per day
         self._risk_day             = None   # date-string the daily counters belong to
         self.daily_realized_r      = 0.0    # sum of realized pnl_r on real trades today
         self.trading_halted_today  = False  # set once the daily loss limit trips
+        # Woodchopper protection: (symbol, direction, bucket) -> attempt count for today
+        self._daily_level_attempts: Dict[tuple, int] = {}
 
         # Expiry & event blackout manager (Bug 18 fix)
         self.expiry_blackout = ExpiryBlackoutManager()
@@ -156,11 +159,16 @@ class StructuralPaperTrader:
         self.db.save_experiment(_structural_08_exp.to_db_dict())
 
         # 2. EMA Pullback
+        # Aug-03 review: LOW_RVOL blocked +52R of with-trend signals. Pullback
+        # entries structurally have quiet volume during the retrace phase — the
+        # expansion follows the pullback, not before it. Using a breakout-tuned
+        # threshold (1.0×) here was killing the best trend-following strategy.
+        # Lowered to 0.5x (just checks for non-zero activity) + efficiency 0.45.
         _ema_pullback_exp = Experiment(
             name="EMA_Pullback_20_50_RVOL1.0",
-            strategy=EmaPullbackStrategy(rvol_threshold=1.0, min_efficiency=0.6),
-            params={"rvol_threshold": 1.0, "min_efficiency": 0.6},
-            description="EMA Pullback strategy — RVOL threshold 1.0x"
+            strategy=EmaPullbackStrategy(rvol_threshold=0.5, min_efficiency=0.45),
+            params={"rvol_threshold": 0.5, "min_efficiency": 0.45},
+            description="EMA Pullback — RVOL 0.5x (pullbacks are quiet by nature), efficiency 0.45"
         )
         self.registry.register(_ema_pullback_exp)
         self.db.save_experiment(_ema_pullback_exp.to_db_dict())
@@ -205,11 +213,16 @@ class StructuralPaperTrader:
         self.db.save_experiment(_orb_30_exp.to_db_dict())
 
         # 6. ATR Squeeze Breakout
+        # Aug-03 review: 6 live trades taken (all counter-trend BUY PUT on a
+        # strong up day), net −1.86R expectancy, 5 of 6 stopped on bar-1.
+        # Squeezes NEED confirmed volume expansion at the breakout — raised RVOL
+        # to 1.5x (was 1.0x).  Also added a move-efficiency floor (0.50) to block
+        # counter-trend squeezes in one-directional trend days.
         _atr_squeeze_exp = Experiment(
             name="ATR_Squeeze_RVOL1.0",
-            strategy=AtrSqueezeStrategy(rvol_threshold=1.0, atr_percentile_threshold=0.20),
-            params={"rvol_threshold": 1.0, "atr_percentile_threshold": 0.20},
-            description="ATR Squeeze Breakout volatility compression"
+            strategy=AtrSqueezeStrategy(rvol_threshold=1.5, atr_percentile_threshold=0.20),
+            params={"rvol_threshold": 1.5, "atr_percentile_threshold": 0.20},
+            description="ATR Squeeze — RVOL 1.5x (requires actual expansion volume at breakout)"
         )
         self.registry.register(_atr_squeeze_exp)
         self.db.save_experiment(_atr_squeeze_exp.to_db_dict())
@@ -336,14 +349,14 @@ class StructuralPaperTrader:
         self.registry.register(_chart_pattern_loose_exp)
         self.db.save_experiment(_chart_pattern_loose_exp.to_db_dict())
 
-        # 10. VWAP Reclaim — trend-continuation on a VWAP cross, the opposite
-        # thesis from VWAP_Reversion (which fades an overstretched deviation
-        # back toward VWAP).
+        # 10. VWAP Reclaim — trend-continuation on a VWAP cross.
+        # Same family as EMA_Pullback (trend-following), so also lowers efficiency
+        # floor to 0.45 (was 0.55) — continuations have moderate efficiency dips.
         _vwap_reclaim_exp = Experiment(
             name="VWAP_Reclaim_v1.0",
-            strategy=VwapReclaimStrategy(rvol_threshold=1.0, min_efficiency=0.55),
-            params={"rvol_threshold": 1.0, "min_efficiency": 0.55},
-            description="VWAP Reclaim — trend continuation on a VWAP cross"
+            strategy=VwapReclaimStrategy(rvol_threshold=1.0, min_efficiency=0.45),
+            params={"rvol_threshold": 1.0, "min_efficiency": 0.45},
+            description="VWAP Reclaim — trend continuation on a VWAP cross (efficiency 0.45)"
         )
         self.registry.register(_vwap_reclaim_exp)
         self.db.save_experiment(_vwap_reclaim_exp.to_db_dict())
@@ -823,8 +836,13 @@ class StructuralPaperTrader:
                 # Previously this only ever existed in-memory for this one candle.
                 try:
                     self.db.upsert_market_state(self._build_market_state_record(snapshot))
+                    # Persist high-quality zones into the durable sr_zones table.
+                    # Unlike market_state.zones (overwritten every candle), sr_zones
+                    # accumulates touch counts and survives across sessions.
+                    self._persist_sr_zones(snapshot)
                 except Exception as e:
                     logger.warning(f"⚠️ Failed to build/save market_state for {symbol}: {e}")
+
 
                 results = self.registry.run(snapshot)
 
@@ -856,17 +874,12 @@ class StructuralPaperTrader:
                             if trade_key in self.active_trades:
                                 logger.debug(f"↩️  [{experiment_name}] Already have open position on {symbol}, skipping.")
                                 continue
-                            # Aggregate risk gate (daily-loss halt / concurrency / exposure)
-                            can_enter, gate_reason = self._can_enter_real(now)
+                            # Aggregate risk gate (daily-loss halt / concurrency / exposure / woodchopper)
+                            can_enter, gate_reason = self._can_enter_real(now, sig)
                             if not can_enter:
                                 logger.warning(
                                     f"⛔ [{experiment_name}] Real entry on {symbol} blocked by risk governor: {gate_reason}"
                                 )
-                                # Previously this signal vanished entirely — logged as
-                                # a warning but saved nowhere, indistinguishable from
-                                # "strategy filters rejected it". Track it so it's
-                                # queryable: was near-zero real trades caused by the
-                                # strategy or by the risk governor?
                                 self.db.save_risk_governor_block({
                                     'block_id': f"blk_{symbol.replace(':', '_').replace('-', '_')}_{experiment_name}_{int(now.timestamp())}",
                                     'timestamp': now,
@@ -885,7 +898,9 @@ class StructuralPaperTrader:
                             logger.info(f"🚀 SIGNAL: {symbol} {sig['signal']} | [{experiment_name}]")
                             logger.info(f"   Entry: {sig['price']} | SL: {sig['stop_loss']} | TP: {sig['take_profit']} (RR: {sig['rr_ratio']})")
                             self._enter_position(sig, now, trade_key, is_counterfactual=False)
+                            self._record_level_attempt(sig)   # woodchopper counter
                             self.portfolios.on_entry(experiment_name, now)
+
                         else:
                             MAX_ACTIVE_COUNTERFACTUALS = 500
                             if len(self.active_counterfactuals) >= MAX_ACTIVE_COUNTERFACTUALS:
@@ -977,6 +992,50 @@ class StructuralPaperTrader:
         """Sum of notional currently deployed across OPEN real trades (CFs excluded)."""
         return sum(float(p.get('position_size_inr', 0.0)) for p in self.active_trades.values())
 
+    def _persist_sr_zones(self, snapshot) -> None:
+        """Upsert high-quality zones from a MarketSnapshot into the persistent sr_zones table.
+
+        Only persists zones with score >= 2.0 to avoid populating the table with
+        marginal / noise-level zones.  Zone IDs are deterministic hashes, so the
+        same zone across multiple candles increments touch_count rather than
+        inserting duplicate rows.
+        """
+        import hashlib
+        from datetime import timezone as _tz
+
+        zones = snapshot.h1_zones or []
+        now = snapshot.timestamp or datetime.now(_tz.utc)
+
+        for z in zones:
+            try:
+                score = float(getattr(z, "score", 0.0))
+                if score < 2.0:
+                    continue
+
+                level = float(z.level)
+                zone_type = z.zone_type          # 'SUPPLY' or 'DEMAND'
+                # half-ATR bucket so nearby zones share the same ID
+                atr = float(snapshot.features.get_float("atr") or 100.0)
+                bucket = round(level / (atr * 0.5)) * int(atr * 0.5)
+
+                raw_id = f"{snapshot.symbol}|{zone_type}|{bucket}"
+                zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
+
+                # price band: ±0.25 ATR around the level
+                half_band = atr * 0.25
+                self.db.upsert_sr_zone({
+                    "zone_id":    zone_id,
+                    "symbol":     snapshot.symbol,
+                    "zone_type":  zone_type,
+                    "price_low":  round(level - half_band, 2),
+                    "price_high": round(level + half_band, 2),
+                    "strength":   score,
+                    "now":        now,
+                })
+            except Exception as e:
+                logger.debug(f"⚠️ _persist_sr_zones: skipping zone — {e}")
+
+
     def _recover_daily_risk_state(self, now):
         """Reconstruct daily_realized_r / trading_halted_today from the DB on startup.
 
@@ -1005,9 +1064,10 @@ class StructuralPaperTrader:
             self._risk_day = today
             self.daily_realized_r = 0.0
             self.trading_halted_today = False
+            self._daily_level_attempts = {}  # reset woodchopper counters for new day
             logger.info(f"🗓️ Risk day rolled to {today} — daily counters reset.")
 
-    def _can_enter_real(self, now) -> Tuple[bool, str]:
+    def _can_enter_real(self, now, sig: Dict = None) -> Tuple[bool, str]:
         """Aggregate risk gate for NEW real entries. Returns (allowed, reason)."""
         if self.trading_halted_today:
             return False, "DAILY_LOSS_HALT"
@@ -1022,7 +1082,39 @@ class StructuralPaperTrader:
             return False, "MAX_CONCURRENT"
         if self._deployed_capital() >= self.MAX_DEPLOYED_FRACTION * self.RISK_CAPITAL:
             return False, "MAX_DEPLOYED"
+
+        # Woodchopper protection: block a 3rd real attempt at the same price level
+        # + direction today (Aug-03 finding: BANKNIFTY BUY PUT hammered 22 times
+        # at the same level over 5 days, −57.4R total on one broken thesis).
+        if sig:
+            symbol    = sig.get('symbol', '')
+            direction = sig.get('signal', '')
+            price     = float(sig.get('price') or 0.0)
+            # Use a wide ATR-bucket so "same level" = ±0.5×ATR
+            atr_raw   = sig.get('diagnostics', {}).get('atr') or sig.get('features', {}).get('atr') or 100.0
+            atr       = float(atr_raw)
+            bucket    = round(price / max(atr, 1.0)) * int(max(atr, 1.0))
+            level_key = (symbol, direction, bucket)
+            attempts  = self._daily_level_attempts.get(level_key, 0)
+            if attempts >= self.MAX_ATTEMPTS_PER_LEVEL:
+                return False, f"LEVEL_REPEAT_CAP({attempts}x@{bucket})"
+
         return True, "OK"
+
+    def _record_level_attempt(self, sig: Dict) -> None:
+        """Increment the woodchopper attempt counter for a real trade that was entered."""
+        symbol    = sig.get('symbol', '')
+        direction = sig.get('signal', '')
+        price     = float(sig.get('price') or 0.0)
+        atr_raw   = sig.get('diagnostics', {}).get('atr') or sig.get('features', {}).get('atr') or 100.0
+        atr       = float(atr_raw)
+        bucket    = round(price / max(atr, 1.0)) * int(max(atr, 1.0))
+        level_key = (symbol, direction, bucket)
+        self._daily_level_attempts[level_key] = self._daily_level_attempts.get(level_key, 0) + 1
+        logger.debug(
+            f"🧩 Level attempt #{self._daily_level_attempts[level_key]} "
+            f"for {symbol} {direction} @ bucket {bucket}"
+        )
 
     def _update_active_trades(self, current_prices: Dict[str, float], timestamp, current_bars: Dict = None):
         """Evaluate open positions against latest market prices.

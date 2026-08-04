@@ -102,15 +102,24 @@ class AtrSqueezeStrategy(BaseStrategy):
             # Rejections
             current_time = snapshot.timestamp
 
-            # 2. RVOL filter (squeeze breakouts need high volume participation)
-            if rvol < self.rvol_threshold:
+            # 2. RVOL filter — squeezes need real expansion volume.
+            # Counter-trend squeezes need even more confirmation (2.5× vs 1.5×).
+            # Aug-03: all 6 live trades were counter-trend on a +1.6% day; raised
+            # the counter-trend bar to filter out lazy counter-moves.
+            is_counter_trend = (
+                (side == "BUY PUT" and snapshot.daily_bias == "BULLISH") or
+                (side == "BUY CALL" and snapshot.daily_bias == "BEARISH")
+            )
+            rvol_required = 2.5 if is_counter_trend else self.rvol_threshold
+            if rvol < rvol_required:
                 rejection_reasons.append("LOW_RVOL")
 
-            # 3. Daily bias alignment
+            # 3. Daily bias alignment — counter-trend squeeze still logged as CF
             if side == "BUY CALL" and snapshot.daily_bias == "BEARISH":
                 rejection_reasons.append("BIAS_MISMATCH")
             elif side == "BUY PUT" and snapshot.daily_bias == "BULLISH":
                 rejection_reasons.append("BIAS_MISMATCH")
+
 
             # Invalidation buffer
             risk_dist = abs(price - sl) if sl else atr

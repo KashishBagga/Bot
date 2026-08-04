@@ -332,5 +332,58 @@ class FyersClient:
             return None
 
 
+    def get_market_depth(self, symbol: str) -> Optional[Dict]:
+        """Get full market depth for a symbol, including real OI data.
+
+        Uses the Fyers `depth` endpoint which returns:
+            oi, pdoi (prev-day OI), oipercent, ltp, volume, bid/ask ladders.
+
+        Args:
+            symbol: Fyers-format symbol e.g. "NSE:NIFTY2680424600CE"
+
+        Returns:
+            Dict with keys: ltp, volume, oi, pdoi, oi_change_pct, bid, ask, or None on error.
+        """
+        if not self.fyers:
+            logger.error("Fyers client not initialized")
+            return None
+
+        self._rate_limit()
+
+        try:
+            response = self.fyers.depth({"symbol": symbol, "ohlcv_flag": 1})
+            if not response or response.get("s") != "ok":
+                logger.warning(f"Depth request failed for {symbol}: {response}")
+                return None
+
+            data = response.get("d", {}).get(symbol, {})
+            if not data:
+                return None
+
+            best_bid = data["bids"][0]["price"] if data.get("bids") else 0.0
+            best_ask = data["ask"][0]["price"] if data.get("ask") else 0.0
+            oi = data.get("oi", 0)
+            pdoi = data.get("pdoi", 0)
+            oi_change = oi - pdoi
+
+            return {
+                "ltp": float(data.get("ltp", 0.0)),
+                "volume": int(data.get("v", 0)),
+                "oi": int(oi),
+                "pdoi": int(pdoi),
+                "oi_change": int(oi_change),
+                "oi_change_pct": float(data.get("oipercent", 0.0)),
+                "bid": float(best_bid),
+                "ask": float(best_ask),
+                "high": float(data.get("h", 0.0)),
+                "low": float(data.get("l", 0.0)),
+                "prev_close": float(data.get("c", 0.0)),
+            }
+
+        except Exception as e:
+            logger.error(f"Error fetching market depth for {symbol}: {e}")
+            return None
+
+
 # Create an instance for direct imports
 fyers_client = FyersClient()
