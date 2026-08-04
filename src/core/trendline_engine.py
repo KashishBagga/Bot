@@ -18,7 +18,7 @@ import pandas as pd
 
 from src.core.market_geometry import (
     Trendline, TrendlineConfidenceComponents, TrendlineDirection,
-    TrendlineRole, GeometryStatus
+    TrendlineRole, GeometryStatus, Channel
 )
 from src.core.market_knowledge import SwingPoint, StructureState, ResearchEvent
 from src.core.trading_clock import TradingClock
@@ -39,9 +39,14 @@ class TrendlineEngine:
         current_price: float,
         symbol: str,
         now: datetime,
+        timeframe: str = "m5",
     ) -> Tuple[List[Trendline], List[ResearchEvent]]:
         """
         Detect all trendlines for the current tick.
+
+        `m5` and `atr` must be the bars/ATR matching `timeframe` — e.g. pass the
+        h1 dataframe and an h1-scaled ATR when timeframe="h1", otherwise lifecycle
+        breach/touch tolerances (scaled by atr) will be wrong for that bar size.
 
         Returns:
             (trendlines, events) — list of top trendlines + status change events.
@@ -58,13 +63,13 @@ class TrendlineEngine:
         # Find trendlines for SUPPORT (from swing lows)
         candidates.extend(self._find_trendlines_for_role(
             swings=lows, role=TrendlineRole.SUPPORT, m5=m5, atr=atr,
-            current_price=current_price, symbol=symbol, now=now
+            current_price=current_price, symbol=symbol, now=now, timeframe=timeframe
         ))
 
         # Find trendlines for RESISTANCE (from swing highs)
         candidates.extend(self._find_trendlines_for_role(
             swings=highs, role=TrendlineRole.RESISTANCE, m5=m5, atr=atr,
-            current_price=current_price, symbol=symbol, now=now
+            current_price=current_price, symbol=symbol, now=now, timeframe=timeframe
         ))
 
         # Step 4: Deduplicate trendlines by slope and price proximity
@@ -89,6 +94,7 @@ class TrendlineEngine:
         current_price: float,
         symbol: str,
         now: datetime,
+        timeframe: str = "m5",
     ) -> List[Trendline]:
         trendlines: List[Trendline] = []
         n_swings = len(swings)
@@ -251,7 +257,9 @@ class TrendlineEngine:
                     provenance={
                         "source": "SWINGS",
                         "breach_info": breach_info,
-                    }
+                        "timeframe": timeframe,
+                    },
+                    timeframe=timeframe,
                 )
                 trendlines.append(tl)
 
@@ -421,6 +429,80 @@ class TrendlineEngine:
                 unique_tls.append(tl)
 
         return unique_tls
+
+    # Same slope-similarity threshold as _deduplicate_trendlines — there it means
+    # "close enough to be the same line"; here (opposite roles) it means "close
+    # enough to be genuinely parallel," i.e. a channel rather than converging/
+    # diverging lines that happen to both currently sit near the same price.
+    CHANNEL_SLOPE_TOLERANCE = 0.15
+    CHANNEL_MAX_PER_TIMEFRAME = 2
+
+    def detect_channels(self, trendlines: List[Trendline], current_price: float) -> List["Channel"]:
+        """
+        Pair up SUPPORT/RESISTANCE trendlines (same timeframe, both non-broken,
+        near-equal slope, resistance strictly above support) into Channels.
+
+        Deliberately does NOT pair across timeframes — an m5 support line and a
+        d1 resistance line drifting into slope-similarity by coincidence isn't a
+        real tradeable channel the way a same-timeframe pair is.
+        """
+        from src.core.market_geometry import Channel
+
+        active = [t for t in trendlines if t.status != GeometryStatus.BROKEN]
+        by_timeframe: Dict[str, List[Trendline]] = {}
+        for tl in active:
+            by_timeframe.setdefault(tl.timeframe, []).append(tl)
+
+        channels: List[Channel] = []
+        for tf, tf_trendlines in by_timeframe.items():
+            supports = [t for t in tf_trendlines if t.role == TrendlineRole.SUPPORT]
+            resistances = [t for t in tf_trendlines if t.role == TrendlineRole.RESISTANCE]
+
+            tf_channels: List[Tuple[float, Channel]] = []
+            for lower in supports:
+                for upper in resistances:
+                    width = upper.price_at_now - lower.price_at_now
+                    if width <= 0:
+                        continue  # crossed/inverted — not a real channel right now
+
+                    m_diff = abs(upper.slope - lower.slope)
+                    m_max = max(abs(upper.slope), abs(lower.slope), 1e-6)
+                    slope_diff_ratio = m_diff / m_max
+                    if slope_diff_ratio >= self.CHANNEL_SLOPE_TOLERANCE:
+                        continue
+
+                    # Relevance filter: price has to still be near the channel.
+                    # Both lines individually pass their own lifecycle "not broken"
+                    # check on their own timeframe, but price can run far away in a
+                    # strong trend while the old lines stay numerically "active" —
+                    # that's a stale channel, not a tradeable one right now.
+                    if not (lower.price_at_now - width <= current_price <= upper.price_at_now + width):
+                        continue
+
+                    parallel_score = round(1.0 - (slope_diff_ratio / self.CHANNEL_SLOPE_TOLERANCE), 3)
+                    status = GeometryStatus.ACTIVE
+                    if GeometryStatus.RETESTED in (upper.status, lower.status):
+                        status = GeometryStatus.RETESTED
+                    elif GeometryStatus.TESTED in (upper.status, lower.status):
+                        status = GeometryStatus.TESTED
+
+                    ch = Channel(
+                        id=Channel.make_id(upper.id, lower.id),
+                        upper=upper,
+                        lower=lower,
+                        direction=lower.direction,
+                        width=round(width, 2),
+                        parallel_score=parallel_score,
+                        status=status,
+                        timeframe=tf,
+                    )
+                    rank = parallel_score * ((upper.confidence + lower.confidence) / 2.0)
+                    tf_channels.append((rank, ch))
+
+            tf_channels.sort(key=lambda pair: pair[0], reverse=True)
+            channels.extend(ch for _, ch in tf_channels[: self.CHANNEL_MAX_PER_TIMEFRAME])
+
+        return channels
 
     def _rank_and_filter(self, trendlines: List[Trendline]) -> List[Trendline]:
         """Keep top 3 trendlines per role (SUPPORT / RESISTANCE)."""

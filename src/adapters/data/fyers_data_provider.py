@@ -8,7 +8,7 @@ Also satisfies the legacy DataProviderInterface for backwards compatibility.
 
 import pandas as pd
 import logging
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Any
 from src.adapters.data.base_data_provider import BaseDataProvider
 from src.adapters.market_interface import DataProviderInterface, Contract
@@ -123,8 +123,6 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
                         return date_map[symbol_name]
             
             # Fallback to monthly format check (e.g. 26AUG instead of expired 26JUL)
-            yy = str(now.year)[-2:]
-            
             def get_last_tuesday(yr, mo):
                 nm = mo + 1 if mo < 12 else 1
                 ny = yr if mo < 12 else yr + 1
@@ -180,9 +178,26 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
                         'time': datetime.now()
                     }
                 else:
-                    expiry_str = "26JUN"
-                    expiry_date = "2026-06-25"
-            
+                    from src.core.options_execution_engine import ExpiryResolver
+                    now = datetime.now()
+                    if "BANK" in underlying:
+                        def get_last_tuesday(yr, mo):
+                            nm = mo + 1 if mo < 12 else 1
+                            ny = yr if mo < 12 else yr + 1
+                            last_d = date(ny, nm, 1) - timedelta(days=1)
+                            return last_d - timedelta(days=(last_d.weekday() - 1) % 7)
+                        fallback_date = get_last_tuesday(now.year, now.month)
+                        if now.date() > fallback_date:
+                            fallback_date = get_last_tuesday(
+                                now.year if now.month < 12 else now.year + 1,
+                                now.month + 1 if now.month < 12 else 1
+                            )
+                    else:
+                        days_until_tuesday = (1 - now.weekday()) % 7 or 7
+                        fallback_date = (now + timedelta(days=days_until_tuesday)).date()
+                    expiry_str = ExpiryResolver.date_to_fyers_expiry(fallback_date)
+                    expiry_date = fallback_date.strftime("%Y-%m-%d")
+
             # 2. Determine ATM strikes
             interval = 50 if "NIFTY50" in underlying else 100
             atm_strike = round(ltp / interval) * interval
@@ -237,11 +252,16 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
                     'bid': float(opt_bid),
                     'ask': float(opt_ask),
                     'volume': int(opt_volume),
+                    # PLACEHOLDER — the quotes endpoint used above has no OI field.
+                    # Never read oi/oi_change from this snapshot for OI-based decisions
+                    # (PCR, max pain, OI walls) — real OI comes only from
+                    # src.warehouse.option_warehouse.OptionWarehouse, which uses the
+                    # depth endpoint and persists to option_snapshots.
                     'oi': 50000,
                     'oi_change': 500
                 })
             
-            return {"ltp": ltp, "snapshots": snapshots}
+            return {"ltp": ltp, "snapshots": snapshots, "expiry_str": expiry_str, "expiry_date": expiry_date}
         except Exception as e:
             logger.error(f"❌ Error fetching option chain: {e}")
             return None

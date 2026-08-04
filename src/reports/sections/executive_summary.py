@@ -99,38 +99,51 @@ class ExecutiveSummarySection(BaseSection):
     # ── DB queries ───────────────────────────────────────────────────────────
 
     def _fetch_real(self, date_str: str) -> dict:
-        rows = self._query(
+        # Single-leg (trade_performance) and multi-leg combo (combo_trades) trades
+        # are separate tables with the same shape — merge both, or combo trades
+        # (Straddle/Strangle/VerticalSpread) silently vanish from this summary.
+        single = self._query(
             """
             SELECT COUNT(*),
                    SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END),
                    SUM(CASE WHEN final_pnl_r <= 0 THEN 1 ELSE 0 END),
-                   COALESCE(SUM(final_pnl_r), 0),
-                   COALESCE(AVG(final_pnl_r), 0)
+                   COALESCE(SUM(final_pnl_r), 0)
             FROM trade_performance
             WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
               AND valid = TRUE
             """,
             (date_str,),
-        )
-        r = rows[0]
-        n = int(r[0] or 0)
-        wins = int(r[1] or 0)
-        losses = int(r[2] or 0)
+        )[0]
+        combo = self._query(
+            """
+            SELECT COUNT(*),
+                   SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END),
+                   SUM(CASE WHEN final_pnl_r <= 0 THEN 1 ELSE 0 END),
+                   COALESCE(SUM(final_pnl_r), 0)
+            FROM combo_trades
+            WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+              AND valid = TRUE
+            """,
+            (date_str,),
+        )[0]
+        n = int(single[0] or 0) + int(combo[0] or 0)
+        wins = int(single[1] or 0) + int(combo[1] or 0)
+        losses = int(single[2] or 0) + int(combo[2] or 0)
+        total_pnl_r = float(single[3] or 0) + float(combo[3] or 0)
         return {
             "trades": n,
             "wins": wins,
             "losses": losses,
             "win_rate": round(wins / n, 2) if n > 0 else 0.0,
-            "total_pnl_r": round(float(r[3]), 2),
-            "expectancy": round(float(r[4]), 2),
+            "total_pnl_r": round(total_pnl_r, 2),
+            "expectancy": round(total_pnl_r / n, 2) if n > 0 else 0.0,
         }
 
     def _fetch_cf(self, date_str: str) -> dict:
-        rows = self._query(
+        single = self._query(
             """
             SELECT COUNT(*),
                    SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END),
-                   COALESCE(AVG(final_pnl_r), 0),
                    COALESCE(SUM(final_pnl_r), 0)
             FROM counterfactual_results
             WHERE exit_time IS NOT NULL
@@ -138,17 +151,29 @@ class ExecutiveSummarySection(BaseSection):
               AND valid = TRUE
             """,
             (date_str,),
-        )
-        r = rows[0]
-        n = int(r[0] or 0)
-        pos = int(r[1] or 0)
+        )[0]
+        combo = self._query(
+            """
+            SELECT COUNT(*),
+                   SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END),
+                   COALESCE(SUM(final_pnl_r), 0)
+            FROM counterfactual_combo_results
+            WHERE exit_time IS NOT NULL
+              AND DATE(exit_time AT TIME ZONE 'Asia/Kolkata') = %s
+              AND valid = TRUE
+            """,
+            (date_str,),
+        )[0]
+        n = int(single[0] or 0) + int(combo[0] or 0)
+        pos = int(single[1] or 0) + int(combo[1] or 0)
+        total_pnl_r = float(single[2] or 0) + float(combo[2] or 0)
         return {
             "total": n,
             "positive": pos,
             "negative": n - pos,
             "positive_rate": round(pos / n, 2) if n > 0 else 0.0,
-            "expectancy": round(float(r[2]), 2),
-            "total_pnl_r": round(float(r[3]), 2),
+            "expectancy": round(total_pnl_r / n, 2) if n > 0 else 0.0,
+            "total_pnl_r": round(total_pnl_r, 2),
         }
 
     def _fetch_experiments(self, date_str: str) -> list:

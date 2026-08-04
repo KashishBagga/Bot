@@ -26,6 +26,7 @@ class Zone:
     max_impulse_pct: float = 0.0
     freshness: float = 0.0
     precision: float = 0.0
+    timeframe: str = "h1"    # origin timeframe: "m5" | "h1" | "d1"
 
 class ZoneEngine:
     """Detects, scores, and invalidates S/R zones."""
@@ -42,7 +43,7 @@ class ZoneEngine:
         self.cluster_pct = cluster_pct
         self.swing_window = swing_window
 
-    def detect_zones(self, df: pd.DataFrame) -> List[Zone]:
+    def detect_zones(self, df: pd.DataFrame, timeframe: str = "h1") -> List[Zone]:
         if df is None or len(df) < 30: return []
 
         highs = df['high'].values
@@ -82,7 +83,7 @@ class ZoneEngine:
             # ── Step 4: Invalidation Check ────────────────────────
             if self._is_zone_invalid(rz, df): continue
                 
-            zone = self._score_zone(rz, df, avg_vol, n)
+            zone = self._score_zone(rz, df, avg_vol, n, timeframe)
             if zone.score >= self.MIN_ZONE_SCORE:
                 scored_zones.append(zone)
 
@@ -110,7 +111,7 @@ class ZoneEngine:
             'touch_prices': prices,
         }
 
-    def _score_zone(self, rz: Dict, df: pd.DataFrame, avg_vol: float, n: int) -> Zone:
+    def _score_zone(self, rz: Dict, df: pd.DataFrame, avg_vol: float, n: int, timeframe: str = "h1") -> Zone:
         level = rz['level']
         touches = rz['touch_indices']
         volumes = df['volume'].values
@@ -146,7 +147,8 @@ class ZoneEngine:
                     score=round(total, 1), rejection_count=rej_count,
                     avg_rvol_at_touch=round(avg_rvol_rank, 2),
                     max_impulse_pct=round(avg_efficiency * 100, 2),
-                    freshness=round(fresh_score, 1), precision=0.0)
+                    freshness=round(fresh_score, 1), precision=0.0,
+                    timeframe=timeframe)
 
     def is_price_at_zone(self, price: float, zones: List[Zone], tolerance: float = 0.003) -> tuple:
         for zone in zones:

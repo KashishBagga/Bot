@@ -80,7 +80,7 @@ class LevelEngine:
 
         # ── 3. Structural levels (swing highs / swing lows) ──────────────────
         struct_levels, struct_events = self._detect_structural(
-            structure, m5, current_price, symbol, now
+            structure, m5, current_price, symbol, now, timeframe="m5"
         )
         levels.extend(struct_levels)
         events.extend(struct_events)
@@ -191,6 +191,26 @@ class LevelEngine:
 
     # ── Structural (swing-derived) ────────────────────────────────────────────
 
+    def detect_structural_levels(
+        self,
+        structure: StructureState,
+        df: pd.DataFrame,
+        current_price: float,
+        symbol: str,
+        now: datetime,
+        timeframe: str = "m5",
+    ) -> Tuple[List[HorizontalLevel], List[ResearchEvent]]:
+        """
+        Public entry point for detecting swing-derived levels from a SINGLE
+        timeframe's structure, without re-running the singleton detectors
+        (institutional/open-of-day/round-number/technical) that detect_levels()
+        already covers once for m5. Used to add h1/d1 structural levels into
+        the same fusion pass without duplicating PDH/PDL/round-number/VWAP/EMA
+        levels 2-3x over (those would otherwise collide by id and inflate
+        confluence for something that isn't actually 3 separate signals).
+        """
+        return self._detect_structural(structure, df, current_price, symbol, now, timeframe)
+
     def _detect_structural(
         self,
         structure: StructureState,
@@ -198,6 +218,7 @@ class LevelEngine:
         current_price: float,
         symbol: str,
         now: datetime,
+        timeframe: str = "m5",
     ) -> Tuple[List[HorizontalLevel], List[ResearchEvent]]:
         levels: List[HorizontalLevel] = []
         events: List[ResearchEvent]   = []
@@ -239,8 +260,9 @@ class LevelEngine:
                 confidence=confidence,
                 provenance={
                     "source": "SWING", "swing_id": swing.id,
-                    "swing_strength": swing.strength
-                }
+                    "swing_strength": swing.strength, "timeframe": timeframe,
+                },
+                timeframe=timeframe,
             ))
 
         return levels, events
@@ -339,9 +361,15 @@ class LevelEngine:
         role_reversal: bool = False,
         confidence: float = 0.7,
         provenance: Optional[Dict[str, Any]] = None,
+        timeframe: str = "m5",
     ) -> HorizontalLevel:
         distance_pct = abs(price - current_price) / current_price if current_price > 0 else 0.0
-        level_id = f"lv_{symbol.replace(':', '_').replace('-', '_')}_{lt.value}_{int(price * 100)}"
+        # timeframe is part of the id for STRUCTURAL (swing-derived) levels only —
+        # institutional/round-number/technical levels are detected once (m5) and
+        # must keep their original id so they aren't accidentally duplicated when
+        # merged with h1/d1 structural levels before fusion.
+        id_timeframe_suffix = f"_{timeframe}" if priority == LevelPriority.STRUCTURAL else ""
+        level_id = f"lv_{symbol.replace(':', '_').replace('-', '_')}_{lt.value}{id_timeframe_suffix}_{int(price * 100)}"
         return HorizontalLevel(
             id=level_id,
             price=round(price, 2),
@@ -356,6 +384,7 @@ class LevelEngine:
             confidence=round(confidence, 3),
             distance_pct=round(distance_pct, 6),
             provenance=provenance or {},
+            timeframe=timeframe,
         )
 
     def _count_touches(self, level_price: float, extremes: np.ndarray, tol: float) -> int:

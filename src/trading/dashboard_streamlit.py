@@ -169,11 +169,12 @@ def load_data(report_date):
             # 1. Real Trades
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT trade_id, candidate_id, entry_time, exit_time, symbol, strategy, 
-                           entry_price, exit_price, pnl, exit_reason, mfe_r, mae_r, final_pnl_r, 
+                    SELECT trade_id, candidate_id, entry_time, exit_time, symbol, strategy,
+                           entry_price, exit_price, pnl, exit_reason, mfe_r, mae_r, final_pnl_r,
                            bars_held, stop_loss, take_profit, experiment_name, diagnostics, features
                     FROM trade_performance
-                    WHERE entry_time::date = %s
+                    WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                      AND (valid IS NULL OR valid = TRUE)
                     ORDER BY entry_time ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -187,7 +188,8 @@ def load_data(report_date):
                            stop_loss, take_profit, exit_time, exit_price, mfe_r, mae_r, final_pnl_r, 
                            experiment_name, diagnostics
                     FROM counterfactual_results
-                    WHERE timestamp::date = %s
+                    WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
+                      AND (valid IS NULL OR valid = TRUE)
                     ORDER BY timestamp ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -200,7 +202,7 @@ def load_data(report_date):
                 cursor.execute("""
                     SELECT event_id, trade_id, NULL AS candidate_id, timestamp, event_type, payload
                     FROM trade_events
-                    WHERE timestamp::date = %s
+                    WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                     ORDER BY timestamp ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -210,7 +212,7 @@ def load_data(report_date):
                 cursor.execute("""
                     SELECT event_id, NULL AS trade_id, candidate_id, timestamp, event_type, payload
                     FROM counterfactual_trade_events
-                    WHERE timestamp::date = %s
+                    WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                     ORDER BY timestamp ASC
                 """, (report_date,))
                 cols = [desc[0] for desc in cursor.description]
@@ -222,7 +224,7 @@ def load_data(report_date):
                     cursor.execute("""
                         SELECT event_id, trade_id, candidate_id, timestamp, event_type, payload
                         FROM execution_events
-                        WHERE timestamp::date = %s
+                        WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
                         ORDER BY timestamp ASC
                     """, (report_date,))
                     cols = [desc[0] for desc in cursor.description]
@@ -293,7 +295,7 @@ with tab1:
         st.info("No realized trades match this strategy filter.")
     else:
         for t in filtered_trades:
-            pnl_val = t["pnl"] or 0.0
+            pnl_val = t["final_pnl_r"] or 0.0
             emoji = "🟢" if pnl_val >= 0 else "🔴"
             title = f"{emoji} {t['symbol']} | {t['strategy']} | {pnl_val:+.2f} R"
             

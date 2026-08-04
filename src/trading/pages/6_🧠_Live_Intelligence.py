@@ -410,6 +410,25 @@ def load_open_positions():
 
 
 @st.cache_data(ttl=20, show_spinner=False)
+def load_open_combo():
+    # Multi-leg (Straddle/Strangle/VerticalSpread) open positions live in their
+    # own mirror table — without this they're excluded from Unrealized/Session
+    # PnL below despite being real, currently-running risk.
+    with db._get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT combo_id, entry_time, symbol, experiment_name, combo_type,
+                       setup_type, underlying_entry_price, net_premium_paid,
+                       max_loss, current_pnl_r
+                FROM combo_trades
+                WHERE exit_time IS NULL AND (valid IS NULL OR valid = TRUE)
+                ORDER BY entry_time
+            """)
+            cols = [c.name for c in cur.description]
+            return [dict(zip(cols, r)) for r in cur.fetchall()]
+
+
+@st.cache_data(ttl=20, show_spinner=False)
 def load_open_cf():
     with db._get_connection() as conn:
         with conn.cursor() as cur:
@@ -468,6 +487,7 @@ def load_today_signals():
 
 
 open_trades  = load_open_positions()
+open_combo   = load_open_combo()
 open_cf      = load_open_cf()
 market_state = load_market_state()
 realized_pnl = load_realized_pnl_today()
@@ -521,18 +541,40 @@ with tab_cockpit:
                         st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
 
+    if open_combo:
+        st.markdown("#### 🧩 Active Multi-Leg (Combo) Positions")
+        for c in open_combo:
+            upnl = c.get("current_pnl_r")
+            sym_short = (c.get("symbol") or "").replace("NSE:", "").replace("-INDEX", "")
+            upnl_cls = "trade-pnl-green" if (upnl or 0) >= 0 else "trade-pnl-red"
+            with st.container():
+                st.markdown('<div class="trade-card-live">', unsafe_allow_html=True)
+                tc1, tc2, tc3 = st.columns([3, 2, 2])
+                with tc1:
+                    st.markdown(f"**{c.get('combo_type','?')} {c.get('setup_type','')}** — `{sym_short}`")
+                    st.markdown(f"<small>{c.get('experiment_name','?')} · Entry: {fmt_dt(c.get('entry_time'))}</small>", unsafe_allow_html=True)
+                with tc2:
+                    st.markdown(f"Underlying entry: **₹{c.get('underlying_entry_price',0):,.2f}**")
+                    st.markdown(f"Net premium: ₹{c.get('net_premium_paid',0):,.2f} | Max loss: ₹{c.get('max_loss',0):,.2f}")
+                with tc3:
+                    st.markdown(f'<span class="{upnl_cls}">{fmt_r(upnl)}</span>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+
     # ─── Executive Metrics Row
     st.markdown("---")
     st.markdown("## 📊 Session Summary")
-    total_unrealized = sum((t.get("unrealized_pnl_r") or 0) for t in open_trades)
-    total_deployed   = sum((t.get("position_size_inr") or 0) for t in open_trades)
+    total_unrealized = sum((t.get("unrealized_pnl_r") or 0) for t in open_trades) + \
+                       sum((c.get("current_pnl_r") or 0) for c in open_combo)
+    total_deployed   = sum((t.get("position_size_inr") or 0) for t in open_trades) + \
+                       sum((c.get("net_premium_paid") or 0) for c in open_combo)
     session_pnl      = (realized_pnl or 0) + total_unrealized
+    total_open_positions = len(open_trades) + len(open_combo)
 
     sc1, sc2, sc3, sc4, sc5 = st.columns(5)
     with sc1:
         st.metric("Realized PnL", fmt_r(realized_pnl))
     with sc2:
-        st.metric("Unrealized PnL", f"{total_unrealized:+.2f}R")
+        st.metric("Unrealized PnL", f"{total_unrealized:+.2f}R", delta=f"{total_open_positions} open ({len(open_combo)} combo)")
     with sc3:
         st.metric("Session PnL", f"{session_pnl:+.2f}R")
     with sc4:

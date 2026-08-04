@@ -153,6 +153,7 @@ class HorizontalLevel:
     distance_pct: float      # |price - current_price| / current_price
     provenance: Dict[str, Any]
     importance: float = 0.5
+    timeframe: str = "m5"     # origin timeframe: "m5" | "h1" | "d1" — for MTF confluence tracing
 
 
 
@@ -198,6 +199,7 @@ class Trendline:
     distance_pct: float
     provenance: Dict[str, Any]
     importance: float = 0.5
+    timeframe: str = "m5"     # origin timeframe: "m5" | "h1" | "d1" — for MTF confluence tracing
 
 
     @staticmethod
@@ -257,6 +259,35 @@ class CompositeLevel:
         }
         types = sorted(set(self.member_types), key=lambda t: priority_order.get(t, 9))
         return " + ".join(types) if types else "Level"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Channel — a pair of parallel opposite-role trendlines (TrendlineEngine output)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@dataclass(frozen=True)
+class Channel:
+    """
+    A price channel: one SUPPORT trendline and one RESISTANCE trendline from
+    the SAME timeframe, with near-equal slope (parallel) and the resistance
+    line strictly above the support line.
+
+    Identity rule: ID = SHA256(sorted([upper.id, lower.id])) — stable across
+    restarts, same lines always produce the same channel ID (mirrors Trendline).
+    """
+    id: str
+    upper: Trendline              # RESISTANCE boundary
+    lower: Trendline              # SUPPORT boundary
+    direction: TrendlineDirection
+    width: float                  # upper.price_at_now - lower.price_at_now, at current_bar
+    parallel_score: float         # 1.0 = identical slope; degrades toward 0 at the 15% dedup threshold
+    status: GeometryStatus        # ACTIVE if both boundaries active; TESTED if either boundary is TESTED/RETESTED
+    timeframe: str                # "m5" | "h1" | "d1" — channels are single-timeframe, not merged across TFs
+
+    @staticmethod
+    def make_id(upper_id: str, lower_id: str) -> str:
+        key = "|".join(sorted([upper_id, lower_id]))
+        return "ch_" + hashlib.sha256(key.encode()).hexdigest()[:16]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -584,6 +615,7 @@ class GeometryContext:
         resistance_confluence: Optional[ConfluenceZone] = None,
         narrative: Optional[MarketNarrative] = None,
         pending_events: Optional[List[Any]] = None,  # List[ResearchEvent]
+        channels: Optional[List["Channel"]] = None,
     ):
         self.levels    = LevelsView(composites, current_price)
         self.trendlines = TrendlinesView(trendlines, current_price)
@@ -591,3 +623,4 @@ class GeometryContext:
         self.resistance_confluence = resistance_confluence
         self.narrative             = narrative
         self.pending_events        = tuple(pending_events or [])
+        self.channels               = tuple(channels or [])

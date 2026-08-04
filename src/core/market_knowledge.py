@@ -256,3 +256,4 @@ class MarketContext:
         self.patterns: Optional[Any] = None
         self.liquidity: Optional[Any] = None
         self.regime: Optional[Any] = None
+        self.options: Optional[Any] = None  # OptionsIntelligence — PCR, max pain, OI walls

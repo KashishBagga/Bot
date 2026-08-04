@@ -32,7 +32,8 @@ from src.core.trendline_engine import TrendlineEngine
 from src.core.fusion_engine import FusionEngine
 from src.core.confluence_engine import ConfluenceEngine
 from src.core.narrative_engine import NarrativeEngine
-from src.core.market_geometry import GeometryContext, CompositeLevel, Trendline, ConfluenceZone
+from src.core.market_geometry import GeometryContext, CompositeLevel, Trendline, ConfluenceZone, Channel
+from src.core.options_intelligence_engine import OptionsIntelligenceEngine
 
 # MKE Stage 1 Context Imports
 from src.core.market_knowledge import MarketContext, HTFStructure, StructureState, SwingStatus, ResearchEvent
@@ -130,7 +131,8 @@ class IndicatorPipeline:
         self.narrative_engine = NarrativeEngine()
         self.pattern_engine = PatternEngine()
         self.liquidity_engine = LiquidityEngine()
-        
+        self.options_engine = OptionsIntelligenceEngine()
+
         # Instantiate PostgresDatabase for persisting research events
         self.db = PostgresDatabase()
 
@@ -166,8 +168,40 @@ class IndicatorPipeline:
             return None
 
         try:
+            # ── Stage 5: Market Context Engine (MKE) ──
+            market_ctx = MarketContext()
+
+            # Compute m5 structure (primary execution timeframe)
+            m5_state, m5_events = self._compute_mke_structure(m5, symbol, "m5", confirmed_only_bars=False)
+            market_ctx.structure = m5_state
+
+            # Save m5 confirmed events
+            for event in m5_events:
+                self.db.save_market_event(event.to_dict())
+
+            # Compute h1/d1 structure once, up front. Reused for: htf_structure
+            # below, _stage_structure's legacy adapter/h1_zones, AND the MTF
+            # geometry merge (levels/trendlines) a few lines down — previously
+            # h1's "developing" state was computed twice per candle (identical
+            # params, here and again later) purely because htf_structure was
+            # assembled after _stage_structure had already run its own copy.
+            h1_conf_state, h1_conf_events = self._compute_mke_structure(h1, symbol, "h1", confirmed_only_bars=True)
+            h1_dev_state, h1_dev_events = self._compute_mke_structure(h1, symbol, "h1", confirmed_only_bars=False)
+
+            d1_conf_state, d1_dev_state, d1_conf_events = None, None, []
+            if d1 is not None and len(d1) >= 20:
+                d1_conf_state, d1_conf_events = self._compute_mke_structure(d1, symbol, "d1", confirmed_only_bars=True)
+                d1_dev_state, _ = self._compute_mke_structure(d1, symbol, "d1", confirmed_only_bars=False)
+
             # Stage 1: Market structure (structural bias, zones)
-            daily_bias, h1_structure, h1_zones = self._stage_structure(d1, h1, symbol)
+            daily_bias, h1_structure, h1_zones = self._stage_structure(d1, h1, symbol, h1_dev_state, h1_dev_events)
+
+            # Multi-timeframe zone detection. h1_zones above is UNCHANGED — every
+            # existing strategy reading snapshot.h1_zones keeps its exact current
+            # behavior. m5_zones/d1_zones are new, additive fields (see
+            # MarketSnapshot below); nothing reads them yet except _persist_sr_zones.
+            m5_zones = self.zone_engine.detect_zones(m5, timeframe="m5")
+            d1_zones = self.zone_engine.detect_zones(d1, timeframe="d1") if d1 is not None else []
 
             # Stage 2: Volume participation
             volume_report = self._stage_volume(m5, symbol)
@@ -178,17 +212,6 @@ class IndicatorPipeline:
             # Stage 4: Feature store (ATR, EMAs, derived metrics)
             features = self._stage_features(m5, d1)
 
-            # ── Stage 5: Market Context Engine (MKE) ──
-            market_ctx = MarketContext()
-            
-            # Compute m5 structure (primary execution timeframe)
-            m5_state, m5_events = self._compute_mke_structure(m5, symbol, "m5", confirmed_only_bars=False)
-            market_ctx.structure = m5_state
-            
-            # Save m5 confirmed events
-            for event in m5_events:
-                self.db.save_market_event(event.to_dict())
-                
             # Build MarketFacts shared context
             t_time = timestamp.time()
             session = "MID"
@@ -222,10 +245,15 @@ class IndicatorPipeline:
                 is_compressed=m5_state.is_compressed
             )
             
-            # Compute Stage 5 Geometry raw parts
-            composites, trendlines, support_confluence, resistance_confluence, geo_events = self._stage_geometry(
+            # Compute Stage 5 Geometry raw parts — MTF-aware: m5 structural
+            # levels/trendlines remain the primary confluence input, with h1/d1
+            # structural levels and trendlines merged in before fusion so a Daily
+            # swing overlapping a 1H swing overlapping a 5M trendline scores
+            # higher in confluence than any single-timeframe hit alone.
+            composites, trendlines, support_confluence, resistance_confluence, geo_events, channels = self._stage_geometry(
                 m5=m5, h1=h1, d1=d1, structure=m5_state, features=features,
-                current_price=price, symbol=symbol, now=timestamp
+                current_price=price, symbol=symbol, now=timestamp,
+                h1_structure=h1_conf_state, d1_structure=d1_conf_state,
             )
             
             # Stage 6: PatternEngine
@@ -248,7 +276,19 @@ class IndicatorPipeline:
                 d1=d1
             )
             market_ctx.liquidity = liquidity_ctx
-            
+
+            # Stage 8: OptionsIntelligenceEngine — real PCR/max-pain/OI walls, fed
+            # from option_snapshots (populated by the OptionWarehouse background
+            # service). Never lets missing/stale option data break the snapshot —
+            # on any failure this stays None and strategies must treat that the
+            # same as "no options data", not fabricate a neutral reading.
+            try:
+                chain_rows = self.db.get_option_chain_snapshot(symbol)
+                market_ctx.options = self.options_engine.analyze(symbol, chain_rows, now=timestamp)
+            except Exception as e:
+                logger.debug(f"⚠️ OptionsIntelligenceEngine failed for {symbol}: {e}")
+                market_ctx.options = None
+
             # Stage 9: NarrativeEngine
             geo_ctx_temp = GeometryContext(
                 composites=composites,
@@ -264,7 +304,7 @@ class IndicatorPipeline:
                 trendlines_view=geo_ctx_temp.trendlines,
                 support_confluence=support_confluence,
                 resistance_confluence=resistance_confluence,
-                regime={"volatility_state": self._stage_regime(m5)},
+                regime={"volatility_state": market_regime},
                 current_price=price,
                 patterns=patterns_ctx,
                 liquidity=liquidity_ctx
@@ -278,7 +318,8 @@ class IndicatorPipeline:
                 support_confluence=support_confluence,
                 resistance_confluence=resistance_confluence,
                 narrative=narrative,
-                pending_events=geo_events
+                pending_events=geo_events,
+                channels=channels,
             )
             market_ctx.geometry = geometry_ctx
             
@@ -296,22 +337,20 @@ class IndicatorPipeline:
                 research_event = event.to_research_event(timestamp)
                 self.db.save_market_event(research_event.to_dict())
 
-                
-            # Compute h1 HTF structures
-            h1_conf_state, h1_conf_events = self._compute_mke_structure(h1, symbol, "h1", confirmed_only_bars=True)
-            h1_dev_state, _ = self._compute_mke_structure(h1, symbol, "h1", confirmed_only_bars=False)
+
+            # HTF structures — h1_conf_state/h1_dev_state/d1_conf_state/d1_dev_state
+            # were already computed once, earlier in this method (also reused for
+            # the MTF geometry merge above); assign here rather than recomputing.
             market_ctx.htf_structure["h1"] = HTFStructure(confirmed=h1_conf_state, developing=h1_dev_state)
-            
+
             # Save h1 confirmed events
             for event in h1_conf_events:
                 self.db.save_market_event(event.to_dict())
-                
-            # Compute d1 HTF structures if available
-            if d1 is not None and len(d1) >= 20:
-                d1_conf_state, d1_conf_events = self._compute_mke_structure(d1, symbol, "d1", confirmed_only_bars=True)
-                d1_dev_state, _ = self._compute_mke_structure(d1, symbol, "d1", confirmed_only_bars=False)
+
+            # Save d1 HTF structures if available
+            if d1_conf_state is not None:
                 market_ctx.htf_structure["d1"] = HTFStructure(confirmed=d1_conf_state, developing=d1_dev_state)
-                
+
                 # Save d1 confirmed events
                 for event in d1_conf_events:
                     self.db.save_market_event(event.to_dict())
@@ -326,6 +365,8 @@ class IndicatorPipeline:
                 daily_bias=daily_bias,
                 h1_structure=h1_structure,
                 h1_zones=h1_zones,
+                m5_zones=m5_zones,
+                d1_zones=d1_zones,
                 market_regime=market_regime,
                 volume_report=volume_report,
                 features=features,
@@ -364,14 +405,16 @@ class IndicatorPipeline:
 
     # ── Stage 1: Structure ────────────────────────────────────────────────
 
-    def _stage_structure(self, d1, h1, symbol: str):
-        """Daily bias, H1 structure report, H1 supply/demand zones."""
+    def _stage_structure(self, d1, h1, symbol: str, h1_state: StructureState, h1_events: List[ResearchEvent]):
+        """Daily bias, H1 structure report, H1 supply/demand zones.
+
+        h1_state/h1_events are precomputed by compute() (confirmed_only_bars=False)
+        and passed in rather than recomputed here — this used to run the identical
+        _compute_mke_structure(h1, ..., confirmed_only_bars=False) call twice per
+        candle (once here, once again for market_ctx.htf_structure["h1"].developing).
+        """
         daily_bias = QuantUtils.get_structural_bias(d1) if d1 is not None else "NEUTRAL"
-        
-        # Compute H1 developing state and wrap it in the legacy adapter for backward compatibility
-        h1_state, h1_events = self._compute_mke_structure(h1, symbol, "h1", confirmed_only_bars=False)
         h1_structure = LegacyStructureReportAdapter(h1_state, h1_events)
-        
         h1_zones = self.zone_engine.detect_zones(h1)
         return daily_bias, h1_structure, h1_zones
 
@@ -502,6 +545,30 @@ class IndicatorPipeline:
 
         return FeatureStore(data)
 
+    @staticmethod
+    def _compute_atr(df: Optional[pd.DataFrame], window: int = 14) -> float:
+        """Generic True-Range ATR for any OHLCV dataframe (any timeframe).
+
+        Same formula as the m5 ATR in _stage_features, generalized so h1/d1
+        trendline lifecycle simulation (breach/touch tolerance) uses a tolerance
+        scaled to THAT timeframe's bar size — an m5-scale ATR is far too tight
+        to sensibly judge whether an hourly or daily candle "broke" a trendline.
+        """
+        if df is None or len(df) < 2:
+            return 0.0
+        close_prev = df["close"].shift(1)
+        tr_series = pd.concat([
+            df["high"] - df["low"],
+            (df["high"] - close_prev).abs(),
+            (df["low"] - close_prev).abs(),
+        ], axis=1).max(axis=1)
+        atr_rolling = tr_series.rolling(window=window).mean()
+        val = atr_rolling.iloc[-1]
+        if not pd.isna(val):
+            return float(val)
+        # Not enough bars for a full rolling window yet — fall back to a simple range mean.
+        return float(df["high"].tail(window).mean() - df["low"].tail(window).mean())
+
     def _stage_geometry(
         self,
         m5: pd.DataFrame,
@@ -512,8 +579,18 @@ class IndicatorPipeline:
         current_price: float,
         symbol: str,
         now: datetime,
-    ) -> Tuple[List[CompositeLevel], List[Trendline], Optional[ConfluenceZone], Optional[ConfluenceZone], List[ResearchEvent]]:
-        """Runs the complete geometry pipeline and returns raw levels, trendlines, and confluence."""
+        h1_structure: Optional[StructureState] = None,
+        d1_structure: Optional[StructureState] = None,
+    ) -> Tuple[List[CompositeLevel], List[Trendline], Optional[ConfluenceZone], Optional[ConfluenceZone], List[ResearchEvent], List["Channel"]]:
+        """Runs the complete geometry pipeline and returns raw levels, trendlines, and confluence.
+
+        MTF-aware: m5 structural levels/trendlines are always computed. If
+        h1_structure/d1_structure are supplied, their swing-derived structural
+        levels and trendlines are additionally detected and merged into the SAME
+        levels/trendlines lists before a single fusion pass — genuine multi-
+        timeframe confluence (FusionEngine clusters by price proximity regardless
+        of which timeframe produced each item), not three independent passes.
+        """
         atr = features.get_float("atr")
         if atr <= 0:
             atr = 1.0
@@ -529,20 +606,46 @@ class IndicatorPipeline:
         except Exception:
             pass
 
-        # 1. Level detection
+        # 1. Level detection (m5) — includes the singleton institutional/
+        #    open-of-day/round-number/technical levels, detected exactly once.
         levels, level_events = self.level_engine.detect_levels(
             m5=m5, h1=h1, d1=d1, structure=structure, atr=atr,
             vwap=vwap, ema20=ema20, ema50=ema50, current_price=current_price,
             symbol=symbol, now=now
         )
 
-        # 2. Trendline detection
+        # 2. Trendline detection (m5)
         trendlines, tl_events = self.trendline_engine.detect_trendlines(
             m5=m5, structure=structure, atr=atr, current_price=current_price,
-            symbol=symbol, now=now
+            symbol=symbol, now=now, timeframe="m5"
         )
 
-        # 3. Fusion (clustering)
+        # 2b. MTF structural levels + trendlines (h1/d1) — additive merge, no
+        # duplication of the m5-only singleton levels above.
+        for tf_df, tf_structure, tf_name in ((h1, h1_structure, "h1"), (d1, d1_structure, "d1")):
+            if tf_df is None or tf_structure is None or len(tf_structure.swings) < 3:
+                continue
+            tf_atr = self._compute_atr(tf_df)
+            if tf_atr <= 0:
+                continue
+
+            tf_levels, tf_level_events = self.level_engine.detect_structural_levels(
+                tf_structure, tf_df, current_price, symbol, now, timeframe=tf_name
+            )
+            levels.extend(tf_levels)
+            level_events.extend(tf_level_events)
+
+            tf_trendlines, tf_tl_events = self.trendline_engine.detect_trendlines(
+                m5=tf_df, structure=tf_structure, atr=tf_atr, current_price=current_price,
+                symbol=symbol, now=now, timeframe=tf_name
+            )
+            trendlines.extend(tf_trendlines)
+            tl_events.extend(tf_tl_events)
+
+        # 3. Fusion (clustering) — one pass over the merged MTF set. Clustering
+        #    tolerance stays keyed off the m5 ATR (unchanged) — this sizes the
+        #    final confluence bands to what's actionable on the execution
+        #    timeframe, not a deliberate oversight.
         composites = self.fusion_engine.fuse(
             levels=levels, trendlines=trendlines, atr=atr
         )
@@ -552,5 +655,8 @@ class IndicatorPipeline:
             composites=composites, trendlines=trendlines, current_price=current_price, atr=atr
         )
 
-        return composites, trendlines, support_confluence, resistance_confluence, level_events + tl_events
+        # 5. Channels — parallel opposite-role trendline pairs, per timeframe.
+        channels = self.trendline_engine.detect_channels(trendlines, current_price)
+
+        return composites, trendlines, support_confluence, resistance_confluence, level_events + tl_events, channels
 

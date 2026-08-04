@@ -8,7 +8,7 @@ Handles persistent storage for high-frequency trading data.
 import os
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor, execute_values
@@ -566,6 +566,10 @@ class PostgresDatabase:
                     ''')
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_sr_zones_symbol ON sr_zones(symbol, active)")
                     cursor.execute("CREATE INDEX IF NOT EXISTS idx_sr_zones_price ON sr_zones(symbol, price_low, price_high)")
+                    # MTF zone tracking — every zone persisted before this migration
+                    # came exclusively from h1 (ZoneEngine was only ever run on h1),
+                    # so 'h1' is the correct default for existing rows.
+                    cursor.execute("ALTER TABLE sr_zones ADD COLUMN IF NOT EXISTS timeframe TEXT DEFAULT 'h1'")
 
                 conn.commit()
 
@@ -977,6 +981,10 @@ class PostgresDatabase:
         Used to reconstruct the daily-loss kill switch on startup so a same-day
         restart can't silently undo an already-tripped halt (daily_realized_r
         was previously in-memory only and reset to 0 on every process start).
+
+        Includes combo_trades (multi-leg options strategies) — omitting them
+        would let a same-day restart undercount real losses from Straddle/
+        Strangle/VerticalSpread and let the kill switch fire late.
         """
         try:
             with self._get_connection() as conn:
@@ -991,8 +999,23 @@ class PostgresDatabase:
                         """,
                         (date_str,),
                     )
-                    row = cursor.fetchone()
-                    return float(row[0]) if row and row[0] is not None else 0.0
+                    single_r = cursor.fetchone()
+
+                    cursor.execute(
+                        """
+                        SELECT COALESCE(SUM(final_pnl_r), 0)
+                        FROM combo_trades
+                        WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND exit_time IS NOT NULL
+                          AND valid = TRUE
+                        """,
+                        (date_str,),
+                    )
+                    combo_r = cursor.fetchone()
+
+                    total = (float(single_r[0]) if single_r and single_r[0] is not None else 0.0) + \
+                            (float(combo_r[0]) if combo_r and combo_r[0] is not None else 0.0)
+                    return total
         except Exception as e:
             logger.error(f"❌ Failed to fetch today's realized R: {e}")
             return 0.0
@@ -1382,20 +1405,61 @@ class PostgresDatabase:
                     """, (experiment_name, date_str))
                     real_row = cursor.fetchone()
 
+                    # Multi-leg (combo/options) trades — same mirror pattern, separate
+                    # tables (combo_trades/counterfactual_combo_results), because these
+                    # rows are otherwise invisible to every downstream report/dashboard
+                    # that only reads trade_performance/counterfactual_results.
+                    cursor.execute("""
+                        SELECT
+                            COUNT(*)                                         AS cf_combo_trades,
+                            SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END) AS wins,
+                            SUM(CASE WHEN final_pnl_r <= 0 THEN 1 ELSE 0 END) AS losses,
+                            SUM(final_pnl_r)                                  AS total_pnl_r,
+                            MIN(final_pnl_r)                                  AS max_drawdown
+                        FROM counterfactual_combo_results
+                        WHERE exit_time IS NOT NULL
+                          AND experiment_name = %s
+                          AND DATE(exit_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND valid = TRUE
+                    """, (experiment_name, date_str))
+                    cf_combo_row = cursor.fetchone()
+
+                    cursor.execute("""
+                        SELECT COUNT(*) AS real_combo_trades
+                        FROM combo_trades
+                        WHERE experiment_name = %s
+                          AND DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND valid = TRUE
+                    """, (experiment_name, date_str))
+                    real_combo_row = cursor.fetchone()
+
+                    cf_trades = (cf_row[0] if cf_row else 0) + (cf_combo_row[0] if cf_combo_row else 0)
+                    wins = (cf_row[1] or 0 if cf_row else 0) + (cf_combo_row[1] or 0 if cf_combo_row else 0)
+                    losses = (cf_row[2] or 0 if cf_row else 0) + (cf_combo_row[2] or 0 if cf_combo_row else 0)
+                    total_pnl_r = (float(cf_row[4]) if cf_row and cf_row[4] is not None else 0.0) + \
+                                  (float(cf_combo_row[3]) if cf_combo_row and cf_combo_row[3] is not None else 0.0)
+                    drawdowns = [v for v in (
+                        float(cf_row[9]) if cf_row and cf_row[9] is not None else None,
+                        float(cf_combo_row[4]) if cf_combo_row and cf_combo_row[4] is not None else None,
+                    ) if v is not None]
+
                     metrics = {
                         'date': date_str,
                         'experiment_name': experiment_name,
-                        'real_trades': real_row[0] if real_row else 0,
-                        'cf_trades': cf_row[0] if cf_row else 0,
-                        'wins': cf_row[1] if cf_row else 0,
-                        'losses': cf_row[2] if cf_row else 0,
-                        'expectancy': float(cf_row[3]) if cf_row and cf_row[3] is not None else None,
-                        'total_pnl_r': float(cf_row[4]) if cf_row and cf_row[4] is not None else None,
+                        'real_trades': (real_row[0] if real_row else 0) + (real_combo_row[0] if real_combo_row else 0),
+                        'cf_trades': cf_trades,
+                        'wins': wins,
+                        'losses': losses,
+                        'expectancy': round(total_pnl_r / cf_trades, 4) if cf_trades > 0 else None,
+                        'total_pnl_r': total_pnl_r if cf_trades > 0 else None,
+                        # avg_capture_rate/avg_holding_eff/avg_mfe/avg_mae have no combo-table
+                        # equivalent (multi-leg net-premium trades don't track single-leg MFE/MAE) —
+                        # these stay single-leg-only, unlike the totals/counts above.
                         'avg_capture_rate': float(cf_row[5]) if cf_row and cf_row[5] is not None else None,
                         'avg_holding_eff': float(cf_row[6]) if cf_row and cf_row[6] is not None else None,
                         'avg_mfe': float(cf_row[7]) if cf_row and cf_row[7] is not None else None,
                         'avg_mae': float(cf_row[8]) if cf_row and cf_row[8] is not None else None,
-                        'max_drawdown': float(cf_row[9]) if cf_row and cf_row[9] is not None else None,
+                        'max_drawdown': min(drawdowns) if drawdowns else None,
                         'config_hash': config_hash,
                     }
 
@@ -1446,18 +1510,22 @@ class PostgresDatabase:
             price_high (float)
             strength  (float) — optional, default 1.0
             now       (datetime) — used for first_seen/last_seen
+            timeframe (str)   — optional, default 'h1'. Origin timeframe of the
+                                 zone ('m5'/'h1'/'d1'), or 'options' for OI-wall
+                                 zones which aren't tied to a chart timeframe.
         """
         try:
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
                     now = zone.get("now") or datetime.now(timezone.utc)
+                    timeframe = zone.get("timeframe") or "h1"
                     cursor.execute("""
                         INSERT INTO sr_zones
                             (zone_id, symbol, zone_type, price_low, price_high,
-                             strength, touch_count, first_seen, last_seen, active)
+                             strength, touch_count, first_seen, last_seen, active, timeframe)
                         VALUES
                             (%(zone_id)s, %(symbol)s, %(zone_type)s, %(price_low)s,
-                             %(price_high)s, %(strength)s, 1, %(now)s, %(now)s, TRUE)
+                             %(price_high)s, %(strength)s, 1, %(now)s, %(now)s, TRUE, %(timeframe)s)
                         ON CONFLICT (zone_id) DO UPDATE SET
                             price_low   = EXCLUDED.price_low,
                             price_high  = EXCLUDED.price_high,
@@ -1465,7 +1533,7 @@ class PostgresDatabase:
                             touch_count = sr_zones.touch_count + 1,
                             last_seen   = EXCLUDED.last_seen,
                             active      = TRUE
-                    """, {**zone, "now": now})
+                    """, {**zone, "now": now, "timeframe": timeframe})
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to upsert sr_zone {zone.get('zone_id')}: {e}")
@@ -1490,14 +1558,14 @@ class PostgresDatabase:
                     where = " AND ".join(conditions)
                     cursor.execute(
                         f"SELECT zone_id, symbol, zone_type, price_low, price_high, "
-                        f"strength, touch_count, first_seen, last_seen, last_tested, active "
+                        f"strength, touch_count, first_seen, last_seen, last_tested, active, timeframe "
                         f"FROM sr_zones WHERE {where} ORDER BY last_seen DESC",
                         params,
                     )
                     cols = [
                         "zone_id", "symbol", "zone_type", "price_low", "price_high",
                         "strength", "touch_count", "first_seen", "last_seen",
-                        "last_tested", "active",
+                        "last_tested", "active", "timeframe",
                     ]
                     return [dict(zip(cols, row)) for row in cursor.fetchall()]
         except Exception as e:

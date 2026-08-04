@@ -1,0 +1,571 @@
+2026-08-05 00:08:30,015 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-08-05 00:08:30,015 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-08-05 00:08:30,037 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,052 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,053 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,053 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,053 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,054 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,054 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,055 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,055 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,055 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,056 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,056 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,056 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,057 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,057 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,057 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,058 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,058 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,058 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,059 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,059 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,059 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,060 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,060 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,060 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,061 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,061 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,062 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,062 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,062 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,063 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,063 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,064 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,064 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,065 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,065 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,065 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,066 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,066 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,066 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,067 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,067 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,068 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:30,068 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,830 - ERROR - ❌ Failed to get option chain snapshot: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,831 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,832 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,832 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,833 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,833 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,834 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,834 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,835 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,835 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,835 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,836 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,836 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,837 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,837 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,838 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,838 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,838 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,839 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,839 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,840 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,840 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,840 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,841 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,841 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,842 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,842 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,842 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,843 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,843 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,844 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,844 - ERROR - ❌ Failed to upsert sr_zone z_2fe77d266b18: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,845 - ERROR - ❌ Failed to upsert sr_zone z_8d07e5966fd8: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:08:35,845 - ERROR - ❌ Failed to upsert sr_zone z_705d48c8a423: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:56,996 - INFO - 🔑 Access token loaded from environment fallback
+2026-08-05 00:23:57,105 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-08-05 00:23:57,132 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,133 - INFO - 🔑 Access token loaded from environment fallback
+2026-08-05 00:23:57,223 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-08-05 00:23:57,225 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,225 - INFO - 📡 Option warehouse started in background thread (real OI capture)
+2026-08-05 00:23:57,225 - INFO - 🚀 Option Warehouse (real OI) started for: ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX']  (interval=60s, depth=5 strikes)
+2026-08-05 00:23:57,233 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-08-05 00:23:57,233 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-08-05 00:23:57,233 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-08-05 00:23:57,234 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,235 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,235 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-08-05 00:23:57,235 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-08-05 00:23:57,261 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=7fd9c8e
+2026-08-05 00:23:57,262 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,263 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,263 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-08-05 00:23:57,263 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-08-05 00:23:57,274 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=7fd9c8e
+2026-08-05 00:23:57,275 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,285 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=5a4bec1b92d6a585 git=7fd9c8e
+2026-08-05 00:23:57,286 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,295 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=7fd9c8e
+2026-08-05 00:23:57,296 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,305 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=7fd9c8e
+2026-08-05 00:23:57,306 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,316 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=7fd9c8e
+2026-08-05 00:23:57,317 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,326 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=7fd9c8e
+2026-08-05 00:23:57,327 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,336 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=a7e6c9da59c6194f git=7fd9c8e
+2026-08-05 00:23:57,337 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,337 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-08-05 00:23:57,346 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=7fd9c8e
+2026-08-05 00:23:57,347 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,347 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-08-05 00:23:57,356 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=7fd9c8e
+2026-08-05 00:23:57,357 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,357 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-08-05 00:23:57,367 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=7fd9c8e
+2026-08-05 00:23:57,368 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,368 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.55, candle_strength>=0.4, min_rr>=1.5]
+2026-08-05 00:23:57,377 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf55 [chart_pattern@v1.0] hash=ce9ab5b18515d260 git=7fd9c8e
+2026-08-05 00:23:57,378 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,378 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.4, candle_strength>=0.3, min_rr>=1.3]
+2026-08-05 00:23:57,387 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf40 [chart_pattern@v1.0] hash=22ad684465d991ac git=7fd9c8e
+2026-08-05 00:23:57,388 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,397 - INFO - 📋 Registered experiment: VWAP_Reclaim_v1.0 [vwap_reclaim@v1.0] hash=5b56271e96b1fee9 git=7fd9c8e
+2026-08-05 00:23:57,398 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,407 - INFO - 📋 Registered experiment: CPR_v1.0 [cpr@v1.0] hash=0d2ee99831362dc3 git=7fd9c8e
+2026-08-05 00:23:57,408 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,417 - INFO - 📋 Registered experiment: Gap_v1.0 [gap@v1.0] hash=b855c688d7bea446 git=7fd9c8e
+2026-08-05 00:23:57,418 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,427 - INFO - 📋 Registered experiment: ORB_60m_IB_RVOL1.2 [orb@v1.0] hash=fb43c099fbb7b444 git=7fd9c8e
+2026-08-05 00:23:57,427 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,436 - INFO - 📋 Registered experiment: VerticalSpread_v1.0 [vertical_spread@v1.0] hash=ebcc2ee58dde4134 git=7fd9c8e
+2026-08-05 00:23:57,437 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,446 - INFO - 📋 Registered experiment: Straddle_v1.0_VolCompression [straddle_strangle@v1.0] hash=5f6294f74dfd83c4 git=7fd9c8e
+2026-08-05 00:23:57,447 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,456 - INFO - 📋 Registered experiment: Strangle_v1.0_VolCompression [straddle_strangle@v1.0] hash=f9e42ca23b1aa8eb git=7fd9c8e
+2026-08-05 00:23:57,457 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,457 - INFO - 📐 ChannelStrategy initialized [parallel>=0.3, breakout_rvol>=1.3, RR>=1.5]
+2026-08-05 00:23:57,466 - INFO - 📋 Registered experiment: Channel_v1.0 [channel@v1.0] hash=68450eb1ba8e68f9 git=7fd9c8e
+2026-08-05 00:23:57,467 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,467 - INFO - 🧱 OIWallReactionStrategy initialized [breakout_rvol>=1.3, RR>=1.5]
+2026-08-05 00:23:57,476 - INFO - 📋 Registered experiment: OIWallReaction_v1.0 [oi_wall_reaction@v1.0] hash=526ec437e2cc75d7 git=7fd9c8e
+2026-08-05 00:23:57,477 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,477 - INFO - 🔄 PCRExtremeReversalStrategy initialized [zone_score>=40.0, RR>=1.5]
+2026-08-05 00:23:57,487 - INFO - 📋 Registered experiment: PCRExtremeReversal_v1.0 [pcr_extreme_reversal@v1.0] hash=9abdaaa8dd3a448c git=7fd9c8e
+2026-08-05 00:23:57,488 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,488 - ERROR - ❌ Failed to fetch open positions: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,489 - ERROR - ❌ Failed to fetch today's realized R: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,489 - ERROR - ❌ Failed to fetch open counterfactuals: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,490 - ERROR - ❌ Failed to fetch open combo positions: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,490 - ERROR - ❌ Failed to fetch open counterfactual combos: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:23:57,490 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-08-05 00:24:17,606 - INFO - 🔑 Access token loaded from environment fallback
+2026-08-05 00:24:17,699 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-08-05 00:24:17,726 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,727 - INFO - 🔑 Access token loaded from environment fallback
+2026-08-05 00:24:17,810 - ERROR - ❌ Failed to initialize Fyers client: {'s': 'error', 'code': -8, 'message': 'Your token has expired. Please generate a token'}
+2026-08-05 00:24:17,811 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,812 - INFO - 📡 Option warehouse started in background thread (real OI capture)
+2026-08-05 00:24:17,812 - INFO - 🚀 Option Warehouse (real OI) started for: ['NSE:NIFTY50-INDEX']  (interval=60s, depth=5 strikes)
+2026-08-05 00:24:17,816 - WARNING - ⚠️ Expiry/Event blackout: NO future RBI/Budget/event dates configured (hard-coded tables are stale). Event-day entry protection is currently INACTIVE — update RBI_MPC_DATES / BUDGET_DATES in expiry_blackout.py.
+2026-08-05 00:24:17,816 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-08-05 00:24:17,816 - INFO - ✅ TimeOfDayEngine initialized with 75 slots.
+2026-08-05 00:24:17,817 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,818 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,818 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-08-05 00:24:17,818 - INFO - 🏛️ StructuralStrategy initialized [rvol>=1.0, zone_score>=50.0]
+2026-08-05 00:24:17,837 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL1.0 [structural@v3.2] hash=e94c3fcc1fbc618d git=7fd9c8e
+2026-08-05 00:24:17,838 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,838 - ERROR - ❌ Postgres Init Failed: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,838 - INFO - 🏛️ Structural Decision Engine initialized | Phase 3.2 (Final Polish) Active
+2026-08-05 00:24:17,838 - INFO - 🏛️ StructuralStrategy initialized [rvol>=0.8, zone_score>=50.0]
+2026-08-05 00:24:17,849 - INFO - 📋 Registered experiment: Structural_v3.2_RVOL0.8 [structural@v3.2] hash=40874fb174f2baa6 git=7fd9c8e
+2026-08-05 00:24:17,850 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,860 - INFO - 📋 Registered experiment: EMA_Pullback_20_50_RVOL1.0 [ema_pullback@v1.0] hash=5a4bec1b92d6a585 git=7fd9c8e
+2026-08-05 00:24:17,861 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,871 - INFO - 📋 Registered experiment: VWAP_Reversion_1.5ATR_RVOL1.0 [vwap_reversion@v1.0] hash=3d6d96cb21ff71cd git=7fd9c8e
+2026-08-05 00:24:17,871 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,881 - INFO - 📋 Registered experiment: PrevDay_Extremes_RVOL1.2 [prev_day_extremes@v1.0] hash=952708070530c475 git=7fd9c8e
+2026-08-05 00:24:17,882 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,891 - INFO - 📋 Registered experiment: ORB_15m_RVOL1.2 [orb@v1.0] hash=7977fff6d541cc39 git=7fd9c8e
+2026-08-05 00:24:17,892 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,902 - INFO - 📋 Registered experiment: ORB_30m_RVOL1.2 [orb@v1.0] hash=a4c360e3a0cd8ef8 git=7fd9c8e
+2026-08-05 00:24:17,903 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,913 - INFO - 📋 Registered experiment: ATR_Squeeze_RVOL1.0 [atr_squeeze@v1.0] hash=a7e6c9da59c6194f git=7fd9c8e
+2026-08-05 00:24:17,914 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,914 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.5, trendline_break=True]
+2026-08-05 00:24:17,925 - INFO - 📋 Registered experiment: Geometry_v1.0_Score35 [geometry@v1.0] hash=7edde6fe809a3b1a git=7fd9c8e
+2026-08-05 00:24:17,926 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,926 - INFO - 📐 GeometryStrategy initialized [score>=50.0, tol=0.2%, RR>=1.8, trendline_break=True]
+2026-08-05 00:24:17,935 - INFO - 📋 Registered experiment: Geometry_v1.0_Score50 [geometry@v1.0] hash=431ce308e16d5c85 git=7fd9c8e
+2026-08-05 00:24:17,936 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,936 - INFO - 💧 OrderFlowStrategy initialized [sweep>=0.6, imbalance>=0.55]
+2026-08-05 00:24:17,945 - INFO - 📋 Registered experiment: OrderFlow_v1.0 [order_flow@v1.0] hash=be581b5e26fdcef5 git=7fd9c8e
+2026-08-05 00:24:17,946 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,946 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.55, candle_strength>=0.4, min_rr>=1.5]
+2026-08-05 00:24:17,956 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf55 [chart_pattern@v1.0] hash=ce9ab5b18515d260 git=7fd9c8e
+2026-08-05 00:24:17,956 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,956 - INFO - 📐 ChartPatternStrategy initialized [pattern_conf>=0.4, candle_strength>=0.3, min_rr>=1.3]
+2026-08-05 00:24:17,966 - INFO - 📋 Registered experiment: ChartPattern_v1.0_Conf40 [chart_pattern@v1.0] hash=22ad684465d991ac git=7fd9c8e
+2026-08-05 00:24:17,967 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,976 - INFO - 📋 Registered experiment: VWAP_Reclaim_v1.0 [vwap_reclaim@v1.0] hash=5b56271e96b1fee9 git=7fd9c8e
+2026-08-05 00:24:17,977 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,986 - INFO - 📋 Registered experiment: CPR_v1.0 [cpr@v1.0] hash=0d2ee99831362dc3 git=7fd9c8e
+2026-08-05 00:24:17,987 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:17,996 - INFO - 📋 Registered experiment: Gap_v1.0 [gap@v1.0] hash=b855c688d7bea446 git=7fd9c8e
+2026-08-05 00:24:17,996 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,006 - INFO - 📋 Registered experiment: ORB_60m_IB_RVOL1.2 [orb@v1.0] hash=fb43c099fbb7b444 git=7fd9c8e
+2026-08-05 00:24:18,006 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,016 - INFO - 📋 Registered experiment: VerticalSpread_v1.0 [vertical_spread@v1.0] hash=ebcc2ee58dde4134 git=7fd9c8e
+2026-08-05 00:24:18,017 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,027 - INFO - 📋 Registered experiment: Straddle_v1.0_VolCompression [straddle_strangle@v1.0] hash=5f6294f74dfd83c4 git=7fd9c8e
+2026-08-05 00:24:18,028 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,038 - INFO - 📋 Registered experiment: Strangle_v1.0_VolCompression [straddle_strangle@v1.0] hash=f9e42ca23b1aa8eb git=7fd9c8e
+2026-08-05 00:24:18,039 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,039 - INFO - 📐 ChannelStrategy initialized [parallel>=0.3, breakout_rvol>=1.3, RR>=1.5]
+2026-08-05 00:24:18,052 - INFO - 📋 Registered experiment: Channel_v1.0 [channel@v1.0] hash=68450eb1ba8e68f9 git=7fd9c8e
+2026-08-05 00:24:18,053 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,053 - INFO - 🧱 OIWallReactionStrategy initialized [breakout_rvol>=1.3, RR>=1.5]
+2026-08-05 00:24:18,065 - INFO - 📋 Registered experiment: OIWallReaction_v1.0 [oi_wall_reaction@v1.0] hash=526ec437e2cc75d7 git=7fd9c8e
+2026-08-05 00:24:18,066 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,066 - INFO - 🔄 PCRExtremeReversalStrategy initialized [zone_score>=40.0, RR>=1.5]
+2026-08-05 00:24:18,076 - INFO - 📋 Registered experiment: PCRExtremeReversal_v1.0 [pcr_extreme_reversal@v1.0] hash=9abdaaa8dd3a448c git=7fd9c8e
+2026-08-05 00:24:18,077 - ERROR - ❌ Failed to save experiment: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,078 - ERROR - ❌ Failed to fetch open positions: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,078 - ERROR - ❌ Failed to fetch today's realized R: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,079 - ERROR - ❌ Failed to fetch open counterfactuals: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,079 - ERROR - ❌ Failed to fetch open combo positions: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,080 - ERROR - ❌ Failed to fetch open counterfactual combos: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,080 - INFO - 🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled
+2026-08-05 00:24:18,103 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,104 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,104 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,104 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:18,105 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,074 - ERROR - ❌ Failed to get option chain snapshot: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,075 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,076 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,076 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,077 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,077 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,078 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,078 - ERROR - ❌ Failed to save market event: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,082 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,085 - ERROR - ❌ Failed to save signal audit: connection to server at "127.0.0.1", port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-08-05 00:24:19,089 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-05 00:24:19,089 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)

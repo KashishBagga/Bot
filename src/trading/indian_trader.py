@@ -46,6 +46,9 @@ from src.strategies.cpr_strategy import CprStrategy
 from src.strategies.gap_strategy import GapStrategy
 from src.strategies.vertical_spread_strategy import VerticalSpreadStrategy
 from src.strategies.straddle_strangle_strategy import StraddleStrangleStrategy
+from src.strategies.channel_strategy import ChannelStrategy
+from src.strategies.oi_wall_reaction_strategy import OIWallReactionStrategy
+from src.strategies.pcr_extreme_reversal_strategy import PCRExtremeReversalStrategy
 
 # Setup Logging
 os.makedirs("logs", exist_ok=True)
@@ -99,7 +102,29 @@ class StructuralPaperTrader:
         self.data_provider = FyersDataProvider()
         self.db = PostgresDatabase()
         self.tz = ZoneInfo("Asia/Kolkata")
-        
+
+        # ── Real option-chain OI warehouse (background) ──────────────────
+        # OptionWarehouse.run() is an asyncio loop that fetches real OI via the
+        # Fyers depth endpoint and writes option_snapshots — the only source of
+        # real (non-placeholder) OI in the system. It previously had no caller
+        # anywhere in the live path, so option_snapshots was empty during
+        # trading hours and PCR/max-pain in the dashboard had no real data.
+        # Runs in its own daemon thread/event loop so a warehouse-side failure
+        # can never block or crash the main 5-minute candle loop below.
+        import threading
+        import asyncio
+        from src.warehouse.option_warehouse import OptionWarehouse
+        self._option_warehouse = OptionWarehouse(list(symbols))
+
+        def _run_option_warehouse():
+            try:
+                asyncio.run(self._option_warehouse.run())
+            except Exception as e:
+                logger.error(f"❌ Option warehouse thread died: {e}")
+
+        threading.Thread(target=_run_option_warehouse, daemon=True, name="OptionWarehouse").start()
+        logger.info("📡 Option warehouse started in background thread (real OI capture)")
+
         from src.core.options_execution_engine import OptionExecutionEngine
         self.option_engine = OptionExecutionEngine(self.db, self.data_provider, strike_policy="ATM")
 
@@ -454,6 +479,68 @@ class StructuralPaperTrader:
         self.registry.register(_strangle_exp)
         self.db.save_experiment(_strangle_exp.to_db_dict())
 
+        # Channel bounce/breakout — consumes MarketContext.geometry.channels
+        # (parallel-trendline pairs, see market_geometry.Channel / TrendlineEngine.
+        # detect_channels). New capability, no channel-based strategy existed
+        # before this.
+        _channel_exp = Experiment(
+            name="Channel_v1.0",
+            strategy=ChannelStrategy(
+                min_parallel_score=0.3, zone_tolerance_pct=0.0015,
+                min_body_fraction=0.40, atr_sl_buffer_mult=0.15,
+                breakout_rvol_threshold=1.3, tp_atr_cap=3.0, min_rr=1.5,
+            ),
+            params={
+                "min_parallel_score": 0.3, "zone_tolerance_pct": 0.0015,
+                "min_body_fraction": 0.40, "atr_sl_buffer_mult": 0.15,
+                "breakout_rvol_threshold": 1.3, "tp_atr_cap": 3.0, "min_rr": 1.5,
+            },
+            description="Channel bounce (fade boundary) + RVOL-confirmed breakout continuation"
+        )
+        self.registry.register(_channel_exp)
+        self.db.save_experiment(_channel_exp.to_db_dict())
+
+        # OI-wall reaction — consumes MarketContext.options (real OI via
+        # OptionsIntelligenceEngine, fed by the OptionWarehouse background
+        # thread started above). Rejects (as an error, not a filtered signal)
+        # whenever options data is missing or stale — never trades on a guess.
+        _oi_wall_exp = Experiment(
+            name="OIWallReaction_v1.0",
+            strategy=OIWallReactionStrategy(
+                zone_tolerance_pct=0.0015, min_body_fraction=0.40,
+                atr_sl_buffer_mult=0.15, breakout_rvol_threshold=1.3,
+                tp_atr_cap=3.0, min_rr=1.5,
+            ),
+            params={
+                "zone_tolerance_pct": 0.0015, "min_body_fraction": 0.40,
+                "atr_sl_buffer_mult": 0.15, "breakout_rvol_threshold": 1.3,
+                "tp_atr_cap": 3.0, "min_rr": 1.5,
+            },
+            description="Fade or breakout reaction to real option-chain OI walls (call/put strikes with outlier OI)"
+        )
+        self.registry.register(_oi_wall_exp)
+        self.db.save_experiment(_oi_wall_exp.to_db_dict())
+
+        # PCR-extreme contrarian reversal — real PCR (OptionsIntelligenceEngine)
+        # gated by a confirmed reversal candle at a genuine confluence zone, not
+        # PCR alone.
+        _pcr_reversal_exp = Experiment(
+            name="PCRExtremeReversal_v1.0",
+            strategy=PCRExtremeReversalStrategy(
+                min_confluence_score=40.0, zone_tolerance_pct=0.0015,
+                min_body_fraction=0.40, atr_sl_buffer_mult=0.15,
+                tp_atr_cap=3.0, min_rr=1.5,
+            ),
+            params={
+                "min_confluence_score": 40.0, "zone_tolerance_pct": 0.0015,
+                "min_body_fraction": 0.40, "atr_sl_buffer_mult": 0.15,
+                "tp_atr_cap": 3.0, "min_rr": 1.5,
+            },
+            description="Contrarian reversal on PCR extremes, gated by zone confluence + candle confirmation"
+        )
+        self.registry.register(_pcr_reversal_exp)
+        self.db.save_experiment(_pcr_reversal_exp.to_db_dict())
+
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
@@ -475,6 +562,9 @@ class StructuralPaperTrader:
         self.portfolios.register("VerticalSpread_v1.0")
         self.portfolios.register("Straddle_v1.0_VolCompression")
         self.portfolios.register("Strangle_v1.0_VolCompression")
+        self.portfolios.register("Channel_v1.0")
+        self.portfolios.register("OIWallReaction_v1.0")
+        self.portfolios.register("PCRExtremeReversal_v1.0")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
@@ -1003,37 +1093,79 @@ class StructuralPaperTrader:
         import hashlib
         from datetime import timezone as _tz
 
-        zones = snapshot.h1_zones or []
         now = snapshot.timestamp or datetime.now(_tz.utc)
+        atr = float(snapshot.features.get_float("atr") or 100.0)
 
-        for z in zones:
+        # Persist zones from all three timeframes. Timeframe is baked into the
+        # zone_id bucket (and the timeframe column) so an m5 zone and a d1 zone
+        # at a similar price stay distinct rows with their own touch_count —
+        # they're different-strength signals, not the same zone re-detected.
+        for zones, tf in (
+            (snapshot.h1_zones, "h1"),
+            (getattr(snapshot, "m5_zones", None), "m5"),
+            (getattr(snapshot, "d1_zones", None), "d1"),
+        ):
+            for z in (zones or []):
+                try:
+                    score = float(getattr(z, "score", 0.0))
+                    if score < 2.0:
+                        continue
+
+                    level = float(z.level)
+                    zone_type = z.zone_type          # 'SUPPLY' or 'DEMAND'
+                    # half-ATR bucket so nearby zones share the same ID
+                    bucket = round(level / (atr * 0.5)) * int(atr * 0.5)
+
+                    raw_id = f"{snapshot.symbol}|{zone_type}|{tf}|{bucket}"
+                    zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
+
+                    # price band: ±0.25 ATR around the level
+                    half_band = atr * 0.25
+                    self.db.upsert_sr_zone({
+                        "zone_id":    zone_id,
+                        "symbol":     snapshot.symbol,
+                        "zone_type":  zone_type,
+                        "price_low":  round(level - half_band, 2),
+                        "price_high": round(level + half_band, 2),
+                        "strength":   score,
+                        "now":        now,
+                        "timeframe":  tf,
+                    })
+                except Exception as e:
+                    logger.debug(f"⚠️ _persist_sr_zones: skipping {tf} zone — {e}")
+
+        # OI walls (from real option-chain data, see options_intelligence_engine) —
+        # persisted using the OI_RESISTANCE/OI_SUPPORT zone_type this table already
+        # supports, so strike-based S/R shows up alongside price-action zones.
+        # Skipped entirely when options data is missing/stale rather than persisting
+        # a guess (matches how every other filter in this system prefers an explicit
+        # rejection over a silent fallback).
+        options = getattr(snapshot.market, "options", None) if snapshot.market else None
+        if options is not None and not options.is_stale:
             try:
-                score = float(getattr(z, "score", 0.0))
-                if score < 2.0:
-                    continue
-
-                level = float(z.level)
-                zone_type = z.zone_type          # 'SUPPLY' or 'DEMAND'
-                # half-ATR bucket so nearby zones share the same ID
-                atr = float(snapshot.features.get_float("atr") or 100.0)
-                bucket = round(level / (atr * 0.5)) * int(atr * 0.5)
-
-                raw_id = f"{snapshot.symbol}|{zone_type}|{bucket}"
-                zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
-
-                # price band: ±0.25 ATR around the level
-                half_band = atr * 0.25
-                self.db.upsert_sr_zone({
-                    "zone_id":    zone_id,
-                    "symbol":     snapshot.symbol,
-                    "zone_type":  zone_type,
-                    "price_low":  round(level - half_band, 2),
-                    "price_high": round(level + half_band, 2),
-                    "strength":   score,
-                    "now":        now,
-                })
+                interval = 100.0 if "BANK" in snapshot.symbol else 50.0
+                half_band = interval / 2.0
+                for wall, zone_type in ((options.call_oi_wall, "OI_RESISTANCE"),
+                                         (options.put_oi_wall, "OI_SUPPORT")):
+                    if wall is None:
+                        continue
+                    raw_id = f"{snapshot.symbol}|{zone_type}|{wall.strike}"
+                    zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
+                    # Heuristic normalization: 1 lakh OI ~= strength 100, capped —
+                    # keeps this comparable to the 0-100 SUPPLY/DEMAND score scale.
+                    strength = min(wall.oi / 100_000.0 * 100.0, 100.0)
+                    self.db.upsert_sr_zone({
+                        "zone_id":    zone_id,
+                        "symbol":     snapshot.symbol,
+                        "zone_type":  zone_type,
+                        "price_low":  wall.strike - half_band,
+                        "price_high": wall.strike + half_band,
+                        "strength":   strength,
+                        "now":        now,
+                        "timeframe":  "options",
+                    })
             except Exception as e:
-                logger.debug(f"⚠️ _persist_sr_zones: skipping zone — {e}")
+                logger.debug(f"⚠️ _persist_sr_zones: skipping OI wall — {e}")
 
 
     def _recover_daily_risk_state(self, now):
@@ -1891,11 +2023,16 @@ class StructuralPaperTrader:
         elif reason == 'SESSION_END':
             mapped_reason = 'SESSION_END'
 
-        # Guard capture rate — store NULL (None) when there was nothing to capture
-        # (MFE <= 0 means price never moved in our favour)
-        # capture=0.0 falsely implies "terrible efficiency"; NULL means "N/A"
+        # Guard capture rate — store NULL (None) when there was nothing meaningful to
+        # capture. MFE <= 0 means price never moved in our favour; capture=0.0 would
+        # falsely imply "terrible efficiency" there, so we store NULL ("N/A") instead.
+        # We also floor MFE at MIN_MFE_FOR_CAPTURE_R: dividing by a near-zero MFE
+        # (e.g. +0.02R) blows pnl_r/mfe_r up to extreme ratios (-5000%+) on ordinary
+        # reversal trades, which then dominates AVG(capture_rate) in daily rollups —
+        # not a real efficiency signal, just a division artifact.
+        MIN_MFE_FOR_CAPTURE_R = 0.15
         capture_rate = None
-        if mfe_r > 0.0:
+        if mfe_r >= MIN_MFE_FOR_CAPTURE_R:
             capture_rate = round(pnl_r / mfe_r, 4)
 
         # Holding efficiency: R earned per bar held

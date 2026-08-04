@@ -50,7 +50,9 @@ class MarketSnapshot:
     # ── Structural layer (typed — StructuralStrategy reads these directly) ─
     daily_bias: str              # "BULLISH" | "BEARISH" | "NEUTRAL"
     h1_structure: object         # StructureReport (typed in engine, duck-typed here)
-    h1_zones: list               # List of Zone objects from ZoneEngine
+    h1_zones: list               # List of Zone objects from ZoneEngine (h1) — unchanged, existing consumers
+    m5_zones: list               # List of Zone objects from ZoneEngine (m5) — additive, MTF confluence
+    d1_zones: list               # List of Zone objects from ZoneEngine (d1) — additive, MTF confluence
     market_regime: str           # e.g. "TREND_UP_HIGH_VOL", "RANGE"
     volume_report: object        # VolumeReport (rvol_tod, is_high_participation, etc.)
 
