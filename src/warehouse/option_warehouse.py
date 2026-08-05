@@ -82,9 +82,10 @@ class OptionWarehouse:
         self, underlying: str, ltp: float, expiry_str: str, expiry_date: str
     ) -> List[Dict]:
         """Fetch depth for each option symbol, returning snapshot rows with real OI."""
+        from datetime import timezone
         symbols_meta = self._build_option_symbols(underlying, ltp, expiry_str)
         snapshots = []
-        now_str = datetime.now().isoformat()
+        now_dt = datetime.now(timezone.utc)
         client = self.data_provider.client
 
         for meta in symbols_meta:
@@ -110,7 +111,7 @@ class OptionWarehouse:
                     logger.debug(f"⚠️  Zero LTP for {sym}")
 
                 snapshots.append({
-                    "time": now_str,
+                    "time": now_dt,
                     "underlying": underlying,
                     "strike": meta["strike"],
                     "expiry": expiry_date,
