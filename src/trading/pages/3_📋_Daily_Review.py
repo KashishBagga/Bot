@@ -440,6 +440,29 @@ with tab_trades:
                     st.metric("Capture Rate", f"{cap*100:.0f}%" if cap else "—")
                     st.metric("Duration", f"{t.get('duration_minutes', 0):.0f} min / {t.get('bars_held', 0)} bars")
 
+                # Resolve events timeline early to extract option contract symbol
+                events = trade_events.get(t.get("trade_id"), [])
+                ex_evts = exec_events.get(t.get("trade_id"), []) or exec_events.get(t.get("candidate_id"), [])
+                all_evts = sorted(events + ex_evts, key=lambda e: e["timestamp"])
+
+                opt_sym = None
+                for ev in all_evts:
+                    pld = ev.get("payload") or {}
+                    if isinstance(pld, str):
+                        try:
+                            pld = json.loads(pld)
+                        except Exception:
+                            pld = {}
+                    cand_sym = pld.get("symbol") or pld.get("option_symbol")
+                    if cand_sym and "INDEX" not in str(cand_sym):
+                        opt_sym = cand_sym
+                        break
+
+                if opt_sym:
+                    st.markdown(f"🎳 **Option Contract:** `{opt_sym}`")
+                else:
+                    st.markdown("🎳 **Option Contract:** Index / Spot Only")
+
                 # Diagnostics / factors
                 diag = parse_json(t.get("diagnostics"))
                 feats = parse_json(t.get("features"))
@@ -475,9 +498,6 @@ with tab_trades:
                     st.markdown(bias_info)
 
                 # Trade event timeline
-                events = trade_events.get(t.get("trade_id"), [])
-                ex_evts = exec_events.get(t.get("trade_id"), []) or exec_events.get(t.get("candidate_id"), [])
-                all_evts = sorted(events + ex_evts, key=lambda e: e["timestamp"])
                 if all_evts:
                     st.markdown("**Event Timeline**")
                     def safe_val(v, sign=False, prefix=""):

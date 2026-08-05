@@ -308,6 +308,21 @@ with tab1:
             emoji = "🟢" if pnl_val >= 0 else "🔴"
             title = f"{emoji} {t['symbol']} | {t['strategy']} | {pnl_val:+.2f} R"
             
+            # Pre-filter events to find option contract symbol and construct timeline
+            t_events = [e for e in data["events"] if e["trade_id"] == t["trade_id"] or (t.get("candidate_id") and e["candidate_id"] == t["candidate_id"])]
+            opt_sym = None
+            for ev in t_events:
+                pld = ev.get("payload") or {}
+                if isinstance(pld, str):
+                    try:
+                        pld = json.loads(pld)
+                    except Exception:
+                        pld = {}
+                cand_sym = pld.get("symbol") or pld.get("option_symbol")
+                if cand_sym and "INDEX" not in str(cand_sym):
+                    opt_sym = cand_sym
+                    break
+
             with st.expander(title):
                 m_col1, m_col2 = st.columns(2)
                 
@@ -317,6 +332,10 @@ with tab1:
                     st.write(f"🛑 **Outcome/Exit Reason:** {t['exit_reason'] or 'OPEN'}")
                     st.write(f"💸 **PnL:** {pnl_val:+.2f} R")
                     st.write(f"🎯 **Target / Exit:** Entry: {t['entry_price']:.2f} | Exit: {t['exit_price'] or 0.0:.2f} | SL: {t['stop_loss'] or 0.0:.2f} | TP: {t['take_profit'] or 0.0:.2f}")
+                    if opt_sym:
+                        st.markdown(f"🎳 **Option Contract:** `{opt_sym}`")
+                    else:
+                        st.markdown("🎳 **Option Contract:** Index / Spot Only")
                     st.write(f"📦 **Experiment / Version:** {t['experiment_name']}")
 
                 with m_col2:
@@ -332,7 +351,6 @@ with tab1:
                             st.markdown(f"<div class='factor-pill'><b>{formatted_k}:</b> {v}</div>", unsafe_allow_html=True)
                 
                 st.subheader("Execution Latency Timeline")
-                t_events = [e for e in data["events"] if e["trade_id"] == t["trade_id"]]
                 if not t_events:
                     st.text("No audit trace events found for this trade.")
                 else:
@@ -357,6 +375,21 @@ with tab2:
             pnl_val = c["final_pnl_r"] or 0.0
             title = f"👻 {c['symbol']} | {c['setup_type'] or c['strategy']} | Blocked: {c['primary_rejection_reason']} | {pnl_val:+.2f} R"
             
+            # Pre-filter events to find option contract symbol and construct timeline
+            t_events = [e for e in data["events"] if e["candidate_id"] == c["candidate_id"]]
+            opt_sym = None
+            for ev in t_events:
+                pld = ev.get("payload") or {}
+                if isinstance(pld, str):
+                    try:
+                        pld = json.loads(pld)
+                    except Exception:
+                        pld = {}
+                cand_sym = pld.get("symbol") or pld.get("option_symbol")
+                if cand_sym and "INDEX" not in str(cand_sym):
+                    opt_sym = cand_sym
+                    break
+
             with st.expander(title):
                 m_col1, m_col2 = st.columns(2)
                 
@@ -367,6 +400,10 @@ with tab2:
                     st.write(f"⛔ **All Rejections:** {c['rejection_reasons']}")
                     st.write(f"💸 **Simulated Outcome:** {pnl_val:+.2f} R")
                     st.write(f"🎯 **Target / Exit:** Entry: {c['entry_price'] or 0.0:.2f} | Exit: {c['exit_price'] or 0.0:.2f} | SL: {c['stop_loss'] or 0.0:.2f} | TP: {c['take_profit'] or 0.0:.2f}")
+                    if opt_sym:
+                        st.markdown(f"🎳 **Option Contract:** `{opt_sym}`")
+                    else:
+                        st.markdown("🎳 **Option Contract:** Index / Spot Only")
 
                 with m_col2:
                     st.subheader("Attribution / Trigger Factors")
@@ -381,7 +418,6 @@ with tab2:
                             st.markdown(f"<div class='factor-pill'><b>{formatted_k}:</b> {v}</div>", unsafe_allow_html=True)
 
                 st.subheader("Execution Latency Timeline")
-                t_events = [e for e in data["events"] if e["candidate_id"] == c["candidate_id"]]
                 if not t_events:
                     st.text("No audit trace events found for this signal.")
                 else:
