@@ -62,7 +62,6 @@ def parse_json(v):
 # ─── CSS ──────────────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="Daily Review", page_icon="📋", layout="wide")
-st.markdown(f'<meta http-equiv="refresh" content="{AUTO_REFRESH_SECONDS}">', unsafe_allow_html=True)
 
 st.markdown("""
 <style>
@@ -422,8 +421,12 @@ with tab_trades:
 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric("Entry Price", f"₹{t.get('entry_price', 0):,.2f}")
-                    st.metric("Exit Price",  f"₹{t.get('exit_price', 0):,.2f}" if t.get("exit_price") else "OPEN")
+                    ep_val = t.get("entry_price")
+                    ep_str = f"₹{ep_val:,.2f}" if ep_val is not None else "—"
+                    ex_val = t.get("exit_price")
+                    ex_str = f"₹{ex_val:,.2f}" if ex_val is not None else "OPEN"
+                    st.metric("Entry Price", ep_str)
+                    st.metric("Exit Price", ex_str)
                 with col2:
                     sl  = t.get("initial_stop_loss") or t.get("stop_loss")
                     tp  = t.get("initial_take_profit") or t.get("take_profit")
@@ -477,20 +480,30 @@ with tab_trades:
                 all_evts = sorted(events + ex_evts, key=lambda e: e["timestamp"])
                 if all_evts:
                     st.markdown("**Event Timeline**")
+                    def safe_val(v, sign=False, prefix=""):
+                        if v is None:
+                            return "—"
+                        try:
+                            val = float(v)
+                            s = f"{val:+.2f}" if sign else f"{val:.2f}"
+                            return f"{prefix}{s}"
+                        except Exception:
+                            return "—"
+
                     for ev in all_evts:
                         p = ev.get("payload", {})
                         etype = ev["event_type"]
                         ts = fmt_dt(ev["timestamp"])
                         if etype == "ENTRY":
-                            desc = f"Entry @ ₹{p.get('entry_price',0):.2f}  SL={p.get('stop_loss',0):.2f}  TP={p.get('take_profit',0):.2f}"
+                            desc = f"Entry @ {safe_val(p.get('entry_price'), prefix='₹')}  SL={safe_val(p.get('stop_loss'))}  TP={safe_val(p.get('take_profit'))}"
                         elif etype == "EXIT":
-                            desc = f"Exit @ ₹{p.get('exit_price',0):.2f}  reason={p.get('exit_reason','?')}  PnL={p.get('final_pnl_r',0):+.2f}R"
+                            desc = f"Exit @ {safe_val(p.get('exit_price'), prefix='₹')}  reason={p.get('exit_reason','?')}  PnL={safe_val(p.get('final_pnl_r'), sign=True)}R"
                         elif etype == "SL_TRAIL":
-                            desc = f"SL trailed → {p.get('stop_loss',0):.2f}  MFE={p.get('mfe_r',0):.2f}R"
+                            desc = f"SL trailed → {safe_val(p.get('stop_loss'))}  MFE={safe_val(p.get('mfe_r'))}R"
                         elif etype == "STRIKE_SELECTED":
                             desc = f"Strike: {p.get('symbol','?')}  expiry={p.get('expiry','?')}"
                         elif etype == "PREMIUM_RETRIEVED":
-                            desc = f"Premium: ₹{p.get('premium',0):.2f}  bid={p.get('bid',0):.2f}  ask={p.get('ask',0):.2f}"
+                            desc = f"Premium: {safe_val(p.get('premium'), prefix='₹')}  bid={safe_val(p.get('bid'))}  ask={safe_val(p.get('ask'))}"
                         else:
                             desc = str(p)[:80]
                         st.markdown(
@@ -553,9 +566,12 @@ with tab_rejected:
                     sl = sig.get("stop_loss")
                     tp = sig.get("take_profit")
                     rr = sig.get("rr_ratio")
+                    ep_str = f"{ep:.2f}" if ep is not None else "—"
+                    sl_str = f"{sl:.2f}" if sl is not None else "—"
+                    tp_str = f"{tp:.2f}" if tp is not None else "—"
+                    rr_str = f"{rr:.2f}" if rr is not None else "—"
                     st.markdown(
-                        f"**Proposed:** Entry `{ep:.2f}` | SL `{sl:.2f}` | TP `{tp:.2f}` | RR `{rr:.2f}`"
-                        if ep else "**Proposed:** prices not recorded"
+                        f"**Proposed:** Entry `{ep_str}` | SL `{sl_str}` | TP `{tp_str}` | RR `{rr_str}`"
                     )
                     st.markdown(
                         f"**Context:** bias={sig.get('daily_bias')} | "
@@ -616,9 +632,12 @@ with tab_blocks:
                 sl = blk.get("stop_loss")
                 tp = blk.get("take_profit")
                 rr = blk.get("rr_ratio")
+                ep_str = f"{ep:.2f}" if ep is not None else "—"
+                sl_str = f"{sl:.2f}" if sl is not None else "—"
+                tp_str = f"{tp:.2f}" if tp is not None else "—"
+                rr_str = f"{rr:.2f}" if rr is not None else "—"
                 st.markdown(
-                    f"**Blocked Trade:** Entry `{ep:.2f}` | SL `{sl:.2f}` | TP `{tp:.2f}` | RR `{rr:.2f}`"
-                    if ep else "Prices not recorded"
+                    f"**Blocked Trade:** Entry `{ep_str}` | SL `{sl_str}` | TP `{tp_str}` | RR `{rr_str}`"
                 )
                 st.markdown(
                     f"**Setup:** {blk.get('setup_type','?')} | Signal: {blk.get('signal_type','?')} | "

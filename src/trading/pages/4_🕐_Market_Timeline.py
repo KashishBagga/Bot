@@ -350,10 +350,14 @@ for (sh, sm, eh, em) in HOUR_WINDOWS:
                 pnl = t.get("final_pnl_r")
                 icon = "🟢" if (pnl or 0) > 0 else ("🔴" if (pnl or 0) < 0 else "⚪")
                 if entry_ist and in_window(t.get("entry_time"), sh, sm, eh, em):
+                    ep = t.get("entry_price")
+                    sl = t.get("stop_loss")
+                    ep_str = f"₹{ep:,.2f}" if ep is not None else "—"
+                    sl_str = f"₹{sl:,.2f}" if sl is not None else "—"
                     st.markdown(
                         f'<div class="trade-entry">⬆️ <b>ENTRY</b> {fmt_t(entry_ist)} | '
                         f'{t.get("setup_type","?")} [{t.get("experiment_name","?")}] | '
-                        f'@ ₹{t.get("entry_price",0):,.2f}  SL={t.get("stop_loss",0):.2f}</div>',
+                        f'@ {ep_str}  SL={sl_str}</div>',
                         unsafe_allow_html=True
                     )
                 if exit_ist and in_window(t.get("exit_time"), sh, sm, eh, em):

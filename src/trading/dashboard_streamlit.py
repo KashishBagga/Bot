@@ -35,56 +35,65 @@ def format_event_description(event_type, payload):
         if isinstance(payload, str):
             payload = json.loads(payload)
 
+        def get_f(key, default=0.0):
+            val = payload.get(key)
+            if val is None:
+                return default
+            try:
+                return float(val)
+            except Exception:
+                return default
+
         # ── Real trade_events shapes ──────────────────────────────────────────
         if event_type == "ENTRY":
-            return (f"📥 **Entry** | Price: `{payload.get('entry_price', 0.0):.2f}` "
-                    f"| SL: `{payload.get('stop_loss', 0.0):.2f}` "
-                    f"| TP: `{payload.get('take_profit', 0.0):.2f}`")
+            return (f"📥 **Entry** | Price: `{get_f('entry_price'):.2f}` "
+                    f"| SL: `{get_f('stop_loss'):.2f}` "
+                    f"| TP: `{get_f('take_profit'):.2f}`")
 
         elif event_type == "SL_TRAIL":
-            return (f"🛡️ **SL Trailed** | SL → `{payload.get('stop_loss', 0.0):.2f}` "
-                    f"| Market: `{payload.get('current_price', 0.0):.2f}` "
-                    f"| MFE: `{payload.get('mfe_r', 0.0):.2f}R` "
-                    f"| MAE: `{payload.get('mae_r', 0.0):.2f}R`")
+            return (f"🛡️ **SL Trailed** | SL → `{get_f('stop_loss'):.2f}` "
+                    f"| Market: `{get_f('current_price'):.2f}` "
+                    f"| MFE: `{get_f('mfe_r'):.2f}R` "
+                    f"| MAE: `{get_f('mae_r'):.2f}R`")
 
         elif event_type == "EXIT":
-            pnl = payload.get('final_pnl_r', 0.0)
+            pnl = get_f('final_pnl_r')
             pnl_str = f"{pnl:+.2f} R"
-            return (f"🏁 **Exit** | Price: `{payload.get('exit_price', 0.0):.2f}` "
+            return (f"🏁 **Exit** | Price: `{get_f('exit_price'):.2f}` "
                     f"| Reason: `{payload.get('exit_reason')}` "
                     f"| PnL: **{pnl_str}** "
-                    f"| Duration: `{payload.get('duration_minutes', 0.0):.1f} mins` "
+                    f"| Duration: `{get_f('duration_minutes'):.1f} mins` "
                     f"| Bars: `{payload.get('bars_held')}`")
 
         # ── Newer execution_auditor shapes ────────────────────────────────────
         elif event_type == "SIGNAL_GENERATED":
-            return f"🎯 **Signal Generated** | Direction: `{payload.get('signal')}` | Price: `{payload.get('price', 0.0):.2f}`"
+            return f"🎯 **Signal Generated** | Direction: `{payload.get('signal')}` | Price: `{get_f('price'):.2f}`"
 
         elif event_type == "STRIKE_SELECTED":
             return f"🎳 **Strike Selected** | Symbol: `{payload.get('symbol')}` | Strike: `{payload.get('strike')}` | Expiry: `{payload.get('expiry')}`"
 
         elif event_type == "PREMIUM_RETRIEVED":
-            return f"💰 **Premium Retrieved** | LTP: `{payload.get('premium', 0.0):.2f}` | Bid: `{payload.get('bid', 0.0):.2f}` | Ask: `{payload.get('ask', 0.0):.2f}`"
+            return f"💰 **Premium Retrieved** | LTP: `{get_f('premium'):.2f}` | Bid: `{get_f('bid'):.2f}` | Ask: `{get_f('ask'):.2f}`"
 
         elif event_type in ("ORDER_SUBMITTED", "CF_SUBMITTED"):
-            return f"📤 **Order Submitted** | Price: `{payload.get('price', 0.0):.2f}` | SL: `{payload.get('sl', 0.0):.2f}` | TP: `{payload.get('tp', 0.0):.2f}`"
+            return f"📤 **Order Submitted** | Price: `{get_f('price'):.2f}` | SL: `{get_f('sl'):.2f}` | TP: `{get_f('tp'):.2f}`"
 
         elif event_type in ("ORDER_FILLED", "CF_FILLED"):
-            return f"✅ **Filled** | Price: `{payload.get('price', 0.0):.2f}`"
+            return f"✅ **Filled** | Price: `{get_f('price'):.2f}`"
 
         elif event_type in ("SL_MODIFIED", "CF_SL_MODIFIED"):
-            return (f"🛡️ **SL Modified** | `{payload.get('old_sl', 0.0):.2f}` → `{payload.get('new_sl', 0.0):.2f}` "
-                    f"| Reason: `{payload.get('reason')}` | Market: `{payload.get('price', 0.0):.2f}`")
+            return (f"🛡️ **SL Modified** | `{get_f('old_sl'):.2f}` → `{get_f('new_sl'):.2f}` "
+                    f"| Reason: `{payload.get('reason')}` | Market: `{get_f('price'):.2f}`")
 
         elif event_type in ("TP_EXPANDED", "CF_TP_EXPANDED"):
-            return f"📈 **TP Expanded** | `{payload.get('old_tp', 0.0):.2f}` → `{payload.get('new_tp', 0.0):.2f}` | Reason: `{payload.get('reason')}`"
+            return f"📈 **TP Expanded** | `{get_f('old_tp'):.2f}` → `{get_f('new_tp'):.2f}` | Reason: `{payload.get('reason')}`"
 
         elif event_type in ("ORDER_EXITED", "CF_EXITED"):
-            pnl = payload.get('pnl_r', 0.0)
-            return (f"🏁 **Exited** | Price: `{payload.get('exit_price', 0.0):.2f}` "
+            pnl = get_f('pnl_r')
+            return (f"🏁 **Exited** | Price: `{get_f('exit_price'):.2f}` "
                     f"| Reason: `{payload.get('exit_reason')}` "
                     f"| PnL: **{pnl:+.2f} R** "
-                    f"| {payload.get('duration_minutes', 0.0):.1f} mins")
+                    f"| {get_f('duration_minutes'):.1f} mins")
 
         return f"🔹 `{event_type}` | {json.dumps(payload)}"
     except Exception as e:

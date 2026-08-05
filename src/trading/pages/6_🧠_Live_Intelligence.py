@@ -632,6 +632,13 @@ with tab_cockpit:
                 bg_color = "rgba(34,197,94,0.02)" if accepted else "rgba(239,68,68,0.02)"
                 border_color = "rgba(34,197,94,0.2)" if accepted else "rgba(239,68,68,0.2)"
                 
+                ep = sig.get('entry_price')
+                sl = sig.get('stop_loss')
+                tp = sig.get('take_profit')
+                ep_str = f"₹{ep:,.1f}" if ep is not None else "—"
+                sl_str = f"₹{sl:,.1f}" if sl is not None else "—"
+                tp_str = f"₹{tp:,.1f}" if tp is not None else "—"
+
                 st.markdown(f"""
                 <div style="background:{bg_color}; border: 1px solid {border_color}; border-radius:8px; padding:12px; margin-bottom:8px">
                     <div style="display:flex; justify-content:space-between; align-items:center">
@@ -641,7 +648,7 @@ with tab_cockpit:
                             <small style="color:#64748b">{fmt_dt(sig.get('timestamp'))} · exp: {sig.get('experiment_name')}</small>
                         </div>
                         <div>
-                            Entry: <b>₹{sig.get('entry_price',0):,.1f}</b> | SL: <b>₹{sig.get('stop_loss',0):,.1f}</b> | TP: <b>₹{sig.get('take_profit',0):,.1f}</b>
+                            Entry: <b>{ep_str}</b> | SL: <b>{sl_str}</b> | TP: <b>{tp_str}</b>
                         </div>
                     </div>
                 </div>
