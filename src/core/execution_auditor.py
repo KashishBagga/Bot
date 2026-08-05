@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional, Any
 from src.models.postgres_database import PostgresDatabase
 
@@ -14,7 +14,7 @@ class ExecutionAuditor:
     def log_event(self, event_type: str, trade_id: Optional[str] = None, 
                   candidate_id: Optional[str] = None, payload: Optional[Dict[str, Any]] = None):
         """Saves a detailed trace execution event milestone."""
-        timestamp = datetime.now()
+        timestamp = datetime.now(timezone.utc)
         event_id = f"exec_{int(timestamp.timestamp() * 1000)}_{event_type.lower()}"
         
         event = {

@@ -443,7 +443,20 @@ with tab_trades:
                 # Resolve events timeline early to extract option contract symbol
                 events = trade_events.get(t.get("trade_id"), [])
                 ex_evts = exec_events.get(t.get("trade_id"), []) or exec_events.get(t.get("candidate_id"), [])
-                all_evts = sorted(events + ex_evts, key=lambda e: e["timestamp"])
+                all_evts = events + ex_evts
+                
+                # Heal shifted timestamps
+                ref_time = t.get("entry_time")
+                for ev in all_evts:
+                    curr_t = ev.get("timestamp")
+                    if curr_t and ref_time and curr_t.tzinfo and ref_time.tzinfo:
+                        diff = (curr_t - ref_time).total_seconds()
+                        if diff > 18000:
+                            ev["timestamp"] = curr_t - timedelta(hours=5, minutes=30)
+                        elif diff < -18000:
+                            ev["timestamp"] = curr_t + timedelta(hours=5, minutes=30)
+                
+                all_evts = sorted(all_evts, key=lambda e: e["timestamp"])
 
                 opt_sym = None
                 for ev in all_evts:

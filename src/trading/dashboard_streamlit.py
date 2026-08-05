@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 import pandas as pd
 import streamlit as st
@@ -26,6 +26,18 @@ def format_dt(dt):
     if dt.tzinfo is not None:
         dt = dt.astimezone(kolkata_tz)
     return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+def adjust_shifted_timestamp(curr_t, ref_t):
+    if curr_t is None or ref_t is None:
+        return curr_t
+    if curr_t.tzinfo is None or ref_t.tzinfo is None:
+        return curr_t
+    diff = (curr_t - ref_t).total_seconds()
+    if diff > 18000:
+        curr_t = curr_t - timedelta(hours=5, minutes=30)
+    elif diff < -18000:
+        curr_t = curr_t + timedelta(hours=5, minutes=30)
+    return curr_t
 
 def format_event_description(event_type, payload):
     if not payload:
@@ -310,6 +322,13 @@ with tab1:
             
             # Pre-filter events to find option contract symbol and construct timeline
             t_events = [e for e in data["events"] if e["trade_id"] == t["trade_id"] or (t.get("candidate_id") and e["candidate_id"] == t["candidate_id"])]
+            
+            # Heal shifted timestamps and sort timeline events chronologically
+            ref_time = t["entry_time"]
+            for ev in t_events:
+                ev["timestamp"] = adjust_shifted_timestamp(ev["timestamp"], ref_time)
+            t_events = sorted(t_events, key=lambda x: x["timestamp"])
+
             opt_sym = None
             for ev in t_events:
                 pld = ev.get("payload") or {}
@@ -377,6 +396,13 @@ with tab2:
             
             # Pre-filter events to find option contract symbol and construct timeline
             t_events = [e for e in data["events"] if e["candidate_id"] == c["candidate_id"]]
+            
+            # Heal shifted timestamps and sort timeline events chronologically
+            ref_time = c["timestamp"]
+            for ev in t_events:
+                ev["timestamp"] = adjust_shifted_timestamp(ev["timestamp"], ref_time)
+            t_events = sorted(t_events, key=lambda x: x["timestamp"])
+
             opt_sym = None
             for ev in t_events:
                 pld = ev.get("payload") or {}
