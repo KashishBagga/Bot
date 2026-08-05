@@ -76,16 +76,18 @@ class EmaPullbackStrategy(BaseStrategy):
             take_profit = None
 
             # Pullback checks
-            # Bullish: ema_bullish is active, low dipped below or touched ema20, close held above ema20
+            # Bullish: ema_bullish is active, low dipped below or touched ema20, close held above ema20 and confirmed bounce (green candle)
             if ema_bullish:
-                if low <= ema20 and close >= ema20 * 0.999:
+                last_open = float(last_candle["open"])
+                if low <= ema20 and close >= ema20 and close > last_open:
                     setup_type = "PULLBACK"
                     side = "BUY CALL"
                     # SL set below ema50 with small buffer
                     sl = min(ema50 - (atr * 0.2), price - (atr * 0.5))
             else:
-                # Bearish: ema_bullish is false, high peaked above or touched ema20, close held below ema20
-                if high >= ema20 and close <= ema20 * 1.001:
+                # Bearish: ema_bullish is false, high peaked above or touched ema20, close held below ema20 and confirmed bounce (red candle)
+                last_open = float(last_candle["open"])
+                if high >= ema20 and close <= ema20 and close < last_open:
                     setup_type = "PULLBACK"
                     side = "BUY PUT"
                     # SL set above ema50 with small buffer
