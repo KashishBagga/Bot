@@ -363,13 +363,15 @@ with tab_summary:
           <div class="stat-sub">Shadow portfolio</div>
         </div>""", unsafe_allow_html=True)
     with c6:
-        best = max(exp_metrics, key=lambda x: x.get("expectancy", -999), default=None)
-        worst = min(exp_metrics, key=lambda x: x.get("expectancy", 999), default=None)
+        best = max(exp_metrics, key=lambda x: float(x.get("expectancy") if x.get("expectancy") is not None else -999.0), default=None)
+        worst = min(exp_metrics, key=lambda x: float(x.get("expectancy") if x.get("expectancy") is not None else 999.0), default=None)
         best_name = (best["experiment_name"].split("_")[0] if best else "—")
+        best_exp_val = best.get("expectancy") if best else None
+        best_exp_str = f"{best_exp_val:+.2f}R" if best_exp_val is not None else "—"
         st.markdown(f"""<div class="stat-card">
           <div class="stat-label">Best Experiment</div>
           <div class="stat-value" style="font-size:1rem">{best_name}</div>
-          <div class="stat-sub">{best["expectancy"]:+.2f}R expectancy</div>
+          <div class="stat-sub">{best_exp_str} expectancy</div>
         </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
