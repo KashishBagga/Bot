@@ -172,7 +172,7 @@ def load_trades(date_str: str):
                        initial_stop_loss, initial_take_profit,
                        final_pnl_r, mfe_r, mae_r, capture_rate,
                        duration_minutes, bars_held, exit_reason,
-                       market_regime, daily_bias, diagnostics, features
+                       market_regime, (features->>'daily_bias') as daily_bias, diagnostics, features
                 FROM trade_performance
                 WHERE entry_time AT TIME ZONE 'Asia/Kolkata' >= %(ds)s::date
                   AND entry_time AT TIME ZONE 'Asia/Kolkata' <  %(ds)s::date + interval '1 day'

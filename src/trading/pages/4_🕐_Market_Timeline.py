@@ -326,11 +326,15 @@ for (sh, sm, eh, em) in HOUR_WINDOWS:
                 sl  = sig.get("stop_loss")
                 bias = sig.get("daily_bias", "?")
                 bias_pill_cls = "pill-bias-bull" if bias == "BULLISH" else ("pill-bias-bear" if bias == "BEARISH" else "pill-neutral")
+                
+                ep_str = f"₹{ep:.2f}" if ep is not None else "—"
+                sl_str = f"₹{sl:.2f}" if sl is not None else "—"
+                
                 st.markdown(
                     f'<div class="signal-row {cls}">'
                     f'<span class="{ts_cls}">{ts}</span>'
                     f'{icon} <b>{sig.get("setup_type","?")}</b> [{sig.get("experiment_name","?")}]'
-                    f'  Entry={ep:.2f}  SL={sl:.2f}{reason_str}'
+                    f'  Entry={ep_str}  SL={sl_str}{reason_str}'
                     f'  <span class="pill {bias_pill_cls}">{bias}</span>'
                     f'  <span class="pill pill-info">{sig.get("market_regime","?")}</span>'
                     f'</div>',
