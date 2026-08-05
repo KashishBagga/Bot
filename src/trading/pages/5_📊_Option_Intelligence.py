@@ -104,7 +104,6 @@ def build_chain_df(rows, atm_strike):
 # ─── CSS ──────────────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="Option Intelligence", page_icon="📊", layout="wide")
-st.markdown(f'<meta http-equiv="refresh" content="{AUTO_REFRESH_SECONDS}">', unsafe_allow_html=True)
 
 st.markdown("""
 <style>
@@ -239,29 +238,30 @@ def load_sr_zones_from_db(symbol):
     return db.get_sr_zones(symbol, active_only=True)
 
 
-# Determine chain data source
-chain_rows = []
-current_price = None
-expiry_date = None
+@st.fragment(run_every=60)
+def render_option_intelligence(symbol, view_mode):
+    chain_rows = []
+    current_price = None
+    expiry_date = None
 
-if view_mode.startswith("🔴"):
-    if is_market_hours():
-        with st.spinner("Fetching live option chain from Fyers..."):
-            current_price, expiry_date, chain_rows = load_live_chain(symbol)
+    if view_mode.startswith("🔴"):
+        if is_market_hours():
+            with st.spinner("Fetching live option chain from Fyers..."):
+                current_price, expiry_date, chain_rows = load_live_chain(symbol)
+        else:
+            st.markdown('<div class="stale-warning">⚠️ Market is closed. Showing warehouse data instead.</div>', unsafe_allow_html=True)
+            chain_rows = load_warehouse_chain(symbol)
+            if chain_rows:
+                expiry_date = chain_rows[0].get("expiry")
     else:
-        st.markdown('<div class="stale-warning">⚠️ Market is closed. Showing warehouse data instead.</div>', unsafe_allow_html=True)
         chain_rows = load_warehouse_chain(symbol)
         if chain_rows:
             expiry_date = chain_rows[0].get("expiry")
-else:
-    chain_rows = load_warehouse_chain(symbol)
-    if chain_rows:
-        expiry_date = chain_rows[0].get("expiry")
-        last_time = max((r.get("time") for r in chain_rows if r.get("time")), default=None)
-        if last_time:
-            age_mins = (datetime.now(timezone.utc) - last_time.replace(tzinfo=timezone.utc if last_time.tzinfo is None else last_time.tzinfo)).total_seconds() / 60
-            if age_mins > 10:
-                st.markdown(f'<div class="stale-warning">⚠️ Warehouse data is {age_mins:.0f} min old. Start the Option Warehouse for live OI data.</div>', unsafe_allow_html=True)
+            last_time = max((r.get("time") for r in chain_rows if r.get("time")), default=None)
+            if last_time:
+                age_mins = (datetime.now(timezone.utc) - last_time.replace(tzinfo=timezone.utc if last_time.tzinfo is None else last_time.tzinfo)).total_seconds() / 60
+                if age_mins > 10:
+                    st.markdown(f'<div class="stale-warning">⚠️ Warehouse data is {age_mins:.0f} min old. Start the Option Warehouse for live OI data.</div>', unsafe_allow_html=True)
 
 sr_zones = load_sr_zones_from_db(symbol)
 
@@ -494,3 +494,5 @@ with tab_zones:
                 f"This is the strike where the total payout to option buyers is minimized. "
                 f"Index has a statistical tendency to gravitate toward this level near expiry."
             )
+
+render_option_intelligence(symbol, view_mode)
