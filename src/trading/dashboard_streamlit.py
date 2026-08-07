@@ -318,8 +318,6 @@ with tab1:
         for t in filtered_trades:
             pnl_val = t["final_pnl_r"] or 0.0
             emoji = "🟢" if pnl_val >= 0 else "🔴"
-            title = f"{emoji} {t['symbol']} | {t['strategy']} | {pnl_val:+.2f} R"
-            
             # Pre-filter events to find option contract symbol and construct timeline
             t_events = [e for e in data["events"] if e["trade_id"] == t["trade_id"] or (t.get("candidate_id") and e["candidate_id"] == t["candidate_id"])]
             
@@ -341,6 +339,9 @@ with tab1:
                 if cand_sym and "INDEX" not in str(cand_sym):
                     opt_sym = cand_sym
                     break
+
+            opt_display = f" ({opt_sym})" if opt_sym else ""
+            title = f"{emoji} {t['symbol']}{opt_display} | {t['strategy']} | {pnl_val:+.2f} R"
 
             with st.expander(title):
                 m_col1, m_col2 = st.columns(2)
@@ -392,8 +393,6 @@ with tab2:
     else:
         for c in filtered_candidates:
             pnl_val = c["final_pnl_r"] or 0.0
-            title = f"👻 {c['symbol']} | {c['setup_type'] or c['strategy']} | Blocked: {c['primary_rejection_reason']} | {pnl_val:+.2f} R"
-            
             # Pre-filter events to find option contract symbol and construct timeline
             t_events = [e for e in data["events"] if e["candidate_id"] == c["candidate_id"]]
             
@@ -415,6 +414,9 @@ with tab2:
                 if cand_sym and "INDEX" not in str(cand_sym):
                     opt_sym = cand_sym
                     break
+
+            opt_display = f" ({opt_sym})" if opt_sym else ""
+            title = f"👻 {c['symbol']}{opt_display} | {c['setup_type'] or c['strategy']} | Blocked: {c['primary_rejection_reason']} | {pnl_val:+.2f} R"
 
             with st.expander(title):
                 m_col1, m_col2 = st.columns(2)

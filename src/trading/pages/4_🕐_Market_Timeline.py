@@ -183,7 +183,7 @@ def load_trades_for_timeline(date_str, symbol):
             cur.execute("""
                 SELECT trade_id, entry_time, exit_time, setup_type, experiment_name,
                        entry_price, exit_price, final_pnl_r, exit_reason,
-                       stop_loss, take_profit, mfe_r, mae_r
+                       stop_loss, take_profit, mfe_r, mae_r, diagnostics
                 FROM trade_performance
                 WHERE symbol = %s
                   AND entry_time AT TIME ZONE 'Asia/Kolkata' >= %s::date
@@ -295,7 +295,7 @@ for (sh, sm, eh, em) in HOUR_WINDOWS:
                     detail = (
                         f"type={p.get('type','?')}  "
                         f"dir={p.get('direction','?')}  "
-                        f"conf={p.get('confidence', p.get('delta',{}).get('confidence_delta','?')):.2f}"
+                        "conf=" + (f"{float(c):.2f}" if (c := p.get("confidence") if p.get("confidence") is not None else (p.get("delta") or {}).get("confidence_delta") if p.get("delta") else None) is not None else "?")
                         if isinstance(p.get("confidence"), float)
                         else f"state={p.get('state','?')}"
                     )
@@ -349,6 +349,10 @@ for (sh, sm, eh, em) in HOUR_WINDOWS:
                 exit_ist  = to_ist(t.get("exit_time"))
                 pnl = t.get("final_pnl_r")
                 icon = "🟢" if (pnl or 0) > 0 else ("🔴" if (pnl or 0) < 0 else "⚪")
+                diag = parse_json(t.get("diagnostics")) or {}
+                opt_sym = diag.get("option_symbol")
+                opt_display = f" ({opt_sym})" if opt_sym else ""
+                
                 if entry_ist and in_window(t.get("entry_time"), sh, sm, eh, em):
                     ep = t.get("entry_price")
                     sl = t.get("stop_loss")
@@ -356,13 +360,14 @@ for (sh, sm, eh, em) in HOUR_WINDOWS:
                     sl_str = f"₹{sl:,.2f}" if sl is not None else "—"
                     st.markdown(
                         f'<div class="trade-entry">⬆️ <b>ENTRY</b> {fmt_t(entry_ist)} | '
-                        f'{t.get("setup_type","?")} [{t.get("experiment_name","?")}] | '
+                        f'{t.get("setup_type","?")}{opt_display} [{t.get("experiment_name","?")}] | '
                         f'@ {ep_str}  SL={sl_str}</div>',
                         unsafe_allow_html=True
                     )
                 if exit_ist and in_window(t.get("exit_time"), sh, sm, eh, em):
                     st.markdown(
                         f'<div class="trade-exit">⬇️ <b>EXIT</b> {fmt_t(exit_ist)} | '
+                        f'{t.get("setup_type","?")}{opt_display} | '
                         f'{icon} {fmt_r(pnl)} | reason={t.get("exit_reason","?")} | '
                         f'MFE={fmt_r(t.get("mfe_r"))} MAE={fmt_r(t.get("mae_r"))}</div>',
                         unsafe_allow_html=True

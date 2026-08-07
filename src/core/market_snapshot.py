@@ -11,7 +11,7 @@ Design principle: compute once, share everywhere.
   - Unlimited strategies read from the same snapshot
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
@@ -53,8 +53,10 @@ class MarketSnapshot:
     h1_zones: list               # List of Zone objects from ZoneEngine (h1) — unchanged, existing consumers
     m5_zones: list               # List of Zone objects from ZoneEngine (m5) — additive, MTF confluence
     d1_zones: list               # List of Zone objects from ZoneEngine (d1) — additive, MTF confluence
-    market_regime: str           # e.g. "TREND_UP_HIGH_VOL", "RANGE"
+    market_regime: str           # e.g. "STRONG_TREND_UP_HIGH_VOL", "RANGE_NORMAL"
     volume_report: object        # VolumeReport (rvol_tod, is_high_participation, etc.)
+    regime_detail: object        # RegimeLabel — structured breakdown (adx, atr_pct, gap_pct, session)
+                                 # Optional: None when constructed by older code paths.
 
     # ── Extensible feature store ───────────────────────────────────────────
     # Strategies access via snapshot.features.get_float("atr") etc.

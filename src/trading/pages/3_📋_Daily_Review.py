@@ -411,9 +411,42 @@ with tab_trades:
             card_cls = "trade-card-win" if (pnl or 0) > 0 else ("trade-card-loss" if (pnl or 0) < 0 else "trade-card-flat")
             symbol_short = (t.get("symbol") or "").replace("NSE:", "").replace("-INDEX", "")
 
+            # Resolve events timeline early to extract option contract symbol
+            events = trade_events.get(t.get("trade_id"), [])
+            ex_evts = exec_events.get(t.get("trade_id"), []) or exec_events.get(t.get("candidate_id"), [])
+            all_evts = events + ex_evts
+            
+            # Heal shifted timestamps
+            ref_time = t.get("entry_time")
+            for ev in all_evts:
+                curr_t = ev.get("timestamp")
+                if curr_t and ref_time and curr_t.tzinfo and ref_time.tzinfo:
+                    diff = (curr_t - ref_time).total_seconds()
+                    if diff > 18000:
+                        ev["timestamp"] = curr_t - timedelta(hours=5, minutes=30)
+                    elif diff < -18000:
+                        ev["timestamp"] = curr_t + timedelta(hours=5, minutes=30)
+            
+            all_evts = sorted(all_evts, key=lambda e: e["timestamp"])
+
+            opt_sym = None
+            for ev in all_evts:
+                pld = ev.get("payload") or {}
+                if isinstance(pld, str):
+                    try:
+                        pld = json.loads(pld)
+                    except Exception:
+                        pld = {}
+                cand_sym = pld.get("symbol") or pld.get("option_symbol")
+                if cand_sym and "INDEX" not in str(cand_sym):
+                    opt_sym = cand_sym
+                    break
+
+            opt_display = f" ({opt_sym})" if opt_sym else ""
+
             with st.expander(
                 f"{color_r(pnl)} Trade #{i} — {t.get('setup_type','?')} {t.get('signal_type','')} "
-                f"`{symbol_short}` | {t.get('experiment_name','?')} | "
+                f"`{symbol_short}`{opt_display} | {t.get('experiment_name','?')} | "
                 f"**{fmt_r(pnl)}** | {fmt_dt(t.get('entry_time'))}",
                 expanded=(i == 1),
             ):
@@ -439,37 +472,6 @@ with tab_trades:
                     cap = t.get("capture_rate")
                     st.metric("Capture Rate", f"{cap*100:.0f}%" if cap else "—")
                     st.metric("Duration", f"{t.get('duration_minutes', 0):.0f} min / {t.get('bars_held', 0)} bars")
-
-                # Resolve events timeline early to extract option contract symbol
-                events = trade_events.get(t.get("trade_id"), [])
-                ex_evts = exec_events.get(t.get("trade_id"), []) or exec_events.get(t.get("candidate_id"), [])
-                all_evts = events + ex_evts
-                
-                # Heal shifted timestamps
-                ref_time = t.get("entry_time")
-                for ev in all_evts:
-                    curr_t = ev.get("timestamp")
-                    if curr_t and ref_time and curr_t.tzinfo and ref_time.tzinfo:
-                        diff = (curr_t - ref_time).total_seconds()
-                        if diff > 18000:
-                            ev["timestamp"] = curr_t - timedelta(hours=5, minutes=30)
-                        elif diff < -18000:
-                            ev["timestamp"] = curr_t + timedelta(hours=5, minutes=30)
-                
-                all_evts = sorted(all_evts, key=lambda e: e["timestamp"])
-
-                opt_sym = None
-                for ev in all_evts:
-                    pld = ev.get("payload") or {}
-                    if isinstance(pld, str):
-                        try:
-                            pld = json.loads(pld)
-                        except Exception:
-                            pld = {}
-                    cand_sym = pld.get("symbol") or pld.get("option_symbol")
-                    if cand_sym and "INDEX" not in str(cand_sym):
-                        opt_sym = cand_sym
-                        break
 
                 if opt_sym:
                     st.markdown(f"🎳 **Option Contract:** `{opt_sym}`")

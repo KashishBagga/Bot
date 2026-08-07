@@ -260,7 +260,7 @@ def place_manual_trade(symbol, signal_type, entry_price, sl_price, tp_price, str
         'initial_take_profit': tp_price,
         'highest_price': entry_price,
         'lowest_price': entry_price,
-        'stop_loss_distance': abs(entry_price - sl_price) if sl_price else 0.0,
+        'stop_loss_distance': abs(entry_price - sl_price) if (entry_price is not None and sl_price is not None) else 0.0,
         'signal_type': signal_type,
         'capture_rate': 0.0,
         'holding_efficiency': 0.0,
@@ -273,7 +273,7 @@ def place_manual_trade(symbol, signal_type, entry_price, sl_price, tp_price, str
         'current_price': entry_price,
         'unrealized_pnl_r': 0.0,
         'last_heartbeat_at': now,
-        'tp1': entry_price + (abs(entry_price - sl_price) * 1.5) if signal_type == "BUY CALL" else entry_price - (abs(entry_price - sl_price) * 1.5)
+        'tp1': (entry_price + (abs(entry_price - sl_price) * 1.5) if signal_type == "BUY CALL" else entry_price - (abs(entry_price - sl_price) * 1.5)) if (entry_price is not None and sl_price is not None) else entry_price
     }
     
     try:
@@ -428,7 +428,7 @@ def load_open_cf():
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT candidate_id, timestamp, symbol, experiment_name, setup_type,
-                       entry_price, stop_loss, take_profit
+                       entry_price, stop_loss, take_profit, diagnostics
                 FROM counterfactual_results
                 WHERE exit_time IS NULL AND (valid IS NULL OR valid = TRUE)
                 ORDER BY timestamp
@@ -518,7 +518,10 @@ with tab_cockpit:
                     st.markdown('<div class="trade-card-live">', unsafe_allow_html=True)
                     tc1, tc2, tc3, tc4 = st.columns([3, 2, 2, 2])
                     with tc1:
-                        st.markdown(f"**{t.get('setup_type','?')} {t.get('signal_type','')}** — `{sym_short}`")
+                        diag = parse_json(t.get("diagnostics")) or {}
+                        opt_sym = diag.get("option_symbol")
+                        opt_display = f" ({opt_sym})" if opt_sym else ""
+                        st.markdown(f"**{t.get('setup_type','?')} {t.get('signal_type','')}** — `{sym_short}`{opt_display}")
                         st.markdown(f"<small>{t.get('experiment_name','?')} · Entry: {fmt_dt(t.get('entry_time'))}</small>", unsafe_allow_html=True)
                     with tc2:
                         st.markdown(f"Entry: **₹{t.get('entry_price',0):,.2f}**")
@@ -830,9 +833,12 @@ with tab_expiry:
             st.markdown(f"## 👻 Open Shadow Positions ({len(open_cf)})")
             for cf in open_cf[:10]:
                 sym_short = (cf.get("symbol") or "").replace("NSE:", "").replace("-INDEX", "")
+                diag = parse_json(cf.get("diagnostics")) or {}
+                opt_sym = diag.get("option_symbol")
+                opt_display = f" ({opt_sym})" if opt_sym else ""
                 st.markdown(
                     f'<div class="trade-card-cf">'
-                    f'<b>{cf.get("setup_type","?")} `{sym_short}`</b> [{cf.get("experiment_name","?")}] '
+                    f'<b>{cf.get("setup_type","?")} `{sym_short}`{opt_display}</b> [{cf.get("experiment_name","?")}] '
                     f'Entry @ ₹{cf.get("entry_price",0):,.2f} | SL={cf.get("stop_loss",0):.2f}</div>',
                     unsafe_allow_html=True
                 )

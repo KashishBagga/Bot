@@ -206,8 +206,9 @@ class IndicatorPipeline:
             # Stage 2: Volume participation
             volume_report = self._stage_volume(m5, symbol)
 
-            # Stage 3: Market regime
-            market_regime = self._stage_regime(m5)
+            # Stage 3: Market regime (enhanced — ADX + gap + volatility state)
+            regime_label  = self._stage_regime(m5, d1=d1, now=timestamp)
+            market_regime = regime_label.label
 
             # Stage 4: Feature store (ATR, EMAs, derived metrics)
             features = self._stage_features(m5, d1)
@@ -369,9 +370,11 @@ class IndicatorPipeline:
                 d1_zones=d1_zones,
                 market_regime=market_regime,
                 volume_report=volume_report,
+                regime_detail=regime_label,
                 features=features,
                 market=market_ctx
             )
+
 
         except Exception as e:
             logger.error(f"[Pipeline] Snapshot computation failed for {symbol}: {e}", exc_info=True)
@@ -426,9 +429,13 @@ class IndicatorPipeline:
 
     # ── Stage 3: Regime ───────────────────────────────────────────────────
 
-    def _stage_regime(self, m5) -> str:
-        """Market regime classification (TREND_UP, RANGE, etc.)."""
-        return self.regime_engine.detect_regime(m5)
+    def _stage_regime(self, m5, d1=None, now=None):
+        """Market regime classification (enhanced: ADX, gap, ATR percentile).
+
+        Returns a RegimeLabel dataclass. Callers that only need the string
+        should call regime_label.label for backward compatibility.
+        """
+        return self.regime_engine.detect_regime(m5, d1=d1, now=now)
 
     # ── Stage 4: Features ─────────────────────────────────────────────────
 
@@ -528,6 +535,24 @@ class IndicatorPipeline:
         except Exception as e:
             logger.warning(f"Error calculating previous day distances: {e}")
 
+        # ── ADX (14-period) — reuse RegimeEngine static helper ─────────────
+        adx_val   = 0.0
+        adx_slope = 0.0
+        try:
+            from src.core.regime_engine import RegimeEngine as _RE
+            adx_val, adx_slope = _RE._compute_adx(m5, period=14)
+        except Exception as _e:
+            logger.warning(f"FeatureStore ADX failed: {_e}")
+
+        # ── Opening gap (requires d1) ─────────────────────────────────────
+        gap_pct = 0.0
+        try:
+            if d1 is not None:
+                from src.core.regime_engine import RegimeEngine as _RE2
+                _, gap_pct = _RE2._compute_gap(m5, d1)
+        except Exception as _e:
+            logger.warning(f"FeatureStore gap_pct failed: {_e}")
+
         data = {
             "atr":                    round(atr, 2),
             "ema20":                  round(ema20, 2),
@@ -541,6 +566,10 @@ class IndicatorPipeline:
             "atr_percentile":         round(atr_percentile, 4),
             "dist_prev_high":         round(dist_prev_high, 4),
             "dist_prev_low":          round(dist_prev_low, 4),
+            # New: regime-related features for ablation & regime gates
+            "adx":                    round(adx_val, 2),
+            "adx_slope":              round(adx_slope, 4),
+            "gap_pct":                round(gap_pct, 4),
         }
 
         return FeatureStore(data)

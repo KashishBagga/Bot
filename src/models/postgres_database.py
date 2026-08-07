@@ -1020,6 +1020,106 @@ class PostgresDatabase:
             logger.error(f"❌ Failed to fetch today's realized R: {e}")
             return 0.0
 
+    def get_strategy_metrics(self, days: int = 30, experiment: str = None) -> list:
+        """
+        Compute per-strategy performance metrics from trade_performance.
+
+        Returns list of dicts (one per strategy x regime) with:
+          expectancy, profit_factor, win_rate, sharpe, kelly_pct,
+          avg_winner, avg_loser, total_trades, wins, losses, avg_hold_minutes.
+        """
+        import math
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    exp_clause = "AND strategy = %(exp)s" if experiment else ""
+                    params = {"exp": experiment} if experiment else None
+                    cursor.execute(f"""
+                        SELECT
+                            strategy, setup_type, market_regime,
+                            COUNT(*) AS total_trades,
+                            SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END) AS wins,
+                            AVG(CASE WHEN final_pnl_r > 0 THEN final_pnl_r END) AS avg_winner,
+                            AVG(CASE WHEN final_pnl_r <= 0 THEN final_pnl_r END) AS avg_loser,
+                            COALESCE(SUM(CASE WHEN final_pnl_r > 0 THEN final_pnl_r END), 0) AS gross_profit,
+                            COALESCE(SUM(CASE WHEN final_pnl_r <= 0 THEN ABS(final_pnl_r) END), 0) AS gross_loss,
+                            AVG(final_pnl_r) AS mean_r,
+                            STDDEV(final_pnl_r) AS stddev_r,
+                            MIN(final_pnl_r) AS worst_r,
+                            MAX(final_pnl_r) AS best_r,
+                            AVG(duration_minutes) AS avg_hold_minutes
+                        FROM trade_performance
+                        WHERE exit_time IS NOT NULL
+                          AND final_pnl_r IS NOT NULL
+                          AND valid = TRUE
+                          AND entry_time > NOW() - INTERVAL '{days} days'
+                          {exp_clause}
+                        GROUP BY strategy, setup_type, market_regime
+                        ORDER BY strategy, market_regime
+                    """, params)
+                    rows = list(cursor.fetchall())
+            results = []
+            for row in rows:
+                r = dict(row)
+                total  = int(r.get("total_trades") or 0)
+                w      = int(r.get("wins") or 0)
+                losses = total - w
+                gp     = float(r.get("gross_profit") or 0.0)
+                gl     = float(r.get("gross_loss") or 0.0)
+                mr     = float(r.get("mean_r") or 0.0)
+                sr     = float(r.get("stddev_r") or 0.0)
+                aw     = float(r.get("avg_winner") or 0.0)
+                al     = float(r.get("avg_loser") or 0.0)
+                win_r  = w / total if total > 0 else 0.0
+                loss_r = losses / total if total > 0 else 0.0
+                pf     = gp / gl if gl > 0 else (99.0 if gp > 0 else 0.0)
+                sharpe = (mr / sr * math.sqrt(252)) if sr > 0 else 0.0
+                wlr    = abs(aw / al) if al != 0 else 0.0
+                kelly  = (win_r - (loss_r / wlr)) if wlr > 0 else 0.0
+                r.update({
+                    "win_rate": round(win_r, 4), "loss_rate": round(loss_r, 4),
+                    "expectancy": round(mr, 4), "profit_factor": round(min(pf, 99.0), 3),
+                    "sharpe": round(sharpe, 3), "kelly_pct": round(max(kelly, 0.0), 4),
+                    "total_trades": total, "wins": w, "losses": losses,
+                })
+                results.append(r)
+            return results
+        except Exception as e:
+            logger.error(f"get_strategy_metrics failed: {e}", exc_info=True)
+            return []
+
+    def get_strategy_equity_curve(self, strategy: str = None, days: int = 30) -> list:
+        """
+        Time-ordered closed trades for plotting cumulative equity curves.
+        Returns: strategy, entry_time, final_pnl_r, cumulative_r, market_regime.
+        strategy=None returns all strategies (multi-line chart).
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    exp_clause = "AND strategy = %(strat)s" if strategy else ""
+                    params_ec = {"strat": strategy} if strategy else None
+                    cursor.execute(f"""
+                        SELECT
+                            strategy, entry_time, exit_time, final_pnl_r, market_regime, setup_type,
+                            SUM(final_pnl_r) OVER (
+                                PARTITION BY strategy ORDER BY entry_time
+                                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                            ) AS cumulative_r
+                        FROM trade_performance
+                        WHERE exit_time IS NOT NULL
+                          AND final_pnl_r IS NOT NULL
+                          AND valid = TRUE
+                          AND entry_time > NOW() - INTERVAL '{days} days'
+                          {exp_clause}
+                        ORDER BY strategy, entry_time
+                    """, params_ec)
+                    return [dict(r) for r in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"get_strategy_equity_curve failed: {e}", exc_info=True)
+            return []
+
+
     def get_open_counterfactuals(self) -> List[Dict[str, Any]]:
         """Fetch all currently open counterfactual positions for recovery"""
         try:
