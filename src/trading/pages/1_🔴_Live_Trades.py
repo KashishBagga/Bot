@@ -212,10 +212,19 @@ def render_live_trades(category_filter):
             stale_badge = ' <span class="stale-badge">⚠️ stale</span>' if stale else ""
 
             cat = category_of(p["experiment_name"])
-            title = f"{emoji} [{cat}] {p['experiment_name']} | {p['signal_type']} | {pnl_r:+.2f} R"
+            diag = p.get("diagnostics") or {}
+            opt_sym = diag.get("option_symbol") if isinstance(diag, dict) else None
+            
+            if opt_sym:
+                title = f"{emoji} [{cat}] {p['experiment_name']} ({opt_sym}) | {p['signal_type']} | {pnl_r:+.2f} R"
+            else:
+                title = f"{emoji} [{cat}] {p['experiment_name']} | {p['signal_type']} | {pnl_r:+.2f} R"
 
             with st.expander(title, expanded=True):
-                st.markdown(f"**Category:** {cat}  ·  **Strategy / Setup:** {p['strategy']}{stale_badge}", unsafe_allow_html=True)
+                if opt_sym:
+                    st.markdown(f"**Category:** {cat}  ·  **Strategy / Setup:** {p['strategy']}  ·  📦 **Option Contract:** `{opt_sym}`{stale_badge}", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"**Category:** {cat}  ·  **Strategy / Setup:** {p['strategy']}{stale_badge}", unsafe_allow_html=True)
 
                 m1, m2, m3, m4 = st.columns(4)
                 m1.metric("Entry", f"{entry:.2f}")

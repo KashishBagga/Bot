@@ -1604,6 +1604,9 @@ class StructuralPaperTrader:
             diagnostics = {"raw": diagnostics}
         diagnostics['position_size_inr'] = position_size_inr
         diagnostics['lots'] = lots
+        if option_contract:
+            diagnostics['option_symbol'] = option_contract.symbol
+            diagnostics['option_premium'] = option_contract.premium
 
         pos = {
             'trade_id': trade_id if not is_counterfactual else None,
