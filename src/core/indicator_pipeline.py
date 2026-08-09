@@ -200,14 +200,14 @@ class IndicatorPipeline:
             # existing strategy reading snapshot.h1_zones keeps its exact current
             # behavior. m5_zones/d1_zones are new, additive fields (see
             # MarketSnapshot below); nothing reads them yet except _persist_sr_zones.
-            m5_zones = self.zone_engine.detect_zones(m5, timeframe="m5")
-            d1_zones = self.zone_engine.detect_zones(d1, timeframe="d1") if d1 is not None else []
+            m5_zones = self.zone_engine.detect_zones(m5, timeframe="m5", atr_pct_of_price=self._atr_pct_of_price(m5))
+            d1_zones = self.zone_engine.detect_zones(d1, timeframe="d1", atr_pct_of_price=self._atr_pct_of_price(d1)) if d1 is not None else []
 
             # Stage 2: Volume participation
             volume_report = self._stage_volume(m5, symbol)
 
-            # Stage 3: Market regime (enhanced — ADX + gap + volatility state)
-            regime_label  = self._stage_regime(m5, d1=d1, now=timestamp)
+            # Stage 3: Market regime (enhanced — ADX + gap + volatility state + MTF context)
+            regime_label  = self._stage_regime(m5, d1=d1, h1_structure=h1_structure, now=timestamp)
             market_regime = regime_label.label
 
             # Stage 4: Feature store (ATR, EMAs, derived metrics)
@@ -418,7 +418,8 @@ class IndicatorPipeline:
         """
         daily_bias = QuantUtils.get_structural_bias(d1) if d1 is not None else "NEUTRAL"
         h1_structure = LegacyStructureReportAdapter(h1_state, h1_events)
-        h1_zones = self.zone_engine.detect_zones(h1)
+        h1_atr_pct = self._atr_pct_of_price(h1)
+        h1_zones = self.zone_engine.detect_zones(h1, timeframe="h1", atr_pct_of_price=h1_atr_pct)
         return daily_bias, h1_structure, h1_zones
 
     # ── Stage 2: Volume ───────────────────────────────────────────────────
@@ -429,13 +430,14 @@ class IndicatorPipeline:
 
     # ── Stage 3: Regime ───────────────────────────────────────────────────
 
-    def _stage_regime(self, m5, d1=None, now=None):
-        """Market regime classification (enhanced: ADX, gap, ATR percentile).
+    def _stage_regime(self, m5, d1=None, h1_structure=None, now=None):
+        """Market regime classification (enhanced: ADX, gap, ATR percentile,
+        h1/d1 MTF context).
 
         Returns a RegimeLabel dataclass. Callers that only need the string
         should call regime_label.label for backward compatibility.
         """
-        return self.regime_engine.detect_regime(m5, d1=d1, now=now)
+        return self.regime_engine.detect_regime(m5, d1=d1, h1_structure=h1_structure, now=now)
 
     # ── Stage 4: Features ─────────────────────────────────────────────────
 
@@ -597,6 +599,18 @@ class IndicatorPipeline:
             return float(val)
         # Not enough bars for a full rolling window yet — fall back to a simple range mean.
         return float(df["high"].tail(window).mean() - df["low"].tail(window).mean())
+
+    @classmethod
+    def _atr_pct_of_price(cls, df: Optional[pd.DataFrame]) -> Optional[float]:
+        """ATR as a fraction of the last close — feeds ZoneEngine's
+        volatility-adaptive clustering tolerance so zone width scales with
+        how quiet/volatile the market actually is, instead of a fixed % band."""
+        if df is None or len(df) < 2:
+            return None
+        last_close = df["close"].iloc[-1]
+        if not last_close or last_close <= 0:
+            return None
+        return cls._compute_atr(df) / float(last_close)
 
     def _stage_geometry(
         self,

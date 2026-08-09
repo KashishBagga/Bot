@@ -8,6 +8,7 @@ Handles persistent storage for high-frequency trading data.
 import os
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 import psycopg2
@@ -38,8 +39,23 @@ class PostgresDatabase:
         self.conn_str = os.getenv("DATABASE_URL", "postgresql://trader:trading_pass@127.0.0.1:5433/trading_warehouse")
         self._init_db()
 
-    def _get_connection(self):
-        return psycopg2.connect(self.conn_str)
+    def _get_connection(self, retries: int = 3, backoff_seconds: float = 0.5):
+        """Connect with short retry/backoff — logs (08-03..08-07) showed hundreds
+        of "Failed to save market event/experiment" errors per week from
+        transient DB unavailability that a single connect attempt has no chance
+        to recover from."""
+        last_err = None
+        for attempt in range(retries):
+            try:
+                return psycopg2.connect(self.conn_str)
+            except psycopg2.OperationalError as e:
+                last_err = e
+                if attempt < retries - 1:
+                    logger.warning(
+                        f"⚠️ Postgres connect failed (attempt {attempt + 1}/{retries}): {e}. Retrying..."
+                    )
+                    time.sleep(backoff_seconds * (attempt + 1))
+        raise last_err if last_err is not None else RuntimeError("Postgres connect failed with no captured error")
 
     def _init_db(self):
         """Initialize tables and hyper-tables for TimescaleDB"""

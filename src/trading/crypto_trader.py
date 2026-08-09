@@ -293,7 +293,7 @@ class WorkingOptimizedModularTradingSystem:
                 stop_loss_price=stop_loss_price,
                 strategy=signal['strategy'],
                 confidence=signal.get('confidence', 70.0),
-                regime=signal.get('regime', 'UNKNOWN'),
+                regime_primary=signal.get('regime', 'UNKNOWN'),
                 deployed_capital=deployed,
             )
             if position_size <= 0:

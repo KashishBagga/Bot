@@ -25,6 +25,7 @@ sys.path.insert(0, project_root)
 
 from src.adapters.data.fyers_data_provider import FyersDataProvider
 from src.models.postgres_database import PostgresDatabase
+from src.core.regime_router import is_regime_eligible
 
 # Strategy Research Framework
 from src.core.indicator_pipeline import IndicatorPipeline
@@ -40,13 +41,10 @@ from src.strategies.orb import OrbStrategy
 from src.strategies.atr_squeeze import AtrSqueezeStrategy
 from src.strategies.geometry_strategy import GeometryStrategy
 from src.strategies.order_flow_strategy import OrderFlowStrategy
-from src.strategies.chart_pattern_strategy import ChartPatternStrategy
 from src.strategies.vwap_reclaim import VwapReclaimStrategy
 from src.strategies.cpr_strategy import CprStrategy
-from src.strategies.gap_strategy import GapStrategy
 from src.strategies.vertical_spread_strategy import VerticalSpreadStrategy
 from src.strategies.straddle_strangle_strategy import StraddleStrangleStrategy
-from src.strategies.channel_strategy import ChannelStrategy
 from src.strategies.oi_wall_reaction_strategy import OIWallReactionStrategy
 from src.strategies.pcr_extreme_reversal_strategy import PCRExtremeReversalStrategy
 
@@ -218,24 +216,9 @@ class StructuralPaperTrader:
         self.registry.register(_prev_day_exp)
         self.db.save_experiment(_prev_day_exp.to_db_dict())
 
-        # 5. ORB (15m and 30m)
-        _orb_15_exp = Experiment(
-            name="ORB_15m_RVOL1.2",
-            strategy=OrbStrategy(rvol_threshold=1.2, opening_range_minutes=15),
-            params={"rvol_threshold": 1.2, "opening_range_minutes": 15},
-            description="Opening Range Breakout 15m range"
-        )
-        self.registry.register(_orb_15_exp)
-        self.db.save_experiment(_orb_15_exp.to_db_dict())
-
-        _orb_30_exp = Experiment(
-            name="ORB_30m_RVOL1.2",
-            strategy=OrbStrategy(rvol_threshold=1.2, opening_range_minutes=30),
-            params={"rvol_threshold": 1.2, "opening_range_minutes": 30},
-            description="Opening Range Breakout 30m range"
-        )
-        self.registry.register(_orb_30_exp)
-        self.db.save_experiment(_orb_30_exp.to_db_dict())
+        # 5. ORB (15m and 30m) — retired 2026-08-08: 0 real trades in 11 days
+        # despite running as CF the whole time (25 & 31 CF trades), and net
+        # negative CF pnl_r (-15.53 / -8.17). Not a thin sample, just losing.
 
         # 6. ATR Squeeze Breakout
         # Aug-03 review: 6 live trades taken (all counter-trend BUY PUT on a
@@ -327,52 +310,10 @@ class StructuralPaperTrader:
         self.registry.register(_order_flow_exp)
         self.db.save_experiment(_order_flow_exp.to_db_dict())
 
-        # 9. Chart Pattern Strategy — trades the previously-unused pattern engine
-        # (Double Top/Bottom, H&S, triangles, flags), confirmed by a named
-        # candlestick pattern and zone_engine S/R confluence. Two variants to
-        # compare a moderate vs. looser acceptance threshold, same as the other
-        # multi-variant experiments above.
-        _chart_pattern_exp = Experiment(
-            name="ChartPattern_v1.0_Conf55",
-            strategy=ChartPatternStrategy(
-                min_pattern_confidence=0.55,
-                min_candle_strength=0.40,
-                zone_tolerance_pct=0.003,
-                tp_atr_cap=5.0,
-                min_rr=1.5,
-            ),
-            params={
-                "min_pattern_confidence": 0.55,
-                "min_candle_strength": 0.40,
-                "zone_tolerance_pct": 0.003,
-                "tp_atr_cap": 5.0,
-                "min_rr": 1.5,
-            },
-            description="Chart Pattern Strategy — pattern engine + candlestick confirmation + zone confluence"
-        )
-        self.registry.register(_chart_pattern_exp)
-        self.db.save_experiment(_chart_pattern_exp.to_db_dict())
-
-        _chart_pattern_loose_exp = Experiment(
-            name="ChartPattern_v1.0_Conf40",
-            strategy=ChartPatternStrategy(
-                min_pattern_confidence=0.40,
-                min_candle_strength=0.30,
-                zone_tolerance_pct=0.005,
-                tp_atr_cap=5.0,
-                min_rr=1.3,
-            ),
-            params={
-                "min_pattern_confidence": 0.40,
-                "min_candle_strength": 0.30,
-                "zone_tolerance_pct": 0.005,
-                "tp_atr_cap": 5.0,
-                "min_rr": 1.3,
-            },
-            description="Chart Pattern Strategy — looser acceptance variant for research comparison"
-        )
-        self.registry.register(_chart_pattern_loose_exp)
-        self.db.save_experiment(_chart_pattern_loose_exp.to_db_dict())
+        # 9. Chart Pattern Strategy — retired 2026-08-08: both confidence
+        # variants (Conf55, Conf40) ran 7 days with large CF samples (92 & 91
+        # trades) and net negative pnl_r (-10.55 / -13.58). Consistent loser,
+        # not a filter-threshold problem.
 
         # 10. VWAP Reclaim — trend-continuation on a VWAP cross.
         # Same family as EMA_Pullback (trend-following), so also lowers efficiency
@@ -397,23 +338,8 @@ class StructuralPaperTrader:
         self.registry.register(_cpr_exp)
         self.db.save_experiment(_cpr_exp.to_db_dict())
 
-        # 12. Gap — Gap-and-Go / Gap-Fill resolved dynamically as ONE strategy
-        # (see gap_strategy.py docstring for why these can't be two independent
-        # always-on strategies without a regime discriminator).
-        _gap_exp = Experiment(
-            name="Gap_v1.0",
-            strategy=GapStrategy(
-                gap_threshold_pct=0.15, rvol_threshold=1.1,
-                min_efficiency=0.55, decision_window_minutes=45,
-            ),
-            params={
-                "gap_threshold_pct": 0.15, "rvol_threshold": 1.1,
-                "min_efficiency": 0.55, "decision_window_minutes": 45,
-            },
-            description="Gap continuation (Gap-and-Go) or reversion (Gap-Fill), decided dynamically"
-        )
-        self.registry.register(_gap_exp)
-        self.db.save_experiment(_gap_exp.to_db_dict())
+        # 12. Gap — retired 2026-08-08: net negative pnl_r (-4.26) over 7 days,
+        # worst experiment overall in the 2026-08-07 EOD report.
 
         # 13. Initial Balance Breakout — same OrbStrategy, 60-min window
         # (only possible now that the 15/30-hardcoded cutoff bug is fixed).
@@ -479,26 +405,8 @@ class StructuralPaperTrader:
         self.registry.register(_strangle_exp)
         self.db.save_experiment(_strangle_exp.to_db_dict())
 
-        # Channel bounce/breakout — consumes MarketContext.geometry.channels
-        # (parallel-trendline pairs, see market_geometry.Channel / TrendlineEngine.
-        # detect_channels). New capability, no channel-based strategy existed
-        # before this.
-        _channel_exp = Experiment(
-            name="Channel_v1.0",
-            strategy=ChannelStrategy(
-                min_parallel_score=0.3, zone_tolerance_pct=0.0015,
-                min_body_fraction=0.40, atr_sl_buffer_mult=0.15,
-                breakout_rvol_threshold=1.3, tp_atr_cap=3.0, min_rr=1.5,
-            ),
-            params={
-                "min_parallel_score": 0.3, "zone_tolerance_pct": 0.0015,
-                "min_body_fraction": 0.40, "atr_sl_buffer_mult": 0.15,
-                "breakout_rvol_threshold": 1.3, "tp_atr_cap": 3.0, "min_rr": 1.5,
-            },
-            description="Channel bounce (fade boundary) + RVOL-confirmed breakout continuation"
-        )
-        self.registry.register(_channel_exp)
-        self.db.save_experiment(_channel_exp.to_db_dict())
+        # Channel bounce/breakout — retired 2026-08-08: net negative pnl_r
+        # (-6.81) over its 3 days running, on a meaningful 33-trade CF sample.
 
         # OI-wall reaction — consumes MarketContext.options (real OI via
         # OptionsIntelligenceEngine, fed by the OptionWarehouse background
@@ -547,22 +455,16 @@ class StructuralPaperTrader:
         self.portfolios.register("EMA_Pullback_20_50_RVOL1.0")
         self.portfolios.register("VWAP_Reversion_1.5ATR_RVOL1.0")
         self.portfolios.register("PrevDay_Extremes_RVOL1.2")
-        self.portfolios.register("ORB_15m_RVOL1.2")
-        self.portfolios.register("ORB_30m_RVOL1.2")
         self.portfolios.register("ATR_Squeeze_RVOL1.0")
         self.portfolios.register("Geometry_v1.0_Score35")
         self.portfolios.register("Geometry_v1.0_Score50")
         self.portfolios.register("OrderFlow_v1.0")
-        self.portfolios.register("ChartPattern_v1.0_Conf55")
-        self.portfolios.register("ChartPattern_v1.0_Conf40")
         self.portfolios.register("VWAP_Reclaim_v1.0")
         self.portfolios.register("CPR_v1.0")
-        self.portfolios.register("Gap_v1.0")
         self.portfolios.register("ORB_60m_IB_RVOL1.2")
         self.portfolios.register("VerticalSpread_v1.0")
         self.portfolios.register("Straddle_v1.0_VolCompression")
         self.portfolios.register("Strangle_v1.0_VolCompression")
-        self.portfolios.register("Channel_v1.0")
         self.portfolios.register("OIWallReaction_v1.0")
         self.portfolios.register("PCRExtremeReversal_v1.0")
 
@@ -888,17 +790,21 @@ class StructuralPaperTrader:
                         logger.error(f"❌ EOD report generation failed: {e}", exc_info=True)
                 return
 
-            # 3b. Expiry / event blackout gate (Bug 18 fix) — DISABLED as of 2026-07-30
-            # (lunch-hour + weekly/monthly expiry + RBI/Budget windows were blocking
-            # too much of the session; re-enable by uncommenting below)
-            # is_blackout, blackout_reason = self.expiry_blackout.is_blackout()
-            # if is_blackout:
-            #     logger.info(f"🚫 Expiry/Event blackout active — no new entries. Reason: {blackout_reason}")
-            #     # Positions were already updated in step 2 above; do NOT update
-            #     # again here. The old double-call inflated bars_held / duration /
-            #     # holding_efficiency on every blackout candle (lunch 11:30–13:30
-            #     # daily + all Thursdays), corrupting those metrics for most trades.
-            #     return
+            # 3b. Expiry / event blackout gate (Bug 18 fix). Re-enabled 2026-08-08
+            # with include_lunch_hour=False: the lunch-hour check blocked ~2 hours
+            # of EVERY session (not just expiry/event days), which is why the
+            # entire gate got disabled on 2026-07-30 instead of just that piece.
+            # Weekly/monthly expiry + RBI/Budget windows are genuine tail-risk
+            # protection and stay on; lunch-hour liquidity filtering (if wanted)
+            # belongs in a separate, dedicated filter, not bundled here.
+            is_blackout, blackout_reason = self.expiry_blackout.is_blackout(include_lunch_hour=False)
+            if is_blackout:
+                logger.info(f"🚫 Expiry/Event blackout active — no new entries. Reason: {blackout_reason}")
+                # Positions were already updated in step 2 above; do NOT update
+                # again here. The old double-call inflated bars_held / duration /
+                # holding_efficiency on every blackout candle (lunch 11:30–13:30
+                # daily + all Thursdays), corrupting those metrics for most trades.
+                return
 
             # 4. Compute snapshot + run experiments per symbol
             total_signals = 0
@@ -947,6 +853,16 @@ class StructuralPaperTrader:
                         trade_key = (symbol, experiment_name)
                         total_signals += 1
 
+                        # Stamp regime context onto every signal from every
+                        # strategy (not just the ones that set it themselves —
+                        # 16 of 17 strategies never did, which is why regime-based
+                        # position sizing was silently always falling through to
+                        # the UNKNOWN default). Single point of truth: snapshot.
+                        sig_features = sig.setdefault('features', {})
+                        sig_features['regime_primary'] = snapshot.regime_detail.primary
+                        sig_features['regime_vol_state'] = snapshot.regime_detail.vol_state
+                        sig_features['market_regime'] = snapshot.regime_detail.label
+
                         # Suffix candidate_id with experiment_name to isolate counterfactual positions
                         if 'candidate_id' in sig and sig['candidate_id']:
                             if not sig['candidate_id'].endswith(f"_{experiment_name}"):
@@ -960,6 +876,22 @@ class StructuralPaperTrader:
                             continue
 
                         if sig['accepted']:
+                            # Regime router: is this experiment eligible for REAL
+                            # capital in the current regime? If not, the signal
+                            # isn't discarded — it's routed into the CF path
+                            # below, tagged REGIME_MISMATCH, so its outcome stays
+                            # measurable (same "same engine, different storage"
+                            # philosophy as every other rejection).
+                            if not is_regime_eligible(result.experiment_name, snapshot.regime_detail):
+                                sig['rejection_reasons'] = sig.get('rejection_reasons', []) + ['REGIME_MISMATCH']
+                                sig['regime_at_decision'] = snapshot.regime_detail.label
+                                logger.info(
+                                    f"🧭 [{experiment_name}] Regime router: {symbol} blocked from REAL "
+                                    f"capital (regime={snapshot.regime_detail.label}) — routed to CF"
+                                )
+                                self._enter_counterfactual(sig, now, symbol, experiment_name, trade_key, result)
+                                continue
+
                             # One real trade per (symbol, experiment_name)
                             if trade_key in self.active_trades:
                                 logger.debug(f"↩️  [{experiment_name}] Already have open position on {symbol}, skipping.")
@@ -992,35 +924,7 @@ class StructuralPaperTrader:
                             self.portfolios.on_entry(experiment_name, now)
 
                         else:
-                            MAX_ACTIVE_COUNTERFACTUALS = 500
-                            if len(self.active_counterfactuals) >= MAX_ACTIVE_COUNTERFACTUALS:
-                                logger.warning(f"⚠️ CF safety limit reached, skipping {symbol}")
-                                continue
-
-                            # Deduplication: strategy-defined thesis key, prepend experiment_name
-                            exp_obj = self.registry.get(result.experiment_name)
-                            if exp_obj:
-                                thesis_base = exp_obj.strategy.thesis_key(sig)
-                            else:
-                                setup_type = sig.get('strategy', 'UNKNOWN')
-                                direction = sig.get('signal', '')
-                                thesis_base = (symbol, setup_type, direction)
-
-                            thesis_key = (result.experiment_name,) + thesis_base
-
-                            if thesis_key in self.active_cf_theses:
-                                existing_cand = self.active_cf_theses[thesis_key]
-                                logger.debug(
-                                    f"↩️  [{experiment_name}] Thesis already tracked: "
-                                    f"{thesis_base} → {existing_cand[-30:]}"
-                                )
-                                continue
-
-                            logger.info(
-                                f"👻 [{experiment_name}] CF {sig.get('strategy','')} {symbol} {sig.get('signal','')} "
-                                f"| Rejected: {sig['rejection_reasons']}"
-                            )
-                            self._enter_position(sig, now, trade_key, is_counterfactual=True)
+                            self._enter_counterfactual(sig, now, symbol, experiment_name, trade_key, result)
 
             if total_signals == 0:
                 logger.info("🧘 Status: Sidelined (No Institutional Alignment)")
@@ -1487,6 +1391,47 @@ class StructuralPaperTrader:
             return (highest - entry) / dist, (entry - lowest) / dist
         return (entry - lowest) / dist, (highest - entry) / dist
 
+    def _enter_counterfactual(self, sig: Dict, now, symbol: str, experiment_name: str,
+                               trade_key: Tuple, result) -> bool:
+        """Shared CF-entry path: dedup by thesis key, then open a shadow
+        position via the exact same _update_position() engine real trades use.
+        Used both for strategy-rejected signals and for signals the regime
+        router blocked from real capital (see the main signal loop) — either
+        way, the candidate isn't discarded, just researched instead of funded.
+        Returns True if a CF position was opened (or attempted), False if
+        skipped (safety limit / duplicate thesis).
+        """
+        MAX_ACTIVE_COUNTERFACTUALS = 500
+        if len(self.active_counterfactuals) >= MAX_ACTIVE_COUNTERFACTUALS:
+            logger.warning(f"⚠️ CF safety limit reached, skipping {symbol}")
+            return False
+
+        # Deduplication: strategy-defined thesis key, prepend experiment_name
+        exp_obj = self.registry.get(result.experiment_name)
+        if exp_obj:
+            thesis_base = exp_obj.strategy.thesis_key(sig)
+        else:
+            setup_type = sig.get('strategy', 'UNKNOWN')
+            direction = sig.get('signal', '')
+            thesis_base = (symbol, setup_type, direction)
+
+        thesis_key = (result.experiment_name,) + thesis_base
+
+        if thesis_key in self.active_cf_theses:
+            existing_cand = self.active_cf_theses[thesis_key]
+            logger.debug(
+                f"↩️  [{experiment_name}] Thesis already tracked: "
+                f"{thesis_base} → {existing_cand[-30:]}"
+            )
+            return False
+
+        logger.info(
+            f"👻 [{experiment_name}] CF {sig.get('strategy','')} {symbol} {sig.get('signal','')} "
+            f"| Rejected: {sig['rejection_reasons']}"
+        )
+        self._enter_position(sig, now, trade_key, is_counterfactual=True)
+        return True
+
     def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool):
         symbol = sig['symbol']
         experiment_name = sig.get('experiment_name', 'Structural_v3.2_RVOL1.0')
@@ -1577,16 +1522,18 @@ class StructuralPaperTrader:
         # Calculate Position Size (Bug 21)
         position_size_inr = 1000.0
         lots = 1.0
-        regime = sig.get('features', {}).get('market_regime', 'UNKNOWN')
+        regime_primary = sig.get('features', {}).get('regime_primary', 'UNKNOWN')
+        regime_vol_state = sig.get('features', {}).get('regime_vol_state', 'NORMAL')
         confidence = sig.get('confidence', 70.0) or 70.0
-        
+
         if sl_price and entry_price and sl_price != entry_price:
             position_size_inr = self.sizer.get_position_size(
                 entry_price=entry_price,
                 stop_loss_price=sl_price,
                 strategy=sig['strategy'],
                 confidence=confidence,
-                regime=regime,
+                regime_primary=regime_primary,
+                regime_vol_state=regime_vol_state,
                 # Pass currently-deployed notional so the 40% portfolio-exposure
                 # cap actually binds. Real trades only; CFs don't consume capital.
                 deployed_capital=(0.0 if is_counterfactual else self._deployed_capital()),

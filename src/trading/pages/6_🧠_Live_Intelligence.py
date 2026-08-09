@@ -221,7 +221,7 @@ def place_manual_trade(symbol, signal_type, entry_price, sl_price, tp_price, str
                     stop_loss_price=sl_price,
                     strategy=strategy,
                     confidence=70.0,
-                    regime="UNKNOWN"
+                    regime_primary="UNKNOWN"
                 )
             except Exception:
                 position_size_inr = 1000.0

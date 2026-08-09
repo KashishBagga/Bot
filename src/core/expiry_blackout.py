@@ -45,10 +45,14 @@ RBI_MPC_DATES: List[Tuple] = [
     (2026,  2,  7, 10,  0),
     (2026,  4,  9, 10,  0),
     (2026,  6,  5, 10,  0),
+    (2026,  8,  5, 10,  0),
+    (2026, 10,  7, 10,  0),
+    (2026, 12,  4, 10,  0),
 ]
 
 BUDGET_DATES: List[Tuple] = [
     (2026,  2,  1,  9, 15),   # Union Budget 2026-27
+    (2027,  2,  1,  9, 15),   # Union Budget 2027-28 (expected — always Feb 1 since 2017)
 ]
 
 # Additional one-off event dates (e.g., election results, US Fed meet)
@@ -92,10 +96,18 @@ class ExpiryBlackoutManager:
 
     # ── Public API ────────────────────────────────────────────────────────────
 
-    def is_blackout(self, now: Optional[datetime] = None) -> Tuple[bool, str]:
+    def is_blackout(
+        self, now: Optional[datetime] = None, include_lunch_hour: bool = True
+    ) -> Tuple[bool, str]:
         """
         Main entry point. Returns (is_blocked, reason).
         Call once per trading cycle before processing signals.
+
+        include_lunch_hour: the lunch-hour check blocks ~2 hours of every single
+        session (not just expiry/event days) and was the reason this whole gate
+        got disabled on 2026-07-30 rather than just the lunch piece. Pass False
+        to keep genuine expiry/event tail-risk protection while leaving daily
+        lunch-hour liquidity filtering to a separate, dedicated filter.
         """
         if now is None:
             now = datetime.now(IST)
@@ -103,9 +115,10 @@ class ExpiryBlackoutManager:
             now = now.replace(tzinfo=IST)
 
         # 1. Lunch-hour filter (11:30 – 13:30 IST)
-        blocked, reason = self._check_lunch_hour(now)
-        if blocked:
-            return True, reason
+        if include_lunch_hour:
+            blocked, reason = self._check_lunch_hour(now)
+            if blocked:
+                return True, reason
 
         # 2. Weekly F&O expiry (all Thursdays)
         blocked, reason = self._check_weekly_expiry(now)

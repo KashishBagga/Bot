@@ -8,7 +8,7 @@ Replaces primitive swing clustering with institutional-grade zone scoring.
 import pandas as pd
 import numpy as np
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 from src.core.quant_utils import QuantUtils
 
@@ -39,12 +39,36 @@ class ZoneEngine:
     }
     MIN_ZONE_SCORE = 60
 
+    # Per-timeframe bounds on the ATR-derived cluster tolerance, so a single
+    # bad ATR reading can't produce a degenerate (too-wide/too-narrow) zone.
+    ATR_TOLERANCE_BOUNDS = {
+        "m5": (0.0005, 0.005),
+        "h1": (0.001,  0.01),
+        "d1": (0.002,  0.02),
+    }
+    ATR_TOLERANCE_K = 0.5   # tolerance = clamp(atr_pct_of_price * K, bounds)
+
     def __init__(self, cluster_pct: float = 0.003, swing_window: int = 5):
         self.cluster_pct = cluster_pct
         self.swing_window = swing_window
 
-    def detect_zones(self, df: pd.DataFrame, timeframe: str = "h1") -> List[Zone]:
+    def _resolve_cluster_pct(self, timeframe: str, atr_pct_of_price: Optional[float]) -> float:
+        """Volatility-adaptive clustering tolerance. A fixed 0.2-0.3% band makes
+        no sense as the same width on a quiet 5m candle and a trending daily
+        one — when ATR is available, derive the tolerance from it instead;
+        otherwise fall back to the fixed `cluster_pct` (backward compatible for
+        any caller that doesn't have an ATR reading handy, e.g. the frozen
+        enhanced_strategy_engine.py)."""
+        if atr_pct_of_price is None or atr_pct_of_price <= 0:
+            return self.cluster_pct
+        lo, hi = self.ATR_TOLERANCE_BOUNDS.get(timeframe, (self.cluster_pct * 0.5, self.cluster_pct * 5))
+        return max(lo, min(hi, atr_pct_of_price * self.ATR_TOLERANCE_K))
+
+    def detect_zones(self, df: pd.DataFrame, timeframe: str = "h1",
+                      atr_pct_of_price: Optional[float] = None) -> List[Zone]:
         if df is None or len(df) < 30: return []
+
+        cluster_pct = self._resolve_cluster_pct(timeframe, atr_pct_of_price)
 
         highs = df['high'].values
         lows = df['low'].values
@@ -68,7 +92,7 @@ class ZoneEngine:
 
         for sp in swing_points[1:]:
             cluster_mean = np.mean([c[1] for c in cluster])
-            if abs(sp[1] - cluster_mean) / cluster_mean < self.cluster_pct:
+            if abs(sp[1] - cluster_mean) / cluster_mean < cluster_pct:
                 cluster.append(sp)
             else:
                 raw_zones.append(self._build_zone(cluster))

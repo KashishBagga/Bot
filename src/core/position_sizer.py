@@ -92,15 +92,27 @@ class StrategyStats:
 
 
 # ── Regime multipliers ────────────────────────────────────────────────────────
-REGIME_MULTIPLIERS: Dict[str, float] = {
-    "BULL_TREND":       1.0,
-    "BEAR_TREND":       1.0,
-    "BREAKOUT":         1.1,   # slightly larger on breakout
-    "REVERSAL":         0.7,
-    "HIGH_VOLATILITY":  0.6,
-    "LOW_VOLATILITY":   0.8,
-    "SIDEWAYS":         0.5,   # range markets: size down
-    "UNKNOWN":          0.8,
+# Two independent tables multiplied together, keyed off the fields RegimeLabel
+# actually produces (RegimeLabel.primary / .vol_state — see regime_engine.py).
+# The old single-key REGIME_MULTIPLIERS table used keys ("BULL_TREND",
+# "SIDEWAYS", ...) that RegimeEngine.label never emits (it emits compound
+# strings like "STRONG_TREND_UP_HIGH_VOL"), so every trade silently fell
+# through to the UNKNOWN default regardless of actual regime.
+PRIMARY_MULTIPLIERS: Dict[str, float] = {
+    "STRONG_TREND_UP":   1.1,
+    "STRONG_TREND_DOWN": 1.1,
+    "WEAK_TREND_UP":     1.0,
+    "WEAK_TREND_DOWN":   1.0,
+    "RANGE":             0.7,
+    "COMPRESSION":       0.6,
+    "GAP_UP":            0.5,
+    "GAP_DOWN":          0.5,
+    "UNKNOWN":           0.8,
+}
+VOL_MULTIPLIERS: Dict[str, float] = {
+    "HIGH_VOL": 0.85,
+    "NORMAL":   1.0,
+    "LOW_VOL":  0.9,
 }
 
 # Confidence multiplier: scale 0.5→1.0 linearly from conf 50→100
@@ -140,8 +152,9 @@ class PositionSizer:
         entry_price:     float,
         stop_loss_price: float,
         strategy:        str,
-        confidence:      float = 70.0,
-        regime:          str   = "UNKNOWN",
+        confidence:       float = 70.0,
+        regime_primary:   str   = "UNKNOWN",
+        regime_vol_state: str   = "NORMAL",
         deployed_capital: float = 0.0,   # already used capital across open trades
     ) -> float:
         """
@@ -184,8 +197,12 @@ class PositionSizer:
             stats             = self._get_or_create_stats(strategy)
             effective_fraction = stats.kelly_fraction
             
-            # Regime multiplier
-            regime_mult = REGIME_MULTIPLIERS.get(regime.upper(), REGIME_MULTIPLIERS["UNKNOWN"])
+            # Regime multiplier — primary (trend/range/compression/gap) and
+            # volatility state are independent dimensions, multiplied together.
+            regime_mult = (
+                PRIMARY_MULTIPLIERS.get(regime_primary.upper(), PRIMARY_MULTIPLIERS["UNKNOWN"])
+                * VOL_MULTIPLIERS.get(regime_vol_state.upper(), VOL_MULTIPLIERS["NORMAL"])
+            )
 
             # Confidence multiplier
             conf_mult = _confidence_multiplier(confidence)
@@ -203,7 +220,7 @@ class PositionSizer:
             position_size = min(position_size, max_allowed)
 
             logger.info(
-                f"💰 Position size [{strategy}|{regime}|conf={confidence:.0f}]: "
+                f"💰 Position size [{strategy}|{regime_primary}_{regime_vol_state}|conf={confidence:.0f}]: "
                 f"frac={final_fraction:.3f} → ₹{position_size:,.0f} "
                 f"(risk/unit={risk_per_unit:.2%})"
             )

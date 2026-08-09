@@ -59,6 +59,11 @@ class RegimeLabel:
     gap_pct: float
     session: str
     vol_state: str
+    # MTF context — additive, does not affect `primary`/`vol_state` classification.
+    # h1_trend_aligned: True if h1 structure agrees with the m5 EMA20/50 direction,
+    # False if it conflicts, None if h1 trend is NEUTRAL/unavailable.
+    h1_trend_aligned: Optional[bool] = None
+    d1_trend: str = "FLAT"   # "UP" | "DOWN" | "FLAT"
 
     @property
     def label(self) -> str:
@@ -80,6 +85,8 @@ class RegimeLabel:
             "session":    self.session,
             "vol_state":  self.vol_state,
             "label":      self.label,
+            "h1_trend_aligned": self.h1_trend_aligned,
+            "d1_trend":         self.d1_trend,
         }
 
 
@@ -116,6 +123,7 @@ class RegimeEngine:
         self,
         m5: pd.DataFrame,
         d1: Optional[pd.DataFrame] = None,
+        h1_structure: Optional[object] = None,
         now: Optional[datetime] = None,
     ) -> RegimeLabel:
         """
@@ -124,7 +132,10 @@ class RegimeEngine:
         Parameters
         ----------
         m5  : 5-minute OHLCV DataFrame (primary timeframe).
-        d1  : Daily OHLCV DataFrame (used for gap detection).
+        d1  : Daily OHLCV DataFrame (used for gap detection + d1_trend).
+        h1_structure : object exposing `.trend` ("BULLISH"/"BEARISH"/"NEUTRAL"),
+                       e.g. MarketSnapshot.h1_structure — reused as-is, not
+                       recomputed here, for h1_trend_aligned.
         now : Current timestamp (for session classification).
 
         Returns
@@ -179,6 +190,10 @@ class RegimeEngine:
         else:
             primary = "RANGE"
 
+        # 8. MTF context (additive — does not affect `primary`/`vol_state` above)
+        h1_trend_aligned = self._compute_h1_alignment(h1_structure, is_up)
+        d1_trend = self._compute_d1_trend(d1)
+
         return RegimeLabel(
             primary=primary,
             adx=float(adx),
@@ -188,6 +203,8 @@ class RegimeEngine:
             gap_pct=float(gap_pct),
             session=session,
             vol_state=vol_state,
+            h1_trend_aligned=h1_trend_aligned,
+            d1_trend=d1_trend,
         )
 
     # Legacy compatibility
@@ -308,6 +325,33 @@ class RegimeEngine:
         except Exception as e:
             logger.warning(f"[RegimeEngine] Gap detection failed: {e}")
             return False, 0.0
+
+    @staticmethod
+    def _compute_h1_alignment(h1_structure: Optional[object], m5_is_up: bool) -> Optional[bool]:
+        """True if h1 structure trend agrees with the m5 EMA20/50 direction,
+        False if it conflicts, None if h1 trend is NEUTRAL/unavailable."""
+        trend = getattr(h1_structure, "trend", None) if h1_structure is not None else None
+        if trend not in ("BULLISH", "BEARISH"):
+            return None
+        h1_is_up = (trend == "BULLISH")
+        return h1_is_up == m5_is_up
+
+    @staticmethod
+    def _compute_d1_trend(d1: Optional[pd.DataFrame]) -> str:
+        """SMA(10) vs SMA(20) of daily close over the already-fetched d1 window."""
+        if d1 is None or len(d1) < 20:
+            return "FLAT"
+        try:
+            sma10 = d1["close"].tail(10).mean()
+            sma20 = d1["close"].tail(20).mean()
+            if sma10 > sma20 * 1.001:
+                return "UP"
+            elif sma10 < sma20 * 0.999:
+                return "DOWN"
+            return "FLAT"
+        except Exception as e:
+            logger.warning(f"[RegimeEngine] d1_trend computation failed: {e}")
+            return "FLAT"
 
     @staticmethod
     def _classify_session(now: datetime) -> str:
