@@ -44,10 +44,14 @@ EXPERIMENT_REGIME_AFFINITY = {
     # Mean-reversion / fade
     "VWAP_Reversion_1.5ATR_RVOL1.0":  {"RANGE"},
     "PCRExtremeReversal_v1.0":        {"RANGE"},
+    "CreditSpread_v1.0_PCRFade":      {"RANGE"},
 
     # Volatility / compression
     "Straddle_v1.0_VolCompression":   {"COMPRESSION"},
     "Strangle_v1.0_VolCompression":   {"COMPRESSION"},
+
+    # Gap
+    "GapRegime_v2.0":                 {"GAP"},
 
     # Hybrid / structural — unrestricted
     "Structural_v3.2_RVOL1.0":  "ANY",

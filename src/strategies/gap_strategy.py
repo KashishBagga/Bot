@@ -42,14 +42,14 @@ class GapStrategy(BaseStrategy):
             "toward yesterday's close) — which one is decided by price action "
             "after the open, not assumed in advance."
         ),
-        version="v1.0",
+        version="v2.0",
         maturity="RESEARCH",
         tags=["gap", "continuation", "reversion", "opening"],
     )
 
     def __init__(
         self,
-        gap_threshold_pct: float = 0.15,
+        gap_threshold_pct: float = 0.4,
         rvol_threshold: float = 1.1,
         min_efficiency: float = 0.55,
         decision_window_minutes: int = 45,

@@ -10,13 +10,16 @@ whole combo the same way a single-leg entry already refuses to trade on an
 unresolved premium.
 
 This does NOT invent multi-leg risk semantics for arbitrary combos — it only
-computes net_premium_paid/max_loss/max_profit for the two combo shapes this
-system currently builds (both always a net debit / defined-risk):
-    - vertical spread   (buy one leg, sell a further OTM leg, same direction)
-    - long straddle/strangle (buy both a CE and a PE)
-Selling naked premium (iron condor/butterfly, uncovered short legs) is out of
-scope until that combo type gets its own margin/max-loss model — deliberately
-not guessed at here.
+computes net_premium_paid/max_loss/max_profit for the combo shapes this
+system currently builds, all defined-risk:
+    - debit vertical spread  (buy one leg, sell a further OTM leg, same
+      direction — max loss = premium paid)
+    - long straddle/strangle (buy both a CE and a PE — max loss = premium paid)
+    - credit vertical spread (sell the near leg, buy a further OTM leg as
+      protection — max loss = spread width minus credit received)
+Selling naked/uncovered premium (iron condor/butterfly, or any short leg
+without a protective long leg) is out of scope until that combo type gets its
+own margin/max-loss model — deliberately not guessed at here.
 """
 
 import logging
@@ -109,14 +112,16 @@ class MultiLegExecutionEngine:
     def _risk_profile(combo_type: str, legs: List[ComboLeg], net_premium_paid: float, interval: float):
         """Max loss / max profit per lot for the combo shapes this system builds.
 
-        Both are net-debit, defined-risk structures:
-          - LONG_STRADDLE / LONG_STRANGLE: max_loss = premium paid (both legs
-            expire worthless). max_profit is theoretically unbounded on the
-            underlying, so left as None — R-multiple tracking still works
-            fine off max_loss as the risk unit.
-          - BULL_CALL_SPREAD / BEAR_PUT_SPREAD: max_loss = premium paid,
-            max_profit = spread width (the strike distance between the two
-            legs) minus premium paid.
+          - LONG_STRADDLE / LONG_STRANGLE: net debit. max_loss = premium paid
+            (both legs expire worthless). max_profit is theoretically
+            unbounded on the underlying, so left as None — R-multiple
+            tracking still works fine off max_loss as the risk unit.
+          - BULL_CALL_SPREAD / BEAR_PUT_SPREAD: net debit. max_loss = premium
+            paid, max_profit = spread width (the strike distance between the
+            two legs) minus premium paid.
+          - BULL_PUT_SPREAD / BEAR_CALL_SPREAD: net credit — net_premium_paid
+            is negative here (credit received, not paid). max_loss = spread
+            width minus credit received; max_profit = credit received.
         """
         if combo_type in ("LONG_STRADDLE", "LONG_STRANGLE"):
             return net_premium_paid, None
@@ -126,5 +131,13 @@ class MultiLegExecutionEngine:
             spread_width = (max(strikes_away_values) - min(strikes_away_values)) * interval
             max_profit = max(spread_width - net_premium_paid, 0.0)
             return net_premium_paid, max_profit
+
+        if combo_type in ("BULL_PUT_SPREAD", "BEAR_CALL_SPREAD"):
+            strikes_away_values = [leg.strikes_away for leg in legs]
+            spread_width = (max(strikes_away_values) - min(strikes_away_values)) * interval
+            credit_received = -net_premium_paid
+            max_loss = max(spread_width - credit_received, 0.01)
+            max_profit = credit_received
+            return max_loss, max_profit
 
         raise ValueError(f"Unknown combo_type for risk profiling: {combo_type}")

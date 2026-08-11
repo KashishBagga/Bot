@@ -47,6 +47,8 @@ from src.strategies.vertical_spread_strategy import VerticalSpreadStrategy
 from src.strategies.straddle_strangle_strategy import StraddleStrangleStrategy
 from src.strategies.oi_wall_reaction_strategy import OIWallReactionStrategy
 from src.strategies.pcr_extreme_reversal_strategy import PCRExtremeReversalStrategy
+from src.strategies.credit_spread_strategy import CreditSpreadStrategy
+from src.strategies.gap_strategy import GapStrategy
 
 # Setup Logging
 os.makedirs("logs", exist_ok=True)
@@ -338,8 +340,21 @@ class StructuralPaperTrader:
         self.registry.register(_cpr_exp)
         self.db.save_experiment(_cpr_exp.to_db_dict())
 
-        # 12. Gap — retired 2026-08-08: net negative pnl_r (-4.26) over 7 days,
-        # worst experiment overall in the 2026-08-07 EOD report.
+        # 12. Gap — v1.0 retired 2026-08-08: net negative pnl_r (-4.26) over 7
+        # days, worst experiment overall in the 2026-08-07 EOD report. Re-added
+        # as v2.0: same GAP_AND_GO/GAP_FILL detection logic (that wasn't what
+        # lost money), but gap_threshold_pct raised from 0.15% to 0.4% to match
+        # regime_engine.py's own GAP classification threshold, and routed
+        # through regime_router.py so it only gets real capital on days the
+        # regime engine actually calls a GAP day (see regime_router.py).
+        _gap_exp = Experiment(
+            name="GapRegime_v2.0",
+            strategy=GapStrategy(gap_threshold_pct=0.4, rvol_threshold=1.1, min_efficiency=0.55),
+            params={"gap_threshold_pct": 0.4, "rvol_threshold": 1.1, "min_efficiency": 0.55},
+            description="Gap-and-Go / Gap-Fill, regime-gated to actual GAP days"
+        )
+        self.registry.register(_gap_exp)
+        self.db.save_experiment(_gap_exp.to_db_dict())
 
         # 13. Initial Balance Breakout — same OrbStrategy, 60-min window
         # (only possible now that the 15/30-hardcoded cutoff bug is fixed).
@@ -405,6 +420,26 @@ class StructuralPaperTrader:
         self.registry.register(_strangle_exp)
         self.db.save_experiment(_strangle_exp.to_db_dict())
 
+        # 16. Credit Spread — same PCR-extreme contrarian thesis as
+        # PCRExtremeReversalStrategy, financed as a credit vertical spread
+        # (sell near OTM, buy further OTM as protection) instead of a naked
+        # long option — theta-positive, defined-risk. Routed real capital
+        # only in RANGE regime via regime_router.py.
+        _credit_spread_exp = Experiment(
+            name="CreditSpread_v1.0_PCRFade",
+            strategy=CreditSpreadStrategy(
+                rvol_ceiling=1.3, max_efficiency=0.55,
+                spread_width_strikes=2, target_r=0.5, stop_r=-1.0,
+            ),
+            params={
+                "rvol_ceiling": 1.3, "max_efficiency": 0.55,
+                "spread_width_strikes": 2, "target_r": 0.5, "stop_r": -1.0,
+            },
+            description="Bull Put Spread / Bear Call Spread — PCR-extreme thesis, credit-spread execution"
+        )
+        self.registry.register(_credit_spread_exp)
+        self.db.save_experiment(_credit_spread_exp.to_db_dict())
+
         # Channel bounce/breakout — retired 2026-08-08: net negative pnl_r
         # (-6.81) over its 3 days running, on a meaningful 33-trade CF sample.
 
@@ -467,6 +502,8 @@ class StructuralPaperTrader:
         self.portfolios.register("Strangle_v1.0_VolCompression")
         self.portfolios.register("OIWallReaction_v1.0")
         self.portfolios.register("PCRExtremeReversal_v1.0")
+        self.portfolios.register("GapRegime_v2.0")
+        self.portfolios.register("CreditSpread_v1.0_PCRFade")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
