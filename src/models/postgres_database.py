@@ -587,6 +587,30 @@ class PostgresDatabase:
                     # so 'h1' is the correct default for existing rows.
                     cursor.execute("ALTER TABLE sr_zones ADD COLUMN IF NOT EXISTS timeframe TEXT DEFAULT 'h1'")
 
+                    # Pre-market snapshots (one row per symbol per trading day)
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS premarket_snapshots (
+                            date               DATE          NOT NULL,
+                            symbol             TEXT          NOT NULL,
+                            gap_pct            REAL,
+                            gap_direction      TEXT,
+                            gap_magnitude      TEXT,
+                            pdh                REAL,
+                            pdl                REAL,
+                            prev_close         REAL,
+                            preopen_price      REAL,
+                            captured_at        TIMESTAMPTZ,
+                            first_5m_direction TEXT,
+                            first_5m_rvol      REAL,
+                            opening_vol_ratio  REAL,
+                            PRIMARY KEY (date, symbol)
+                        )
+                    ''')
+                    cursor.execute(
+                        "CREATE INDEX IF NOT EXISTS idx_premarket_symbol "
+                        "ON premarket_snapshots(symbol, date DESC)"
+                    )
+
                 conn.commit()
 
                 logger.info("✅ PostgreSQL tables and migrations checked/initialized")
@@ -702,6 +726,157 @@ class PostgresDatabase:
             logger.info("✅ PostgreSQL / TimescaleDB fully initialized")
         except Exception as e:
             logger.error(f"❌ Postgres Init Failed: {e}")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Pre-market & options chain accessors (used by new v3.1 strategies)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def get_atm_oi_series(
+        self,
+        underlying: str,
+        minutes: int = 10,
+        depth: int = 1,
+    ) -> List[Dict[str, Any]]:
+        """
+        Fetch the last `minutes` minutes of ATM ± `depth` strike option snapshots
+        for `underlying`, ordered by time ASC.
+
+        Returns raw dicts suitable for constructing OptionSnapshotRow objects.
+        Caller computes OI change pct by differencing consecutive .oi values.
+
+        NOTE: oi_change from the DB is a daily cumulative field (oi - pdoi).
+        Do NOT use it for intraday velocity. Use consecutive .oi diffs instead.
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT time, strike, option_type, ltp, bid, ask, oi, volume
+                        FROM option_snapshots
+                        WHERE underlying = %s
+                          AND time >= NOW() - INTERVAL '%s minutes'
+                        ORDER BY time ASC, strike ASC, option_type ASC
+                    """, (underlying, minutes))
+                    rows = cur.fetchall()
+                    return [
+                        {
+                            "time":        r[0],
+                            "strike":      float(r[1]),
+                            "option_type": r[2],
+                            "ltp":         float(r[3]) if r[3] else 0.0,
+                            "bid":         float(r[4]) if r[4] else 0.0,
+                            "ask":         float(r[5]) if r[5] else 0.0,
+                            "oi":          int(r[6])   if r[6] else 0,
+                            "volume":      int(r[7])   if r[7] else 0,
+                        }
+                        for r in rows
+                    ]
+        except Exception as e:
+            logger.error(f"get_atm_oi_series error: {e}")
+            return []
+
+    def get_premarket_data(self, symbol: str, date) -> Optional[Dict[str, Any]]:
+        """
+        Fetch today's PreMarketData for symbol, or None if not yet collected.
+        Returns a dict with keys matching PreMarketData fields.
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT gap_pct, gap_direction, gap_magnitude,
+                               pdh, pdl, prev_close, preopen_price, captured_at
+                        FROM premarket_snapshots
+                        WHERE symbol = %s AND date = %s
+                    """, (symbol, date))
+                    row = cur.fetchone()
+                    if not row:
+                        return None
+                    return {
+                        "gap_pct":       row[0],
+                        "gap_direction":  row[1],
+                        "gap_magnitude":  row[2],
+                        "pdh":            row[3],
+                        "pdl":            row[4],
+                        "prev_close":     row[5],
+                        "preopen_price":  row[6],
+                        "captured_at":    row[7],
+                        "is_available":   True,
+                    }
+        except Exception as e:
+            logger.error(f"get_premarket_data error: {e}")
+            return None
+
+    def get_opening_data(self, symbol: str, date) -> Optional[Dict[str, Any]]:
+        """
+        Fetch OpeningData for today (populated at 9:20 IST by PreMarketCollector).
+        Returns None when not yet available.
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT first_5m_direction, first_5m_rvol, opening_vol_ratio
+                        FROM premarket_snapshots
+                        WHERE symbol = %s AND date = %s
+                          AND first_5m_direction IS NOT NULL
+                    """, (symbol, date))
+                    row = cur.fetchone()
+                    if not row:
+                        return None
+                    return {
+                        "first_5m_direction":  row[0],
+                        "first_5m_rvol":       row[1],
+                        "opening_volume_ratio": row[2],
+                        "is_available":         True,
+                    }
+        except Exception as e:
+            logger.error(f"get_opening_data error: {e}")
+            return None
+
+    def save_premarket_snapshot(self, symbol: str, date, data: Dict[str, Any]) -> None:
+        """
+        Upsert one premarket_snapshots row.
+        Called by PreMarketCollector at 9:15 (premarket fields) and 9:20 (opening fields).
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO premarket_snapshots
+                            (date, symbol, gap_pct, gap_direction, gap_magnitude,
+                             pdh, pdl, prev_close, preopen_price, captured_at,
+                             first_5m_direction, first_5m_rvol, opening_vol_ratio)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (date, symbol) DO UPDATE SET
+                            gap_pct           = EXCLUDED.gap_pct,
+                            gap_direction     = EXCLUDED.gap_direction,
+                            gap_magnitude     = EXCLUDED.gap_magnitude,
+                            pdh               = EXCLUDED.pdh,
+                            pdl               = EXCLUDED.pdl,
+                            prev_close        = EXCLUDED.prev_close,
+                            preopen_price     = EXCLUDED.preopen_price,
+                            captured_at       = EXCLUDED.captured_at,
+                            first_5m_direction = COALESCE(EXCLUDED.first_5m_direction, premarket_snapshots.first_5m_direction),
+                            first_5m_rvol     = COALESCE(EXCLUDED.first_5m_rvol,     premarket_snapshots.first_5m_rvol),
+                            opening_vol_ratio = COALESCE(EXCLUDED.opening_vol_ratio, premarket_snapshots.opening_vol_ratio)
+                    """, (
+                        date, symbol,
+                        data.get("gap_pct"),
+                        data.get("gap_direction"),
+                        data.get("gap_magnitude"),
+                        data.get("pdh"),
+                        data.get("pdl"),
+                        data.get("prev_close"),
+                        data.get("preopen_price"),
+                        data.get("captured_at"),
+                        data.get("first_5m_direction"),
+                        data.get("first_5m_rvol"),
+                        data.get("opening_vol_ratio"),
+                    ))
+                    conn.commit()
+        except Exception as e:
+            logger.error(f"save_premarket_snapshot error: {e}")
 
     def save_option_snapshots(self, snapshots: List[Dict[str, Any]]):
         """Bulk insert option snapshots"""

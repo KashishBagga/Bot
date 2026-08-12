@@ -92,3 +92,144 @@ class BreakoutEngine:
             'consolidation_tightness': round(recent_range * 100, 2),
             'velocity': round(velocity, 2)
         }
+
+# ── Consolidation Zone detection (v3.1 addition) ──────────────────────────────
+
+from dataclasses import dataclass
+from typing import List, Optional
+
+
+@dataclass
+class ConsolidationZone:
+    """A detected low-volatility consolidation range on a given timeframe."""
+    top: float
+    bottom: float
+    range: float
+    atr: float
+    atr_percentile: float
+    top_touches: int
+    bot_touches: int
+    bar_start: object   # pd.Timestamp
+    bar_end: object
+
+
+def _count_clustered_touches(
+    df,
+    col: str,
+    level: float,
+    atr: float,
+    tolerance: float = 0.10,
+    min_separation_bars: int = 2,
+    exclude_idx=None,
+) -> int:
+    """
+    Count distinct touches of `level` in column `col`.
+
+    A touch: candle's col value within tolerance×ATR of level.
+    Two candles in the same continuous cluster = ONE touch.
+    A new cluster requires at least `min_separation_bars` consecutive
+    non-touching bars between it and the previous touch.
+
+    exclude_idx: index of the boundary-defining candle (skipped so the candle
+    that established zone_high/zone_low doesn't auto-count as its own touch.
+    """
+    threshold = tolerance * atr
+    touch_count = 0
+    bars_since_last_touch = min_separation_bars + 1  # start: no active cluster
+
+    for idx, row in df.iterrows():
+        if exclude_idx is not None and idx == exclude_idx:
+            continue  # skip boundary-defining candle
+        near = abs(row[col] - level) <= threshold
+        if near:
+            if bars_since_last_touch >= min_separation_bars:
+                touch_count += 1   # new distinct cluster
+            bars_since_last_touch = 0
+        else:
+            bars_since_last_touch += 1
+
+    return touch_count
+
+
+def detect_consolidation_zone(
+    h1_df,
+    lookback: int = 12,
+    atr_pct_threshold: float = 30.0,
+    max_zone_atr_mult: float = 1.5,
+    min_touches: int = 3,
+    min_top_touches: int = 1,
+    min_bot_touches: int = 1,
+) -> Optional[ConsolidationZone]:
+    """
+    Detect a consolidation zone in the last `lookback` H1 bars.
+
+    Uses the canonical True-Range ATR (same formula as IndicatorPipeline._compute_atr).
+    ATR percentile is computed from the H1 ATR series — a squeeze requires ATR
+    to be in the bottom `atr_pct_threshold`-th percentile.
+
+    Boundary-defining candles are excluded from touch counts so the extrema
+    themselves don't automatically satisfy the touch requirement.
+
+    Returns a ConsolidationZone or None.
+    Requires at least 30 bars of history for a meaningful ATR percentile.
+    """
+    import pandas as pd
+    from scipy.stats import percentileofscore
+
+    if h1_df is None or len(h1_df) < 30:
+        return None
+
+    # ── Canonical True-Range ATR ──────────────────────────────────────────────
+    close_prev = h1_df["close"].shift(1)
+    tr = pd.concat([
+        h1_df["high"] - h1_df["low"],
+        (h1_df["high"] - close_prev).abs(),
+        (h1_df["low"]  - close_prev).abs(),
+    ], axis=1).max(axis=1)
+    atr_series = tr.rolling(window=14).mean()
+
+    current_atr = float(atr_series.iloc[-1])
+    if pd.isna(current_atr) or current_atr <= 0:
+        return None
+
+    atr_pct = percentileofscore(atr_series.dropna().values, current_atr)
+    if atr_pct > atr_pct_threshold:
+        return None   # not a volatility squeeze
+
+    window = h1_df.iloc[-lookback:]
+    zone_high = float(window["high"].max())
+    zone_low  = float(window["low"].min())
+    zone_range = zone_high - zone_low
+
+    if zone_range > max_zone_atr_mult * current_atr:
+        return None   # zone too wide
+
+    # ── Touch counting (boundary candles excluded) ────────────────────────────
+    zone_high_idx = window["high"].idxmax()
+    zone_low_idx  = window["low"].idxmin()
+
+    top_touches = _count_clustered_touches(
+        window, "high", zone_high, current_atr,
+        exclude_idx=zone_high_idx,
+    )
+    bot_touches = _count_clustered_touches(
+        window, "low", zone_low, current_atr,
+        exclude_idx=zone_low_idx,
+    )
+
+    if top_touches < min_top_touches or bot_touches < min_bot_touches:
+        return None
+    if (top_touches + bot_touches) < min_touches:
+        return None
+
+    return ConsolidationZone(
+        top=zone_high,
+        bottom=zone_low,
+        range=zone_range,
+        atr=current_atr,
+        atr_percentile=atr_pct,
+        top_touches=top_touches,
+        bot_touches=bot_touches,
+        bar_start=window.index[0],
+        bar_end=window.index[-1],
+    )

@@ -49,6 +49,11 @@ from src.strategies.oi_wall_reaction_strategy import OIWallReactionStrategy
 from src.strategies.pcr_extreme_reversal_strategy import PCRExtremeReversalStrategy
 from src.strategies.credit_spread_strategy import CreditSpreadStrategy
 from src.strategies.gap_strategy import GapStrategy
+from src.strategies.iron_condor_strategy import IronCondorStrategy
+from src.strategies.butterfly_strategy import ButterflyStrategy
+from src.strategies.options_scalping_strategy import OptionsScalpingStrategy
+from src.strategies.consolidation_breakout_strategy import ConsolidationBreakoutStrategy
+from src.warehouse.premarket_collector import PreMarketCollector
 
 # Setup Logging
 os.makedirs("logs", exist_ok=True)
@@ -124,6 +129,15 @@ class StructuralPaperTrader:
 
         threading.Thread(target=_run_option_warehouse, daemon=True, name="OptionWarehouse").start()
         logger.info("📡 Option warehouse started in background thread (real OI capture)")
+
+        # ── Pre-market collector (9:00 poll → 9:15 freeze → 9:20 opening data) ─
+        self._premarket_collector = PreMarketCollector(list(symbols))
+        threading.Thread(
+            target=self._premarket_collector.run,
+            daemon=True,
+            name="PreMarketCollector",
+        ).start()
+        logger.info("🌅 Pre-market collector started in background thread")
 
         from src.core.options_execution_engine import OptionExecutionEngine
         self.option_engine = OptionExecutionEngine(self.db, self.data_provider, strike_policy="ATM")
@@ -484,6 +498,89 @@ class StructuralPaperTrader:
         self.registry.register(_pcr_reversal_exp)
         self.db.save_experiment(_pcr_reversal_exp.to_db_dict())
 
+        # 17. Iron Condor — Sideways/Range market income play
+        _iron_condor_exp = Experiment(
+            name="IronCondor_v1.0",
+            strategy=IronCondorStrategy(
+                rvol_ceiling=1.3, max_efficiency=0.55,
+                spread_width_strikes=2, target_r=0.4, stop_r=-1.0,
+            ),
+            params={
+                "rvol_ceiling": 1.3, "max_efficiency": 0.55,
+                "spread_width_strikes": 2, "target_r": 0.4, "stop_r": -1.0,
+            },
+            description="Iron Condor (OTM Call spread + OTM Put spread) sideways credit play"
+        )
+        self.registry.register(_iron_condor_exp)
+        self.db.save_experiment(_iron_condor_exp.to_db_dict())
+
+        # 18. Butterfly Spread — Sideways/Range market defined-risk debit play
+        _butterfly_exp = Experiment(
+            name="Butterfly_v1.0",
+            strategy=ButterflyStrategy(
+                rvol_ceiling=1.3, max_efficiency=0.55,
+                wing_width_strikes=2, target_r=1.5, stop_r=-0.5,
+            ),
+            params={
+                "rvol_ceiling": 1.3, "max_efficiency": 0.55,
+                "wing_width_strikes": 2, "target_r": 1.5, "stop_r": -0.5,
+            },
+            description="Butterfly Spread (Long ITM Call + 2x Short ATM Call + Long OTM Call) sideways debit play"
+        )
+        self.registry.register(_butterfly_exp)
+        self.db.save_experiment(_butterfly_exp.to_db_dict())
+
+        # ── v3.1: OI Scalping (PAPER) ──────────────────────────────────────
+        _oi_scalping_exp = Experiment(
+            name="OI_Scalping_v1.0",
+            strategy=OptionsScalpingStrategy(
+                stop_loss_pct=0.50, target_multiple=2.0,
+                min_rvol=1.5, min_votes=3, lookback_minutes=10,
+            ),
+            params={"stop_loss_pct": 0.50, "target_multiple": 2.0, "min_rvol": 1.5},
+            description=(
+                "PAPER: OI×premium 4-quadrant positioning inference scalper. "
+                "3/5 windows must agree on direction. BSM Greeks required. "
+                "Exit: bid-based premium stop/target + 15-min time stop."
+            ),
+        )
+        self.registry.register(_oi_scalping_exp)
+        self.db.save_experiment(_oi_scalping_exp.to_db_dict())
+
+        # ── v3.1: Consolidation Breakout Standard (PAPER) ──────────────────
+        _consol_brk_exp = Experiment(
+            name="Consolidation_Breakout_v1.0",
+            strategy=ConsolidationBreakoutStrategy(
+                rvol_threshold=1.5, breakout_score_min=60,
+                atr_pct_threshold=30.0, min_touches=3,
+            ),
+            params={"rvol_threshold": 1.5, "breakout_score_min": 60},
+            description=(
+                "PAPER: 1H consolidation squeeze + M5 breakout + RVOL≥1.5. "
+                "RSI Momentum Confirmation. Explicit 2R SL/TP. "
+                "Boundary candles excluded from touch count."
+            ),
+        )
+        self.registry.register(_consol_brk_exp)
+        self.db.save_experiment(_consol_brk_exp.to_db_dict())
+
+        # ── v3.1: Consolidation Breakout Tight (PAPER) ─────────────────────
+        _consol_brk_tight_exp = Experiment(
+            name="Consolidation_Breakout_Tight_v1.0",
+            strategy=ConsolidationBreakoutStrategy(
+                rvol_threshold=2.0, breakout_score_min=60,
+                atr_pct_threshold=30.0, min_touches=3,
+            ),
+            params={"rvol_threshold": 2.0, "breakout_score_min": 60},
+            description=(
+                "PAPER: Same as Consolidation_Breakout_v1.0 but RVOL≥2.0. "
+                "A/B against standard to test whether stronger participation "
+                "improves profit factor. Data decides."
+            ),
+        )
+        self.registry.register(_consol_brk_tight_exp)
+        self.db.save_experiment(_consol_brk_tight_exp.to_db_dict())
+
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
@@ -504,6 +601,11 @@ class StructuralPaperTrader:
         self.portfolios.register("PCRExtremeReversal_v1.0")
         self.portfolios.register("GapRegime_v2.0")
         self.portfolios.register("CreditSpread_v1.0_PCRFade")
+        self.portfolios.register("IronCondor_v1.0")
+        self.portfolios.register("Butterfly_v1.0")
+        self.portfolios.register("OI_Scalping_v1.0")
+        self.portfolios.register("Consolidation_Breakout_v1.0")
+        self.portfolios.register("Consolidation_Breakout_Tight_v1.0")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}

@@ -140,4 +140,25 @@ class MultiLegExecutionEngine:
             max_profit = credit_received
             return max_loss, max_profit
 
+        if combo_type == "IRON_CONDOR":
+            put_legs = [l.strikes_away for l in legs if l.option_type == "PE"]
+            call_legs = [l.strikes_away for l in legs if l.option_type == "CE"]
+            put_width = (max(put_legs) - min(put_legs)) * interval if len(put_legs) >= 2 else 0.0
+            call_width = (max(call_legs) - min(call_legs)) * interval if len(call_legs) >= 2 else 0.0
+            spread_width = max(put_width, call_width)
+            credit_received = -net_premium_paid
+            max_loss = max(spread_width - credit_received, 0.01)
+            max_profit = credit_received
+            return max_loss, max_profit
+
+        if combo_type == "BUTTERFLY_SPREAD":
+            strikes_away_values = sorted(list(set(leg.strikes_away for leg in legs)))
+            if len(strikes_away_values) >= 2:
+                spread_width = (strikes_away_values[1] - strikes_away_values[0]) * interval
+            else:
+                spread_width = 0.0
+            max_profit = max(spread_width - net_premium_paid, 0.0)
+            return net_premium_paid, max_profit
+
         raise ValueError(f"Unknown combo_type for risk profiling: {combo_type}")
+

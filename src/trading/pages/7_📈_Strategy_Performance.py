@@ -51,6 +51,8 @@ STRATEGY_META = {
     "Strangle_v1.0_VolCompression":    {"status": "🔬 Research",   "group": "D — Volatility"},
     "OIWallReaction_v1.0":             {"status": "🟢 Production", "group": "B — S/R Reaction"},
     "PCRExtremeReversal_v1.0":         {"status": "🔬 Research",   "group": "B — S/R Reaction"},
+    "IronCondor_v1.0":                 {"status": "🔬 Research",   "group": "D — Volatility"},
+    "Butterfly_v1.0":                  {"status": "🔬 Research",   "group": "D — Volatility"},
 }
 
 # Regime primary buckets for regime-split table
