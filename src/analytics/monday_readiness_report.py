@@ -6,6 +6,7 @@ Binary status check for production readiness.
 """
 
 import logging
+import sys
 from datetime import datetime, timedelta
 
 from src.analytics.parity_engine import ParityEngine
@@ -17,6 +18,37 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger("ReadinessGate")
 
 SYMBOLS = ["NSE:NIFTY50-INDEX"]
+
+
+def check_token_health() -> bool:
+    """Fast pre-market check that the Fyers access token is actually usable.
+
+    The token expires every morning and refresh requires an interactive
+    browser login (authenticate_fyers.py) — there's no way to automate that
+    step. What CAN be automated is catching a stale/missing token loudly
+    *before* market open instead of the trader silently degrading to
+    'no live prices' at 09:15 with only a log warning. Runs first and fast —
+    no point running the slower parity/warehouse checks below against a dead
+    token, they'll all fail for the same root cause.
+    """
+    try:
+        provider = FyersDataProvider()
+        prices = provider.get_current_prices_batch(SYMBOLS)
+        if any(v is not None and v > 0 for v in prices.values()):
+            logger.info(f"✅ Fyers token OK — live quote received: {prices}")
+            return True
+        print("\n" + "!" * 70)
+        print("❌ FYERS TOKEN INVALID/EXPIRED OR MARKET DATA UNAVAILABLE")
+        print("   Got no usable quote for", SYMBOLS)
+        print("   Run: python3 authenticate_fyers.py   (before 09:15 IST)")
+        print("!" * 70 + "\n")
+        return False
+    except Exception as e:
+        print("\n" + "!" * 70)
+        print(f"❌ FYERS TOKEN CHECK FAILED: {e}")
+        print("   Run: python3 authenticate_fyers.py   (before 09:15 IST)")
+        print("!" * 70 + "\n")
+        return False
 
 
 def _fetch_parity_inputs(symbols):
@@ -42,6 +74,12 @@ def _fetch_parity_inputs(symbols):
 
 def run_readiness_check():
     logger.info("🚦 Running Sunday Night Go/No-Go Readiness Check...")
+
+    # 0. Token health — fail fast and loud rather than let a dead token
+    # silently fail every check below for the same underlying reason.
+    if not check_token_health():
+        print("🛑 SYSTEM STATUS: NOT READY (token check failed — see above)")
+        return False
 
     # 1. Parity Check — fed real recent data, not mock inputs.
     historical_data, current_prices = _fetch_parity_inputs(SYMBOLS)
@@ -106,4 +144,4 @@ def run_readiness_check():
 
 
 if __name__ == "__main__":
-    run_readiness_check()
+    sys.exit(0 if run_readiness_check() else 1)

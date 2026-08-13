@@ -488,6 +488,23 @@ class IndicatorPipeline:
         except Exception as e:
             logger.warning(f"Error calculating RSI: {e}")
 
+        # ── RSI-2 ──────────────────────────────────────────────────────────
+        # Short-period RSI (Connors-style) — swings to genuine extremes
+        # (<10 / >90) on ordinary bars, unlike RSI-14 which rarely gets past
+        # 20/80 on 5m index data. Used for short-term mean-reversion, not
+        # trend/momentum reads — that's what rsi14 is for.
+        rsi2 = 50.0
+        try:
+            delta2 = m5["close"].diff()
+            gain2 = delta2.clip(lower=0).rolling(window=2).mean()
+            loss2 = (-delta2.clip(upper=0)).rolling(window=2).mean()
+            rs2 = gain2 / loss2.replace(0, float('nan'))
+            rsi2_series = 100 - (100 / (1 + rs2))
+            val2 = rsi2_series.iloc[-1]
+            rsi2 = float(val2) if not pd.isna(val2) else 50.0
+        except Exception as e:
+            logger.warning(f"Error calculating RSI-2: {e}")
+
         # ── VWAP Distance ──────────────────────────────────────────────────
         distance_to_vwap = 0.0
         try:
@@ -564,6 +581,7 @@ class IndicatorPipeline:
             "wickiness":              round(wickiness, 4),
             "ema_bullish":            ema_bullish,
             "rsi14":                  round(rsi14, 2),
+            "rsi2":                   round(rsi2, 2),
             "distance_to_vwap":       round(distance_to_vwap, 4),
             "atr_percentile":         round(atr_percentile, 4),
             "dist_prev_high":         round(dist_prev_high, 4),

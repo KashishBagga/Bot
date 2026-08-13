@@ -11,15 +11,19 @@ unresolved premium.
 
 This does NOT invent multi-leg risk semantics for arbitrary combos — it only
 computes net_premium_paid/max_loss/max_profit for the combo shapes this
-system currently builds, all defined-risk:
+system currently builds, all defined-risk (every short leg has a protective
+long leg further out — no naked/uncovered premium):
     - debit vertical spread  (buy one leg, sell a further OTM leg, same
       direction — max loss = premium paid)
     - long straddle/strangle (buy both a CE and a PE — max loss = premium paid)
     - credit vertical spread (sell the near leg, buy a further OTM leg as
       protection — max loss = spread width minus credit received)
-Selling naked/uncovered premium (iron condor/butterfly, or any short leg
-without a protective long leg) is out of scope until that combo type gets its
-own margin/max-loss model — deliberately not guessed at here.
+    - iron condor / iron butterfly (sell a near-the-money CE and PE, buy
+      further-out wings on both sides for protection — max loss = wing
+      width minus credit received; iron butterfly is the same shape with
+      both short legs at strikes_away=0 instead of 1 apart)
+A combo type with no branch in _risk_profile below is genuinely unsupported —
+adding a new combo means adding its risk model here first, not guessing.
 """
 
 import logging
@@ -147,7 +151,11 @@ class MultiLegExecutionEngine:
             max_profit = credit_received
             return max_loss, max_profit
 
-        if combo_type == "IRON_CONDOR":
+        if combo_type in ("IRON_CONDOR", "IRON_BUTTERFLY"):
+            # Same defined-risk shape as Iron Condor — short strikes at the
+            # short-leg strikes_away distance apart from the long wings on
+            # each side (0 apart for Iron Butterfly's ATM shorts, 2 apart for
+            # Iron Condor's OTM shorts) — the width/credit math is identical.
             put_legs = [l.strikes_away for l in legs if l.option_type == "PE"]
             call_legs = [l.strikes_away for l in legs if l.option_type == "CE"]
             put_width = (max(put_legs) - min(put_legs)) * interval if len(put_legs) >= 2 else 0.0

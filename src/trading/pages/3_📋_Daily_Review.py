@@ -339,14 +339,15 @@ def process_trade_metrics(trade):
         entry_price = trade.get("entry_price") or 0.0
         initial_sl = trade.get("initial_stop_loss") or 0.0
         sl_distance = trade.get("stop_loss_distance") or abs(entry_price - initial_sl)
-        
+        diagnostics = parse_json(trade.get("diagnostics"))
+
         if sl_distance <= 0:
             features = parse_json(trade.get("features"))
-            atr = features.get("atr") or parse_json(trade.get("diagnostics")).get("atr") or 15.0
+            atr = features.get("atr") or diagnostics.get("atr") or 15.0
             sl_distance = 0.5 * atr
-            
-        lots = trade.get("lots") or parse_json(trade.get("diagnostics")).get("lots") or 1
-        option_premium = parse_json(trade.get("diagnostics")).get("option_premium") or 100.0
+
+        lots = trade.get("lots") or diagnostics.get("lots") or 1
+        option_premium = diagnostics.get("option_premium") or 100.0
         
         max_loss_premium_points = sl_distance * 0.5
         max_loss_inr = max_loss_premium_points * lot_size * lots
@@ -796,9 +797,9 @@ with tab_reasoning:
                             st.markdown(f"**Max Loss points:** `{t.get('max_loss')} pts` | **Max Profit:** `{t.get('max_profit') or 'Unlimited'}`")
                             st.caption(f"*Note: Realized ₹ P&L is calculated as R-Multiple * (Max Loss * Lot Size of {get_lot_size(t.get('symbol'))}).*")
                         else:
-                            opt_symbol = t.get("option_symbol") or t.get("diagnostics", {}).get("option_symbol")
-                            opt_premium = t.get("option_premium") or t.get("diagnostics", {}).get("option_premium")
-                            lots = t.get("lots") or t.get("diagnostics", {}).get("lots") or 1
+                            opt_symbol = t.get("option_symbol") or t["diagnostics"].get("option_symbol")
+                            opt_premium = t.get("option_premium") or t["diagnostics"].get("option_premium")
+                            lots = t.get("lots") or t["diagnostics"].get("lots") or 1
                             if opt_symbol:
                                 st.markdown(f"**Option Resolved:** `{opt_symbol}` @ premium of `₹{opt_premium}` (Lots: {lots})")
                             st.caption(f"*Note: R is measured in underlying index points. Realized ₹ P&L is estimated using an ATM delta of 0.5: R * (Index SL Distance * 0.5 * Lot Size of {get_lot_size(t.get('symbol'))} * Lots).*")
@@ -811,7 +812,15 @@ with tab_reasoning:
                         features = t.get("features") or {}
                         zone_explanation = diagnostics.get("zone_explanation")
                         
-                        if "Geometry" in exp:
+                        if "Geometry" in exp and strategy == "TRENDLINE_RETEST":
+                            trigger_text = (
+                                f"The system detected a `TRENDLINE_RETEST` setup under the `GeometryStrategy` — "
+                                f"a previously broken trendline (role reversal: old support/resistance retested "
+                                f"from the other side) was retested and held. "
+                                f"The system confirmed the reversal with a candle body of at least 40% of its range and close in the reversal direction. "
+                                f"Daily bias was '{diagnostics.get('narrative_bias', 'NEUTRAL')}' with confidence {diagnostics.get('bias_confidence', 0.5)}."
+                            )
+                        elif "Geometry" in exp:
                             zone_desc = zone_explanation or "confluence zone"
                             trigger_text = (
                                 f"The system detected a `{strategy}` setup under the `GeometryStrategy`. "
@@ -823,10 +832,13 @@ with tab_reasoning:
                             rvol = features.get("rvol") or diagnostics.get("rvol") or "N/A"
                             daily_bias = features.get("daily_bias") or "N/A"
                             hourly_bias = features.get("hourly_bias") or "N/A"
+                            rvol_threshold = features.get("rvol_threshold")
+                            if rvol_threshold is None:
+                                rvol_threshold = diagnostics.get("rvol_threshold", 0.8)
                             trigger_text = (
                                 f"The frozen core `StructuralStrategy` (`EnhancedStrategyEngine` {t.get('version') or 'v3.2'}) triggered a `{strategy}` setup. "
                                 f"This occurred under Daily Bias '{daily_bias}' and Hourly Bias '{hourly_bias}'. "
-                                f"The trigger was validated by a Relative Volume (RVOL) of {rvol} (threshold >= {diagnostics.get('rvol_threshold', 0.8)}). "
+                                f"The trigger was validated by a Relative Volume (RVOL) of {rvol} (threshold >= {rvol_threshold}). "
                             )
                             if strategy == "SWEEP":
                                 trigger_text += "Price swept liquidity at a major HTF structure zone (Supply/Demand) and printed a strong 5m rejection body."
@@ -849,6 +861,13 @@ with tab_reasoning:
                                 f"The `EmaPullbackStrategy` triggered on a trend-continuation setup. "
                                 f"Price pulled back to touch the 20 EMA, and then printed a green/red confirmation body in the direction of the macro EMA trend (bullish/bearish crossover)."
                             )
+                        elif "VerticalSpread" in exp:
+                            trigger_text = (
+                                f"This is a debit vertical spread (`{strategy}`) — the opposite hypothesis to the "
+                                f"credit-spread family. It requires a genuine directional move: trending, EMA-aligned "
+                                f"conditions with high RVOL and high move efficiency, not the range-bound/low-RVOL "
+                                f"conditions the credit-spread and volatility-combo strategies look for."
+                            )
                         elif t.get("is_combo"):
                             trigger_text = (
                                 f"This is an options combination spread strategy (`{strategy}`). "
@@ -860,7 +879,13 @@ with tab_reasoning:
                             trigger_text = f"This trade was triggered by strategy `{strategy}` under experiment `{exp}` based on default momentum/reversal rules."
                             
                         sl_tp_text = ""
-                        if "Geometry" in exp:
+                        if "Geometry" in exp and strategy == "TRENDLINE_RETEST":
+                            sl_tp_text = (
+                                f"The Stop Loss was set at the retest candle's low/high minus/plus an ATR buffer "
+                                f"(no supply/demand zone involved — this is a pure trendline role-reversal setup). "
+                                f"The Take Profit targets the nearest opposing structural level, capped at `3 * ATR` from entry."
+                            )
+                        elif "Geometry" in exp:
                             sl_tp_text = (
                                 f"The Stop Loss was set at `band_low - 0.15 * ATR` (for longs) or `band_high + 0.15 * ATR` (for shorts) to protect against breakouts past the confluence zone. "
                                 f"The Take Profit was set at the opposing composite level or trendline, capped at `3 * ATR` from entry."

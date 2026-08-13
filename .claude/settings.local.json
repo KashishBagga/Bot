@@ -20,7 +20,11 @@
       "Bash(python3 -)",
       "Bash(ps -o pid,stat,etime,%cpu,rss -p 11131,78026)",
       "Bash(python3 -c ' *)",
-      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/trading/indian_trader.py'\\).read\\(\\)\\)\")"
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/trading/indian_trader.py'\\).read\\(\\)\\)\")",
+      "Bash(git log *)",
+      "Bash(awk '/def _init_db/,/^    def [a-z_]+\\\\\\(self/' src/models/postgres_database.py)",
+      "Bash(awk '/^    def _init_db/{f=1} f && /^    def [a-zA-Z_]+\\\\\\(self/ && !/_init_db/{exit} f' src/models/postgres_database.py)",
+      "Bash(xargs -I{} basename {})"
     ]
   }
 }

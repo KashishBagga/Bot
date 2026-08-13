@@ -42,6 +42,10 @@ FYERS_AUTH_CODE = os.getenv("FYERS_AUTH_CODE")
 # Database configuration
 DATABASE_PATH = os.getenv("DATABASE_PATH", "trading_signals.db")
 
+# Live order placement (defaults keep the system in paper mode)
+LIVE_MODE = os.getenv("LIVE_MODE", "false").lower() == "true"
+MAX_LIVE_LOTS = int(os.getenv("MAX_LIVE_LOTS", "1"))
+
 # Telegram configuration
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")

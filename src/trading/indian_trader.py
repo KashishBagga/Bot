@@ -18,7 +18,7 @@ import schedule
 import threading
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 # Path Injection
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -52,8 +52,12 @@ from src.strategies.credit_spread_strategy import CreditSpreadStrategy
 from src.strategies.gap_strategy import GapStrategy
 from src.strategies.iron_condor_strategy import IronCondorStrategy
 from src.strategies.butterfly_strategy import ButterflyStrategy
+from src.strategies.iron_butterfly_strategy import IronButterflyStrategy
 from src.strategies.options_scalping_strategy import OptionsScalpingStrategy
 from src.strategies.consolidation_breakout_strategy import ConsolidationBreakoutStrategy
+from src.strategies.rsi2_mean_reversion_strategy import Rsi2MeanReversionStrategy
+from src.strategies.expiry_aware_theta_strategy import ExpiryAwareThetaStrategy
+from src.strategies.relative_value_strategy import RelativeValueStrategy
 from src.warehouse.premarket_collector import PreMarketCollector
 
 # Setup Logging
@@ -167,8 +171,40 @@ class StructuralPaperTrader:
         # Woodchopper protection: (symbol, direction, bucket) -> attempt count for today
         self._daily_level_attempts: Dict[tuple, int] = {}
 
+        # ── Circuit breaker (sustained data-feed failure) ────────────────
+        # Separate from trading_halted_today (daily-loss halt) on purpose: a
+        # data outage isn't a daily-risk event and shouldn't reset at day-roll,
+        # only when quotes actually start flowing again — and a real daily-loss
+        # halt shouldn't get silently cleared just because one quote succeeded.
+        self.QUOTE_FAILURE_HALT_THRESHOLD = 5   # consecutive all-quotes-failed ticks (~2.5min @ 30s cadence)
+        self._quote_failure_streak = 0
+        self.data_feed_halted = False
+        if self.db.has_open_system_alert("DATA_FEED_DOWN"):
+            # A previous process died mid-outage — stay halted until a live
+            # quote actually proves the feed is back (checked every tick below).
+            self.data_feed_halted = True
+            logger.warning("⚠️ Resuming with an unresolved DATA_FEED_DOWN alert from a prior run — new real entries stay halted until quotes recover.")
+
         # Expiry & event blackout manager (Bug 18 fix)
         self.expiry_blackout = ExpiryBlackoutManager()
+
+        # ── Live order placement (first cut, defaults to paper) ─────────
+        # LIVE_MODE off by default (src/config/settings.py). Real trades only
+        # (never counterfactual/shadow) place real orders once True. A run of
+        # LIVE_ORDER_FAILURE_HALT_THRESHOLD consecutive order failures flips
+        # live_mode back off automatically — see _on_live_order_failure().
+        from src.config import settings as _settings
+        from src.execution.fyers_order_executor import FyersOrderExecutor
+        self.live_mode = _settings.LIVE_MODE
+        self.max_live_lots = _settings.MAX_LIVE_LOTS
+        self.live_order_executor = FyersOrderExecutor(self.data_provider.client)
+        self.LIVE_ORDER_FAILURE_HALT_THRESHOLD = 2
+        self.live_order_failure_streak = 0
+        if self.live_mode:
+            logger.warning(
+                f"🔴 LIVE_MODE is ON — real orders will be placed for real trades "
+                f"(max {self.max_live_lots} lot(s)/trade). Counterfactual trades stay simulated."
+            )
 
         # ── Strategy Research Framework ──────────────────────────────────
         self.pipeline = IndicatorPipeline(
@@ -531,6 +567,24 @@ class StructuralPaperTrader:
         self.registry.register(_butterfly_exp)
         self.db.save_experiment(_butterfly_exp.to_db_dict())
 
+        # 18b. Iron Butterfly — ATM-centered credit theta-harvest. Distinct from
+        # both Iron Condor (wider, lower-credit) and Butterfly (debit, long-vol
+        # collapse bet) — this system had no ATM-centered credit structure before.
+        _iron_butterfly_exp = Experiment(
+            name="IronButterfly_v1.0",
+            strategy=IronButterflyStrategy(
+                rvol_ceiling=1.2, max_efficiency=0.50,
+                wing_width_strikes=4, target_r=0.35, stop_r=-1.0,
+            ),
+            params={
+                "rvol_ceiling": 1.2, "max_efficiency": 0.50,
+                "wing_width_strikes": 4, "target_r": 0.35, "stop_r": -1.0,
+            },
+            description="Iron Butterfly (Sell ATM Call + ATM Put, buy wings) ATM credit theta-harvest"
+        )
+        self.registry.register(_iron_butterfly_exp)
+        self.db.save_experiment(_iron_butterfly_exp.to_db_dict())
+
         # ── v3.1: OI Scalping (PAPER) ──────────────────────────────────────
         _oi_scalping_exp = Experiment(
             name="OI_Scalping_v1.0",
@@ -582,6 +636,72 @@ class StructuralPaperTrader:
         self.registry.register(_consol_brk_tight_exp)
         self.db.save_experiment(_consol_brk_tight_exp.to_db_dict())
 
+        # ── RSI-2 Mean Reversion — fills a real gap: every other RANGE/
+        # COMPRESSION strategy here reads VWAP-distance or OI/PCR extremes,
+        # not a plain price oscillator. Runs every day like everything else —
+        # not gated to particular days/windows, just a different signal basis.
+        _rsi2_exp = Experiment(
+            name="RSI2_MeanReversion_v1.0",
+            strategy=Rsi2MeanReversionStrategy(
+                rsi_oversold=10.0, rsi_overbought=90.0, min_body_fraction=0.40,
+                atr_sl_buffer_mult=0.15, tp_atr_cap=3.0, min_rr=1.5, rvol_ceiling=1.5,
+            ),
+            params={
+                "rsi_oversold": 10.0, "rsi_overbought": 90.0, "min_body_fraction": 0.40,
+                "atr_sl_buffer_mult": 0.15, "tp_atr_cap": 3.0, "min_rr": 1.5, "rvol_ceiling": 1.5,
+            },
+            description="RSI-2 extreme fade (<10 / >90), confirmed by a reversal candle, targets EMA20"
+        )
+        self.registry.register(_rsi2_exp)
+        self.db.save_experiment(_rsi2_exp.to_db_dict())
+
+        # ── Expiry-Aware Theta — an Iron Condor whose wing width, RVOL
+        # ceiling, and target scale continuously with time-to-expiry instead
+        # of one fixed configuration every day. Evaluates every candle same
+        # as everything else — not gated to any particular day/window, just
+        # more selective (wider wings, tighter RVOL ceiling) the closer we
+        # get to expiry, since gamma risk is highest then even though theta
+        # reward is too.
+        _expiry_theta_exp = Experiment(
+            name="ExpiryAwareTheta_v1.0",
+            strategy=ExpiryAwareThetaStrategy(
+                rvol_ceiling_far=1.4, rvol_ceiling_near=0.8, max_efficiency=0.55,
+                wing_width_far=2, wing_width_near=5,
+                target_r_far=0.5, target_r_near=0.25, stop_r=-1.0,
+            ),
+            params={
+                "rvol_ceiling_far": 1.4, "rvol_ceiling_near": 0.8, "max_efficiency": 0.55,
+                "wing_width_far": 2, "wing_width_near": 5,
+                "target_r_far": 0.5, "target_r_near": 0.25, "stop_r": -1.0,
+            },
+            description="Iron Condor with wing width/RVOL ceiling/target scaled continuously by time-to-expiry"
+        )
+        self.registry.register(_expiry_theta_exp)
+        self.db.save_experiment(_expiry_theta_exp.to_db_dict())
+
+        # ── NIFTY-BankNifty Relative Value — the one genuinely new category:
+        # every other strategy here trades each index independently. This one
+        # trades the RELATIONSHIP between them (ratio divergence from its own
+        # rolling mean), regardless of either index's own trend/range state.
+        # One shared strategy instance, called once per symbol per candle by
+        # the registry exactly like every other symbol-agnostic strategy —
+        # it remembers each symbol's latest snapshot internally and emits one
+        # leg of the pair on each symbol's call once it's seen both.
+        _relative_value_exp = Experiment(
+            name="RelativeValue_NIFTY_BANKNIFTY_v1.0",
+            strategy=RelativeValueStrategy(
+                nifty_symbol="NSE:NIFTY50-INDEX", banknifty_symbol="NSE:NIFTYBANK-INDEX",
+                lookback_bars=60, z_entry=2.0, min_rr=1.2, tp_ratio_reversion_fraction=0.6,
+            ),
+            params={
+                "lookback_bars": 60, "z_entry": 2.0, "min_rr": 1.2,
+                "tp_ratio_reversion_fraction": 0.6,
+            },
+            description="NIFTY/BankNifty ratio divergence from its own rolling mean — fade the rich leg, buy the cheap leg"
+        )
+        self.registry.register(_relative_value_exp)
+        self.db.save_experiment(_relative_value_exp.to_db_dict())
+
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
@@ -604,9 +724,13 @@ class StructuralPaperTrader:
         self.portfolios.register("CreditSpread_v1.0_PCRFade")
         self.portfolios.register("IronCondor_v1.0")
         self.portfolios.register("Butterfly_v1.0")
+        self.portfolios.register("IronButterfly_v1.0")
         self.portfolios.register("OI_Scalping_v1.0")
         self.portfolios.register("Consolidation_Breakout_v1.0")
         self.portfolios.register("Consolidation_Breakout_Tight_v1.0")
+        self.portfolios.register("RSI2_MeanReversion_v1.0")
+        self.portfolios.register("ExpiryAwareTheta_v1.0")
+        self.portfolios.register("RelativeValue_NIFTY_BANKNIFTY_v1.0")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
@@ -632,6 +756,7 @@ class StructuralPaperTrader:
         self.last_processed_m5_time = None
         
         # Load open real positions from DB on startup
+        from src.core.options_mapper import OptionsMapper
         open_reals = self.db.get_open_positions()
         now = datetime.now(self.tz)
         for op in open_reals:
@@ -689,6 +814,15 @@ class StructuralPaperTrader:
                 # silently undercounts this position after every restart.
                 'position_size_inr': op.get('position_size_inr', 0.0) or 0.0,
                 'lots': op.get('lots', 1.0) or 1.0,
+                # Restore real-fill premium tracking so a mid-session restart
+                # doesn't silently fall back to the index-point P&L proxy.
+                'option_symbol': op.get('option_symbol'),
+                'entry_premium': op.get('entry_premium'),
+                'exit_premium': None,
+                'lot_size': (
+                    OptionsMapper.get_lot_size(op['option_symbol']) if op.get('option_symbol') else None
+                ),
+                'pnl_calculation_method': None,
             }
             # recovered_after_minutes: distinguish quick restart from multi-hour outage
             recovered_after_minutes = round(
@@ -873,6 +1007,7 @@ class StructuralPaperTrader:
 
             # Fetch live prices in batch for accurate position evaluation
             live_prices = self.data_provider.get_current_prices_batch(self.symbols)
+            self._record_quote_batch_result(live_prices, now)
 
             # 1. Fetch Multi-Timeframe Data (once per symbol)
             end_date = datetime.now(self.tz)
@@ -1120,7 +1255,8 @@ class StructuralPaperTrader:
             try:
                 # Fetch live LTP in batch
                 live_prices = self.data_provider.get_current_prices_batch(self.symbols)
-                
+                self._record_quote_batch_result(live_prices, now)
+
                 # Filter out None/failed quotes
                 valid_prices = {}
                 for symbol in self.symbols:
@@ -1256,6 +1392,14 @@ class StructuralPaperTrader:
         options = getattr(snapshot.market, "options", None) if snapshot.market else None
         if options is not None and not options.is_stale:
             try:
+                # NSE only ever lists NIFTY strikes as multiples of 50 and
+                # BANKNIFTY strikes as multiples of 100, so relevance_factor's
+                # "else" tier below is a defensive fallback, not something a
+                # real strike hits — for BANKNIFTY every strike is %100==0, so
+                # relevance_factor is always 1.0 there; the 100/50 split only
+                # differentiates NIFTY strikes.
+                half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0
+                oi_wall_zones = []
                 for walls, zone_type in (
                     (getattr(options, "call_oi_walls", []), "OI_RESISTANCE"),
                     (getattr(options, "put_oi_walls", []), "OI_SUPPORT"),
@@ -1263,29 +1407,24 @@ class StructuralPaperTrader:
                     for wall in (walls or []):
                         if wall is None or wall.strike is None:
                             continue
-                        
+
                         strike = float(wall.strike)
-                        
-                        # Determine relevance factor: 100 intervals are very strong,
-                        # 50 intervals are moderately strong, others are weak.
+
                         if strike % 100 == 0:
                             relevance_factor = 1.0
-                            half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0  # Tight band for exact strike
                         elif strike % 50 == 0:
                             relevance_factor = 0.5
-                            half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0
                         else:
                             relevance_factor = 0.1
-                            half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0
-                            
+
                         raw_id = f"{snapshot.symbol}|{zone_type}|{strike}"
                         zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
-                        
+
                         # Heuristic normalization: 1 lakh OI ~= strength 100, scaled by relevance factor
                         base_strength = min(wall.oi / 100_000.0 * 100.0, 100.0)
                         strength = base_strength * relevance_factor
-                        
-                        self.db.upsert_sr_zone({
+
+                        oi_wall_zones.append({
                             "zone_id":    zone_id,
                             "symbol":     snapshot.symbol,
                             "zone_type":  zone_type,
@@ -1295,6 +1434,8 @@ class StructuralPaperTrader:
                             "now":        now,
                             "timeframe":  "options",
                         })
+                # One connection for up to ~20 walls, not one per wall.
+                self.db.upsert_sr_zones_batch(oi_wall_zones)
             except Exception as e:
                 logger.debug(f"⚠️ _persist_sr_zones: skipping OI wall — {e}")
 
@@ -1330,8 +1471,35 @@ class StructuralPaperTrader:
             self._daily_level_attempts = {}  # reset woodchopper counters for new day
             logger.info(f"🗓️ Risk day rolled to {today} — daily counters reset.")
 
+    def _record_quote_batch_result(self, prices: Dict[str, Optional[float]], now) -> None:
+        """Circuit breaker: track consecutive all-quotes-failed ticks and halt
+        new real entries once sustained failure looks like a genuine outage
+        rather than one transient blip. Auto-clears the moment quotes succeed
+        again — existing open positions keep being marked whenever a quote
+        does come back, only NEW entries are gated (via _can_enter_real)."""
+        success = any(v is not None and v > 0 for v in prices.values())
+        if success:
+            if self.data_feed_halted:
+                logger.info("✅ Live quotes recovered — clearing DATA_FEED_DOWN halt.")
+                self.db.resolve_system_alert("DATA_FEED_DOWN", now)
+            self._quote_failure_streak = 0
+            self.data_feed_halted = False
+            return
+
+        self._quote_failure_streak += 1
+        if self._quote_failure_streak >= self.QUOTE_FAILURE_HALT_THRESHOLD and not self.data_feed_halted:
+            self.data_feed_halted = True
+            msg = (
+                f"All symbol quotes failed for {self._quote_failure_streak} consecutive ticks "
+                f"(~{self._quote_failure_streak * 30}s) — halting new real entries until the feed recovers."
+            )
+            logger.critical(f"🛑 CIRCUIT BREAKER TRIPPED: {msg}")
+            self.db.save_system_alert(now, "DATA_FEED_DOWN", msg)
+
     def _can_enter_real(self, now, sig: Dict = None) -> Tuple[bool, str]:
         """Aggregate risk gate for NEW real entries. Returns (allowed, reason)."""
+        if self.data_feed_halted:
+            return False, "DATA_FEED_DOWN"
         if self.trading_halted_today:
             return False, "DAILY_LOSS_HALT"
         if self.daily_realized_r <= self.DAILY_LOSS_LIMIT_R:
@@ -1364,6 +1532,87 @@ class StructuralPaperTrader:
 
         return True, "OK"
 
+    def _place_live_entry_order(self, pos: Dict) -> None:
+        """Places a REAL market BUY for a real (non-CF) entry. Mutates `pos`
+        in place with the outcome; never raises into the caller — a failure
+        here must not stop the paper-simulated position from being tracked."""
+        symbol = pos.get('option_symbol') or pos['symbol']
+        qty = int((pos.get('lots') or 1) * (pos.get('lot_size') or 1))
+        try:
+            result = self.live_order_executor.place(symbol, qty, side="BUY")
+        except Exception as e:
+            logger.error(f"❌ Live entry order raised for {symbol} qty={qty}: {e}")
+            self._on_live_order_failure(f"ENTRY {symbol} qty={qty}: {e}")
+            return
+
+        pos['is_live'] = result.success
+        pos['live_order_id'] = result.order_id
+        pos['live_fill_price'] = result.fill_price
+        if result.success:
+            self.live_order_failure_streak = 0
+            logger.info(f"✅ LIVE ENTRY: {symbol} qty={qty} order_id={result.order_id} fill={result.fill_price}")
+        else:
+            self._on_live_order_failure(f"ENTRY {symbol} qty={qty}: {result.message}")
+
+    def _place_live_exit_order(self, pos: Dict, exit_price: float, reason: str) -> None:
+        """Places a REAL market SELL to square off the live entry opened above.
+        Mutates `pos` in place; never raises into the caller."""
+        symbol = pos.get('option_symbol') or pos['symbol']
+        qty = int((pos.get('lots') or 1) * (pos.get('lot_size') or 1))
+        try:
+            result = self.live_order_executor.place(symbol, qty, side="SELL")
+        except Exception as e:
+            logger.error(f"❌ Live exit order raised for {symbol} qty={qty}: {e}")
+            self._on_live_order_failure(f"EXIT {symbol} qty={qty} reason={reason}: {e}")
+            return
+
+        pos['live_exit_order_id'] = result.order_id
+        pos['live_exit_fill_price'] = result.fill_price
+        if result.success:
+            self.live_order_failure_streak = 0
+            logger.info(f"✅ LIVE EXIT: {symbol} qty={qty} reason={reason} order_id={result.order_id} fill={result.fill_price}")
+        else:
+            self._on_live_order_failure(f"EXIT {symbol} qty={qty} reason={reason}: {result.message}")
+
+    def _on_live_order_failure(self, message: str) -> None:
+        """Circuit breaker for real order placement — stricter than the 5-tick
+        data-feed threshold, since an order rejection is a much higher-signal
+        failure than one missed quote. Flips live_mode off (falling back to
+        paper) rather than crashing the loop, and fires the same system-alert
+        mechanism DATA_FEED_DOWN already uses."""
+        self.live_order_failure_streak += 1
+        logger.error(
+            f"❌ Live order failure ({self.live_order_failure_streak}/"
+            f"{self.LIVE_ORDER_FAILURE_HALT_THRESHOLD}): {message}"
+        )
+        if self.live_order_failure_streak >= self.LIVE_ORDER_FAILURE_HALT_THRESHOLD and self.live_mode:
+            self.live_mode = False
+            reason = f"{self.live_order_failure_streak} consecutive live order failures: {message}"
+            logger.critical(f"🛑 LIVE_MODE disabled — reverting to paper. {reason}")
+            self.db.save_system_alert(datetime.now(self.tz), "LIVE_ORDER_HALTED", reason)
+            self._send_circuit_breaker_alert(reason)
+
+    def _send_circuit_breaker_alert(self, reason: str) -> None:
+        """Sync bridge into the (currently unused elsewhere) async AlertManager —
+        the trading loop is sync, so this wraps the one async call it needs in
+        asyncio.run(). Never raises; a failed alert must not affect trading."""
+        try:
+            import asyncio
+            from src.execution.monitoring_alerting_system import AlertManager, AlertConfig
+            from src.config import settings as _settings
+            if not hasattr(self, '_alert_manager'):
+                self._alert_manager = AlertManager(AlertConfig(
+                    enable_email=False,
+                    enable_slack=False,
+                    enable_webhook=False,
+                    enable_telegram=bool(_settings.TELEGRAM_BOT_TOKEN and _settings.TELEGRAM_CHAT_ID),
+                    telegram_bot_token=_settings.TELEGRAM_BOT_TOKEN or "",
+                    telegram_chat_id=_settings.TELEGRAM_CHAT_ID or "",
+                ))
+            asyncio.run(self._alert_manager.alert_circuit_breaker_activated(reason))
+        except Exception as e:
+            logger.error(f"❌ Failed to send live-order circuit breaker alert: {e}")
+
     def _record_level_attempt(self, sig: Dict) -> None:
         """Increment the woodchopper attempt counter for a real trade that was entered."""
         symbol    = sig.get('symbol', '')
@@ -1389,6 +1638,17 @@ class StructuralPaperTrader:
         """
         with self.position_lock:
             current_bars = current_bars or {}
+
+            # One batch quote call for every open position's resolved option
+            # leg, instead of one call per position per tick (see
+            # _batch_resolve_option_quotes / _premium_pnl_r).
+            option_symbols = {
+                pos['option_symbol'] for pos in self.active_trades.values() if pos.get('option_symbol')
+            } | {
+                pos['option_symbol'] for pos in self.active_counterfactuals.values() if pos.get('option_symbol')
+            }
+            option_quotes = self._batch_resolve_option_quotes(list(option_symbols))
+
             # Update real trades — keyed by (symbol, experiment_name)
             for key in list(self.active_trades.keys()):
                 symbol, experiment_name = key
@@ -1397,7 +1657,9 @@ class StructuralPaperTrader:
                 try:
                     pos = self.active_trades[key]
                     is_closed = self._update_position(
-                        pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol), increment_bar_count=increment_bar_count
+                        pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol),
+                        increment_bar_count=increment_bar_count,
+                        option_quote=option_quotes.get(pos.get('option_symbol')),
                     )
                     if is_closed:
                         pnl_r = pos.get('_last_pnl_r', 0.0)
@@ -1420,7 +1682,9 @@ class StructuralPaperTrader:
                     if symbol not in current_prices:
                         continue
                     is_closed = self._update_position(
-                        pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol), increment_bar_count=increment_bar_count
+                        pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol),
+                        increment_bar_count=increment_bar_count,
+                        option_quote=option_quotes.get(pos.get('option_symbol')),
                     )
                 except Exception as e:
                     logger.error(f"⚠️ Position update failed for counterfactual {cand_id}: {e}", exc_info=True)
@@ -1480,7 +1744,88 @@ class StructuralPaperTrader:
                     self._notify_strategy_exit(exp_name, pos['symbol'], pos.get('_last_pnl_r', 0.0), timestamp)
                     self.active_cf_combos.pop(combo_id)
 
-    def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None, increment_bar_count: bool = True) -> bool:
+    def _batch_resolve_option_quotes(self, option_symbols: List[str]) -> Dict[str, Tuple[float, float, float]]:
+        """One get_quotes() call for every open position's resolved option leg,
+        instead of one call per position per 30s tick. Returns
+        {option_symbol: (premium, bid, ask)} for whatever the batch call
+        actually returned a live LTP for — missing symbols are simply absent,
+        never fabricated."""
+        if not option_symbols:
+            return {}
+        try:
+            quotes = self.data_provider.client.get_quotes(option_symbols)
+        except Exception as e:
+            logger.warning(f"⚠️ Batch option quote fetch failed: {e}")
+            return {}
+        result = {}
+        if quotes and isinstance(quotes, list):
+            symbol_set = set(option_symbols)
+            for q in quotes:
+                name = q.get('n')
+                if name in symbol_set:
+                    v = q.get('v', {})
+                    ltp = v.get('lp')
+                    if ltp is not None:
+                        result[name] = (float(ltp), float(v.get('bid', 0.0) or 0.0), float(v.get('ask', 0.0) or 0.0))
+        return result
+
+    def _resolve_current_premium(self, pos: Dict, option_quote: Optional[Tuple[float, float, float]]) -> Optional[float]:
+        """Realistic current fill for closing this position's option leg — a
+        long CALL/PUT always closes by SELLING, so it fills at bid, never at
+        raw LTP (options_execution_engine.realistic_fill_price). Uses the
+        pre-batched quote if the caller supplied one, else falls back to a
+        single live-quote lookup. Returns None (never fabricates a price) if
+        there's no option leg or no quote could be resolved."""
+        option_symbol = pos.get('option_symbol')
+        if not option_symbol:
+            return None
+        if option_quote is not None:
+            premium, bid, ask = option_quote
+        else:
+            try:
+                quotes = self.data_provider.client.get_quotes([option_symbol])
+            except Exception as e:
+                logger.warning(f"⚠️ Could not resolve current premium for {option_symbol}: {e}")
+                return None
+            premium = bid = ask = None
+            if quotes and isinstance(quotes, list):
+                for q in quotes:
+                    if q.get('n') == option_symbol:
+                        v = q.get('v', {})
+                        premium, bid, ask = v.get('lp'), v.get('bid', 0.0), v.get('ask', 0.0)
+                        break
+            if premium is None:
+                return None
+        from src.core.options_execution_engine import realistic_fill_price
+        return realistic_fill_price(float(premium), float(bid or 0.0), float(ask or 0.0), 'SELL')
+
+    def _premium_pnl_r(self, pos: Dict, option_quote: Optional[Tuple[float, float, float]]) -> Optional[float]:
+        """Real option-premium P&L expressed in R, using the same risk-per-R
+        (position_size_inr * stop_loss_distance / entry_price) PositionSizer
+        used to size the trade at entry — so R stays comparable across trades
+        while the numerator reflects an actual fill instead of assuming the
+        option tracked the index point-for-point (delta=1, zero theta/IV
+        decay). Returns None (caller falls back to the index-point proxy) when
+        this position has no resolved option leg or the current premium can't
+        be resolved — never fabricates a price."""
+        if not pos.get('option_symbol') or not pos.get('entry_premium') or not pos.get('lot_size'):
+            return None
+        current_premium = self._resolve_current_premium(pos, option_quote)
+        if current_premium is None:
+            return None
+        entry_price = pos.get('entry_price') or 0.0
+        stop_loss_distance = pos.get('stop_loss_distance') or 0.0
+        if entry_price <= 0 or stop_loss_distance <= 0:
+            return None
+        risk_amount_inr = pos.get('position_size_inr', 0.0) * stop_loss_distance / entry_price
+        if risk_amount_inr <= 0:
+            return None
+        premium_pnl_inr = (current_premium - pos['entry_premium']) * pos['lot_size'] * pos.get('lots', 1.0)
+        pos['_last_current_premium'] = current_premium
+        return premium_pnl_inr / risk_amount_inr
+
+    def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None,
+                          increment_bar_count: bool = True, option_quote: Tuple[float, float, float] = None) -> bool:
         """Evaluate a position against the latest market tick. Returns True if position exited.
 
         ``bar`` is the last CLOSED candle's OHLC ({'open','high','low','close'}).
@@ -1488,6 +1833,11 @@ class StructuralPaperTrader:
         low/high, not just its close) and gap-through the stop is filled at the
         candle open — modelling the worst-case fill instead of assuming a perfect
         fill exactly at the stop price.
+
+        ``option_quote`` is an optional pre-batched (premium, bid, ask) for this
+        position's resolved option leg (see _batch_resolve_option_quotes) — when
+        the position has one, pnl_r is priced off the real premium fill instead
+        of the index-point proxy (see _premium_pnl_r).
         """
         if pos.get('status', 'OPEN') != 'OPEN':
             return False
@@ -1511,12 +1861,20 @@ class StructuralPaperTrader:
         pos['highest_price'] = max(old_highest, current_price)
         pos['lowest_price'] = min(old_lowest, current_price)
         
-        # Calculate current R PnL
+        # Calculate current R PnL — index-point proxy (assumes the option
+        # tracked the index point-for-point: delta=1, zero theta/IV decay).
         if pos['signal'] == 'BUY CALL':
-            current_pnl_r = (current_price - pos['entry_price']) / stop_loss_distance if stop_loss_distance > 0 else 0.0
+            index_pnl_r = (current_price - pos['entry_price']) / stop_loss_distance if stop_loss_distance > 0 else 0.0
         else: # BUY PUT
-            current_pnl_r = (pos['entry_price'] - current_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
-            
+            index_pnl_r = (pos['entry_price'] - current_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
+
+        # Prefer the real option-premium fill whenever this position has a
+        # resolved option leg — None means no leg / premium unresolvable, in
+        # which case we fall back to the index-point proxy above rather than
+        # fabricate a price.
+        premium_pnl_r = self._premium_pnl_r(pos, option_quote)
+        current_pnl_r = premium_pnl_r if premium_pnl_r is not None else index_pnl_r
+
         pos['max_closed_profit_r'] = max(pos.get('max_closed_profit_r', 0.0), current_pnl_r)
 
         is_closed = False
@@ -1585,13 +1943,25 @@ class StructuralPaperTrader:
 
         if is_closed:
             pos['status'] = 'EXIT_PENDING'
-            # Calculate final PnL R-units
-            if pos['signal'] == 'BUY CALL':
-                pnl_r = (exit_price - pos['entry_price']) / stop_loss_distance if stop_loss_distance > 0 else 0.0
-            else: # BUY PUT
-                pnl_r = (pos['entry_price'] - exit_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
-            
-            pnl_r -= 0.05  # Transaction cost buffer
+            if premium_pnl_r is not None:
+                # Real fill: reuse this tick's resolved premium as the exit fill.
+                # (There's no historical option-bar feed to pin the exact
+                # index-stop-cross moment — the latest available quote is the
+                # best available approximation, same convention combo legs use.)
+                pnl_r = premium_pnl_r
+                pos['exit_premium'] = pos.pop('_last_current_premium', None)
+                pos['pnl_calculation_method'] = 'premium'
+                # No separate transaction-cost buffer here — realistic_fill_price
+                # (sell-at-bid) already prices in the real bid/ask spread.
+            else:
+                # Index-point proxy — no resolved option leg (or premium
+                # unresolvable this tick). Calculate final PnL R-units.
+                if pos['signal'] == 'BUY CALL':
+                    pnl_r = (exit_price - pos['entry_price']) / stop_loss_distance if stop_loss_distance > 0 else 0.0
+                else: # BUY PUT
+                    pnl_r = (pos['entry_price'] - exit_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
+                pnl_r -= 0.05  # Transaction cost buffer
+                pos['pnl_calculation_method'] = 'index_proxy'
             self._exit_position(pos, exit_price, exit_reason, timestamp, pnl_r)
             pos['status'] = 'CLOSED'
             return True
@@ -1775,12 +2145,26 @@ class StructuralPaperTrader:
                 deployed_capital=(0.0 if is_counterfactual else self._deployed_capital()),
             )
             
+        lot_size = None
+        entry_premium = None
         if option_contract:
             from src.core.options_mapper import OptionsMapper
+            from src.core.options_execution_engine import realistic_fill_price
             lot_size = OptionsMapper.get_lot_size(option_contract.symbol)
             premium = option_contract.premium or 100.0
             if premium > 0 and lot_size > 0:
                 lots = max(1, int(position_size_inr / (premium * lot_size)))
+            # Hard live-order lot cap (LIVE_MODE only, real trades only) — a
+            # ceiling independent of PositionSizer's own exposure caps, so a
+            # sizing bug can never place more than MAX_LIVE_LOTS on a real order.
+            if self.live_mode and not is_counterfactual:
+                lots = min(lots, self.max_live_lots)
+            # Real fill for P&L purposes: a BUY CALL/PUT closes long, so it opens
+            # by paying the ask (never the raw LTP) — same convention combo legs
+            # already use (options_execution_engine.realistic_fill_price).
+            entry_premium = realistic_fill_price(
+                option_contract.premium, option_contract.bid, option_contract.ask, 'BUY'
+            )
 
         diagnostics = sig.get('diagnostics') or {}
         if not isinstance(diagnostics, dict):
@@ -1826,8 +2210,29 @@ class StructuralPaperTrader:
             'diagnostics': diagnostics,
             'option_symbol': option_contract.symbol if option_contract else None,
             'option_premium': option_contract.premium if option_contract else None,
+            # Real-fill premium tracking (single-leg P&L fix) — when present,
+            # _update_position/_exit_position price pnl_r off the actual option
+            # premium instead of assuming the option tracked the index
+            # point-for-point. None for raw-index CFs with no resolved contract.
+            'entry_premium': entry_premium,
+            'exit_premium': None,
+            'lot_size': lot_size,
+            'pnl_calculation_method': None,
+            # First-cut live order placement — always present, only ever
+            # populated for real (non-CF) trades when LIVE_MODE is on.
+            'is_live': False,
+            'live_order_id': None,
+            'live_fill_price': None,
+            'live_exit_order_id': None,
+            'live_exit_fill_price': None,
         }
-        
+
+        # ── Live entry order (REAL trades only, LIVE_MODE gated) ─────────
+        # Fires before storage below so trade_performance's initial insert
+        # already carries the real order id/fill, not a later backfill.
+        if not is_counterfactual and self.live_mode:
+            self._place_live_entry_order(pos)
+
         if is_counterfactual:
             self.active_counterfactuals[candidate_id] = pos
 
@@ -1979,6 +2384,9 @@ class StructuralPaperTrader:
                 'current_price': entry_price,
                 'unrealized_pnl_r': 0.0,
                 'last_heartbeat_at': timestamp,
+                'is_live': pos.get('is_live', False),
+                'live_order_id': pos.get('live_order_id'),
+                'live_fill_price': pos.get('live_fill_price'),
             }
             self.db.save_trade_performance(perf)
             
@@ -2115,6 +2523,10 @@ class StructuralPaperTrader:
                 'diagnostics': pos.get('diagnostics'),
                 'position_size_inr': pos.get('position_size_inr', 0.0),
                 'lots': pos.get('lots', 1.0),
+                'entry_premium': pos.get('entry_premium'),
+                'exit_premium': None,
+                'option_symbol': pos.get('option_symbol'),
+                'pnl_calculation_method': None,
             }
             self.db.save_trade_performance(perf)
         else:
@@ -2233,6 +2645,13 @@ class StructuralPaperTrader:
         if not is_cf:
             self.sizer.record_trade_result(pos['strategy'], pnl_r)
 
+        # ── Live exit order (REAL trades only, LIVE_MODE gated) ──────────
+        # Squares off whatever live position was opened at entry. The exit
+        # itself is still decided by the simulated engine above (SL/TP/session
+        # end) — only the fill is real.
+        if not is_cf and self.live_mode and pos.get('live_order_id'):
+            self._place_live_exit_order(pos, exit_price, mapped_reason)
+
         # ── Audit Lifecycle: Order Exited ──────────────────────────────
         t_id = pos.get('trade_id')
         cand_id = pos.get('candidate_id')
@@ -2326,6 +2745,12 @@ class StructuralPaperTrader:
                 'diagnostics': pos.get('diagnostics'),
                 'position_size_inr': pos.get('position_size_inr', 0.0),
                 'lots': pos.get('lots', 1.0),
+                'entry_premium': pos.get('entry_premium'),
+                'exit_premium': pos.get('exit_premium'),
+                'option_symbol': pos.get('option_symbol'),
+                'pnl_calculation_method': pos.get('pnl_calculation_method'),
+                'live_exit_order_id': pos.get('live_exit_order_id'),
+                'live_exit_fill_price': pos.get('live_exit_fill_price'),
             }
             self.db.save_trade_performance(perf)
         else:
@@ -2379,6 +2804,10 @@ class StructuralPaperTrader:
                 'version': pos.get('version', ''),
                 'confidence': pos.get('confidence'),
                 'diagnostics': pos.get('diagnostics'),
+                'entry_premium': pos.get('entry_premium'),
+                'exit_premium': pos.get('exit_premium'),
+                'option_symbol': pos.get('option_symbol'),
+                'pnl_calculation_method': pos.get('pnl_calculation_method'),
             }
             self.db.save_counterfactual_result(result)
             

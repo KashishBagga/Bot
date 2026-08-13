@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(grep -n 't\\\\.get\\(\"diagnostics\", {}\\)' \"src/trading/pages/3_📋_Daily_Review.py\")",
+      "Bash(python3 -c \"import psycopg2\")",
+      "Bash(pip3 show *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m venv /tmp/smoke_venv)",
+      "Bash(/tmp/smoke_venv/bin/pip install *)",
+      "Bash(/tmp/smoke_venv/bin/python3 -c ' *)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(pyenv versions *)",
+      "Bash(rm -rf /tmp/smoke_venv)",
+      "Bash(python3.13 -m venv /tmp/smoke_venv)",
+      "Bash(/tmp/smoke_venv/bin/python3 src/testing/smoke_test_premarket.py)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(python3 -m py_compile src/trading/indian_trader.py src/models/postgres_database.py src/testing/smoke_test_premarket.py src/reports/sections/market_state_outlook.py src/reports/eod_report_generator.py src/analytics/monday_readiness_report.py)",
+      "Bash(awk 'NR==48,NR==90{print NR\": \"$0}' /Users/kashishbagga/Desktop/Bot/src/models/postgres_database.py)",
+      "Bash(awk -F: '$1>74')",
+      "Bash(PYTHONPATH=. python3 -c ' *)",
+      "Bash(awk -F: '$1>74 && $1<778')",
+      "Bash(python3 -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(find / -maxdepth 4 -iname \"pandas\" -type d)",
+      "Bash(awk 'NR==2512,NR==2700' /Users/kashishbagga/Desktop/Bot/src/trading/indian_trader.py)",
+      "Bash(awk -F: '$1>2512')",
+      "Bash(python3 -m py_compile src/config/settings.py src/execution/fyers_order_executor.py src/trading/indian_trader.py src/models/postgres_database.py)"
+    ]
+  }
+}

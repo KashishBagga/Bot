@@ -375,6 +375,45 @@ class PostgresDatabase:
                     cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS tp1 REAL")
                     cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS tp1 REAL")
 
+                    # Single-leg P&L realism fix: entry/exit are now priced off the
+                    # actual resolved option premium (realistic_fill_price, same
+                    # convention combos already used) instead of assuming the
+                    # option tracked the index point-for-point. pnl_calculation_method
+                    # self-describes each row so old ('index_proxy') and new
+                    # ('premium') rows are never silently averaged together.
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS entry_premium REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS exit_premium REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS option_symbol TEXT")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS pnl_calculation_method TEXT")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS entry_premium REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS exit_premium REAL")
+
+                    # First-cut live order placement: real fill data alongside the
+                    # existing simulated entry_price/exit_price, so paper-vs-live
+                    # slippage can be quantified before raising MAX_LIVE_LOTS.
+                    # counterfactual_results never populates these — CF trades
+                    # never place a real order.
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS is_live BOOLEAN DEFAULT FALSE")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS live_order_id TEXT")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS live_fill_price REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS live_exit_order_id TEXT")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS live_exit_fill_price REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS option_symbol TEXT")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS pnl_calculation_method TEXT")
+
+                    # Circuit breaker: persisted so a data-feed-down halt survives
+                    # a restart and shows up in the dashboard/report, not just logs.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS system_alerts (
+                            id SERIAL PRIMARY KEY,
+                            timestamp TIMESTAMPTZ NOT NULL,
+                            alert_type TEXT NOT NULL,
+                            message TEXT,
+                            resolved_at TIMESTAMPTZ
+                        )
+                    ''')
+                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_system_alerts_open ON system_alerts(alert_type) WHERE resolved_at IS NULL")
+
                     # Signals that passed every strategy filter (accepted=True) but
                     # were still blocked from becoming a real trade by the portfolio
                     # risk governor (daily-loss halt / max concurrent / max deployed
@@ -998,9 +1037,11 @@ class PostgresDatabase:
                     placeholders = [f"%({col})s" for col in columns]
                     
                     query = f"""
-                        INSERT INTO trade_performance ({','.join(columns)}) 
+                        INSERT INTO trade_performance ({','.join(columns)})
                         VALUES ({','.join(placeholders)})
                         ON CONFLICT (trade_id, entry_time) DO UPDATE SET
+                        live_exit_order_id = EXCLUDED.live_exit_order_id,
+                        live_exit_fill_price = EXCLUDED.live_exit_fill_price,
                         exit_time = EXCLUDED.exit_time,
                         exit_price = EXCLUDED.exit_price,
                         mfe = EXCLUDED.mfe,
@@ -1034,7 +1075,11 @@ class PostgresDatabase:
                         diagnostics = EXCLUDED.diagnostics,
                         position_size_inr = EXCLUDED.position_size_inr,
                         lots = EXCLUDED.lots,
-                        tp1 = EXCLUDED.tp1
+                        tp1 = EXCLUDED.tp1,
+                        entry_premium = EXCLUDED.entry_premium,
+                        exit_premium = EXCLUDED.exit_premium,
+                        option_symbol = EXCLUDED.option_symbol,
+                        pnl_calculation_method = EXCLUDED.pnl_calculation_method
                     """
                     cursor.execute(query, perf_copy)
                 conn.commit()
@@ -1181,6 +1226,54 @@ class PostgresDatabase:
                 conn.commit()
         except Exception as e:
             logger.error(f"⚠️ Failed to log risk governor block: {e}")
+
+    def save_system_alert(self, timestamp, alert_type: str, message: str) -> None:
+        """Persist a circuit-breaker/system-health alert so it survives a
+        restart and is visible outside the log file (dashboard/report)."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "INSERT INTO system_alerts (timestamp, alert_type, message) VALUES (%s, %s, %s)",
+                        (timestamp, alert_type, message),
+                    )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"⚠️ Failed to save system alert: {e}")
+
+    def resolve_system_alert(self, alert_type: str, resolved_at) -> None:
+        """Mark the most recent open alert of this type as resolved."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        UPDATE system_alerts SET resolved_at = %s
+                        WHERE id = (
+                            SELECT id FROM system_alerts
+                            WHERE alert_type = %s AND resolved_at IS NULL
+                            ORDER BY timestamp DESC LIMIT 1
+                        )
+                        """,
+                        (resolved_at, alert_type),
+                    )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"⚠️ Failed to resolve system alert: {e}")
+
+    def has_open_system_alert(self, alert_type: str) -> bool:
+        """True if an unresolved alert of this type exists (e.g. survives a restart)."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT 1 FROM system_alerts WHERE alert_type = %s AND resolved_at IS NULL LIMIT 1",
+                        (alert_type,),
+                    )
+                    return cursor.fetchone() is not None
+        except Exception as e:
+            logger.error(f"⚠️ Failed to check system alerts: {e}")
+            return False
 
     def get_realized_r_today(self, date_str: str) -> float:
         """Sum of final_pnl_r for real trades already closed today (IST).
@@ -1381,7 +1474,11 @@ class PostgresDatabase:
                         valid = EXCLUDED.valid,
                         validation_errors = EXCLUDED.validation_errors,
                         confidence = EXCLUDED.confidence,
-                        diagnostics = EXCLUDED.diagnostics
+                        diagnostics = EXCLUDED.diagnostics,
+                        entry_premium = EXCLUDED.entry_premium,
+                        exit_premium = EXCLUDED.exit_premium,
+                        option_symbol = EXCLUDED.option_symbol,
+                        pnl_calculation_method = EXCLUDED.pnl_calculation_method
                     """
                     cursor.execute(query, result_copy)
                 conn.commit()
@@ -1844,6 +1941,42 @@ class PostgresDatabase:
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to upsert sr_zone {zone.get('zone_id')}: {e}")
+
+    def upsert_sr_zones_batch(self, zones: List[Dict[str, Any]]) -> None:
+        """Same as upsert_sr_zone, but for many zones in a single connection and
+        transaction. OI-wall persistence can write up to ~20 zones per symbol
+        per candle — one connection per zone there was adding up to 40 fresh
+        psycopg2 connects every 5-minute cycle for no reason."""
+        if not zones:
+            return
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    rows = [
+                        (
+                            z["zone_id"], z["symbol"], z["zone_type"], z["price_low"], z["price_high"],
+                            z.get("strength", 1.0),
+                            z.get("now") or datetime.now(timezone.utc), z.get("now") or datetime.now(timezone.utc),
+                            z.get("timeframe") or "h1",
+                        )
+                        for z in zones
+                    ]
+                    execute_values(cursor, """
+                        INSERT INTO sr_zones
+                            (zone_id, symbol, zone_type, price_low, price_high,
+                             strength, touch_count, first_seen, last_seen, active, timeframe)
+                        VALUES %s
+                        ON CONFLICT (zone_id) DO UPDATE SET
+                            price_low   = EXCLUDED.price_low,
+                            price_high  = EXCLUDED.price_high,
+                            strength    = GREATEST(sr_zones.strength, EXCLUDED.strength),
+                            touch_count = sr_zones.touch_count + 1,
+                            last_seen   = EXCLUDED.last_seen,
+                            active      = TRUE
+                    """, rows, template="(%s, %s, %s, %s, %s, %s, 1, %s, %s, TRUE, %s)")
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Failed to batch-upsert {len(zones)} sr_zones: {e}")
 
     def get_sr_zones(
         self,

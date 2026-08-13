@@ -139,6 +139,7 @@ class EnhancedStrategyEngine:
             'hourly_bias': h1_struct.trend,
             'trend_strength': h1_struct.quality_score,
             'rvol': vol_report.rvol_tod,
+            'rvol_threshold': self.rvol_threshold,
             'atr': round(atr, 2),
             'distance_from_supply': round(dist_supply, 2),
             'distance_from_demand': round(dist_demand, 2),
