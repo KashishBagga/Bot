@@ -238,7 +238,7 @@ try:
     df.iloc[-1, df.columns.get_loc("low")] = 24190.0   # low <= ema20 (24195)
     df.iloc[-1, df.columns.get_loc("close")] = 24196.0  # close >= ema20
 
-    result = strat.evaluate(snap, "EMA_Pullback_20_50_RVOL1.0")
+    result = strat.evaluate(snap, "EMA_Pullback_20_50_RVOL0.5")
     sigs = result.signals
     if sigs:
         reasons = sigs[0].get("rejection_reasons", [])
@@ -251,7 +251,7 @@ try:
     vol_report_low = MagicMock()
     vol_report_low.rvol_tod = 0.3
     snap.volume_report = vol_report_low
-    result_low = strat.evaluate(snap, "EMA_Pullback_20_50_RVOL1.0")
+    result_low = strat.evaluate(snap, "EMA_Pullback_20_50_RVOL0.5")
     if result_low.signals:
         reasons_low = result_low.signals[0].get("rejection_reasons", [])
         check("C4: RVOL=0.3 below 0.5 threshold — LOW_RVOL rejection fires",
@@ -262,7 +262,7 @@ try:
     # C5: BIAS_MISMATCH still works — BUY CALL on BEARISH day
     snap.daily_bias = "BEARISH"
     snap.volume_report = vol_report_ok
-    result_mismatch = strat.evaluate(snap, "EMA_Pullback_20_50_RVOL1.0")
+    result_mismatch = strat.evaluate(snap, "EMA_Pullback_20_50_RVOL0.5")
     if result_mismatch.signals:
         reasons_mm = result_mismatch.signals[0].get("rejection_reasons", [])
         check("C5: BIAS_MISMATCH still rejects BUY CALL on BEARISH day",
@@ -308,7 +308,7 @@ try:
     # D2: with-trend RVOL = 1.6 (above 1.5) → no LOW_RVOL if it generates a signal
     vol_ok = MagicMock(); vol_ok.rvol_tod = 1.6
     snap.volume_report = vol_ok
-    result = strat.evaluate(snap, "ATR_Squeeze_RVOL1.0")
+    result = strat.evaluate(snap, "ATR_Squeeze_RVOL1.5")
     if result.signals:
         reasons = result.signals[0].get("rejection_reasons", [])
         # If direction is with-trend (BULLISH + BUY CALL), threshold is 1.5 and rvol=1.6 passes

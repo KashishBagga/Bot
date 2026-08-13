@@ -20,6 +20,19 @@ class OptionContract:
     volume: int = 0
     resolved_at: datetime = None
 
+
+def realistic_fill_price(premium: float, bid: float, ask: float, side: str) -> float:
+    """A real fill buys at ask and sells at bid, never at last-traded-price.
+    Combo legs (2-4 per trade) compound LTP-vs-real-fill slippage the most —
+    this is what both combo entry (MultiLegExecutionEngine) and combo
+    mark/exit (_update_combo_position) should use instead of raw LTP.
+    Falls back to premium/LTP when a quote side is missing (0.0), since a
+    literal 0.0 bid isn't a real sell price."""
+    if side == "BUY":
+        return ask if ask > 0 else premium
+    return bid if bid > 0 else premium
+
+
 class ExpiryResolver:
     """Resolves weekly or monthly expiry dates using database snapshots with fallbacks."""
     

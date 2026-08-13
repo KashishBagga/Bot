@@ -205,7 +205,7 @@ class StructuralPaperTrader:
         # threshold (1.0×) here was killing the best trend-following strategy.
         # Lowered to 0.5x (just checks for non-zero activity) + efficiency 0.45.
         _ema_pullback_exp = Experiment(
-            name="EMA_Pullback_20_50_RVOL1.0",
+            name="EMA_Pullback_20_50_RVOL0.5",
             strategy=EmaPullbackStrategy(rvol_threshold=0.5, min_efficiency=0.45),
             params={"rvol_threshold": 0.5, "min_efficiency": 0.45},
             description="EMA Pullback — RVOL 0.5x (pullbacks are quiet by nature), efficiency 0.45"
@@ -244,7 +244,7 @@ class StructuralPaperTrader:
         # to 1.5x (was 1.0x).  Also added a move-efficiency floor (0.50) to block
         # counter-trend squeezes in one-directional trend days.
         _atr_squeeze_exp = Experiment(
-            name="ATR_Squeeze_RVOL1.0",
+            name="ATR_Squeeze_RVOL1.5",
             strategy=AtrSqueezeStrategy(rvol_threshold=1.5, atr_percentile_threshold=0.20),
             params={"rvol_threshold": 1.5, "atr_percentile_threshold": 0.20},
             description="ATR Squeeze — RVOL 1.5x (requires actual expansion volume at breakout)"
@@ -256,7 +256,7 @@ class StructuralPaperTrader:
         _geometry_v1_exp = Experiment(
             name="Geometry_v1.0_Score35",
             strategy=GeometryStrategy(
-                min_confluence_score=50.0,   # BUG FIX: was 35 — too low, accepts junk zones
+                min_confluence_score=35.0,
                 zone_tolerance_pct=0.002,
                 min_body_fraction=0.40,
                 min_bias_confidence=0.45,
@@ -266,14 +266,14 @@ class StructuralPaperTrader:
                 trendline_break_enabled=True,
             ),
             params={
-                "min_confluence_score": 50.0,
+                "min_confluence_score": 35.0,
                 "zone_tolerance_pct": 0.002,
                 "min_body_fraction": 0.40,
                 "min_bias_confidence": 0.45,
                 "min_rr": 1.5,
                 "trendline_break_enabled": True,
             },
-            description="Geometry Strategy v1.0 — confluence bounce + trendline retest. Score threshold=50 (fixed from 35)."
+            description="Geometry Strategy v1.0 — confluence bounce + trendline retest. Score threshold=35 (loose arm; A/B against Score50)."
         )
         self.registry.register(_geometry_v1_exp)
         self.db.save_experiment(_geometry_v1_exp.to_db_dict())
@@ -585,10 +585,10 @@ class StructuralPaperTrader:
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
-        self.portfolios.register("EMA_Pullback_20_50_RVOL1.0")
+        self.portfolios.register("EMA_Pullback_20_50_RVOL0.5")
         self.portfolios.register("VWAP_Reversion_1.5ATR_RVOL1.0")
         self.portfolios.register("PrevDay_Extremes_RVOL1.2")
-        self.portfolios.register("ATR_Squeeze_RVOL1.0")
+        self.portfolios.register("ATR_Squeeze_RVOL1.5")
         self.portfolios.register("Geometry_v1.0_Score35")
         self.portfolios.register("Geometry_v1.0_Score50")
         self.portfolios.register("OrderFlow_v1.0")
@@ -1453,6 +1453,7 @@ class StructuralPaperTrader:
                         pnl_r = pos.get('_last_pnl_r', 0.0)
                         self.daily_realized_r += pnl_r
                         self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
+                        self._notify_strategy_exit(experiment_name, symbol, pnl_r, timestamp)
                         self.active_combo_trades.pop(key)
                 except Exception as e:
                     logger.critical(
@@ -1476,6 +1477,7 @@ class StructuralPaperTrader:
                     exp_name = pos.get('experiment_name', '')
                     thesis_base = (pos['symbol'], pos.get('setup_type', ''), pos.get('combo_type', ''))
                     self.active_cf_combo_theses.pop((exp_name,) + thesis_base, None)
+                    self._notify_strategy_exit(exp_name, pos['symbol'], pos.get('_last_pnl_r', 0.0), timestamp)
                     self.active_cf_combos.pop(combo_id)
 
     def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None, increment_bar_count: bool = True) -> bool:
@@ -2460,12 +2462,19 @@ class StructuralPaperTrader:
             logger.error(f"❌ Failed to resolve combo legs for {symbol} {combo_type}: {e}")
             return
 
+        from src.core.options_execution_engine import realistic_fill_price
         combo_id = sig.get('candidate_id') or f"combo_{symbol.replace(':', '_').replace('-', '_')}_{experiment_name}_{int(timestamp.timestamp())}"
         legs_payload = [
             {
                 'option_symbol': leg.contract.symbol, 'strike': leg.contract.strike,
                 'option_type': leg.option_type, 'side': leg.side, 'expiry': leg.contract.expiry,
-                'entry_premium': leg.contract.premium, 'exit_premium': None,
+                # Matches the realistic-fill price baked into resolved.net_premium_paid
+                # (MultiLegExecutionEngine.resolve), not the raw LTP — keeps the
+                # per-leg audit trail consistent with the actual P&L math.
+                'entry_premium': realistic_fill_price(
+                    leg.contract.premium, leg.contract.bid, leg.contract.ask, leg.side
+                ),
+                'exit_premium': None,
             }
             for leg in resolved.legs
         ]
@@ -2522,23 +2531,36 @@ class StructuralPaperTrader:
             f"| Net premium: {resolved.net_premium_paid:.2f} | Max loss: {resolved.max_loss:.2f}"
         )
 
+    def _notify_strategy_exit(self, experiment_name: str, symbol: str, pnl_r: float, timestamp) -> None:
+        """Tell a strategy instance its position just closed, e.g. so it can
+        start a loss-cooldown. No-op for strategies that don't opt in (most
+        don't need this — added for ButterflyStrategy's re-entry-after-loss guard)."""
+        experiment = self.registry.get(experiment_name)
+        if experiment is not None and hasattr(experiment.strategy, 'notify_exit'):
+            experiment.strategy.notify_exit(symbol, pnl_r, timestamp)
+
     def _update_combo_position(self, pos: Dict, underlying_price: float, timestamp, is_cf: bool) -> bool:
         """Re-fetch each leg's live premium, compute combined PnL, and check
         target/stop/session-end. Returns True if the combo exited."""
         if pos.get('status', 'OPEN') != 'OPEN':
             return False
 
-        from src.core.options_execution_engine import PremiumResolver
+        from src.core.options_execution_engine import PremiumResolver, realistic_fill_price
         premium_resolver = PremiumResolver(self.db, self.data_provider)
 
         symbol = pos['symbol']
         legs = pos['legs']
         current_net_value = 0.0
         for leg in legs:
+            # Closing reverses the fill side: a long (BUY) leg must be SOLD to
+            # close (fills at bid), a short (SELL) leg must be BOUGHT back
+            # (fills at ask) — the opposite of the entry-side convention.
+            closing_side = 'SELL' if leg['side'] == 'BUY' else 'BUY'
             try:
-                premium, _, _, _ = premium_resolver.resolve_premium(
+                premium, bid, ask, _ = premium_resolver.resolve_premium(
                     symbol, leg['strike'], leg['option_type'], leg['expiry'], leg['option_symbol'],
                 )
+                premium = realistic_fill_price(premium, bid, ask, closing_side)
             except Exception as e:
                 logger.warning(f"⚠️ Could not refresh leg {leg['option_symbol']}: {e} — using last known premium")
                 premium = leg.get('exit_premium') or leg['entry_premium']
@@ -2552,7 +2574,20 @@ class StructuralPaperTrader:
         is_closed = False
         exit_reason = None
 
-        if pnl_r >= pos['target_r']:
+        # For bounded-profit combos (credit spreads, iron condor), the strategy's
+        # fixed target_r can exceed what this specific trade's own strike/premium
+        # selection can ever pay out (max_profit/max_loss < target_r) — e.g. a
+        # credit spread with max_loss=73.6, max_profit=26.4 caps out at 0.36R,
+        # so a target_r=0.5 could never fire and the trade could only ever end
+        # in STOP_R or SESSION_END. Cap the effective target at what's actually
+        # reachable. Unbounded-profit combos (straddle/strangle, max_profit=None)
+        # keep the strategy's stated target_r unchanged.
+        effective_target_r = pos['target_r']
+        max_profit = pos.get('max_profit')
+        if max_profit is not None and pos['max_loss'] > 0:
+            effective_target_r = min(effective_target_r, max_profit / pos['max_loss'])
+
+        if pnl_r >= effective_target_r:
             is_closed = True
             exit_reason = 'TARGET_R'
         elif pnl_r <= pos['stop_r']:

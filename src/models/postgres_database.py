@@ -8,6 +8,7 @@ Handles persistent storage for high-frequency trading data.
 import os
 import json
 import logging
+import threading
 import time
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
@@ -35,9 +36,22 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 class PostgresDatabase:
+    # 25+ call sites across the codebase each construct their own PostgresDatabase(),
+    # several from background threads (OptionWarehouse, PreMarketCollector) started
+    # near process startup. _init_db() runs ~700 lines of CREATE/ALTER/materialized-view
+    # DDL — running that concurrently from multiple threads deadlocks Postgres on
+    # catalog locks (seen in prod: "Postgres Init Failed: deadlock detected"). Guard it
+    # so the DDL runs exactly once per process.
+    _schema_lock = threading.Lock()
+    _schema_ready = False
+
     def __init__(self):
         self.conn_str = os.getenv("DATABASE_URL", "postgresql://trader:trading_pass@127.0.0.1:5433/trading_warehouse")
-        self._init_db()
+        if not PostgresDatabase._schema_ready:
+            with PostgresDatabase._schema_lock:
+                if not PostgresDatabase._schema_ready:
+                    if self._init_db():
+                        PostgresDatabase._schema_ready = True
 
     def _get_connection(self, retries: int = 3, backoff_seconds: float = 0.5):
         """Connect with short retry/backoff — logs (08-03..08-07) showed hundreds
@@ -724,8 +738,10 @@ class PostgresDatabase:
                     logger.warning(f"⚠️ Failed to recreate research_signal_mart view: {e}")
             conn2.close()
             logger.info("✅ PostgreSQL / TimescaleDB fully initialized")
+            return True
         except Exception as e:
             logger.error(f"❌ Postgres Init Failed: {e}")
+            return False
 
     # ─────────────────────────────────────────────────────────────────────────
     # Pre-market & options chain accessors (used by new v3.1 strategies)

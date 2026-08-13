@@ -86,7 +86,9 @@ class PreMarketCollector:
         """Fetch previous trading day OHLCV."""
         try:
             provider = self._get_provider()
-            df = provider.get_historical_data(symbol, "D", days=5)
+            start = datetime.combine(today - timedelta(days=5), datetime.min.time(), tzinfo=IST)
+            end = datetime.combine(today, datetime.min.time(), tzinfo=IST)
+            df = provider.get_historical_data(symbol, start, end, "D")
             if df is None or len(df) < 2:
                 return None
             # Last row might be today (partial) — use second-to-last
@@ -104,7 +106,9 @@ class PreMarketCollector:
         """Fetch first 5-minute bar after 9:15 IST."""
         try:
             provider = self._get_provider()
-            df = provider.get_historical_data(symbol, "5", days=2)
+            start = datetime.combine(today - timedelta(days=2), datetime.min.time(), tzinfo=IST)
+            end = datetime.combine(today, datetime.min.time(), tzinfo=IST)
+            df = provider.get_historical_data(symbol, start, end, "5")
             if df is None or len(df) < 1:
                 return None
             today_bars = df[df.index.date == today]

@@ -215,7 +215,15 @@ class EnhancedStrategyEngine:
                     trigger_level = bos_level
                     candidate_id = f"cand_{symbol_clean}_TRAP_{trigger_level:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
                     side = trap_type
-                    sl = m5_df['high'].iloc[-1] + 1.0 if side == "BUY PUT" else m5_df['low'].iloc[-1] - 1.0
+                    # Floor the stop at 0.5*ATR from entry, same as SWEEP/BREAKOUT —
+                    # without this, a trap wick sitting right on price gives a stop
+                    # of only a point or two, letting normal noise stop it out before
+                    # the trap thesis is actually invalidated (see e.g. RVOL 3.15
+                    # "high confidence" TRAP trades hitting INITIAL_SL immediately).
+                    if side == "BUY PUT":
+                        sl = max(m5_df['high'].iloc[-1] + 1.0, price + min_stop_dist)
+                    else:
+                        sl = min(m5_df['low'].iloc[-1] - 1.0, price - min_stop_dist)
                     if side == "BUY CALL" and htf_bias == "BEARISH":
                         setup_rejection_reasons.append("BIAS_MISMATCH")
                     elif side == "BUY PUT" and htf_bias == "BULLISH":

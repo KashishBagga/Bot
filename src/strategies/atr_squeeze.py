@@ -120,6 +120,16 @@ class AtrSqueezeStrategy(BaseStrategy):
             elif side == "BUY PUT" and snapshot.daily_bias == "BULLISH":
                 rejection_reasons.append("BIAS_MISMATCH")
 
+            # 4. Move-efficiency floor — counter-trend only. A genuine reversal
+            # squeeze needs a decisive, efficient break; a choppy one is just
+            # noise fading the trend. (This is the fix the Aug-03 review comment
+            # in indian_trader.py claimed was already in place — it wasn't;
+            # move_efficiency was computed into diagnostics but never actually
+            # gated anything.)
+            move_efficiency = snapshot.features.get_float("move_efficiency")
+            if is_counter_trend and move_efficiency < 0.50:
+                rejection_reasons.append("LOW_EFFICIENCY_COUNTERTREND")
+
 
             # Invalidation buffer
             risk_dist = abs(price - sl) if sl else atr
@@ -173,7 +183,7 @@ class AtrSqueezeStrategy(BaseStrategy):
                 "atr": round(atr, 2),
                 "bos_trend": m5_struct.trend,
                 "bos_count": m5_struct.bos_count,
-                "move_efficiency": round(snapshot.features.get_float("move_efficiency"), 3)
+                "move_efficiency": round(move_efficiency, 3)
             }
 
             accepted = len(rejection_reasons) == 0

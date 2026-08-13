@@ -186,6 +186,11 @@ class OptionWarehouse:
                                         f"{max(s['oi'] for s in snapshots):,})"
                                     )
                                 except Exception as db_err:
+                                    # A whole cycle's snapshots failing to persist starves
+                                    # every downstream OI-dependent strategy (OI_Scalping's
+                                    # 10-min lookback especially) — track it in stats so it
+                                    # shows up in get_stats(), not just a per-cycle error log.
+                                    self.stats["errors"] += 1
                                     logger.error(f"❌ DB insert error for {underlying}: {db_err}")
 
                         except Exception as e:

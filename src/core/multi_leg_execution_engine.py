@@ -28,7 +28,9 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 from src.models.postgres_database import PostgresDatabase
-from src.core.options_execution_engine import ExpiryResolver, StrikeSelector, PremiumResolver, OptionContract
+from src.core.options_execution_engine import (
+    ExpiryResolver, StrikeSelector, PremiumResolver, OptionContract, realistic_fill_price,
+)
 
 logger = logging.getLogger("MultiLegExecution")
 
@@ -92,8 +94,13 @@ class MultiLegExecutionEngine:
             )
             legs.append(ComboLeg(option_type=option_type, side=side, strikes_away=strikes_away, contract=contract))
 
+        # Real fills buy at ask and sell at bid, not at LTP — with 2-4 legs per
+        # combo this compounds fast; see realistic_fill_price().
         net_premium_paid = sum(
-            leg.contract.premium if leg.side == "BUY" else -leg.contract.premium for leg in legs
+            realistic_fill_price(leg.contract.premium, leg.contract.bid, leg.contract.ask, leg.side)
+            if leg.side == "BUY" else
+            -realistic_fill_price(leg.contract.premium, leg.contract.bid, leg.contract.ask, leg.side)
+            for leg in legs
         )
 
         max_loss, max_profit = self._risk_profile(combo_type, legs, net_premium_paid, selector.interval)

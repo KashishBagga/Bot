@@ -9,6 +9,7 @@ Max profit is realized if the underlying asset expires exactly at the sold cente
 """
 
 import logging
+from datetime import timedelta
 from typing import List, Dict, Any, Optional
 
 from src.core.base_strategy import BaseStrategy, StrategyResult, StrategyMetadata
@@ -42,12 +43,23 @@ class ButterflyStrategy(BaseStrategy):
         wing_width_strikes: int = 2,
         target_r: float = 1.5,
         stop_r: float = -0.5,
+        loss_cooldown_minutes: float = 30.0,
     ):
         self.rvol_ceiling = rvol_ceiling
         self.max_efficiency = max_efficiency
         self.wing_width_strikes = wing_width_strikes
         self.target_r = target_r
         self.stop_r = stop_r
+        self.loss_cooldown_minutes = loss_cooldown_minutes
+        # Same strikes kept re-firing every 5-10min inside chop right after a
+        # stop-out (13 fires in one session on Aug 13, 25% win rate) — suppress
+        # re-entry on a symbol for a while after a loss. Wins re-enter immediately;
+        # only losses trigger the cooldown.
+        self._loss_cooldown_until: Dict[str, Any] = {}
+
+    def notify_exit(self, symbol: str, pnl_r: float, timestamp) -> None:
+        if pnl_r < 0:
+            self._loss_cooldown_until[symbol] = timestamp + timedelta(minutes=self.loss_cooldown_minutes)
 
     def evaluate(self, snapshot: MarketSnapshot, experiment_name: str) -> StrategyResult:
         errors: List[str] = []
@@ -79,6 +91,9 @@ class ButterflyStrategy(BaseStrategy):
                 rejection_reasons.append("LATE_SESSION")
             if self.wing_width_strikes <= 0:
                 rejection_reasons.append("ZERO_WIDTH")
+            cooldown_until = self._loss_cooldown_until.get(snapshot.symbol)
+            if cooldown_until is not None and current_time < cooldown_until:
+                rejection_reasons.append("COOLDOWN_AFTER_LOSS")
 
             # Butterfly Spread Legs:
             # Buy 1 ITM Call (-wing_width_strikes)

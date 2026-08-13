@@ -32,12 +32,12 @@ _TREND_CATEGORIES = {"TREND_UP", "TREND_DOWN"}
 # hybrid (bounce-or-break) experiments that shouldn't be regime-restricted.
 EXPERIMENT_REGIME_AFFINITY = {
     # Trend-continuation
-    "EMA_Pullback_20_50_RVOL1.0":      {"TREND_UP", "TREND_DOWN"},
+    "EMA_Pullback_20_50_RVOL0.5":      {"TREND_UP", "TREND_DOWN"},
     "VWAP_Reclaim_v1.0":               {"TREND_UP", "TREND_DOWN"},
     "VerticalSpread_v1.0":             {"TREND_UP", "TREND_DOWN"},
 
     # Breakout
-    "ATR_Squeeze_RVOL1.0":             {"TREND_UP", "TREND_DOWN", "GAP", "COMPRESSION"},
+    "ATR_Squeeze_RVOL1.5":             {"TREND_UP", "TREND_DOWN", "GAP", "COMPRESSION"},
     "CPR_v1.0":                       {"TREND_UP", "TREND_DOWN", "GAP"},
     "ORB_60m_IB_RVOL1.2":             {"TREND_UP", "TREND_DOWN", "GAP"},
 
