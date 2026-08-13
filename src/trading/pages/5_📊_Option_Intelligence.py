@@ -430,34 +430,38 @@ def render_option_intelligence(symbol, view_mode):
     with tab_zones:
         st.markdown("### 🎯 Persistent Support & Resistance Zones")
         if sr_zones:
-            supply = [z for z in sr_zones if z["zone_type"] == "SUPPLY"]
-            demand = [z for z in sr_zones if z["zone_type"] == "DEMAND"]
+            supply = [z for z in sr_zones if z["zone_type"] in ("SUPPLY", "OI_RESISTANCE")]
+            demand = [z for z in sr_zones if z["zone_type"] in ("DEMAND", "OI_SUPPORT")]
 
             c1, c2 = st.columns(2)
             with c1:
-                st.markdown(f"**🔴 Supply Zones ({len(supply)})**")
-                for z in supply[:10]:
+                st.markdown(f"**🔴 Supply / Resistance Zones ({len(supply)})**")
+                for z in supply[:15]:
                     lo = z["price_low"]
                     hi = z["price_high"]
                     mid = (lo + hi) / 2
                     tc = z.get("touch_count", 1)
+                    tf = z.get("timeframe", "h1")
+                    source = "Option Chain (OI)" if tf == "options" else f"Price Action ({tf.upper()})"
                     st.markdown(
                         f'<div class="zone-card zone-supply">'
-                        f'<span>₹{lo:,.1f} – ₹{hi:,.1f} <small>(mid {mid:,.0f})</small></span>'
-                        f'<span style="color:#f87171">Touches: {tc}</span></div>',
+                        f'<span>₹{lo:,.1f} – ₹{hi:,.1f} <small>(mid {mid:,.0f})</small></span><br>'
+                        f'<small style="color:#94a3b8">Source: {source} | Touches: {tc}</small></div>',
                         unsafe_allow_html=True
                     )
             with c2:
-                st.markdown(f"**🟢 Demand Zones ({len(demand)})**")
-                for z in demand[:10]:
+                st.markdown(f"**🟢 Demand / Support Zones ({len(demand)})**")
+                for z in demand[:15]:
                     lo = z["price_low"]
                     hi = z["price_high"]
                     mid = (lo + hi) / 2
                     tc = z.get("touch_count", 1)
+                    tf = z.get("timeframe", "h1")
+                    source = "Option Chain (OI)" if tf == "options" else f"Price Action ({tf.upper()})"
                     st.markdown(
                         f'<div class="zone-card zone-demand">'
-                        f'<span>₹{lo:,.1f} – ₹{hi:,.1f} <small>(mid {mid:,.0f})</small></span>'
-                        f'<span style="color:#4ade80">Touches: {tc}</span></div>',
+                        f'<span>₹{lo:,.1f} – ₹{hi:,.1f} <small>(mid {mid:,.0f})</small></span><br>'
+                        f'<small style="color:#94a3b8">Source: {source} | Touches: {tc}</small></div>',
                         unsafe_allow_html=True
                     )
 

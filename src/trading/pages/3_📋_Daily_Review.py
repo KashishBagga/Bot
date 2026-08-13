@@ -291,9 +291,83 @@ def load_experiment_metrics(date_str: str):
             return [dict(zip(cols, r)) for r in cur.fetchall()]
 
 
+def get_lot_size(symbol: str) -> int:
+    if "BANKNIFTY" in symbol or "NIFTYBANK" in symbol:
+        return 15
+    elif "FINNIFTY" in symbol:
+        return 40
+    elif "NIFTY" in symbol:
+        return 25
+    return 1
+
+
+@st.cache_data(ttl=120, show_spinner=False)
+def load_combo_trades(date_str: str):
+    with db._get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT combo_id, entry_time, exit_time, symbol,
+                       experiment_name, strategy_id, version, combo_type, setup_type,
+                       underlying_entry_price, underlying_exit_price, legs,
+                       net_premium_paid, max_loss, max_profit, target_r, stop_r,
+                       current_pnl_r, final_pnl_r, exit_reason, duration_minutes,
+                       confidence, diagnostics, valid, validation_errors
+                FROM combo_trades
+                WHERE entry_time AT TIME ZONE 'Asia/Kolkata' >= %(ds)s::date
+                  AND entry_time AT TIME ZONE 'Asia/Kolkata' <  %(ds)s::date + interval '1 day'
+                  AND (valid IS NULL OR valid = TRUE)
+                ORDER BY entry_time
+            """, {"ds": date_str})
+            cols = [c.name for c in cur.description]
+            return [dict(zip(cols, r)) for r in cur.fetchall()]
+
+
+def process_trade_metrics(trade):
+    is_combo = trade.get("is_combo", False)
+    symbol = trade.get("symbol") or "UNKNOWN"
+    lot_size = get_lot_size(symbol)
+    
+    pnl_r = trade.get("final_pnl_r") or trade.get("pnl") or 0.0
+    
+    if is_combo:
+        max_loss = trade.get("max_loss") or 0.0
+        max_loss_inr = max_loss * lot_size
+        realized_pnl_inr = pnl_r * max_loss_inr
+        capital_deployed_inr = max_loss_inr
+        is_win = pnl_r > 0
+    else:
+        entry_price = trade.get("entry_price") or 0.0
+        initial_sl = trade.get("initial_stop_loss") or 0.0
+        sl_distance = trade.get("stop_loss_distance") or abs(entry_price - initial_sl)
+        
+        if sl_distance <= 0:
+            features = parse_json(trade.get("features"))
+            atr = features.get("atr") or parse_json(trade.get("diagnostics")).get("atr") or 15.0
+            sl_distance = 0.5 * atr
+            
+        lots = trade.get("lots") or parse_json(trade.get("diagnostics")).get("lots") or 1
+        option_premium = parse_json(trade.get("diagnostics")).get("option_premium") or 100.0
+        
+        max_loss_premium_points = sl_distance * 0.5
+        max_loss_inr = max_loss_premium_points * lot_size * lots
+        realized_pnl_inr = pnl_r * max_loss_inr
+        capital_deployed_inr = option_premium * lot_size * lots
+        is_win = pnl_r > 0
+        
+    return {
+        "max_loss_inr": round(max_loss_inr, 2),
+        "realized_pnl_inr": round(realized_pnl_inr, 2),
+        "capital_deployed_inr": round(capital_deployed_inr, 2),
+        "capital_efficiency_percent": round((realized_pnl_inr / capital_deployed_inr * 100) if capital_deployed_inr > 0 else 0.0, 2),
+        "is_win": is_win,
+        "pnl_r": pnl_r
+    }
+
+
 # ─── Load all data ─────────────────────────────────────────────────────────────
 
 trades        = load_trades(date_str)
+combo_trades  = load_combo_trades(date_str)
 trade_events  = load_trade_events(date_str)
 exec_events   = load_execution_events(date_str)
 signals       = load_signal_audit(date_str)
@@ -307,9 +381,10 @@ accepted_signals = [s for s in signals if s["accepted"]]
 
 # ─── Tabs ──────────────────────────────────────────────────────────────────────
 
-tab_summary, tab_trades, tab_rejected, tab_blocks = st.tabs([
-    f"📊 Summary",
+tab_summary, tab_trades, tab_reasoning, tab_rejected, tab_blocks = st.tabs([
+    "📊 Summary",
     f"📈 All Trades ({len(trades)})",
+    "🧠 Trade Reasoning & Triggers",
     f"❌ Rejected Signals ({len(rejected_signals)})",
     f"🛡️ Risk Blocks ({len(risk_blocks)})",
 ])
@@ -553,6 +628,296 @@ with tab_trades:
                     st.markdown(f"**Exit Reason:** `{er}`")
 
                 st.markdown('</div>', unsafe_allow_html=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 3 — TRADE REASONING & TRIGGERS
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_reasoning:
+    # 1. Prepare and merge all trades for this day
+    day_trades = []
+    for t in trades:
+        tc = dict(t)
+        tc["is_combo"] = False
+        day_trades.append(tc)
+        
+    for ct in combo_trades:
+        ctc = dict(ct)
+        ctc["is_combo"] = True
+        ctc["trade_id"] = ctc.get("combo_id")
+        ctc["strategy"] = ctc.get("combo_type")
+        ctc["entry_price"] = ctc.get("underlying_entry_price")
+        ctc["exit_price"] = ctc.get("underlying_exit_price")
+        ctc["candidate_id"] = ctc.get("combo_id")
+        day_trades.append(ctc)
+        
+    if not day_trades:
+        st.info("No trades executed on this day.")
+    else:
+        # Match with signal audit features in memory
+        for t in day_trades:
+            t["features"] = parse_json(t.get("features"))
+            t["diagnostics"] = parse_json(t.get("diagnostics"))
+            
+            cand_id = t.get("candidate_id")
+            sig_match = None
+            if cand_id:
+                sig_match = next((s for s in signals if s.get("candidate_id") == cand_id), None)
+            if not sig_match:
+                entry_time = t.get("entry_time")
+                symbol = t.get("symbol")
+                if entry_time and symbol:
+                    for s in signals:
+                        if s.get("symbol") == symbol and abs((s.get("timestamp") - entry_time).total_seconds()) <= 300:
+                            sig_match = s
+                            break
+            if sig_match:
+                t["features"] = parse_json(sig_match.get("score_breakdown")) or t["features"]
+                t["market_regime"] = sig_match.get("market_regime") or t.get("market_regime")
+                t["daily_bias"] = sig_match.get("daily_bias")
+                t["hourly_bias"] = sig_match.get("hourly_bias")
+                t["setup_type"] = sig_match.get("setup_type") or t.get("setup_type")
+                t["rejection_reasons"] = parse_json(sig_match.get("rejection_reasons"))
+                
+        # Calculate metrics for each trade
+        metrics_dict = {}
+        for t in day_trades:
+            metrics_dict[t["trade_id"]] = process_trade_metrics(t)
+            
+        # Group by experiment
+        experiments = {}
+        for t in day_trades:
+            exp = t.get("experiment_name") or "Default"
+            if exp not in experiments:
+                experiments[exp] = []
+            experiments[exp].append(t)
+            
+        # Summary Table at the Top
+        st.subheader("📊 Session Experiment Summary")
+        summary_md = [
+            "| Experiment Name | R-Multiple Ledger | Family | Trades | Win Rate | Total R-PnL | Total PnL (₹) | Capital Deployed | Capital Efficiency |",
+            "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |"
+        ]
+        
+        for exp, exp_trades in sorted(experiments.items()):
+            tot = len(exp_trades)
+            wins = sum(1 for t in exp_trades if metrics_dict[t["trade_id"]]["is_win"])
+            wr = f"{(wins / tot * 100):.1f}%" if tot > 0 else "0.0%"
+            is_combo = exp_trades[0].get("is_combo", False)
+            family = "Combo Spreads" if is_combo else "Directional"
+            r_type = "Premium R" if is_combo else "Index R"
+            
+            tot_r = sum(metrics_dict[t["trade_id"]]["pnl_r"] for t in exp_trades)
+            tot_pnl_inr = sum(metrics_dict[t["trade_id"]]["realized_pnl_inr"] for t in exp_trades)
+            avg_cap = sum(metrics_dict[t["trade_id"]]["capital_deployed_inr"] for t in exp_trades) / tot if tot > 0 else 0.0
+            avg_eff = sum(metrics_dict[t["trade_id"]]["capital_efficiency_percent"] for t in exp_trades) / tot if tot > 0 else 0.0
+            
+            summary_md.append(
+                f"| **`{exp}`** | *{r_type}* | {family} | {tot} | {wr} | {tot_r:+.2f}R | **{tot_pnl_inr:+,.2f} ₹** | {avg_cap:,.2f} ₹ | {avg_eff:+.2f}% |"
+            )
+            
+        st.markdown("\n".join(summary_md))
+        st.markdown("---")
+        
+        # Deduplicated trigger signals block
+        st.subheader("🧠 Deduplicated Trigger Performance")
+        unique_signals = {}
+        for t in day_trades:
+            entry_time_str = str(t.get("entry_time"))
+            symbol = t.get("symbol")
+            key = (symbol, entry_time_str)
+            if key not in unique_signals:
+                unique_signals[key] = []
+            unique_signals[key].append(t)
+            
+        dedup_list = [v[0] for v in unique_signals.values()]
+        tot_dedup = len(dedup_list)
+        wins_dedup = sum(1 for t in dedup_list if metrics_dict[t["trade_id"]]["is_win"])
+        wr_dedup = f"{(wins_dedup / tot_dedup * 100):.1f}%" if tot_dedup > 0 else "0.0%"
+        pnl_dedup = sum(metrics_dict[t["trade_id"]]["realized_pnl_inr"] for t in dedup_list)
+        
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.metric("Unique Signal Triggers", tot_dedup)
+        with c2:
+            st.metric("Deduplicated Win Rate", wr_dedup)
+        with c3:
+            st.metric("Realized ₹ PnL (Deduplicated)", f"₹{pnl_dedup:+,.2f}")
+            
+        st.markdown("---")
+        
+        # Strategies details grouped by family
+        families = {
+            "🎯 Directional Single-Leg Strategy Ledgers": [e for e, ts in experiments.items() if not ts[0].get("is_combo")],
+            "⚖️ Options Combination Spread Strategy Ledgers": [e for e, ts in experiments.items() if ts[0].get("is_combo")]
+        }
+        
+        for fam_name, exp_names in families.items():
+            if not exp_names:
+                continue
+            st.markdown(f"## {fam_name}")
+            
+            for exp in sorted(exp_names):
+                exp_trades = experiments[exp]
+                st.markdown(f"### 🧪 Experiment: `{exp}`")
+                
+                for idx, t in enumerate(exp_trades, 1):
+                    met = metrics_dict[t["trade_id"]]
+                    pnl_r = met["pnl_r"]
+                    real_pnl = met["realized_pnl_inr"]
+                    cap_dep = met["capital_deployed_inr"]
+                    cap_eff = met["capital_efficiency_percent"]
+                    symbol_short = (t.get("symbol") or "").replace("NSE:", "").replace("-INDEX", "")
+                    
+                    icon = "🟢" if pnl_r > 0 else ("🔴" if pnl_r < 0 else "⚪")
+                    header_str = (
+                        f"{icon} Trade #{idx}: {symbol_short} {t.get('setup_type','?')} {t.get('signal_type') or ''} | "
+                        f"{pnl_r:+.3f}R ({real_pnl:+,.2f} ₹) | Cap Deployed: {cap_dep:,.2f} ₹ | Eff: {cap_eff:+.2f}%"
+                    )
+                    
+                    with st.expander(header_str):
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("Entry → Exit", f"{t.get('entry_price')} → {t.get('exit_price') or 'OPEN'}")
+                            st.metric("Exit Reason", t.get("exit_reason") or "N/A")
+                        with col2:
+                            r_label = "R PnL (Premium-based)" if t.get("is_combo") else "R PnL (Index points-based)"
+                            st.metric(r_label, f"{pnl_r:+.3f}R")
+                            st.metric("Realized PnL (₹)", f"₹{real_pnl:+,.2f}")
+                        with col3:
+                            st.metric("Capital Deployed", f"₹{cap_dep:,.2f}")
+                            st.metric("Capital Efficiency", f"{cap_eff:+.2f}%")
+                        with col4:
+                            st.metric("Stop Loss", f"₹{t.get('stop_loss') or '—'}")
+                            st.metric("Take Profit", f"₹{t.get('take_profit') or '—'}")
+                            
+                        if t.get("is_combo"):
+                            st.markdown(f"**Legs Structure:** `{format_legs(t.get('legs'))}`")
+                            st.markdown(f"**Max Loss points:** `{t.get('max_loss')} pts` | **Max Profit:** `{t.get('max_profit') or 'Unlimited'}`")
+                            st.caption(f"*Note: Realized ₹ P&L is calculated as R-Multiple * (Max Loss * Lot Size of {get_lot_size(t.get('symbol'))}).*")
+                        else:
+                            opt_symbol = t.get("option_symbol") or t.get("diagnostics", {}).get("option_symbol")
+                            opt_premium = t.get("option_premium") or t.get("diagnostics", {}).get("option_premium")
+                            lots = t.get("lots") or t.get("diagnostics", {}).get("lots") or 1
+                            if opt_symbol:
+                                st.markdown(f"**Option Resolved:** `{opt_symbol}` @ premium of `₹{opt_premium}` (Lots: {lots})")
+                            st.caption(f"*Note: R is measured in underlying index points. Realized ₹ P&L is estimated using an ATM delta of 0.5: R * (Index SL Distance * 0.5 * Lot Size of {get_lot_size(t.get('symbol'))} * Lots).*")
+                            
+                        st.markdown("#### Strategy Forensics")
+                        
+                        trigger_text = ""
+                        strategy = t.get("strategy")
+                        diagnostics = t.get("diagnostics") or {}
+                        features = t.get("features") or {}
+                        zone_explanation = diagnostics.get("zone_explanation")
+                        
+                        if "Geometry" in exp:
+                            zone_desc = zone_explanation or "confluence zone"
+                            trigger_text = (
+                                f"The system detected a `{strategy}` setup under the `GeometryStrategy`. "
+                                f"Specifically, price hit the {zone_desc}. "
+                                f"The system confirmed the reversal with a candle body of at least 40% of its range and close in the reversal direction. "
+                                f"Daily bias was '{diagnostics.get('narrative_bias', 'NEUTRAL')}' with confidence {diagnostics.get('bias_confidence', 0.5)}."
+                            )
+                        elif "Structural" in exp:
+                            rvol = features.get("rvol") or diagnostics.get("rvol") or "N/A"
+                            daily_bias = features.get("daily_bias") or "N/A"
+                            hourly_bias = features.get("hourly_bias") or "N/A"
+                            trigger_text = (
+                                f"The frozen core `StructuralStrategy` (`EnhancedStrategyEngine` {t.get('version') or 'v3.2'}) triggered a `{strategy}` setup. "
+                                f"This occurred under Daily Bias '{daily_bias}' and Hourly Bias '{hourly_bias}'. "
+                                f"The trigger was validated by a Relative Volume (RVOL) of {rvol} (threshold >= {diagnostics.get('rvol_threshold', 0.8)}). "
+                            )
+                            if strategy == "SWEEP":
+                                trigger_text += "Price swept liquidity at a major HTF structure zone (Supply/Demand) and printed a strong 5m rejection body."
+                            elif strategy == "BREAKOUT":
+                                trigger_text += "Price broke out of a key 5m Swing High/Low Break of Structure (BOS) level with high move efficiency and low wickiness."
+                            elif strategy == "TRAP":
+                                trigger_text += "Price attempted a breakout but failed to follow through (FFT), trapping breakout buyers/sellers and triggering a reversal fade."
+                        elif "OrderFlow" in exp:
+                            trigger_text = (
+                                f"The `OrderFlowStrategy` v1.0 identified an institutional stop hunt (sweep) or pullback into an unmitigated Fair Value Gap (FVG) imbalance. "
+                                f"The setup triggered when price swept stops at a high-value liquidity pool (PDH/PDL or EQH/EQL) and printed a confirmation reversal candle."
+                            )
+                        elif "VWAP_Reclaim" in exp:
+                            trigger_text = (
+                                f"The `VwapReclaimStrategy` triggered on a trend-continuation crossover. "
+                                f"The 5m close crossed over the intraday VWAP line, clearing it by an ATR-scaled buffer to confirm momentum in the reclaim direction (continuation, not reversion)."
+                            )
+                        elif "EMA_Pullback" in exp:
+                            trigger_text = (
+                                f"The `EmaPullbackStrategy` triggered on a trend-continuation setup. "
+                                f"Price pulled back to touch the 20 EMA, and then printed a green/red confirmation body in the direction of the macro EMA trend (bullish/bearish crossover)."
+                            )
+                        elif t.get("is_combo"):
+                            trigger_text = (
+                                f"This is an options combination spread strategy (`{strategy}`). "
+                                f"It was triggered based on volatility conditions. Specifically, range-bound / sideways conditions "
+                                f"(e.g., low RVOL, low move efficiency) led the system to believe that price would consolidate. "
+                                f"The spread was structured using ITM, ATM, and OTM strikes to capture time decay (theta) or volatility expansion/contraction."
+                            )
+                        else:
+                            trigger_text = f"This trade was triggered by strategy `{strategy}` under experiment `{exp}` based on default momentum/reversal rules."
+                            
+                        sl_tp_text = ""
+                        if "Geometry" in exp:
+                            sl_tp_text = (
+                                f"The Stop Loss was set at `band_low - 0.15 * ATR` (for longs) or `band_high + 0.15 * ATR` (for shorts) to protect against breakouts past the confluence zone. "
+                                f"The Take Profit was set at the opposing composite level or trendline, capped at `3 * ATR` from entry."
+                            )
+                        elif "Structural" in exp:
+                            if strategy == "SWEEP":
+                                sl_tp_text = (
+                                    f"Stop Loss was placed 1 tick beyond the sweep wick (the invalidation point of the sweep thesis). "
+                                    f"Take Profit was set at the nearest opposing Supply/Demand zone level, capped at `5 * ATR` from entry."
+                                )
+                            elif strategy == "BREAKOUT":
+                                sl_tp_text = (
+                                    f"Stop Loss was set 0.3 * ATR below/above the broken structure level, with a minimum stop distance of `0.5 * ATR`. "
+                                    f"Take Profit was set at the nearest opposing zone level or a fallback projection of 2.0 * risk distance."
+                                )
+                            elif strategy == "TRAP":
+                                sl_tp_text = (
+                                    f"Stop Loss was placed 1 tick beyond the breakout high/low (since a break past the trap high invalidates the trap thesis). "
+                                    f"Take Profit was set at the opposing zone."
+                                )
+                        elif "OrderFlow" in exp:
+                            sl_tp_text = (
+                                f"Stop Loss was set at the swept level +/- `0.15 * ATR` buffer, floored at `0.5 * ATR` from entry. "
+                                f"Take Profit was placed at the nearest opposing liquidity target or FVG imbalance."
+                            )
+                        elif "VWAP_Reclaim" in exp:
+                            sl_tp_text = (
+                                f"Stop Loss was set at `low/high - 0.15 * ATR`, floored at `0.5 * ATR` from entry. "
+                                f"Take Profit was placed at the next opposing zone, floored at `2.0 * R` to ensure positive risk-reward."
+                            )
+                        elif "EMA_Pullback" in exp:
+                            sl_tp_text = (
+                                f"Stop Loss was set below/above the 50 EMA with a small buffer (`0.2 * ATR`), floored at `0.5 * ATR` from entry. "
+                                f"Take Profit was projected to the nearest resistance or fallback R-multiple."
+                            )
+                        elif t.get("is_combo"):
+                            sl_tp_text = (
+                                f"For options combination spreads, the stop loss and take profit are defined in terms of net premium multiples. "
+                                f"The target profit was set at `{t.get('target_r') or '1.5'}R` and the stop loss was set at `{t.get('stop_r') or '-0.5'}R` net debit/credit change."
+                            )
+                        else:
+                            sl_tp_text = f"Stop Loss and Take Profit were placed according to standard risk parameters (ATR buffers and opposing structures)."
+                            
+                        exit_reason = t.get("exit_reason")
+                        exit_text = f"The trade exited due to `{exit_reason}`. "
+                        if exit_reason == "INITIAL_SL":
+                            exit_text += "Price went immediately against the setup and hit the initial stop loss level, invalidating the structural thesis."
+                        elif exit_reason == "TRAILING_SL":
+                            exit_text += "Price initially moved in favor of the trade, allowing the system to trail the stop loss (e.g., lock in profits or reduce risk), and eventually hit the trailing stop."
+                        elif exit_reason == "SESSION_END":
+                            exit_text += "The position was closed at the market close (15:25 IST) as a paper-trading session requirement."
+                        elif exit_reason == "TARGET_R" or exit_reason == "TP_EXPANSION" or exit_reason == "STOP_R":
+                            exit_text += f"Price reached the target or stop R multiple ({pnl_r:+.2f}R realized)."
+                            
+                        st.markdown(f"**Why it triggered:** {trigger_text}")
+                        st.markdown(f"**SL/TP Placement Logic:** {sl_tp_text}")
+                        st.markdown(f"**Exit Behavior:** {exit_text}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════

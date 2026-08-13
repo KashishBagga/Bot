@@ -1252,32 +1252,49 @@ class StructuralPaperTrader:
         # persisted using the OI_RESISTANCE/OI_SUPPORT zone_type this table already
         # supports, so strike-based S/R shows up alongside price-action zones.
         # Skipped entirely when options data is missing/stale rather than persisting
-        # a guess (matches how every other filter in this system prefers an explicit
-        # rejection over a silent fallback).
+        # a guess.
         options = getattr(snapshot.market, "options", None) if snapshot.market else None
         if options is not None and not options.is_stale:
             try:
-                interval = 100.0 if "BANK" in snapshot.symbol else 50.0
-                half_band = interval / 2.0
-                for wall, zone_type in ((options.call_oi_wall, "OI_RESISTANCE"),
-                                         (options.put_oi_wall, "OI_SUPPORT")):
-                    if wall is None:
-                        continue
-                    raw_id = f"{snapshot.symbol}|{zone_type}|{wall.strike}"
-                    zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
-                    # Heuristic normalization: 1 lakh OI ~= strength 100, capped —
-                    # keeps this comparable to the 0-100 SUPPLY/DEMAND score scale.
-                    strength = min(wall.oi / 100_000.0 * 100.0, 100.0)
-                    self.db.upsert_sr_zone({
-                        "zone_id":    zone_id,
-                        "symbol":     snapshot.symbol,
-                        "zone_type":  zone_type,
-                        "price_low":  wall.strike - half_band,
-                        "price_high": wall.strike + half_band,
-                        "strength":   strength,
-                        "now":        now,
-                        "timeframe":  "options",
-                    })
+                for walls, zone_type in (
+                    (getattr(options, "call_oi_walls", []), "OI_RESISTANCE"),
+                    (getattr(options, "put_oi_walls", []), "OI_SUPPORT"),
+                ):
+                    for wall in (walls or []):
+                        if wall is None or wall.strike is None:
+                            continue
+                        
+                        strike = float(wall.strike)
+                        
+                        # Determine relevance factor: 100 intervals are very strong,
+                        # 50 intervals are moderately strong, others are weak.
+                        if strike % 100 == 0:
+                            relevance_factor = 1.0
+                            half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0  # Tight band for exact strike
+                        elif strike % 50 == 0:
+                            relevance_factor = 0.5
+                            half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0
+                        else:
+                            relevance_factor = 0.1
+                            half_band = 5.0 if "BANK" not in snapshot.symbol else 15.0
+                            
+                        raw_id = f"{snapshot.symbol}|{zone_type}|{strike}"
+                        zone_id = "z_" + hashlib.sha1(raw_id.encode()).hexdigest()[:12]
+                        
+                        # Heuristic normalization: 1 lakh OI ~= strength 100, scaled by relevance factor
+                        base_strength = min(wall.oi / 100_000.0 * 100.0, 100.0)
+                        strength = base_strength * relevance_factor
+                        
+                        self.db.upsert_sr_zone({
+                            "zone_id":    zone_id,
+                            "symbol":     snapshot.symbol,
+                            "zone_type":  zone_type,
+                            "price_low":  strike - half_band,
+                            "price_high": strike + half_band,
+                            "strength":   round(strength, 1),
+                            "now":        now,
+                            "timeframe":  "options",
+                        })
             except Exception as e:
                 logger.debug(f"⚠️ _persist_sr_zones: skipping OI wall — {e}")
 

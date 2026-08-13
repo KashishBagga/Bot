@@ -29,7 +29,7 @@ PCR_BULLISH_THRESHOLD = 1.3
 PCR_BEARISH_THRESHOLD = 0.7
 
 # How many top-OI strikes per side count as "the wall" (matches dashboard's top_ce/top_pe).
-TOP_OI_STRIKE_COUNT = 3
+TOP_OI_STRIKE_COUNT = 10
 
 # A snapshot older than this is not fresh enough to trade on.
 STALE_AFTER_SECONDS = 5 * 60
