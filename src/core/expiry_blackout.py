@@ -26,6 +26,11 @@ logger = logging.getLogger(__name__)
 
 IST = ZoneInfo("Asia/Kolkata")
 
+# ── Master kill-switch ────────────────────────────────────────────────────────
+# Set to False to trade through ALL expiry/event/lunch windows (default: volatility days).
+# Set to True to restore full blackout protection.
+BLACKOUT_ENABLED = False
+
 # ── Window (minutes) blocked BEFORE and AFTER each event ─────────────────────
 PRE_EXPIRY_MINS  = 30    # block 30 min before expiry market-open
 POST_EXPIRY_MINS = 30    # block 30 min after expiry market-open
@@ -108,7 +113,13 @@ class ExpiryBlackoutManager:
         got disabled on 2026-07-30 rather than just the lunch piece. Pass False
         to keep genuine expiry/event tail-risk protection while leaving daily
         lunch-hour liquidity filtering to a separate, dedicated filter.
+
+        BLACKOUT_ENABLED=False: all windows disabled — trade through expiry/event
+        days for volatility. Set to True to restore full protection.
         """
+        if not BLACKOUT_ENABLED:
+            return False, ""
+
         if now is None:
             now = datetime.now(IST)
         elif now.tzinfo is None:

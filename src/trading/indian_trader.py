@@ -15,6 +15,7 @@ import sys
 import time
 import logging
 import schedule
+import threading
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import List, Dict, Tuple
@@ -625,6 +626,10 @@ class StructuralPaperTrader:
         # EOD report: generated once per session at 15:35, reset on new day
         self._report_generated_today: bool = False
         self._report_date: str = ""
+
+        # Position state lock & candle tracking
+        self.position_lock = threading.RLock()
+        self.last_processed_m5_time = None
         
         # Load open real positions from DB on startup
         open_reals = self.db.get_open_positions()
@@ -677,6 +682,7 @@ class StructuralPaperTrader:
                 'strategy_version': op.get('signal_logic_version', 'v3.2'),
                 'market_regime': op.get('market_regime', 'UNKNOWN'),
                 'is_counterfactual': False,
+                'status': 'OPEN',
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics'),
                 # Notional deployed — must be recovered or _deployed_capital()
@@ -767,6 +773,7 @@ class StructuralPaperTrader:
                 'strategy_version': op.get('strategy_version', 'v3.2'),
                 'market_regime': 'UNKNOWN',
                 'is_counterfactual': True,
+                'status': 'OPEN',
                 'rejection_reasons': op.get('rejection_reasons', []),
                 'confidence': op.get('confidence'),
                 'diagnostics': op.get('diagnostics')
@@ -818,7 +825,9 @@ class StructuralPaperTrader:
                 self.db.save_combo_trade(op_exit)
                 logger.info(f"🧹 Self-Healed orphaned prior-day combo: {op['combo_id']} entered on {entry_time.date()}")
                 continue
-            self.active_combo_trades[key] = dict(op)
+            combo_dict = dict(op)
+            combo_dict['status'] = 'OPEN'
+            self.active_combo_trades[key] = combo_dict
         if open_combos:
             logger.info(f"🔄 Recovered {len(open_combos)} active real combo positions: {list(self.active_combo_trades.keys())}")
 
@@ -836,7 +845,9 @@ class StructuralPaperTrader:
                 self.db.save_counterfactual_combo_result(op_exit)
                 logger.info(f"🧹 Self-Healed orphaned prior-day CF combo: {op['combo_id']} entered on {entry_time.date()}")
                 continue
-            self.active_cf_combos[op['combo_id']] = dict(op)
+            combo_dict = dict(op)
+            combo_dict['status'] = 'OPEN'
+            self.active_cf_combos[op['combo_id']] = combo_dict
             exp_name = op.get('experiment_name', '')
             thesis_base = (op['symbol'], op.get('setup_type', ''), op.get('combo_type', ''))
             self.active_cf_combo_theses[(exp_name,) + thesis_base] = op['combo_id']
@@ -853,12 +864,16 @@ class StructuralPaperTrader:
         if not (9 <= now.hour < 16):
             return
 
-        # Reset daily risk counters at the first pulse of a new day
-        self._roll_risk_day(now)
-
-        logger.info(f"--- {now.strftime('%H:%M:%S')} Market Pulse ---")
-
+        self.position_lock.acquire()
         try:
+            # Reset daily risk counters at the first pulse of a new day
+            self._roll_risk_day(now)
+
+            logger.info(f"--- {now.strftime('%H:%M:%S')} Market Pulse ---")
+
+            # Fetch live prices in batch for accurate position evaluation
+            live_prices = self.data_provider.get_current_prices_batch(self.symbols)
+
             # 1. Fetch Multi-Timeframe Data (once per symbol)
             end_date = datetime.now(self.tz)
             start_date_d1 = end_date - timedelta(days=40)
@@ -879,7 +894,15 @@ class StructuralPaperTrader:
                     # stops on the last fully CLOSED candle (iloc[-2]) so live and
                     # backtest agree on the decision/mark bar.
                     closed = m5.iloc[-2]
-                    current_prices[symbol] = float(closed['close'])
+                    
+                    # Use live LTP if available and fresh, otherwise fall back to closed candle close
+                    live_ltp = live_prices.get(symbol)
+                    if live_ltp is not None:
+                        current_prices[symbol] = live_ltp
+                    else:
+                        current_prices[symbol] = float(closed['close'])
+                        logger.warning(f"⚠️ Live LTP quote for {symbol} not available in market_loop; falling back to closed candle close: {current_prices[symbol]}")
+
                     current_bars[symbol] = {
                         'open': float(closed['open']),
                         'high': float(closed['high']),
@@ -1070,6 +1093,54 @@ class StructuralPaperTrader:
 
         except Exception as e:
             logger.error(f"❌ Error in market loop: {e}", exc_info=True)
+        finally:
+            self.position_lock.release()
+
+    def position_tracking_loop(self):
+        """Lightweight loop to check SL/TP and exit positions in real time (every 30s)."""
+        now = datetime.now(self.tz)
+        
+        # Only run between 09:00 and 15:59 IST
+        if not (9 <= now.hour < 16):
+            return
+            
+        with self.position_lock:
+            # Check if we have any active trades to update (avoid API overhead if book is empty)
+            has_active = (
+                len(self.active_trades) > 0 or 
+                len(self.active_counterfactuals) > 0 or 
+                len(self.active_combo_trades) > 0 or 
+                len(self.active_cf_combos) > 0
+            )
+            if not has_active:
+                return
+                
+            logger.info(f"⏱️ [Real-time Exit Loop] Checking open positions @ {now.strftime('%H:%M:%S')}...")
+            
+            try:
+                # Fetch live LTP in batch
+                live_prices = self.data_provider.get_current_prices_batch(self.symbols)
+                
+                # Filter out None/failed quotes
+                valid_prices = {}
+                for symbol in self.symbols:
+                    price = live_prices.get(symbol)
+                    if price is not None and price > 0:
+                        valid_prices[symbol] = price
+                    else:
+                        logger.warning(f"⚠️ Live LTP quote for {symbol} not available or invalid: {price}")
+                
+                # If all quotes failed, do NOT update or trigger exits (data sanity guard)
+                if not valid_prices:
+                    logger.warning("❌ All symbol quotes failed or invalid — skipping position tracking loop")
+                    return
+                
+                # Update open trades using these live prices without passing candle bar objects
+                # and with increment_bar_count=False to avoid modifying bars_held
+                self._update_active_trades(valid_prices, now, current_bars=None, increment_bar_count=False)
+                
+            except Exception as e:
+                logger.error(f"❌ Error in position_tracking_loop: {e}", exc_info=True)
 
     def _build_market_state_record(self, snapshot) -> Dict:
         """Flatten one MarketSnapshot into the plain dict upsert_market_state() persists."""
@@ -1291,7 +1362,7 @@ class StructuralPaperTrader:
             f"for {symbol} {direction} @ bucket {bucket}"
         )
 
-    def _update_active_trades(self, current_prices: Dict[str, float], timestamp, current_bars: Dict = None):
+    def _update_active_trades(self, current_prices: Dict[str, float], timestamp, current_bars: Dict = None, increment_bar_count: bool = True):
         """Evaluate open positions against latest market prices.
 
         Each position is updated inside its own try/except so that one malformed
@@ -1299,97 +1370,98 @@ class StructuralPaperTrader:
         management for the rest of the book — previously an exception here
         unwound the whole loop and left every remaining position unmanaged.
         """
-        current_bars = current_bars or {}
-        # Update real trades — keyed by (symbol, experiment_name)
-        for key in list(self.active_trades.keys()):
-            symbol, experiment_name = key
-            if symbol not in current_prices:
-                continue
-            try:
-                pos = self.active_trades[key]
-                is_closed = self._update_position(
-                    pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol)
-                )
-                if is_closed:
-                    pnl_r = pos.get('_last_pnl_r', 0.0)
-                    # Accrue realized R for the daily-loss kill switch
-                    self.daily_realized_r += pnl_r
-                    self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
-                    self.active_trades.pop(key)
-            except Exception as e:
-                logger.critical(
-                    f"🚨 Position update FAILED for real trade {key}: {e}. "
-                    f"Position left open and quarantined for manual review.",
-                    exc_info=True,
-                )
-
-        # Update counterfactual trades — keyed by candidate_id (unchanged)
-        for cand_id in list(self.active_counterfactuals.keys()):
-            try:
-                pos = self.active_counterfactuals[cand_id]
-                symbol = pos['symbol']
+        with self.position_lock:
+            current_bars = current_bars or {}
+            # Update real trades — keyed by (symbol, experiment_name)
+            for key in list(self.active_trades.keys()):
+                symbol, experiment_name = key
                 if symbol not in current_prices:
                     continue
-                is_closed = self._update_position(
-                    pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol)
-                )
-            except Exception as e:
-                logger.error(f"⚠️ Position update failed for counterfactual {cand_id}: {e}", exc_info=True)
-                continue
-            if is_closed:
-                # Clean up thesis deduplication index so next candle can start a fresh CF
-                exp_name = pos.get('experiment_name', 'Structural_v3.2_RVOL1.0')
-                # Rebuild thesis_base via the strategy if available, else use fallback
-                exp_obj = self.registry.get(exp_name)
-                if exp_obj:
-                    # Reconstruct a minimal sig-like dict for thesis_key()
-                    _sig_proxy = {'symbol': symbol, 'strategy': pos.get('setup_type', ''), 'signal': pos.get('signal', '')}
-                    thesis_base = exp_obj.strategy.thesis_key(_sig_proxy)
-                else:
-                    thesis_base = (symbol, pos.get('setup_type', ''), pos.get('signal', ''))
-                thesis_key = (exp_name,) + thesis_base
-                self.active_cf_theses.pop(thesis_key, None)
-                self.active_counterfactuals.pop(cand_id)
+                try:
+                    pos = self.active_trades[key]
+                    is_closed = self._update_position(
+                        pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol), increment_bar_count=increment_bar_count
+                    )
+                    if is_closed:
+                        pnl_r = pos.get('_last_pnl_r', 0.0)
+                        # Accrue realized R for the daily-loss kill switch
+                        self.daily_realized_r += pnl_r
+                        self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
+                        self.active_trades.pop(key)
+                except Exception as e:
+                    logger.critical(
+                        f"🚨 Position update FAILED for real trade {key}: {e}. "
+                        f"Position left open and quarantined for manual review.",
+                        exc_info=True,
+                    )
 
-        # Update real combo positions — keyed by (symbol, experiment_name), same
-        # dedup contract as active_trades, entirely separate lifecycle logic.
-        for key in list(self.active_combo_trades.keys()):
-            symbol, experiment_name = key
-            if symbol not in current_prices:
-                continue
-            try:
-                pos = self.active_combo_trades[key]
-                is_closed = self._update_combo_position(pos, current_prices[symbol], timestamp, is_cf=False)
+            # Update counterfactual trades — keyed by candidate_id (unchanged)
+            for cand_id in list(self.active_counterfactuals.keys()):
+                try:
+                    pos = self.active_counterfactuals[cand_id]
+                    symbol = pos['symbol']
+                    if symbol not in current_prices:
+                        continue
+                    is_closed = self._update_position(
+                        pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol), increment_bar_count=increment_bar_count
+                    )
+                except Exception as e:
+                    logger.error(f"⚠️ Position update failed for counterfactual {cand_id}: {e}", exc_info=True)
+                    continue
                 if is_closed:
-                    pnl_r = pos.get('_last_pnl_r', 0.0)
-                    self.daily_realized_r += pnl_r
-                    self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
-                    self.active_combo_trades.pop(key)
-            except Exception as e:
-                logger.critical(
-                    f"🚨 Combo position update FAILED for {key}: {e}. "
-                    f"Position left open and quarantined for manual review.",
-                    exc_info=True,
-                )
+                    # Clean up thesis deduplication index so next candle can start a fresh CF
+                    exp_name = pos.get('experiment_name', 'Structural_v3.2_RVOL1.0')
+                    # Rebuild thesis_base via the strategy if available, else use fallback
+                    exp_obj = self.registry.get(exp_name)
+                    if exp_obj:
+                        # Reconstruct a minimal sig-like dict for thesis_key()
+                        _sig_proxy = {'symbol': symbol, 'strategy': pos.get('setup_type', ''), 'signal': pos.get('signal', '')}
+                        thesis_base = exp_obj.strategy.thesis_key(_sig_proxy)
+                    else:
+                        thesis_base = (symbol, pos.get('setup_type', ''), pos.get('signal', ''))
+                    thesis_key = (exp_name,) + thesis_base
+                    self.active_cf_theses.pop(thesis_key, None)
+                    self.active_counterfactuals.pop(cand_id)
 
-        # Update counterfactual combo positions — keyed by combo_id.
-        for combo_id in list(self.active_cf_combos.keys()):
-            try:
-                pos = self.active_cf_combos[combo_id]
-                symbol = pos['symbol']
+            # Update real combo positions — keyed by (symbol, experiment_name), same
+            # dedup contract as active_trades, entirely separate lifecycle logic.
+            for key in list(self.active_combo_trades.keys()):
+                symbol, experiment_name = key
                 if symbol not in current_prices:
                     continue
-                is_closed = self._update_combo_position(pos, current_prices[symbol], timestamp, is_cf=True)
-            except Exception as e:
-                logger.error(f"⚠️ Combo position update failed for CF {combo_id}: {e}", exc_info=True)
-                continue
-            if is_closed:
-                exp_name = pos.get('experiment_name', '')
-                thesis_base = (pos['symbol'], pos.get('setup_type', ''), pos.get('combo_type', ''))
-                self.active_cf_combo_theses.pop((exp_name,) + thesis_base, None)
-                self.active_cf_combos.pop(combo_id)
+                try:
+                    pos = self.active_combo_trades[key]
+                    is_closed = self._update_combo_position(pos, current_prices[symbol], timestamp, is_cf=False)
+                    if is_closed:
+                        pnl_r = pos.get('_last_pnl_r', 0.0)
+                        self.daily_realized_r += pnl_r
+                        self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
+                        self.active_combo_trades.pop(key)
+                except Exception as e:
+                    logger.critical(
+                        f"🚨 Combo position update FAILED for {key}: {e}. "
+                        f"Position left open and quarantined for manual review.",
+                        exc_info=True,
+                    )
 
-    def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None) -> bool:
+            # Update counterfactual combo positions — keyed by combo_id.
+            for combo_id in list(self.active_cf_combos.keys()):
+                try:
+                    pos = self.active_cf_combos[combo_id]
+                    symbol = pos['symbol']
+                    if symbol not in current_prices:
+                        continue
+                    is_closed = self._update_combo_position(pos, current_prices[symbol], timestamp, is_cf=True)
+                except Exception as e:
+                    logger.error(f"⚠️ Combo position update failed for CF {combo_id}: {e}", exc_info=True)
+                    continue
+                if is_closed:
+                    exp_name = pos.get('experiment_name', '')
+                    thesis_base = (pos['symbol'], pos.get('setup_type', ''), pos.get('combo_type', ''))
+                    self.active_cf_combo_theses.pop((exp_name,) + thesis_base, None)
+                    self.active_cf_combos.pop(combo_id)
+
+    def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None, increment_bar_count: bool = True) -> bool:
         """Evaluate a position against the latest market tick. Returns True if position exited.
 
         ``bar`` is the last CLOSED candle's OHLC ({'open','high','low','close'}).
@@ -1398,6 +1470,9 @@ class StructuralPaperTrader:
         candle open — modelling the worst-case fill instead of assuming a perfect
         fill exactly at the stop price.
         """
+        if pos.get('status', 'OPEN') != 'OPEN':
+            return False
+
         symbol = pos['symbol']
         is_cf = pos.get('is_counterfactual', False)
         stop_loss_distance = pos['stop_loss_distance']
@@ -1408,7 +1483,8 @@ class StructuralPaperTrader:
         bar_open = float(bar['open']) if bar else current_price
 
         # Increment bars held
-        pos['bars_held'] = pos.get('bars_held', 0) + 1
+        if increment_bar_count:
+            pos['bars_held'] = pos.get('bars_held', 0) + 1
         
         # Update extremes
         old_highest = pos['highest_price']
@@ -1489,6 +1565,7 @@ class StructuralPaperTrader:
             exit_reason = 'SESSION_END'
 
         if is_closed:
+            pos['status'] = 'EXIT_PENDING'
             # Calculate final PnL R-units
             if pos['signal'] == 'BUY CALL':
                 pnl_r = (exit_price - pos['entry_price']) / stop_loss_distance if stop_loss_distance > 0 else 0.0
@@ -1497,6 +1574,7 @@ class StructuralPaperTrader:
             
             pnl_r -= 0.05  # Transaction cost buffer
             self._exit_position(pos, exit_price, exit_reason, timestamp, pnl_r)
+            pos['status'] = 'CLOSED'
             return True
 
         # Live dashboard heartbeat — refresh current price/PnL for still-open
@@ -1720,6 +1798,7 @@ class StructuralPaperTrader:
             'strategy_version': version,
             'market_regime': sig.get('features', {}).get('market_regime', 'UNKNOWN'),
             'is_counterfactual': is_counterfactual,
+            'status': 'OPEN',
             'rejection_reasons': sig.get('rejection_reasons', []),
             'position_size_inr': position_size_inr,  # notional; drives deployed-capital exposure gate
             'lots': lots,
@@ -2394,6 +2473,7 @@ class StructuralPaperTrader:
             'confidence': sig.get('confidence'),
             'diagnostics': sig.get('diagnostics'),
             'is_counterfactual': is_counterfactual,
+            'status': 'OPEN',
             'rejection_reasons': sig.get('rejection_reasons', []),
             '_last_pnl_r': 0.0,
         }
@@ -2428,6 +2508,9 @@ class StructuralPaperTrader:
     def _update_combo_position(self, pos: Dict, underlying_price: float, timestamp, is_cf: bool) -> bool:
         """Re-fetch each leg's live premium, compute combined PnL, and check
         target/stop/session-end. Returns True if the combo exited."""
+        if pos.get('status', 'OPEN') != 'OPEN':
+            return False
+
         from src.core.options_execution_engine import PremiumResolver
         premium_resolver = PremiumResolver(self.db, self.data_provider)
 
@@ -2463,7 +2546,9 @@ class StructuralPaperTrader:
             exit_reason = 'SESSION_END'
 
         if is_closed:
+            pos['status'] = 'EXIT_PENDING'
             self._exit_combo_position(pos, underlying_price, exit_reason, timestamp, pnl_r)
+            pos['status'] = 'CLOSED'
             return True
 
         # Heartbeat — persist current leg premiums / pnl_r every candle, same
@@ -2520,39 +2605,68 @@ class StructuralPaperTrader:
 def main():
     trader = StructuralPaperTrader(["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"])
 
-    # BUG FIX (Bug 19): Align scheduler to actual 5-minute candle close boundaries.
-    # NSE 5-min candles close at 09:20, 09:25, 09:30 ... 15:25 IST.
-    # Running at an arbitrary offset (e.g. start at 10:03 → runs at 10:03,10:08...)
-    # means we sometimes evaluate incomplete forming candles or stale closed candles.
     tz = ZoneInfo("Asia/Kolkata")
+    
+    # 1. Align scheduler to the next 30-second grid offset by 5 seconds (i.e. :05 or :35 of the minute)
     now = datetime.now(tz)
-    # Calculate seconds until the next 5-minute boundary (with a 5-second buffer for data latency)
-    seconds_past_boundary = (now.minute % 5) * 60 + now.second
-    seconds_to_next = (5 * 60 - seconds_past_boundary) + 5  # +5s data latency buffer
-    if seconds_to_next < 10:
-        seconds_to_next += 300  # Already very close — wait for the one after
-    logger.info(f"⏱️ Aligning to 5-min candle boundary. Sleeping {seconds_to_next}s until {(now + timedelta(seconds=seconds_to_next)).strftime('%H:%M:%S')} IST...")
-    time.sleep(seconds_to_next)
+    target_seconds = 5 if now.second < 5 or now.second >= 35 else 35
+    if target_seconds == 5 and now.second >= 35:
+        sleep_s = (60 - now.second) + 5
+    else:
+        sleep_s = target_seconds - now.second
+        
+    logger.info(f"⏱️ Aligning scheduler to 30-second grid offset by 5s. Sleeping {sleep_s}s until {(now + timedelta(seconds=sleep_s)).strftime('%H:%M:%S')} IST...")
+    time.sleep(sleep_s)
 
-    logger.info("⏱️ Scheduler aligned and running. Next candle evaluation at 5-min intervals.")
+    logger.info("⏱️ Scheduler aligned and running. Evaluating positions every 30s, signals on new completed M5 candles.")
 
-    # Run once immediately (now aligned to a candle boundary)
+    # 2. Run one immediate initial evaluation
+    # We round down to the nearest 5-minute block to initialize last_processed_m5_time
+    now = datetime.now(tz)
+    current_m5_block = now.replace(second=0, microsecond=0) - timedelta(minutes=now.minute % 5)
+    trader.last_processed_m5_time = current_m5_block
+    
+    logger.info(f"🔔 [Initial Run] Running full market loop at {now.strftime('%H:%M:%S')}...")
     trader.market_loop()
 
-    # Boundary-aligned loop. `schedule.every(5).minutes` anchors the next run to
-    # when the PREVIOUS run finished, so each slow fetch/DB cycle adds drift and
-    # by afternoon the loop runs minutes past the boundary (deep into the forming
-    # candle, and possibly missing the 15:25 force-exit tick). Re-aligning to the
-    # fixed 5-min grid every cycle eliminates that drift and guarantees a tick
-    # lands in the 15:25 square-off window whenever the process is alive.
+    # 3. Independent Scheduler Loop
     while True:
+        loop_start = datetime.now(tz)
+        
+        # Check if we are close to a new 5-minute boundary (minute is multiple of 5 and second is around :05)
+        # We calculate current 5-minute block
+        current_m5_block = loop_start.replace(second=0, microsecond=0) - timedelta(minutes=loop_start.minute % 5)
+        
+        is_new_m5_candle = False
+        # If the current block is different from the last processed one, and we are at least at the :05 mark
+        # of that block, it means the candle has closed and Fyers has had time to populate it.
+        if trader.last_processed_m5_time != current_m5_block:
+            # Check if we are past the 5-second buffer (to allow for latency in data feed)
+            if loop_start.second >= 5:
+                is_new_m5_candle = True
+
+        if is_new_m5_candle:
+            logger.info(f"🔔 [New Candle Closed] Running entry pipeline for candle {current_m5_block.strftime('%H:%M')} at {loop_start.strftime('%H:%M:%S')}...")
+            trader.market_loop()
+            trader.last_processed_m5_time = current_m5_block
+        else:
+            # Run lightweight real-time position exit check
+            trader.position_tracking_loop()
+
+        # Sleep to align to the next :05 / :35 boundary
         now = datetime.now(tz)
-        seconds_past = (now.minute % 5) * 60 + now.second
-        sleep_s = (5 * 60 - seconds_past) + 5  # +5s data-latency buffer
-        if sleep_s < 10:
-            sleep_s += 300  # too close to the boundary — wait for the next one
+        if 5 <= now.second < 35:
+            sleep_s = 35 - now.second
+        elif now.second < 5:
+            sleep_s = 5 - now.second
+        else:
+            sleep_s = (60 - now.second) + 5
+            
+        # Safety margin: ensure we sleep at least 5s to avoid tight loops/multiple executions
+        if sleep_s < 5:
+            sleep_s += 30
+            
         time.sleep(sleep_s)
-        trader.market_loop()
 
 if __name__ == "__main__":
     main()
