@@ -34,11 +34,17 @@ TOP_OI_STRIKE_COUNT = 10
 # A snapshot older than this is not fresh enough to trade on.
 STALE_AFTER_SECONDS = 5 * 60
 
+# Minimum |put_oi_change - call_oi_change| to call a side's buildup
+# meaningful rather than noise-level — same order of magnitude as one
+# meaningful lot-block on the warehouse's captured strikes.
+MIN_OI_CHANGE_DELTA = 5000
+
 
 @dataclass(frozen=True)
 class OiWall:
     strike: float
     oi: int
+    oi_change: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -52,6 +58,12 @@ class OptionsIntelligence:
     put_oi_walls: List[OiWall] = field(default_factory=list)
     as_of: Optional[datetime] = None
     is_stale: bool = True
+    # OI momentum (calls/puts actively being written vs. unwound right now) —
+    # a materially different signal from static PCR/OI. Computed from
+    # option_snapshots.oi_change, which was already captured but unused here.
+    total_call_oi_change: Optional[int] = None
+    total_put_oi_change: Optional[int] = None
+    oi_change_bias: str = "UNKNOWN"  # "PUT_BUILDUP" | "CALL_BUILDUP" | "NEUTRAL" | "UNKNOWN"
 
     @property
     def call_oi_wall(self) -> Optional[OiWall]:
@@ -96,14 +108,47 @@ def pcr_bias(pcr: Optional[float]) -> str:
     return "NEUTRAL"
 
 
+def compute_oi_change_bias(chain_rows: List[Dict[str, Any]]) -> tuple:
+    """Sum oi_change per side and classify OI momentum — same "informed
+    seller" interpretation already used for PCR: puts being added faster than
+    calls right now = sellers actively getting MORE comfortable short puts =
+    fresh bullish conviction (PUT_BUILDUP); symmetric for CALL_BUILDUP.
+
+    Returns (total_call_oi_change, total_put_oi_change, bias). Any side missing
+    oi_change entirely on every row returns (None, None, "UNKNOWN") — mirrors
+    pcr_bias's None-safety rather than fabricating a neutral reading.
+    """
+    call_changes = [r["oi_change"] for r in chain_rows if r["option_type"] == "CE" and r.get("oi_change") is not None]
+    put_changes = [r["oi_change"] for r in chain_rows if r["option_type"] == "PE" and r.get("oi_change") is not None]
+
+    if not call_changes or not put_changes:
+        return None, None, "UNKNOWN"
+
+    total_call_change = sum(call_changes)
+    total_put_change = sum(put_changes)
+    delta = total_put_change - total_call_change
+
+    if abs(delta) < MIN_OI_CHANGE_DELTA:
+        bias = "NEUTRAL"
+    elif delta > 0:
+        bias = "PUT_BUILDUP"
+    else:
+        bias = "CALL_BUILDUP"
+
+    return total_call_change, total_put_change, bias
+
+
 def top_oi_walls(chain_rows: List[Dict[str, Any]], option_type: str) -> List[OiWall]:
     by_strike = [
-        (r["strike"], r.get("oi") or 0)
+        (r["strike"], r.get("oi") or 0, r.get("oi_change"))
         for r in chain_rows
         if r["option_type"] == option_type
     ]
     ranked = sorted(by_strike, key=lambda x: x[1], reverse=True)[:TOP_OI_STRIKE_COUNT]
-    return [OiWall(strike=float(strike), oi=int(oi)) for strike, oi in ranked if oi > 0]
+    return [
+        OiWall(strike=float(strike), oi=int(oi), oi_change=(int(oi_change) if oi_change is not None else None))
+        for strike, oi, oi_change in ranked if oi > 0
+    ]
 
 
 class OptionsIntelligenceEngine:
@@ -142,6 +187,7 @@ class OptionsIntelligenceEngine:
             is_stale = age > STALE_AFTER_SECONDS
 
         pcr = compute_pcr(chain_rows)
+        total_call_oi_change, total_put_oi_change, oi_change_bias_val = compute_oi_change_bias(chain_rows)
         return OptionsIntelligence(
             underlying=underlying,
             pcr=pcr,
@@ -151,4 +197,7 @@ class OptionsIntelligenceEngine:
             put_oi_walls=top_oi_walls(chain_rows, "PE"),
             as_of=latest_row_time,
             is_stale=is_stale,
+            total_call_oi_change=total_call_oi_change,
+            total_put_oi_change=total_put_oi_change,
+            oi_change_bias=oi_change_bias_val,
         )

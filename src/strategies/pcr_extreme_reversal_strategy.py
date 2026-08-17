@@ -254,6 +254,11 @@ class PCRExtremeReversalStrategy(BaseStrategy):
                 "pcr_bias": options.pcr_bias,
                 "zone_score": round(zone.total_score, 1),
                 "zone_explanation": zone.explanation,
+                # Research fields, not a filter yet — does PCR extreme +
+                # agreeing OI buildup outperform PCR extreme alone?
+                "oi_change_bias": options.oi_change_bias,
+                "total_call_oi_change": options.total_call_oi_change,
+                "total_put_oi_change": options.total_put_oi_change,
             },
         }
         return self._tag_signal(sig, experiment_name)

@@ -32,6 +32,14 @@ MIN_POSITION_AMOUNT  = 500    # Minimum position size in INR
 MAX_POSITION_AMOUNT  = 5_000  # Hard cap ₹5,000 per position (reduced from 10k)
 MAX_PORTFOLIO_EXPOSURE = 0.40 # Max 40% capital deployment (reduced from 60%)
 
+# Short-vol/theta-selling experiments all want the same thing (low realized
+# movement) — they don't diversify each other, they stack the same bet. Cap
+# their COMBINED capital-at-risk on top of (not instead of) MAX_PORTFOLIO_EXPOSURE.
+SHORT_VOL_GROUP_EXPERIMENTS = {
+    "CreditSpread_v1.0_PCRFade", "IronCondor_v1.0", "IronButterfly_v1.0", "ExpiryAwareTheta_v1.0",
+}
+MAX_SHORT_VOL_GROUP_EXPOSURE = 0.15
+
 
 @dataclass
 class StrategyStats:
@@ -229,6 +237,77 @@ class PositionSizer:
         except Exception as e:
             logger.error(f"Position sizing error: {e}")
             return MIN_POSITION_AMOUNT
+
+    def get_combo_lots(
+        self,
+        max_loss_per_lot: float,
+        strategy: str,
+        confidence: float = 70.0,
+        regime_primary: str = "UNKNOWN",
+        regime_vol_state: str = "NORMAL",
+        deployed_capital: float = 0.0,
+        group_deployed_capital: float = 0.0,
+        is_short_vol_group: bool = False,
+    ) -> int:
+        """
+        Capital-based lot sizing for multi-leg combo trades (credit/debit
+        spreads, straddle/strangle, iron condor/butterfly) — parallel to
+        get_position_size() but built for a fixed-INR risk unit (max_loss per
+        lot) instead of a price-distance fraction, since a combo's risk isn't
+        expressed as "entry vs stop_loss on the underlying".
+
+        Returns 0 only when the capital/exposure GATE itself is exhausted
+        (MAX_PORTFOLIO_EXPOSURE or, for the short-vol group, MAX_SHORT_VOL_GROUP_EXPOSURE
+        already used up) — the caller should skip the entry entirely rather than
+        trade against a blown cap. Otherwise floors at 1 lot, mirroring
+        get_position_size()'s MIN_POSITION_AMOUNT floor: a brand-new strategy's
+        pre-Kelly risk_amount (0.75% of capital) is almost always smaller than a
+        typical combo's max_loss, so without a floor it could never place the
+        20+ real trades get_or_create_stats needs to develop a Kelly edge —
+        the exposure gates are the real hard limit, not this fraction math.
+        """
+        try:
+            if max_loss_per_lot <= 0:
+                logger.warning("max_loss_per_lot <= 0, cannot size combo lots")
+                return 0
+
+            available = self.capital * MAX_PORTFOLIO_EXPOSURE - deployed_capital
+            if available <= 0:
+                return 0
+
+            if is_short_vol_group:
+                available_group = self.capital * MAX_SHORT_VOL_GROUP_EXPOSURE - group_deployed_capital
+                if available_group <= 0:
+                    return 0
+                available = min(available, available_group)
+
+            # available covers at least 1 lot's max_loss — otherwise the gate
+            # really is exhausted (not just pre-Kelly conservatism), so skip.
+            if available < max_loss_per_lot:
+                return 0
+
+            stats = self._get_or_create_stats(strategy)
+            regime_mult = (
+                PRIMARY_MULTIPLIERS.get(regime_primary.upper(), PRIMARY_MULTIPLIERS["UNKNOWN"])
+                * VOL_MULTIPLIERS.get(regime_vol_state.upper(), VOL_MULTIPLIERS["NORMAL"])
+            )
+            conf_mult = _confidence_multiplier(confidence)
+            final_fraction = stats.kelly_fraction * regime_mult * conf_mult
+
+            risk_amount = min(self.capital * final_fraction, MAX_POSITION_AMOUNT)
+            budget = min(risk_amount, available)
+
+            lots = max(1, int(budget / max_loss_per_lot))
+            logger.info(
+                f"💰 Combo lots [{strategy}|{regime_primary}_{regime_vol_state}|conf={confidence:.0f}"
+                f"{'|short_vol_group' if is_short_vol_group else ''}]: "
+                f"budget=₹{budget:,.0f} / max_loss={max_loss_per_lot:.2f} → {lots} lots"
+            )
+            return lots
+
+        except Exception as e:
+            logger.error(f"Combo lot sizing error: {e}")
+            return 0
 
     def get_strategy_allocation_weight(self, strategy: str) -> float:
         """

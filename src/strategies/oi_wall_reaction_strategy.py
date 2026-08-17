@@ -290,6 +290,10 @@ class OIWallReactionStrategy(BaseStrategy):
             "diagnostics": {
                 "wall_strike": wall.strike,
                 "wall_oi": wall.oi,
+                # Research field, not a filter yet — does a wall still being
+                # actively built (oi_change > 0) hold better than one already
+                # being unwound?
+                "wall_oi_change": wall.oi_change,
                 **extra,
             },
         }

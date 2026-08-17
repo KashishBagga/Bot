@@ -27,6 +27,12 @@ class Zone:
     freshness: float = 0.0
     precision: float = 0.0
     timeframe: str = "h1"    # origin timeframe: "m5" | "h1" | "d1"
+    # Set by confirm_zones_with_geometry() — True if a market_geometry.py
+    # CompositeLevel (PDH/trendline/EMA/round-number confluence) independently
+    # agrees with this swing-cluster zone. Defaulted so any existing direct
+    # construction (tests, etc.) is unaffected.
+    geometry_confirmed: bool = False
+    geometry_score_boost: float = 0.0
 
 class ZoneEngine:
     """Detects, scores, and invalidates S/R zones."""
@@ -179,3 +185,36 @@ class ZoneEngine:
             dist = abs(price - zone.level) / zone.level
             if dist < tolerance: return True, zone, round(dist * 100, 3)
         return False, None, 0.0
+
+
+def confirm_zones_with_geometry(zones: List[Zone], levels_view, tolerance_pct: float = 0.0025) -> List[Zone]:
+    """Cross-reference zone_engine's swing/RVOL zones against market_geometry.py's
+    independently-computed PDH/trendline/EMA/round-number confluence levels
+    (same cross-referencing pattern liquidity_engine.py already uses for its
+    own confluence_score component). A zone confirmed by BOTH a swing cluster
+    AND geometry confluence is a materially stronger S/R read than either
+    alone — this only boosts scores upward, never rejects a zone, so existing
+    consumers of h1_zones/m5_zones/d1_zones see no behavior regression.
+
+    Known limitation: detect_zones() already truncated to the top 8 zones by
+    score BEFORE this runs, so a zone that would deserve promotion into the
+    top 8 post-boost but didn't make pre-boost top-8 stays excluded. Fixing
+    that means changing detect_zones()'s truncation order — out of scope here;
+    this only re-ranks among current survivors.
+    """
+    if not zones or levels_view is None:
+        return zones
+
+    for zone in zones:
+        composites = levels_view.support() if zone.zone_type == "DEMAND" else levels_view.resistance()
+        for composite in composites:
+            if composite.price <= 0:
+                continue
+            if abs(zone.level - composite.price) / composite.price <= tolerance_pct:
+                zone.geometry_confirmed = True
+                zone.geometry_score_boost = round(min(20.0, composite.confidence * 20), 1)
+                zone.score = round(zone.score + zone.geometry_score_boost, 1)
+                break
+
+    zones.sort(key=lambda z: z.score, reverse=True)
+    return zones

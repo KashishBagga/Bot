@@ -1169,7 +1169,7 @@ class StructuralPaperTrader:
                         # take a completely separate path — combined-premium PnL,
                         # not a single directional index R-multiple.
                         if 'combo_legs' in sig:
-                            self._handle_combo_signal(sig, now, symbol, experiment_name, trade_key, result.experiment_name)
+                            self._handle_combo_signal(sig, now, symbol, experiment_name, trade_key, result.experiment_name, snapshot.regime_detail)
                             continue
 
                         if sig['accepted']:
@@ -1329,8 +1329,26 @@ class StructuralPaperTrader:
         }
 
     def _deployed_capital(self) -> float:
-        """Sum of notional currently deployed across OPEN real trades (CFs excluded)."""
-        return sum(float(p.get('position_size_inr', 0.0)) for p in self.active_trades.values())
+        """Sum of notional currently deployed across OPEN real trades (CFs excluded).
+
+        Includes combo/multi-leg positions (max_loss × lots is their capital-at-risk) —
+        previously only single-leg active_trades was counted, so combo capital was
+        invisible to MAX_PORTFOLIO_EXPOSURE.
+        """
+        single_leg = sum(float(p.get('position_size_inr', 0.0)) for p in self.active_trades.values())
+        combo = sum(float(p.get('max_loss', 0.0)) * float(p.get('lots', 1)) for p in self.active_combo_trades.values())
+        return single_leg + combo
+
+    def _short_vol_group_deployed_capital(self) -> float:
+        """Combined capital-at-risk across all currently open short-vol/theta-selling
+        combo positions (see position_sizer.SHORT_VOL_GROUP_EXPERIMENTS) — these all
+        want the same thing (low realized movement) and don't diversify each other."""
+        from src.core.position_sizer import SHORT_VOL_GROUP_EXPERIMENTS
+        return sum(
+            float(p.get('max_loss', 0.0)) * float(p.get('lots', 1))
+            for p in self.active_combo_trades.values()
+            if p.get('experiment_name') in SHORT_VOL_GROUP_EXPERIMENTS
+        )
 
     def _persist_sr_zones(self, snapshot) -> None:
         """Upsert high-quality zones from a MarketSnapshot into the persistent sr_zones table.
@@ -2823,11 +2841,28 @@ class StructuralPaperTrader:
 
     # ── Multi-leg options combos (vertical spreads, straddle/strangle) ──────
 
-    def _handle_combo_signal(self, sig: Dict, timestamp, symbol: str, experiment_name: str, trade_key: Tuple, result_experiment_name: str):
+    def _handle_combo_signal(self, sig: Dict, timestamp, symbol: str, experiment_name: str, trade_key: Tuple, result_experiment_name: str, regime_detail=None):
         """Combo counterpart of the accepted/CF branching in market_loop, kept as
         its own method so market_loop doesn't have to interleave two dedup/risk
         models inline."""
         if sig['accepted']:
+            # Regime router: same check the single-leg path applies (market_loop,
+            # above) — combo signals previously skipped this entirely, so
+            # regime_router.py's affinity entries (e.g. short-vol/theta strategies
+            # restricted to RANGE/COMPRESSION) were silently never enforced for
+            # any combo strategy. Ineligible signals aren't discarded — routed to
+            # CF, same "same engine, different storage" philosophy as every
+            # other filter.
+            if regime_detail is not None and not is_regime_eligible(experiment_name, regime_detail):
+                sig['rejection_reasons'] = sig.get('rejection_reasons', []) + ['REGIME_MISMATCH']
+                sig['regime_at_decision'] = regime_detail.label
+                logger.info(
+                    f"🧭 [{experiment_name}] Regime router: {symbol} combo blocked from REAL "
+                    f"capital (regime={regime_detail.label}) — routed to CF"
+                )
+                self._enter_combo_position(sig, timestamp, trade_key, is_counterfactual=True)
+                return
+
             if trade_key in self.active_combo_trades:
                 logger.debug(f"↩️  [{experiment_name}] Already have an open combo position on {symbol}, skipping.")
                 return
@@ -2891,6 +2926,24 @@ class StructuralPaperTrader:
             logger.error(f"❌ Failed to resolve combo legs for {symbol} {combo_type}: {e}")
             return
 
+        lots = 1
+        if not is_counterfactual:
+            from src.core.position_sizer import SHORT_VOL_GROUP_EXPERIMENTS
+            is_short_vol = experiment_name in SHORT_VOL_GROUP_EXPERIMENTS
+            lots = self.sizer.get_combo_lots(
+                max_loss_per_lot=resolved.max_loss,
+                strategy=sig.get('strategy', experiment_name),
+                confidence=sig.get('confidence', 70.0) or 70.0,
+                regime_primary=sig.get('features', {}).get('regime_primary', 'UNKNOWN'),
+                regime_vol_state=sig.get('features', {}).get('regime_vol_state', 'NORMAL'),
+                deployed_capital=self._deployed_capital(),
+                group_deployed_capital=self._short_vol_group_deployed_capital() if is_short_vol else 0.0,
+                is_short_vol_group=is_short_vol,
+            )
+            if lots <= 0:
+                logger.info(f"⛔ [{experiment_name}] Combo entry on {symbol} skipped — capital/group exposure exhausted")
+                return
+
         from src.core.options_execution_engine import realistic_fill_price
         combo_id = sig.get('candidate_id') or f"combo_{symbol.replace(':', '_').replace('-', '_')}_{experiment_name}_{int(timestamp.timestamp())}"
         legs_payload = [
@@ -2919,6 +2972,7 @@ class StructuralPaperTrader:
             'entry_time': timestamp,
             'underlying_entry_price': underlying_price,
             'legs': legs_payload,
+            'lots': lots,
             'net_premium_paid': resolved.net_premium_paid,
             'max_loss': resolved.max_loss,
             'max_profit': resolved.max_profit,
@@ -3067,6 +3121,10 @@ class StructuralPaperTrader:
         else:
             self.db.save_combo_event(event)
             self.db.save_combo_trade(result)
+            # Feed Kelly bookkeeping from real combo outcomes — previously never
+            # wired up, so get_combo_lots()'s Kelly fraction for every combo
+            # strategy would have stayed at the default RISK_FRACTION forever.
+            self.sizer.record_trade_result(pos.get('setup_type', pos.get('experiment_name', '')), pnl_r)
 
         tag = "CF " if is_cf else ""
         logger.info(

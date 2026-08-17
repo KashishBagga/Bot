@@ -23,7 +23,7 @@ from src.core.trading_clock import TradingClock
 from src.core.feature_store import FeatureStore
 from src.core.market_snapshot import MarketSnapshot
 from src.core.structure_engine import StructureEngine
-from src.core.zone_engine import ZoneEngine
+from src.core.zone_engine import ZoneEngine, confirm_zones_with_geometry
 from src.core.volume_engine import VolumeEngine
 from src.core.regime_engine import RegimeEngine
 from src.core.quant_utils import QuantUtils
@@ -323,7 +323,16 @@ class IndicatorPipeline:
                 channels=channels,
             )
             market_ctx.geometry = geometry_ctx
-            
+
+            # Cross-reference zone_engine's independently-computed swing/RVOL
+            # zones against this same geometry pass's confluence levels — a
+            # zone confirmed by both is a materially stronger S/R read than
+            # either alone. Boosts scores only, never rejects a zone, so
+            # existing h1_zones/m5_zones/d1_zones consumers see no regression.
+            h1_zones = confirm_zones_with_geometry(h1_zones, geometry_ctx.levels)
+            m5_zones = confirm_zones_with_geometry(m5_zones, geometry_ctx.levels)
+            d1_zones = confirm_zones_with_geometry(d1_zones, geometry_ctx.levels)
+
             # Save geometry pending events
             for event in geo_events:
                 self.db.save_market_event(event.to_dict())

@@ -134,6 +134,21 @@ def _is_session_close_blackout(ts: datetime) -> bool:
     return t >= time(15, 15)
 
 
+def _zone_engine_confirms(snapshot: MarketSnapshot, zone: ConfluenceZone, zone_type: str, tolerance_pct: float) -> bool:
+    """Research field, not a filter yet — does an independent zone_engine.py
+    swing/RVOL zone (already flagged geometry_confirmed by
+    confirm_zones_with_geometry() in indicator_pipeline.py) sit within this
+    confluence zone's own tolerance? Cross-checks two independently-computed
+    S/R reads; see zone_engine.py's confirm_zones_with_geometry()."""
+    h1_zones = getattr(snapshot, "h1_zones", None) or []
+    for z in h1_zones:
+        if z.zone_type != zone_type or not z.geometry_confirmed:
+            continue
+        if abs(z.level - zone.price) / zone.price <= tolerance_pct:
+            return True
+    return False
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Strategy
 # ─────────────────────────────────────────────────────────────────────────────
@@ -416,6 +431,7 @@ class GeometryStrategy(BaseStrategy):
                 "dist_to_zone": round(dist, 2),
                 "narrative_bias": bias.value,
                 "bias_confidence": round(bias_confidence, 3),
+                "zone_engine_confirmed": _zone_engine_confirms(snapshot, zone, "DEMAND", self.zone_tolerance_pct),
             },
         )
 
@@ -508,6 +524,7 @@ class GeometryStrategy(BaseStrategy):
                 "dist_to_zone": round(dist, 2),
                 "narrative_bias": bias.value,
                 "bias_confidence": round(bias_confidence, 3),
+                "zone_engine_confirmed": _zone_engine_confirms(snapshot, zone, "SUPPLY", self.zone_tolerance_pct),
             },
         )
 

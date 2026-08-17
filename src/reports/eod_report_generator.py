@@ -34,6 +34,7 @@ from src.reports.sections.market_behaviour import MarketBehaviourSection
 from src.reports.sections.market_state_outlook import MarketStateOutlookSection
 from src.reports.sections.research_queue import ResearchQueueSection
 from src.reports.sections.strategy_health import StrategyHealthSection
+from src.reports.sections.strategic_outlook import StrategicOutlookSection
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,7 @@ class EODReportGenerator:
             MarketStateOutlookSection,
             ResearchQueueSection,
             StrategyHealthSection,
+            StrategicOutlookSection,
         ]
 
         # 3. Compute + render each section

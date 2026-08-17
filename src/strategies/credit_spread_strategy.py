@@ -151,6 +151,12 @@ class CreditSpreadStrategy(BaseStrategy):
                     "atr": round(atr, 2),
                     "move_efficiency": round(move_efficiency, 3),
                     "spread_width_strikes": self.spread_width_strikes,
+                    # Research fields, not a filter yet — does OI buildup
+                    # direction agreeing with the PCR fade predict a better
+                    # win rate for this thesis? See options_intelligence_engine.py.
+                    "oi_change_bias": options.oi_change_bias,
+                    "total_call_oi_change": options.total_call_oi_change,
+                    "total_put_oi_change": options.total_put_oi_change,
                 },
             }
             self._tag_signal(sig, experiment_name)

@@ -50,6 +50,13 @@ EXPERIMENT_REGIME_AFFINITY = {
     "Straddle_v1.0_VolCompression":   {"COMPRESSION"},
     "Strangle_v1.0_VolCompression":   {"COMPRESSION"},
 
+    # Short-vol / theta harvest — all want low realized movement, so RANGE +
+    # COMPRESSION only. Previously unmapped (fell through to fail-open "ANY"),
+    # which meant these could sell premium on a day already classified TREND.
+    "IronCondor_v1.0":                {"RANGE", "COMPRESSION"},
+    "IronButterfly_v1.0":             {"RANGE", "COMPRESSION"},
+    "ExpiryAwareTheta_v1.0":          {"RANGE", "COMPRESSION"},
+
     # Gap
     "GapRegime_v2.0":                 {"GAP"},
 
