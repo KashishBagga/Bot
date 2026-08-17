@@ -30,34 +30,9 @@ from src.core.regime_router import is_regime_eligible
 
 # Strategy Research Framework
 from src.core.indicator_pipeline import IndicatorPipeline
-from src.core.experiment import Experiment
-from src.core.experiment_registry import ExperimentRegistry
+from src.core.experiment_factory import build_registry
 from src.core.portfolio import PortfolioManager
 from src.core.expiry_blackout import ExpiryBlackoutManager
-from src.strategies.structural_strategy import StructuralStrategy
-from src.strategies.ema_pullback import EmaPullbackStrategy
-from src.strategies.vwap_reversion import VwapReversionStrategy
-from src.strategies.prev_day_extremes import PrevDayExtremesStrategy
-from src.strategies.orb import OrbStrategy
-from src.strategies.atr_squeeze import AtrSqueezeStrategy
-from src.strategies.geometry_strategy import GeometryStrategy
-from src.strategies.order_flow_strategy import OrderFlowStrategy
-from src.strategies.vwap_reclaim import VwapReclaimStrategy
-from src.strategies.cpr_strategy import CprStrategy
-from src.strategies.vertical_spread_strategy import VerticalSpreadStrategy
-from src.strategies.straddle_strangle_strategy import StraddleStrangleStrategy
-from src.strategies.oi_wall_reaction_strategy import OIWallReactionStrategy
-from src.strategies.pcr_extreme_reversal_strategy import PCRExtremeReversalStrategy
-from src.strategies.credit_spread_strategy import CreditSpreadStrategy
-from src.strategies.gap_strategy import GapStrategy
-from src.strategies.iron_condor_strategy import IronCondorStrategy
-from src.strategies.butterfly_strategy import ButterflyStrategy
-from src.strategies.iron_butterfly_strategy import IronButterflyStrategy
-from src.strategies.options_scalping_strategy import OptionsScalpingStrategy
-from src.strategies.consolidation_breakout_strategy import ConsolidationBreakoutStrategy
-from src.strategies.rsi2_mean_reversion_strategy import Rsi2MeanReversionStrategy
-from src.strategies.expiry_aware_theta_strategy import ExpiryAwareThetaStrategy
-from src.strategies.relative_value_strategy import RelativeValueStrategy
 from src.warehouse.premarket_collector import PreMarketCollector
 
 # Setup Logging
@@ -213,498 +188,25 @@ class StructuralPaperTrader:
             min_zone_score=50.0,
         )
 
-        self.registry = ExperimentRegistry()
-        
-        # 1. Structural
-        _structural_exp = Experiment(
-            name="Structural_v3.2_RVOL1.0",
-            strategy=StructuralStrategy(rvol_threshold=1.0, min_zone_score=50.0),
-            params={"rvol_threshold": 1.0, "min_zone_score": 50.0},
-            description="Production structural strategy — RVOL threshold 1.0x"
-        )
-        self.registry.register(_structural_exp)
-        self.db.save_experiment(_structural_exp.to_db_dict())
+        # Experiment set lives in experiment_factory.py — the single source of
+        # truth both this live loop and the backtester build from, so neither
+        # can drift out of sync with the other.
+        self.registry = build_registry()
+        for _exp in self.registry.experiments:
+            self.db.save_experiment(_exp.to_db_dict())
 
-        _structural_08_exp = Experiment(
-            name="Structural_v3.2_RVOL0.8",
-            strategy=StructuralStrategy(rvol_threshold=0.8, min_zone_score=50.0),
-            params={"rvol_threshold": 0.8, "min_zone_score": 50.0},
-            description="Parallel experiment — RVOL threshold 0.8x"
-        )
-        self.registry.register(_structural_08_exp)
-        self.db.save_experiment(_structural_08_exp.to_db_dict())
-
-        # 2. EMA Pullback
-        # Aug-03 review: LOW_RVOL blocked +52R of with-trend signals. Pullback
-        # entries structurally have quiet volume during the retrace phase — the
-        # expansion follows the pullback, not before it. Using a breakout-tuned
-        # threshold (1.0×) here was killing the best trend-following strategy.
-        # Lowered to 0.5x (just checks for non-zero activity) + efficiency 0.45.
-        _ema_pullback_exp = Experiment(
-            name="EMA_Pullback_20_50_RVOL0.5",
-            strategy=EmaPullbackStrategy(rvol_threshold=0.5, min_efficiency=0.45),
-            params={"rvol_threshold": 0.5, "min_efficiency": 0.45},
-            description="EMA Pullback — RVOL 0.5x (pullbacks are quiet by nature), efficiency 0.45"
-        )
-        self.registry.register(_ema_pullback_exp)
-        self.db.save_experiment(_ema_pullback_exp.to_db_dict())
-
-        # 3. VWAP Reversion
-        _vwap_reversion_exp = Experiment(
-            name="VWAP_Reversion_1.5ATR_RVOL1.0",
-            strategy=VwapReversionStrategy(rvol_threshold=1.0, vwap_stretch_multiplier=1.5),
-            params={"rvol_threshold": 1.0, "vwap_stretch_multiplier": 1.5},
-            description="VWAP Reversion strategy — RVOL threshold 1.0x"
-        )
-        self.registry.register(_vwap_reversion_exp)
-        self.db.save_experiment(_vwap_reversion_exp.to_db_dict())
-
-        # 4. Previous Day High/Low
-        _prev_day_exp = Experiment(
-            name="PrevDay_Extremes_RVOL1.2",
-            strategy=PrevDayExtremesStrategy(breakout_rvol_threshold=1.2, reversal_rvol_threshold=1.0),
-            params={"breakout_rvol_threshold": 1.2, "reversal_rvol_threshold": 1.0, "proximity_multiplier": 0.3},
-            description="Previous Day High/Low sweeps and breakouts"
-        )
-        self.registry.register(_prev_day_exp)
-        self.db.save_experiment(_prev_day_exp.to_db_dict())
-
-        # 5. ORB (15m and 30m) — retired 2026-08-08: 0 real trades in 11 days
-        # despite running as CF the whole time (25 & 31 CF trades), and net
-        # negative CF pnl_r (-15.53 / -8.17). Not a thin sample, just losing.
-
-        # 6. ATR Squeeze Breakout
-        # Aug-03 review: 6 live trades taken (all counter-trend BUY PUT on a
-        # strong up day), net −1.86R expectancy, 5 of 6 stopped on bar-1.
-        # Squeezes NEED confirmed volume expansion at the breakout — raised RVOL
-        # to 1.5x (was 1.0x).  Also added a move-efficiency floor (0.50) to block
-        # counter-trend squeezes in one-directional trend days.
-        _atr_squeeze_exp = Experiment(
-            name="ATR_Squeeze_RVOL1.5",
-            strategy=AtrSqueezeStrategy(rvol_threshold=1.5, atr_percentile_threshold=0.20),
-            params={"rvol_threshold": 1.5, "atr_percentile_threshold": 0.20},
-            description="ATR Squeeze — RVOL 1.5x (requires actual expansion volume at breakout)"
-        )
-        self.registry.register(_atr_squeeze_exp)
-        self.db.save_experiment(_atr_squeeze_exp.to_db_dict())
-
-        # 7. Geometry Strategy — purely from MKE Stage 5 GeometryContext
-        _geometry_v1_exp = Experiment(
-            name="Geometry_v1.0_Score35",
-            strategy=GeometryStrategy(
-                min_confluence_score=35.0,
-                zone_tolerance_pct=0.002,
-                min_body_fraction=0.40,
-                min_bias_confidence=0.45,
-                atr_sl_buffer_mult=0.15,
-                tp_atr_cap=3.0,
-                min_rr=1.5,
-                trendline_break_enabled=True,
-            ),
-            params={
-                "min_confluence_score": 35.0,
-                "zone_tolerance_pct": 0.002,
-                "min_body_fraction": 0.40,
-                "min_bias_confidence": 0.45,
-                "min_rr": 1.5,
-                "trendline_break_enabled": True,
-            },
-            description="Geometry Strategy v1.0 — confluence bounce + trendline retest. Score threshold=35 (loose arm; A/B against Score50)."
-        )
-        self.registry.register(_geometry_v1_exp)
-        self.db.save_experiment(_geometry_v1_exp.to_db_dict())
-
-        _geometry_v1_tight_exp = Experiment(
-            name="Geometry_v1.0_Score50",
-            strategy=GeometryStrategy(
-                min_confluence_score=50.0,
-                zone_tolerance_pct=0.002,
-                min_body_fraction=0.40,
-                min_bias_confidence=0.50,
-                atr_sl_buffer_mult=0.15,
-                tp_atr_cap=3.0,
-                min_rr=1.8,
-                trendline_break_enabled=True,
-            ),
-            params={
-                "min_confluence_score": 50.0,
-                "zone_tolerance_pct": 0.002,
-                "min_body_fraction": 0.40,
-                "min_bias_confidence": 0.50,
-                "min_rr": 1.8,
-                "trendline_break_enabled": True,
-            },
-            description="Geometry Strategy v1.0 tighter — Score threshold=50 (3+ sources), RR>=1.8."
-        )
-        self.registry.register(_geometry_v1_tight_exp)
-        self.db.save_experiment(_geometry_v1_tight_exp.to_db_dict())
-
-        # 8. Order Flow Strategy (Milestone 2C)
-        _order_flow_exp = Experiment(
-            name="OrderFlow_v1.0",
-            strategy=OrderFlowStrategy(
-                min_sweep_confidence=0.60,  # BUG FIX: was 0.45 — too close to coin flip
-                min_imb_confidence=0.55,    # BUG FIX: was 0.45
-                min_body_fraction=0.40,
-                atr_sl_buffer_mult=0.15,
-                tp_atr_cap=3.0,
-                min_rr=1.5
-            ),
-            params={
-                "min_sweep_confidence": 0.60,
-                "min_imb_confidence": 0.55,
-                "min_body_fraction": 0.40,
-                "atr_sl_buffer_mult": 0.15,
-                "tp_atr_cap": 3.0,
-                "min_rr": 1.5
-            },
-            description="Order Flow Strategy v1.0 — stop sweeps and imbalance pullbacks (M2C)"
-        )
-        self.registry.register(_order_flow_exp)
-        self.db.save_experiment(_order_flow_exp.to_db_dict())
-
-        # 9. Chart Pattern Strategy — retired 2026-08-08: both confidence
-        # variants (Conf55, Conf40) ran 7 days with large CF samples (92 & 91
-        # trades) and net negative pnl_r (-10.55 / -13.58). Consistent loser,
-        # not a filter-threshold problem.
-
-        # 10. VWAP Reclaim — trend-continuation on a VWAP cross.
-        # Same family as EMA_Pullback (trend-following), so also lowers efficiency
-        # floor to 0.45 (was 0.55) — continuations have moderate efficiency dips.
-        _vwap_reclaim_exp = Experiment(
-            name="VWAP_Reclaim_v1.0",
-            strategy=VwapReclaimStrategy(rvol_threshold=1.0, min_efficiency=0.45),
-            params={"rvol_threshold": 1.0, "min_efficiency": 0.45},
-            description="VWAP Reclaim — trend continuation on a VWAP cross (efficiency 0.45)"
-        )
-        self.registry.register(_vwap_reclaim_exp)
-        self.db.save_experiment(_vwap_reclaim_exp.to_db_dict())
-
-        # 11. CPR (Central Pivot Range) Breakout — India-specific pivot geometry,
-        # not previously in this framework.
-        _cpr_exp = Experiment(
-            name="CPR_v1.0",
-            strategy=CprStrategy(rvol_threshold=1.1, min_efficiency=0.55),
-            params={"rvol_threshold": 1.1, "min_efficiency": 0.55},
-            description="Central Pivot Range breakout — prior-day TC/BC value area"
-        )
-        self.registry.register(_cpr_exp)
-        self.db.save_experiment(_cpr_exp.to_db_dict())
-
-        # 12. Gap — v1.0 retired 2026-08-08: net negative pnl_r (-4.26) over 7
-        # days, worst experiment overall in the 2026-08-07 EOD report. Re-added
-        # as v2.0: same GAP_AND_GO/GAP_FILL detection logic (that wasn't what
-        # lost money), but gap_threshold_pct raised from 0.15% to 0.4% to match
-        # regime_engine.py's own GAP classification threshold, and routed
-        # through regime_router.py so it only gets real capital on days the
-        # regime engine actually calls a GAP day (see regime_router.py).
-        _gap_exp = Experiment(
-            name="GapRegime_v2.0",
-            strategy=GapStrategy(gap_threshold_pct=0.4, rvol_threshold=1.1, min_efficiency=0.55),
-            params={"gap_threshold_pct": 0.4, "rvol_threshold": 1.1, "min_efficiency": 0.55},
-            description="Gap-and-Go / Gap-Fill, regime-gated to actual GAP days"
-        )
-        self.registry.register(_gap_exp)
-        self.db.save_experiment(_gap_exp.to_db_dict())
-
-        # 13. Initial Balance Breakout — same OrbStrategy, 60-min window
-        # (only possible now that the 15/30-hardcoded cutoff bug is fixed).
-        _ib_exp = Experiment(
-            name="ORB_60m_IB_RVOL1.2",
-            strategy=OrbStrategy(rvol_threshold=1.2, opening_range_minutes=60),
-            params={"rvol_threshold": 1.2, "opening_range_minutes": 60},
-            description="Initial Balance Breakout — 60-minute opening range"
-        )
-        self.registry.register(_ib_exp)
-        self.db.save_experiment(_ib_exp.to_db_dict())
-
-        # 14. Vertical Spread — directional thesis (EMA cross + bias), executed
-        # as a debit spread instead of a naked single-leg option. First combo
-        # (multi-leg) experiment in this framework — see _handle_combo_signal()/
-        # _enter_combo_position() in this file for the separate execution path.
-        _vertical_spread_exp = Experiment(
-            name="VerticalSpread_v1.0",
-            strategy=VerticalSpreadStrategy(
-                rvol_threshold=1.0, min_efficiency=0.55,
-                spread_width_strikes=2, target_r=1.0, stop_r=-0.6,
-            ),
-            params={
-                "rvol_threshold": 1.0, "min_efficiency": 0.55,
-                "spread_width_strikes": 2, "target_r": 1.0, "stop_r": -0.6,
-            },
-            description="Bull Call Spread / Bear Put Spread — directional thesis, debit-spread execution"
-        )
-        self.registry.register(_vertical_spread_exp)
-        self.db.save_experiment(_vertical_spread_exp.to_db_dict())
-
-        # 15. Straddle/Strangle — long volatility on realized-vol compression
-        # (a proxy for implied-vol rank, which this system doesn't have data for
-        # — see straddle_strangle_strategy.py's module docstring).
-        _straddle_exp = Experiment(
-            name="Straddle_v1.0_VolCompression",
-            strategy=StraddleStrangleStrategy(
-                atr_percentile_threshold=0.20, wing_strikes=0,
-                decision_cutoff_hour=14, target_r=1.2, stop_r=-0.5,
-            ),
-            params={
-                "atr_percentile_threshold": 0.20, "wing_strikes": 0,
-                "decision_cutoff_hour": 14, "target_r": 1.2, "stop_r": -0.5,
-            },
-            description="Long Straddle on ATR-percentile volatility compression"
-        )
-        self.registry.register(_straddle_exp)
-        self.db.save_experiment(_straddle_exp.to_db_dict())
-
-        # Strangle variant — wider wings, cheaper premium, wider breakevens.
-        _strangle_exp = Experiment(
-            name="Strangle_v1.0_VolCompression",
-            strategy=StraddleStrangleStrategy(
-                atr_percentile_threshold=0.20, wing_strikes=2,
-                decision_cutoff_hour=14, target_r=1.2, stop_r=-0.5,
-            ),
-            params={
-                "atr_percentile_threshold": 0.20, "wing_strikes": 2,
-                "decision_cutoff_hour": 14, "target_r": 1.2, "stop_r": -0.5,
-            },
-            description="Long Strangle (2-strike wings) on ATR-percentile volatility compression"
-        )
-        self.registry.register(_strangle_exp)
-        self.db.save_experiment(_strangle_exp.to_db_dict())
-
-        # 16. Credit Spread — same PCR-extreme contrarian thesis as
-        # PCRExtremeReversalStrategy, financed as a credit vertical spread
-        # (sell near OTM, buy further OTM as protection) instead of a naked
-        # long option — theta-positive, defined-risk. Routed real capital
-        # only in RANGE regime via regime_router.py.
-        _credit_spread_exp = Experiment(
-            name="CreditSpread_v1.0_PCRFade",
-            strategy=CreditSpreadStrategy(
-                rvol_ceiling=1.3, max_efficiency=0.55,
-                spread_width_strikes=2, target_r=0.5, stop_r=-1.0,
-            ),
-            params={
-                "rvol_ceiling": 1.3, "max_efficiency": 0.55,
-                "spread_width_strikes": 2, "target_r": 0.5, "stop_r": -1.0,
-            },
-            description="Bull Put Spread / Bear Call Spread — PCR-extreme thesis, credit-spread execution"
-        )
-        self.registry.register(_credit_spread_exp)
-        self.db.save_experiment(_credit_spread_exp.to_db_dict())
-
-        # Channel bounce/breakout — retired 2026-08-08: net negative pnl_r
-        # (-6.81) over its 3 days running, on a meaningful 33-trade CF sample.
-
-        # OI-wall reaction — consumes MarketContext.options (real OI via
-        # OptionsIntelligenceEngine, fed by the OptionWarehouse background
-        # thread started above). Rejects (as an error, not a filtered signal)
-        # whenever options data is missing or stale — never trades on a guess.
-        _oi_wall_exp = Experiment(
-            name="OIWallReaction_v1.0",
-            strategy=OIWallReactionStrategy(
-                zone_tolerance_pct=0.0015, min_body_fraction=0.40,
-                atr_sl_buffer_mult=0.15, breakout_rvol_threshold=1.3,
-                tp_atr_cap=3.0, min_rr=1.5,
-            ),
-            params={
-                "zone_tolerance_pct": 0.0015, "min_body_fraction": 0.40,
-                "atr_sl_buffer_mult": 0.15, "breakout_rvol_threshold": 1.3,
-                "tp_atr_cap": 3.0, "min_rr": 1.5,
-            },
-            description="Fade or breakout reaction to real option-chain OI walls (call/put strikes with outlier OI)"
-        )
-        self.registry.register(_oi_wall_exp)
-        self.db.save_experiment(_oi_wall_exp.to_db_dict())
-
-        # PCR-extreme contrarian reversal — real PCR (OptionsIntelligenceEngine)
-        # gated by a confirmed reversal candle at a genuine confluence zone, not
-        # PCR alone.
-        _pcr_reversal_exp = Experiment(
-            name="PCRExtremeReversal_v1.0",
-            strategy=PCRExtremeReversalStrategy(
-                min_confluence_score=40.0, zone_tolerance_pct=0.0015,
-                min_body_fraction=0.40, atr_sl_buffer_mult=0.15,
-                tp_atr_cap=3.0, min_rr=1.5,
-            ),
-            params={
-                "min_confluence_score": 40.0, "zone_tolerance_pct": 0.0015,
-                "min_body_fraction": 0.40, "atr_sl_buffer_mult": 0.15,
-                "tp_atr_cap": 3.0, "min_rr": 1.5,
-            },
-            description="Contrarian reversal on PCR extremes, gated by zone confluence + candle confirmation"
-        )
-        self.registry.register(_pcr_reversal_exp)
-        self.db.save_experiment(_pcr_reversal_exp.to_db_dict())
-
-        # 17. Iron Condor — Sideways/Range market income play
-        _iron_condor_exp = Experiment(
-            name="IronCondor_v1.0",
-            strategy=IronCondorStrategy(
-                rvol_ceiling=1.3, max_efficiency=0.55,
-                spread_width_strikes=2, target_r=0.4, stop_r=-1.0,
-            ),
-            params={
-                "rvol_ceiling": 1.3, "max_efficiency": 0.55,
-                "spread_width_strikes": 2, "target_r": 0.4, "stop_r": -1.0,
-            },
-            description="Iron Condor (OTM Call spread + OTM Put spread) sideways credit play"
-        )
-        self.registry.register(_iron_condor_exp)
-        self.db.save_experiment(_iron_condor_exp.to_db_dict())
-
-        # 18. Butterfly Spread — Sideways/Range market defined-risk debit play
-        _butterfly_exp = Experiment(
-            name="Butterfly_v1.0",
-            strategy=ButterflyStrategy(
-                rvol_ceiling=1.3, max_efficiency=0.55,
-                wing_width_strikes=2, target_r=1.5, stop_r=-0.5,
-            ),
-            params={
-                "rvol_ceiling": 1.3, "max_efficiency": 0.55,
-                "wing_width_strikes": 2, "target_r": 1.5, "stop_r": -0.5,
-            },
-            description="Butterfly Spread (Long ITM Call + 2x Short ATM Call + Long OTM Call) sideways debit play"
-        )
-        self.registry.register(_butterfly_exp)
-        self.db.save_experiment(_butterfly_exp.to_db_dict())
-
-        # 18b. Iron Butterfly — ATM-centered credit theta-harvest. Distinct from
-        # both Iron Condor (wider, lower-credit) and Butterfly (debit, long-vol
-        # collapse bet) — this system had no ATM-centered credit structure before.
-        _iron_butterfly_exp = Experiment(
-            name="IronButterfly_v1.0",
-            strategy=IronButterflyStrategy(
-                rvol_ceiling=1.2, max_efficiency=0.50,
-                wing_width_strikes=4, target_r=0.35, stop_r=-1.0,
-            ),
-            params={
-                "rvol_ceiling": 1.2, "max_efficiency": 0.50,
-                "wing_width_strikes": 4, "target_r": 0.35, "stop_r": -1.0,
-            },
-            description="Iron Butterfly (Sell ATM Call + ATM Put, buy wings) ATM credit theta-harvest"
-        )
-        self.registry.register(_iron_butterfly_exp)
-        self.db.save_experiment(_iron_butterfly_exp.to_db_dict())
-
-        # ── v3.1: OI Scalping (PAPER) ──────────────────────────────────────
-        _oi_scalping_exp = Experiment(
-            name="OI_Scalping_v1.0",
-            strategy=OptionsScalpingStrategy(
-                stop_loss_pct=0.50, target_multiple=2.0,
-                min_rvol=1.5, min_votes=3, lookback_minutes=10,
-            ),
-            params={"stop_loss_pct": 0.50, "target_multiple": 2.0, "min_rvol": 1.5},
-            description=(
-                "PAPER: OI×premium 4-quadrant positioning inference scalper. "
-                "3/5 windows must agree on direction. BSM Greeks required. "
-                "Exit: bid-based premium stop/target + 15-min time stop."
-            ),
-        )
-        self.registry.register(_oi_scalping_exp)
-        self.db.save_experiment(_oi_scalping_exp.to_db_dict())
-
-        # ── v3.1: Consolidation Breakout Standard (PAPER) ──────────────────
-        _consol_brk_exp = Experiment(
-            name="Consolidation_Breakout_v1.0",
-            strategy=ConsolidationBreakoutStrategy(
-                rvol_threshold=1.5, breakout_score_min=60,
-                atr_pct_threshold=30.0, min_touches=3,
-            ),
-            params={"rvol_threshold": 1.5, "breakout_score_min": 60},
-            description=(
-                "PAPER: 1H consolidation squeeze + M5 breakout + RVOL≥1.5. "
-                "RSI Momentum Confirmation. Explicit 2R SL/TP. "
-                "Boundary candles excluded from touch count."
-            ),
-        )
-        self.registry.register(_consol_brk_exp)
-        self.db.save_experiment(_consol_brk_exp.to_db_dict())
-
-        # ── v3.1: Consolidation Breakout Tight (PAPER) ─────────────────────
-        _consol_brk_tight_exp = Experiment(
-            name="Consolidation_Breakout_Tight_v1.0",
-            strategy=ConsolidationBreakoutStrategy(
-                rvol_threshold=2.0, breakout_score_min=60,
-                atr_pct_threshold=30.0, min_touches=3,
-            ),
-            params={"rvol_threshold": 2.0, "breakout_score_min": 60},
-            description=(
-                "PAPER: Same as Consolidation_Breakout_v1.0 but RVOL≥2.0. "
-                "A/B against standard to test whether stronger participation "
-                "improves profit factor. Data decides."
-            ),
-        )
-        self.registry.register(_consol_brk_tight_exp)
-        self.db.save_experiment(_consol_brk_tight_exp.to_db_dict())
-
-        # ── RSI-2 Mean Reversion — fills a real gap: every other RANGE/
-        # COMPRESSION strategy here reads VWAP-distance or OI/PCR extremes,
-        # not a plain price oscillator. Runs every day like everything else —
-        # not gated to particular days/windows, just a different signal basis.
-        _rsi2_exp = Experiment(
-            name="RSI2_MeanReversion_v1.0",
-            strategy=Rsi2MeanReversionStrategy(
-                rsi_oversold=10.0, rsi_overbought=90.0, min_body_fraction=0.40,
-                atr_sl_buffer_mult=0.15, tp_atr_cap=3.0, min_rr=1.5, rvol_ceiling=1.5,
-            ),
-            params={
-                "rsi_oversold": 10.0, "rsi_overbought": 90.0, "min_body_fraction": 0.40,
-                "atr_sl_buffer_mult": 0.15, "tp_atr_cap": 3.0, "min_rr": 1.5, "rvol_ceiling": 1.5,
-            },
-            description="RSI-2 extreme fade (<10 / >90), confirmed by a reversal candle, targets EMA20"
-        )
-        self.registry.register(_rsi2_exp)
-        self.db.save_experiment(_rsi2_exp.to_db_dict())
-
-        # ── Expiry-Aware Theta — an Iron Condor whose wing width, RVOL
-        # ceiling, and target scale continuously with time-to-expiry instead
-        # of one fixed configuration every day. Evaluates every candle same
-        # as everything else — not gated to any particular day/window, just
-        # more selective (wider wings, tighter RVOL ceiling) the closer we
-        # get to expiry, since gamma risk is highest then even though theta
-        # reward is too.
-        _expiry_theta_exp = Experiment(
-            name="ExpiryAwareTheta_v1.0",
-            strategy=ExpiryAwareThetaStrategy(
-                rvol_ceiling_far=1.4, rvol_ceiling_near=0.8, max_efficiency=0.55,
-                wing_width_far=2, wing_width_near=5,
-                target_r_far=0.5, target_r_near=0.25, stop_r=-1.0,
-            ),
-            params={
-                "rvol_ceiling_far": 1.4, "rvol_ceiling_near": 0.8, "max_efficiency": 0.55,
-                "wing_width_far": 2, "wing_width_near": 5,
-                "target_r_far": 0.5, "target_r_near": 0.25, "stop_r": -1.0,
-            },
-            description="Iron Condor with wing width/RVOL ceiling/target scaled continuously by time-to-expiry"
-        )
-        self.registry.register(_expiry_theta_exp)
-        self.db.save_experiment(_expiry_theta_exp.to_db_dict())
-
-        # ── NIFTY-BankNifty Relative Value — the one genuinely new category:
-        # every other strategy here trades each index independently. This one
-        # trades the RELATIONSHIP between them (ratio divergence from its own
-        # rolling mean), regardless of either index's own trend/range state.
-        # One shared strategy instance, called once per symbol per candle by
-        # the registry exactly like every other symbol-agnostic strategy —
-        # it remembers each symbol's latest snapshot internally and emits one
-        # leg of the pair on each symbol's call once it's seen both.
-        _relative_value_exp = Experiment(
-            name="RelativeValue_NIFTY_BANKNIFTY_v1.0",
-            strategy=RelativeValueStrategy(
-                nifty_symbol="NSE:NIFTY50-INDEX", banknifty_symbol="NSE:NIFTYBANK-INDEX",
-                lookback_bars=60, z_entry=2.0, min_rr=1.2, tp_ratio_reversion_fraction=0.6,
-            ),
-            params={
-                "lookback_bars": 60, "z_entry": 2.0, "min_rr": 1.2,
-                "tp_ratio_reversion_fraction": 0.6,
-            },
-            description="NIFTY/BankNifty ratio divergence from its own rolling mean — fade the rich leg, buy the cheap leg"
-        )
-        self.registry.register(_relative_value_exp)
-        self.db.save_experiment(_relative_value_exp.to_db_dict())
+        # Last successfully computed MarketSnapshot per symbol — one candle
+        # stale relative to _update_active_trades (which runs before this
+        # candle's snapshot exists). Lets _update_position() read live
+        # ATR/regime/structure for exit-management without forcing snapshot
+        # computation to run on every tick (including session-cutoff/blackout
+        # early-returns that currently skip it).
+        self._last_snapshot: Dict[str, object] = {}
 
         self.portfolios = PortfolioManager()
         self.portfolios.register("Structural_v3.2_RVOL1.0")
         self.portfolios.register("Structural_v3.2_RVOL0.8")
+        self.portfolios.register("Structural_v3.3_ExitMgmt")
         self.portfolios.register("EMA_Pullback_20_50_RVOL0.5")
         self.portfolios.register("VWAP_Reversion_1.5ATR_RVOL1.0")
         self.portfolios.register("PrevDay_Extremes_RVOL1.2")
@@ -731,6 +233,8 @@ class StructuralPaperTrader:
         self.portfolios.register("RSI2_MeanReversion_v1.0")
         self.portfolios.register("ExpiryAwareTheta_v1.0")
         self.portfolios.register("RelativeValue_NIFTY_BANKNIFTY_v1.0")
+        self.portfolios.register("MomentumBurst_5m_v1.0_RVOL2.0")
+        self.portfolios.register("HtfPullback_v1.0_Tol0.6pct")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
@@ -1124,6 +628,11 @@ class StructuralPaperTrader:
                     logger.warning(f"⚠️ Pipeline returned None for {symbol}")
                     continue
 
+                # Cache for _update_position()'s exit-management checks next tick —
+                # by the time _update_active_trades() runs (step 2, above this loop),
+                # this candle's snapshot doesn't exist yet.
+                self._last_snapshot[symbol] = snapshot
+
                 # Publish current market state for the dashboard — bias, regime,
                 # RVOL/ATR/efficiency, S/R zones, in-progress chart patterns.
                 # Previously this only ever existed in-memory for this one candle.
@@ -1186,7 +695,7 @@ class StructuralPaperTrader:
                                     f"🧭 [{experiment_name}] Regime router: {symbol} blocked from REAL "
                                     f"capital (regime={snapshot.regime_detail.label}) — routed to CF"
                                 )
-                                self._enter_counterfactual(sig, now, symbol, experiment_name, trade_key, result)
+                                self._enter_counterfactual(sig, now, symbol, experiment_name, trade_key, result, snapshot=snapshot)
                                 continue
 
                             # One real trade per (symbol, experiment_name)
@@ -1216,12 +725,12 @@ class StructuralPaperTrader:
                                 continue
                             logger.info(f"🚀 SIGNAL: {symbol} {sig['signal']} | [{experiment_name}]")
                             logger.info(f"   Entry: {sig['price']} | SL: {sig['stop_loss']} | TP: {sig['take_profit']} (RR: {sig['rr_ratio']})")
-                            self._enter_position(sig, now, trade_key, is_counterfactual=False)
+                            self._enter_position(sig, now, trade_key, is_counterfactual=False, snapshot=snapshot)
                             self._record_level_attempt(sig)   # woodchopper counter
                             self.portfolios.on_entry(experiment_name, now)
 
                         else:
-                            self._enter_counterfactual(sig, now, symbol, experiment_name, trade_key, result)
+                            self._enter_counterfactual(sig, now, symbol, experiment_name, trade_key, result, snapshot=snapshot)
 
             if total_signals == 0:
                 logger.info("🧘 Status: Sidelined (No Institutional Alignment)")
@@ -1678,6 +1187,7 @@ class StructuralPaperTrader:
                         pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol),
                         increment_bar_count=increment_bar_count,
                         option_quote=option_quotes.get(pos.get('option_symbol')),
+                        live_snapshot=self._last_snapshot.get(symbol),
                     )
                     if is_closed:
                         pnl_r = pos.get('_last_pnl_r', 0.0)
@@ -1703,6 +1213,7 @@ class StructuralPaperTrader:
                         pos, current_prices[symbol], timestamp, bar=current_bars.get(symbol),
                         increment_bar_count=increment_bar_count,
                         option_quote=option_quotes.get(pos.get('option_symbol')),
+                        live_snapshot=self._last_snapshot.get(symbol),
                     )
                 except Exception as e:
                     logger.error(f"⚠️ Position update failed for counterfactual {cand_id}: {e}", exc_info=True)
@@ -1818,24 +1329,33 @@ class StructuralPaperTrader:
         return realistic_fill_price(float(premium), float(bid or 0.0), float(ask or 0.0), 'SELL')
 
     def _premium_pnl_r(self, pos: Dict, option_quote: Optional[Tuple[float, float, float]]) -> Optional[float]:
-        """Real option-premium P&L expressed in R, using the same risk-per-R
-        (position_size_inr * stop_loss_distance / entry_price) PositionSizer
-        used to size the trade at entry — so R stays comparable across trades
-        while the numerator reflects an actual fill instead of assuming the
-        option tracked the index point-for-point (delta=1, zero theta/IV
-        decay). Returns None (caller falls back to the index-point proxy) when
-        this position has no resolved option leg or the current premium can't
-        be resolved — never fabricates a price."""
+        """Real option-premium P&L expressed in R.
+
+        R is defined as the premium actually paid for the position
+        (entry_premium * lot_size * lots) — the standard convention for a long
+        option, whose maximum loss IS the premium paid. This bounds R at -1.0
+        on the downside and keeps it comparable across trades of different
+        sizes, same as the index-point proxy's R is comparable across trades
+        of different stop distances.
+
+        Previous formula (fixed 2026-08-18): risk was computed as
+        `position_size_inr * stop_loss_distance / entry_price` — the correct
+        risk-per-R for a LINEAR instrument (futures/cash), where a small
+        index-point move against you costs only that fraction of notional.
+        Applied to a leveraged option premium P&L, that denominator is tiny
+        (fraction of a percent of notional) while the numerator is the full
+        leveraged premium swing, producing R-multiples off by roughly
+        entry_price/stop_loss_distance — this is what produced trades logged
+        at -50R to +650R in the same session. Never fabricates a price —
+        returns None (caller falls back to the index-point proxy) when this
+        position has no resolved option leg or the current premium can't be
+        resolved."""
         if not pos.get('option_symbol') or not pos.get('entry_premium') or not pos.get('lot_size'):
             return None
         current_premium = self._resolve_current_premium(pos, option_quote)
         if current_premium is None:
             return None
-        entry_price = pos.get('entry_price') or 0.0
-        stop_loss_distance = pos.get('stop_loss_distance') or 0.0
-        if entry_price <= 0 or stop_loss_distance <= 0:
-            return None
-        risk_amount_inr = pos.get('position_size_inr', 0.0) * stop_loss_distance / entry_price
+        risk_amount_inr = pos['entry_premium'] * pos['lot_size'] * pos.get('lots', 1.0)
         if risk_amount_inr <= 0:
             return None
         premium_pnl_inr = (current_premium - pos['entry_premium']) * pos['lot_size'] * pos.get('lots', 1.0)
@@ -1843,7 +1363,8 @@ class StructuralPaperTrader:
         return premium_pnl_inr / risk_amount_inr
 
     def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None,
-                          increment_bar_count: bool = True, option_quote: Tuple[float, float, float] = None) -> bool:
+                          increment_bar_count: bool = True, option_quote: Tuple[float, float, float] = None,
+                          live_snapshot=None) -> bool:
         """Evaluate a position against the latest market tick. Returns True if position exited.
 
         ``bar`` is the last CLOSED candle's OHLC ({'open','high','low','close'}).
@@ -1856,6 +1377,16 @@ class StructuralPaperTrader:
         position's resolved option leg (see _batch_resolve_option_quotes) — when
         the position has one, pnl_r is priced off the real premium fill instead
         of the index-point proxy (see _premium_pnl_r).
+
+        ``live_snapshot`` is the most recently computed MarketSnapshot for this
+        symbol (see self._last_snapshot in market_loop()) — always exactly one
+        candle stale relative to this tick's mark price, since a fresh snapshot
+        for *this* candle doesn't exist yet when positions are marked. None on
+        the first candle of a session/after a restart; every check below must
+        fall back to legacy behavior in that case, never crash. Only consulted
+        when the owning experiment opted into exit_management via `pos['exit_mgmt']`
+        — every flag there defaults to off, preserving today's exact behavior
+        for the other ~25 experiments that haven't opted in.
         """
         if pos.get('status', 'OPEN') != 'OPEN':
             return False
@@ -1863,6 +1394,10 @@ class StructuralPaperTrader:
         symbol = pos['symbol']
         is_cf = pos.get('is_counterfactual', False)
         stop_loss_distance = pos['stop_loss_distance']
+        # pos.get(...) — positions restored from the DB on restart (built in
+        # __init__ from get_open_positions()) predate this field and won't have
+        # it; every flag defaults to off/unlimited, i.e. today's exact behavior.
+        exit_mgmt = pos.get('exit_mgmt') or {}
 
         # Intrabar extremes for stop evaluation (fall back to the mark price).
         bar_high = float(bar['high']) if bar else current_price
@@ -1907,25 +1442,55 @@ class StructuralPaperTrader:
                 # at the open, which is worse than the stop.
                 exit_price = min(pos['stop_loss'], bar_open)
                 exit_reason = 'STOP_LOSS'
+            # Structural invalidation — checked BEFORE TP_EXPANSION/trailing so it
+            # can close a trade before price ever reaches the stop; checked AFTER
+            # STOP_LOSS since the hard price stop is a non-negotiable risk floor
+            # that must never be pre-empted by a qualitative structure judgment.
+            elif (exit_mgmt.get('structure_invalidation')
+                  and pos.get('structure_invalidation_level') is not None
+                  and bar_low <= pos['structure_invalidation_level']):
+                is_closed = True
+                exit_price = min(pos['structure_invalidation_level'], bar_open)
+                exit_reason = 'STRUCTURE_INVALIDATED'
             # Check TP expansion — capture old values before modifying pos
             elif current_price >= pos['take_profit']:
-                old_sl, old_tp = pos['stop_loss'], pos['take_profit']
-                pos['take_profit'] = old_tp + stop_loss_distance
-                new_sl = current_price - stop_loss_distance
-                pos['stop_loss'] = max(old_sl, new_sl)
-                self._log_position_update(pos, current_price, timestamp, 'TP_EXPANSION',
-                                          old_sl=old_sl, old_tp=old_tp)
+                cap = exit_mgmt.get('tp_expansion_cap')
+                regime_ok = (live_snapshot is None) or (
+                    live_snapshot.regime_detail.primary in ('STRONG_TREND_UP', 'WEAK_TREND_UP')
+                )
+                if cap is not None and (pos.get('tp_expansion_count', 0) >= cap or not regime_ok):
+                    is_closed = True
+                    exit_price = current_price
+                    exit_reason = 'TP_EXPANSION_CAPPED'
+                else:
+                    old_sl, old_tp = pos['stop_loss'], pos['take_profit']
+                    pos['take_profit'] = old_tp + stop_loss_distance
+                    new_sl = current_price - stop_loss_distance
+                    pos['stop_loss'] = max(old_sl, new_sl)
+                    pos['tp_expansion_count'] = pos.get('tp_expansion_count', 0) + 1
+                    pos['last_tp_expansion_regime'] = live_snapshot.regime_detail.primary if live_snapshot else None
+                    self._log_position_update(pos, current_price, timestamp, 'TP_EXPANSION',
+                                              old_sl=old_sl, old_tp=old_tp)
             # Check trailing SL
             elif current_price > old_highest:
                 old_sl = pos['stop_loss']
                 # FIX: Tighten trail step to 0.75× once 1.5R is in the bag
                 trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
-                new_sl = current_price - (stop_loss_distance * trail_mult)
+                if exit_mgmt.get('atr_adaptive_trailing') and live_snapshot is not None:
+                    current_atr = live_snapshot.features.get_float('atr', pos.get('atr_at_entry') or stop_loss_distance)
+                    # k1=1.5: Chandelier-style multiple of CURRENT ATR (replaces the
+                    # frozen entry-time R distance). k2=0.5: floor so the trail can
+                    # never tighten below half the original entry-risk distance
+                    # purely because one candle's ATR momentarily collapsed.
+                    trail_distance = max(current_atr * 1.5, stop_loss_distance * 0.5) * trail_mult
+                else:
+                    trail_distance = stop_loss_distance * trail_mult
+                new_sl = current_price - trail_distance
                 if new_sl > old_sl:
                     pos['stop_loss'] = new_sl
                     self._log_position_update(pos, current_price, timestamp, 'TRAILING_SL',
                                               old_sl=old_sl, old_tp=None)
-                    
+
         elif pos['signal'] == 'BUY PUT':
             # Check SL breach intrabar (candle high), gap-aware fill at open
             if bar_high >= pos['stop_loss']:
@@ -1934,24 +1499,56 @@ class StructuralPaperTrader:
                 # at the open, which is worse than the stop.
                 exit_price = max(pos['stop_loss'], bar_open)
                 exit_reason = 'STOP_LOSS'
+            # Structural invalidation — see BUY CALL branch for priority rationale.
+            elif (exit_mgmt.get('structure_invalidation')
+                  and pos.get('structure_invalidation_level') is not None
+                  and bar_high >= pos['structure_invalidation_level']):
+                is_closed = True
+                exit_price = max(pos['structure_invalidation_level'], bar_open)
+                exit_reason = 'STRUCTURE_INVALIDATED'
             # Check TP expansion — capture old values before modifying pos
             elif current_price <= pos['take_profit']:
-                old_sl, old_tp = pos['stop_loss'], pos['take_profit']
-                pos['take_profit'] = old_tp - stop_loss_distance
-                new_sl = current_price + stop_loss_distance
-                pos['stop_loss'] = min(old_sl, new_sl)
-                self._log_position_update(pos, current_price, timestamp, 'TP_EXPANSION',
-                                          old_sl=old_sl, old_tp=old_tp)
+                cap = exit_mgmt.get('tp_expansion_cap')
+                regime_ok = (live_snapshot is None) or (
+                    live_snapshot.regime_detail.primary in ('STRONG_TREND_DOWN', 'WEAK_TREND_DOWN')
+                )
+                if cap is not None and (pos.get('tp_expansion_count', 0) >= cap or not regime_ok):
+                    is_closed = True
+                    exit_price = current_price
+                    exit_reason = 'TP_EXPANSION_CAPPED'
+                else:
+                    old_sl, old_tp = pos['stop_loss'], pos['take_profit']
+                    pos['take_profit'] = old_tp - stop_loss_distance
+                    new_sl = current_price + stop_loss_distance
+                    pos['stop_loss'] = min(old_sl, new_sl)
+                    pos['tp_expansion_count'] = pos.get('tp_expansion_count', 0) + 1
+                    pos['last_tp_expansion_regime'] = live_snapshot.regime_detail.primary if live_snapshot else None
+                    self._log_position_update(pos, current_price, timestamp, 'TP_EXPANSION',
+                                              old_sl=old_sl, old_tp=old_tp)
             # Check trailing SL
             elif current_price < old_lowest:
                 old_sl = pos['stop_loss']
                 # FIX: Tighten trail step to 0.75× once 1.5R is in the bag
                 trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
-                new_sl = current_price + (stop_loss_distance * trail_mult)
+                if exit_mgmt.get('atr_adaptive_trailing') and live_snapshot is not None:
+                    current_atr = live_snapshot.features.get_float('atr', pos.get('atr_at_entry') or stop_loss_distance)
+                    trail_distance = max(current_atr * 1.5, stop_loss_distance * 0.5) * trail_mult
+                else:
+                    trail_distance = stop_loss_distance * trail_mult
+                new_sl = current_price + trail_distance
                 if new_sl < old_sl:
                     pos['stop_loss'] = new_sl
                     self._log_position_update(pos, current_price, timestamp, 'TRAILING_SL',
                                               old_sl=old_sl, old_tp=None)
+
+        # Time stop — closes stagnant trades that have neither hit stop/target
+        # nor moved meaningfully in either direction within the bar budget.
+        if (not is_closed and exit_mgmt.get('time_stop_bars') is not None
+                and pos.get('bars_held', 0) >= exit_mgmt['time_stop_bars']
+                and abs(current_pnl_r) < exit_mgmt.get('time_stop_min_r', 0.3)):
+            is_closed = True
+            exit_price = current_price
+            exit_reason = 'TIME_STOP'
 
         # Session force exit check (15:25 PM IST)
         if not is_closed and timestamp.hour == 15 and timestamp.minute >= 25:
@@ -1980,6 +1577,10 @@ class StructuralPaperTrader:
                     pnl_r = (pos['entry_price'] - exit_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
                 pnl_r -= 0.05  # Transaction cost buffer
                 pos['pnl_calculation_method'] = 'index_proxy'
+            # Stashed for _exit_position to persist — atr_at_entry was already
+            # captured at signal time; this is the live reading at the moment
+            # of exit, one candle stale like every other live_snapshot use here.
+            pos['_atr_at_exit'] = live_snapshot.features.get_float('atr') if live_snapshot is not None else None
             self._exit_position(pos, exit_price, exit_reason, timestamp, pnl_r)
             pos['status'] = 'CLOSED'
             return True
@@ -2016,7 +1617,7 @@ class StructuralPaperTrader:
         return (entry - lowest) / dist, (highest - entry) / dist
 
     def _enter_counterfactual(self, sig: Dict, now, symbol: str, experiment_name: str,
-                               trade_key: Tuple, result) -> bool:
+                               trade_key: Tuple, result, snapshot=None) -> bool:
         """Shared CF-entry path: dedup by thesis key, then open a shadow
         position via the exact same _update_position() engine real trades use.
         Used both for strategy-rejected signals and for signals the regime
@@ -2053,10 +1654,27 @@ class StructuralPaperTrader:
             f"👻 [{experiment_name}] CF {sig.get('strategy','')} {symbol} {sig.get('signal','')} "
             f"| Rejected: {sig['rejection_reasons']}"
         )
-        self._enter_position(sig, now, trade_key, is_counterfactual=True)
+        self._enter_position(sig, now, trade_key, is_counterfactual=True, snapshot=snapshot)
         return True
 
-    def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool):
+    def _resolve_exit_mgmt_params(self, experiment_name: str) -> Dict:
+        """Resolve an experiment's exit_management config, defaulting every
+        flag to today's exact behavior (structure_invalidation/atr_adaptive_
+        trailing off, tp_expansion_cap/time_stop_bars disabled). Frozen onto
+        `pos` at entry so a position's exit behavior never changes mid-trade
+        even if the experiment's registered params are edited later.
+        """
+        exp = self.registry.get(experiment_name)
+        cfg = (exp.params.get('exit_management') if exp and isinstance(exp.params, dict) else None) or {}
+        return {
+            'structure_invalidation': bool(cfg.get('structure_invalidation', False)),
+            'atr_adaptive_trailing': bool(cfg.get('atr_adaptive_trailing', False)),
+            'tp_expansion_cap': cfg.get('tp_expansion_cap'),
+            'time_stop_bars': cfg.get('time_stop_bars'),
+            'time_stop_min_r': cfg.get('time_stop_min_r', 0.3),
+        }
+
+    def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool, snapshot=None):
         symbol = sig['symbol']
         experiment_name = sig.get('experiment_name', 'Structural_v3.2_RVOL1.0')
         strategy_id = sig.get('strategy_id', 'structural')
@@ -2193,6 +1811,23 @@ class StructuralPaperTrader:
             diagnostics['option_symbol'] = option_contract.symbol
             diagnostics['option_premium'] = option_contract.premium
 
+        # Structural-invalidation snapshot (read-only reuse of StructureEngine's
+        # already-computed swing output — no edits to structure_engine.py or the
+        # frozen enhanced_strategy_engine.py). `snapshot` is the same MarketSnapshot
+        # that produced this signal, passed through from market_loop().
+        structure_trend_at_entry = None
+        struct_level = None
+        struct_side = None
+        if snapshot is not None and getattr(snapshot, 'market', None) and getattr(snapshot.market, 'structure', None):
+            st = snapshot.market.structure
+            structure_trend_at_entry = getattr(st, 'trend', None)
+            if sig['signal'] == 'BUY CALL' and getattr(st, 'last_swing_low', None) is not None:
+                struct_level = st.last_swing_low.price
+                struct_side = 'SWING_LOW'
+            elif sig['signal'] == 'BUY PUT' and getattr(st, 'last_swing_high', None) is not None:
+                struct_level = st.last_swing_high.price
+                struct_side = 'SWING_HIGH'
+
         pos = {
             'trade_id': trade_id if not is_counterfactual else None,
             'candidate_id': candidate_id,
@@ -2243,6 +1878,15 @@ class StructuralPaperTrader:
             'live_fill_price': None,
             'live_exit_order_id': None,
             'live_exit_fill_price': None,
+            # ── Context-aware exit management (opt-in per experiment, see
+            # Experiment.params['exit_management'] / _resolve_exit_mgmt_params) ──
+            'exit_mgmt': self._resolve_exit_mgmt_params(experiment_name),
+            'atr_at_entry': sig.get('features', {}).get('atr'),
+            'structure_trend_at_entry': structure_trend_at_entry,
+            'structure_invalidation_level': struct_level,
+            'structure_invalidation_side': struct_side,
+            'tp_expansion_count': 0,
+            'last_tp_expansion_regime': None,
         }
 
         # ── Live entry order (REAL trades only, LIVE_MODE gated) ─────────
@@ -2769,6 +2413,9 @@ class StructuralPaperTrader:
                 'pnl_calculation_method': pos.get('pnl_calculation_method'),
                 'live_exit_order_id': pos.get('live_exit_order_id'),
                 'live_exit_fill_price': pos.get('live_exit_fill_price'),
+                'atr_at_entry': pos.get('atr_at_entry'),
+                'atr_at_exit': pos.get('_atr_at_exit'),
+                'tp_expansion_count': pos.get('tp_expansion_count', 0),
             }
             self.db.save_trade_performance(perf)
         else:
@@ -2826,6 +2473,9 @@ class StructuralPaperTrader:
                 'exit_premium': pos.get('exit_premium'),
                 'option_symbol': pos.get('option_symbol'),
                 'pnl_calculation_method': pos.get('pnl_calculation_method'),
+                'atr_at_entry': pos.get('atr_at_entry'),
+                'atr_at_exit': pos.get('_atr_at_exit'),
+                'tp_expansion_count': pos.get('tp_expansion_count', 0),
             }
             self.db.save_counterfactual_result(result)
             

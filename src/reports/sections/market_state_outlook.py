@@ -24,7 +24,7 @@ from src.core.options_intelligence_engine import compute_pcr, compute_max_pain, 
 logger = logging.getLogger(__name__)
 
 SYMBOLS = {"nifty": "NSE:NIFTY50-INDEX", "banknifty": "NSE:NIFTYBANK-INDEX"}
-VIX_SYMBOL = "NSE:INDIA VIX-INDEX"
+VIX_SYMBOL = "NSE:INDIAVIX-INDEX"
 TRAILING_DAYS = 7
 
 

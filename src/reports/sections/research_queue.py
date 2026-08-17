@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 MIN_SAMPLES_HIGH = 100
 MIN_SAMPLES_MEDIUM = 40
+MIN_SAMPLES_FLOOR = 10  # below this, "next step" actions are not allowed to render
 EXPECTANCY_THRESHOLD = 0.50
 
 
@@ -52,6 +53,14 @@ class ResearchQueueSection(BaseSection):
                 confidence = "Low"
                 stars = 2
 
+            if count < MIN_SAMPLES_FLOOR:
+                next_step = (
+                    f"Insufficient sample size ({count} < {MIN_SAMPLES_FLOOR}) — "
+                    "continue shadow-testing before proposing a threshold change."
+                )
+            else:
+                next_step = f"Create Experiment with {fname} threshold loosened by 20%, run for 5 days."
+
             queue.append({
                 "priority": stars,
                 "title": f"Investigate `{fname}` filter threshold",
@@ -65,7 +74,7 @@ class ResearchQueueSection(BaseSection):
                 "rolling_expectancy": round(exp, 2),
                 "sample_count": count,
                 "status": "Needs experiment",
-                "next_step": f"Create Experiment with {fname} threshold loosened by 20%, run for 5 days.",
+                "next_step": next_step,
             })
 
         # ── Hypothesis 2: Woodchopper patterns ───────────────────────────

@@ -89,16 +89,23 @@ def validate_trade_data(row: Dict[str, Any]) -> Tuple[bool, List[str]]:
             if exit_price < lowest_price - 1.0 or exit_price > highest_price + 1.0:
                 errors.append(f"exit_price ({exit_price}) outside range [{lowest_price}, {highest_price}]")
 
-        # PnL consistency check
+        # PnL consistency check — only meaningful when final_pnl_r was priced
+        # off the index-point proxy. Premium-priced trades (pnl_calculation_
+        # method == "premium", see indian_trader.py:_premium_pnl_r) express R
+        # as real option-premium P&L over premium risked — it's expected to
+        # diverge from the index-point formula below (theta/IV/delta aren't
+        # 1), so comparing them here would flag every correctly-computed
+        # premium trade as "inconsistent".
         signal_type = row.get("signal_type") or row.get("signal")
-        if signal_type and entry_price and exit_price and stop_loss_distance and stop_loss_distance > 0:
+        if (row.get("pnl_calculation_method") != "premium" and signal_type and entry_price
+                and exit_price and stop_loss_distance and stop_loss_distance > 0):
             sig_upper = str(signal_type).upper()
             is_long = "CALL" in sig_upper or ("BUY" in sig_upper and "PUT" not in sig_upper)
             if is_long:
                 expected_pnl_raw = (exit_price - entry_price) / stop_loss_distance
             else:
                 expected_pnl_raw = (entry_price - exit_price) / stop_loss_distance
-            
+
             if final_pnl_r is not None:
                 diff_with_fee = abs(final_pnl_r - (expected_pnl_raw - 0.05))
                 diff_without_fee = abs(final_pnl_r - expected_pnl_raw)

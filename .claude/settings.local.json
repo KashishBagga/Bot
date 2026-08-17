@@ -24,7 +24,27 @@
       "Bash(git log *)",
       "Bash(awk '/def _init_db/,/^    def [a-z_]+\\\\\\(self/' src/models/postgres_database.py)",
       "Bash(awk '/^    def _init_db/{f=1} f && /^    def [a-zA-Z_]+\\\\\\(self/ && !/_init_db/{exit} f' src/models/postgres_database.py)",
-      "Bash(xargs -I{} basename {})"
+      "Bash(xargs -I{} basename {})",
+      "Bash(ls /Applications | grep -i docker)",
+      "Read(//Applications/**)",
+      "Bash(colima status *)",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/core/data_quality.py'\\).read\\(\\)\\)\")",
+      "Bash(cp src/trading/indian_trader.py /tmp/indian_trader.py.bak)",
+      "Bash(sed -i '' '223,712d' src/trading/indian_trader.py)",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/backtesting/advanced_backtester.py'\\).read\\(\\)\\)\")",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/models/postgres_database.py'\\).read\\(\\)\\)\")",
+      "Read(//Users/kashishbagga/.pyenv/**)",
+      "Bash(find / -maxdepth 4 -iname \"pandas\" -type d)",
+      "Bash(python3 -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(python3 -m pip show pandas)",
+      "Bash(grep -n \"pos = {\\\\|'diagnostics': diagnostics,\\\\|self.registry.get\\(\" src/trading/indian_trader.py)",
+      "Bash(PYTHONPATH=. python3 scratch/verify_update_position.py)",
+      "Bash(python3 -m pip install schedule)",
+      "Bash(python3 -m pip install --user --break-system-packages schedule)",
+      "Bash(python3 -m pip install --user --break-system-packages pandas numpy ta SQLAlchemy psycopg2-binary python-dotenv requests websockets psutil pytz fyers-apiv3)",
+      "Bash(python3 -m pip install --user --break-system-packages scipy)",
+      "Bash(PYTHONPATH=. python3 -c ' *)",
+      "Bash(PYTHONPATH=. python3 scratch/verify_new_strategies.py)"
     ]
   }
 }

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 SYMBOLS = {
     "nifty": "NSE:NIFTY50-INDEX",
     "banknifty": "NSE:NIFTYBANK-INDEX",
-    "vix": "NSE:INDIA VIX-INDEX",
+    "vix": "NSE:INDIAVIX-INDEX",
 }
 
 

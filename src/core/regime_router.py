@@ -60,9 +60,37 @@ EXPERIMENT_REGIME_AFFINITY = {
     # Gap
     "GapRegime_v2.0":                 {"GAP"},
 
+    # Momentum / fast-reversal — pure 5m, deliberately designed to catch fast
+    # reversals that MTF strategies miss/arrive-late-to in choppy/range/
+    # compression conditions and gap days where the open itself is the burst.
+    # Excluded from TREND_UP/TREND_DOWN on purpose: in a confirmed trend,
+    # Structural_v3.2 and the trend-continuation strategies already own that
+    # regime — a momentum burst inside an already-strong trend is more likely
+    # a late/exhausted move than a genuine new one. Provisional pending a real
+    # backtest run (see experiment_factory.py); revisit once signal counts exist.
+    "MomentumBurst_5m_v1.0_RVOL2.0":  {"RANGE", "COMPRESSION", "GAP"},
+
+    # HTF Pullback — a trend-continuation-via-pullback hypothesis, so it
+    # belongs with EMA_Pullback_20_50/VWAP_Reclaim/VerticalSpread, not "ANY"
+    # like Structural_v3.2 (deliberately hybrid bounce-or-break, regime-agnostic
+    # by design). Provisional pending a real backtest run.
+    "HtfPullback_v1.0_Tol0.6pct":     {"TREND_UP", "TREND_DOWN"},
+
     # Hybrid / structural — unrestricted
     "Structural_v3.2_RVOL1.0":  "ANY",
     "Structural_v3.2_RVOL0.8":  "ANY",
+
+    # Shadow-only A/B clone of Structural_v3.2_RVOL1.0 testing the new
+    # context-aware exit management (see indian_trader.py's exit_mgmt).
+    # Empty set == never eligible for real capital under a classified regime
+    # (`category not in affinity` is always True for an empty set) — every
+    # accepted signal routes to counterfactual only, until the exit-management
+    # fix is validated via a replay-harness comparison against the baseline.
+    # NOTE: still fails open to real capital on an UNKNOWN/unclassified regime
+    # (regime_label is None or category resolves to UNKNOWN) per the router's
+    # general fail-open design — an accepted known limitation of this interim
+    # gate, not a full "never trade real" guarantee.
+    "Structural_v3.3_ExitMgmt": set(),
     "PrevDay_Extremes_RVOL1.2": "ANY",
     "Geometry_v1.0_Score35":    "ANY",
     "Geometry_v1.0_Score50":    "ANY",

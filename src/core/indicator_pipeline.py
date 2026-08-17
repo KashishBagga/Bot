@@ -21,7 +21,7 @@ from src.core.trading_clock import TradingClock
 
 
 from src.core.feature_store import FeatureStore
-from src.core.market_snapshot import MarketSnapshot
+from src.core.market_snapshot import MarketSnapshot, OptionSnapshotRow
 from src.core.structure_engine import StructureEngine
 from src.core.zone_engine import ZoneEngine, confirm_zones_with_geometry
 from src.core.volume_engine import VolumeEngine
@@ -114,6 +114,7 @@ class IndicatorPipeline:
         zone_cluster_pct: float = 0.002,
         min_zone_score: float = 50.0,
         historical_days: int = 20,
+        db=None,
     ):
         self.tod_engine = TimeOfDayEngine()
         self.pivot_engine = PivotEngine(pivot_window=pivot_window)
@@ -133,8 +134,15 @@ class IndicatorPipeline:
         self.liquidity_engine = LiquidityEngine()
         self.options_engine = OptionsIntelligenceEngine()
 
-        # Instantiate PostgresDatabase for persisting research events
-        self.db = PostgresDatabase()
+        # Persists research events (market_events) and reads live option-chain
+        # data (get_option_chain_snapshot/get_atm_oi_series). Real PostgresDatabase
+        # by default — callers replaying HISTORICAL candles (the backtester) should
+        # inject a stub here instead: writing real-time-shaped events for a
+        # replayed 2026-06-01 candle would pollute the live market_events table,
+        # and get_option_chain_snapshot/get_atm_oi_series would return TODAY's
+        # option data, not point-in-time-correct data for the replayed candle.
+        # See src/backtesting/backtest_db_stub.py.
+        self.db = db if db is not None else PostgresDatabase()
 
 
     @property
@@ -290,6 +298,16 @@ class IndicatorPipeline:
                 logger.debug(f"⚠️ OptionsIntelligenceEngine failed for {symbol}: {e}")
                 market_ctx.options = None
 
+            # Stage 8b: ATM ± depth option chain rows for OptionsScalpingStrategy.
+            # Same "never break the snapshot on missing options data" contract as
+            # Stage 8 — on any failure this stays None/empty.
+            try:
+                atm_rows = self.db.get_atm_oi_series(symbol, minutes=10)
+                atm_chain = [OptionSnapshotRow(**row) for row in atm_rows]
+            except Exception as e:
+                logger.debug(f"⚠️ ATM OI series fetch failed for {symbol}: {e}")
+                atm_chain = None
+
             # Stage 9: NarrativeEngine
             geo_ctx_temp = GeometryContext(
                 composites=composites,
@@ -381,7 +399,8 @@ class IndicatorPipeline:
                 volume_report=volume_report,
                 regime_detail=regime_label,
                 features=features,
-                market=market_ctx
+                market=market_ctx,
+                atm_chain=atm_chain
             )
 
 

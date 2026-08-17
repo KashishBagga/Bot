@@ -66,7 +66,14 @@ The live trader (`src/trading/indian_trader.py`) runs **many strategies as paral
 4. Each `Experiment` (`src/core/experiment.py`) wraps a strategy (a `BaseStrategy` subclass) + a params dict. Positions are keyed by **`(symbol, experiment_name)`**, so experiments hold independent positions simultaneously.
 5. `PortfolioManager` (`src/core/portfolio.py`) tracks per-experiment analytics as a passive observer.
 
-**To add a strategy:** subclass `BaseStrategy` (`src/core/base_strategy.py`), returning `StrategyResult` from `evaluate()`, then register one `Experiment(...)` in `indian_trader.py` (see the block of `Experiment(...)` registrations there). If adding a strategy requires editing anything else, that's hidden coupling to avoid — the framework is designed so this is the only change needed.
+**To add a strategy:** subclass `BaseStrategy` (`src/core/base_strategy.py`), returning `StrategyResult` from `evaluate()`, then register one `Experiment(...)` in `src/core/experiment_factory.py`'s `build_registry()` (the single source of truth both the live trader and `advanced_backtester.py` build from). If adding a strategy requires editing anything else, that's hidden coupling to avoid — the framework is designed so this is the only change needed.
+
+**Archetype recipe** — when a new strategy represents a genuinely different timeframe-combination hypothesis (not just a parameter variant of an existing one — e.g. `momentum_burst_5m.py`'s pure-5m no-MTF-gating approach vs. `htf_pullback_reversal.py`'s Daily+1H-supported approach), follow this checklist:
+1. **Pick the MTF surface it reads, and state explicitly what it does NOT gate on.** A pure single-timeframe strategy should read only its one timeframe + `features`/`volume_report`, and must not use `daily_bias`/`h1_structure` as an entry gate (see `momentum_burst_5m.py`). An MTF strategy should state which timeframe is "context" (gates entry, doesn't itself trigger) vs. "execution" (provides the actual trigger candle) — see `htf_pullback_reversal.py`.
+2. **Define entry/SL/TP logic** entirely inside `evaluate()` — self-contained, no shared mutable state with other strategies (see `orb.py`/`vwap_reversion.py` as templates).
+3. **Return the signal dict contract**: `symbol`, `signal` ('BUY CALL'/'BUY PUT'), `price`, `stop_loss`, `take_profit`, `tp1`, `rr_ratio`, `strategy` (setup_type), `accepted`, `rejection_reasons`, `confidence`, `features` (= `snapshot.features.to_dict()`), `diagnostics`, `candidate_id`, then call `self._tag_signal(sig, experiment_name)` before appending.
+4. **Register one `Experiment(...)`** in `experiment_factory.py`, name format `<Family>_<version>_<key_param>`.
+5. **Regime affinity is optional, not required** — `regime_router.py`'s `EXPERIMENT_REGIME_AFFINITY` fails open (unmapped = `"ANY"` = eligible for real capital in every regime); add an explicit entry only when you have a stated hypothesis about which regime the archetype should/shouldn't get real capital in. Counterfactual logging, `filter_attribution.py`, and the backtester all pick up any new registered experiment automatically.
 
 ### EnhancedStrategyEngine (v3.2) — the frozen core strategy
 

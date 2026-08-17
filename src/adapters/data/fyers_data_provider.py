@@ -16,52 +16,107 @@ from src.api.fyers import FyersClient
 
 logger = logging.getLogger(__name__)
 
+RES_MAP = {
+    "1": "1", "1m": "1",
+    "5": "5", "5m": "5",
+    "15": "15", "15m": "15",
+    "30": "30", "30m": "30",
+    "60": "60", "1h": "60",
+    "D": "D", "1D": "D", "1d": "D"
+}
+BAR_SECONDS = {"1": 60, "5": 300, "15": 900, "30": 1800, "60": 3600, "D": 86400}
+
 class FyersDataProvider(BaseDataProvider, DataProviderInterface):
     """Bridge between Market Interface and Fyers API."""
-    
+
     def __init__(self):
         self.client = FyersClient()
         self.client.initialize_client()
         self.expiry_cache = {}
+        from src.models.postgres_database import PostgresDatabase
+        self.db = PostgresDatabase()
 
-    def get_historical_data(self, symbol: str, start_date: datetime, 
-                          end_date: datetime, resolution: str) -> Optional[pd.DataFrame]:
-        """Fetch historical data and convert to pandas DataFrame."""
-        try:
-            # Map resolution to Fyers format
-            res_map = {
-                "1": "1", "1m": "1",
-                "5": "5", "5m": "5",
-                "15": "15", "15m": "15",
-                "30": "30", "30m": "30",
-                "60": "60", "1h": "60",
-                "D": "D", "1D": "D", "1d": "D"
-            }
-            fyers_res = res_map.get(resolution, resolution)
-            
-            data = self.client.get_historical_data(symbol, start_date, end_date, fyers_res)
-            
-            if data and 'candles' in data:
-                df = pd.DataFrame(data['candles'], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-                if df.empty:
-                    return None
-                df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
-                df.set_index('timestamp', inplace=True)
-                # Convert UTC to Asia/Kolkata
-                df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
-                # Data hygiene: Fyers can return duplicate rows (the same forming
-                # candle repeated across calls), out-of-order rows, or NaN candles.
-                # Dedup (keep the freshest copy), sort chronologically, drop NaN OHLC
-                # so indicators are never computed on a corrupt/unsorted series.
-                df = df[~df.index.duplicated(keep='last')].sort_index()
-                df = df.dropna(subset=['open', 'high', 'low', 'close'])
-                if df.empty:
-                    return None
-                return df
+    def _fetch_from_fyers(self, symbol: str, start_date: datetime, end_date: datetime,
+                           fyers_res: str) -> Optional[pd.DataFrame]:
+        """Raw Fyers historical-data call, parsed into a clean DataFrame. No caching —
+        callers decide what (if anything) gets persisted."""
+        data = self.client.get_historical_data(symbol, start_date, end_date, fyers_res)
+        if not data or 'candles' not in data:
             return None
+        df = pd.DataFrame(data['candles'], columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+        if df.empty:
+            return None
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+        df.set_index('timestamp', inplace=True)
+        # Convert UTC to Asia/Kolkata
+        df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
+        # Data hygiene: Fyers can return duplicate rows (the same forming
+        # candle repeated across calls), out-of-order rows, or NaN candles.
+        # Dedup (keep the freshest copy), sort chronologically, drop NaN OHLC
+        # so indicators are never computed on a corrupt/unsorted series.
+        df = df[~df.index.duplicated(keep='last')].sort_index()
+        df = df.dropna(subset=['open', 'high', 'low', 'close'])
+        return df if not df.empty else None
+
+    def get_historical_data(self, symbol: str, start_date: datetime,
+                          end_date: datetime, resolution: str) -> Optional[pd.DataFrame]:
+        """Fetch historical OHLCV as a DataFrame, backed by the local `candles`
+        cache (src/models/postgres_database.py) so repeat requests over the
+        same historical range — backtests especially — replay from Postgres
+        instead of re-hitting the Fyers API every time. Only the gap between
+        what's cached and `end_date` (the "tail") is ever fetched live; a
+        fully-cached range makes zero Fyers calls."""
+        try:
+            fyers_res = RES_MAP.get(resolution, resolution)
+            bar_td = timedelta(seconds=BAR_SECONDS.get(fyers_res, 300))
+
+            cached_rows = self.db.get_candles(symbol, fyers_res, start_date, end_date)
+
+            head_gap = not cached_rows or (cached_rows[0]["time"] - start_date) > bar_td
+            if head_gap:
+                # No usable cache for this range at all — fetch it in full and
+                # seed the cache so subsequent calls hit it.
+                df = self._fetch_from_fyers(symbol, start_date, end_date, fyers_res)
+                if df is not None:
+                    self.db.save_candles(symbol, fyers_res, self._df_to_rows(df))
+                return df
+
+            tail_gap = (end_date - cached_rows[-1]["time"]) > bar_td
+            if not tail_gap:
+                # Cache fully covers the requested range — no Fyers call needed.
+                return self._rows_to_df(cached_rows)
+
+            # Only the tail is stale/missing — fetch from the last cached bar
+            # onward (this naturally re-fetches and re-upserts the last,
+            # still-forming bar too, which is harmless — see save_candles).
+            fresh = self._fetch_from_fyers(symbol, cached_rows[-1]["time"], end_date, fyers_res)
+            if fresh is not None:
+                self.db.save_candles(symbol, fyers_res, self._df_to_rows(fresh))
+            merged = self._rows_to_df(cached_rows)
+            if fresh is not None:
+                merged = pd.concat([merged, fresh])
+                merged = merged[~merged.index.duplicated(keep='last')].sort_index()
+            return merged if not merged.empty else None
         except Exception as e:
             logger.error(f"❌ Error in FyersDataProvider.get_historical_data: {e}")
             return None
+
+    @staticmethod
+    def _df_to_rows(df: pd.DataFrame) -> List[Dict[str, Any]]:
+        return [
+            {"time": ts.to_pydatetime(), "open": float(r.open), "high": float(r.high),
+             "low": float(r.low), "close": float(r.close),
+             "volume": int(r.volume) if pd.notna(r.volume) else None}
+            for ts, r in df.iterrows()
+        ]
+
+    @staticmethod
+    def _rows_to_df(rows: List[Dict[str, Any]]) -> pd.DataFrame:
+        df = pd.DataFrame(rows)
+        df["time"] = pd.to_datetime(df["time"], utc=True).dt.tz_convert('Asia/Kolkata')
+        df.set_index("time", inplace=True)
+        df.index.name = "timestamp"
+        return df
 
     def get_current_price(self, symbol: str) -> Optional[float]:
         """Get live LTP for a symbol."""

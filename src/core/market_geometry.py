@@ -527,6 +527,8 @@ class LevelsView:
     def nearest(self) -> Optional[CompositeLevel]:            return self._nearest
     def nearest_support(self) -> Optional[CompositeLevel]:    return self._nearest_support
     def nearest_resistance(self) -> Optional[CompositeLevel]: return self._nearest_resistance
+    def support(self) -> Tuple[CompositeLevel, ...]:          return self._support
+    def resistance(self) -> Tuple[CompositeLevel, ...]:       return self._resistance
     def above_price(self) -> Tuple[CompositeLevel, ...]:      return self._above
     def below_price(self) -> Tuple[CompositeLevel, ...]:      return self._below
     def round_numbers(self) -> Tuple[CompositeLevel, ...]:    return self._rounds

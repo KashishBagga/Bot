@@ -70,14 +70,8 @@ class PreMarketCollector:
         """Fetch pre-open indicative price from Fyers quotes endpoint."""
         try:
             provider = self._get_provider()
-            quote = provider.client.quotes(symbol)
-            if quote and "ltp" in quote:
-                return float(quote["ltp"])
-            # Some brokers expose indicative price under different keys
-            for key in ("indicative_price", "prev_close", "close"):
-                if quote and key in quote:
-                    return float(quote[key])
-            return None
+            price = provider.get_current_price(symbol)
+            return price if price else None
         except Exception as e:
             logger.warning(f"[PreMarketCollector] indicative price fetch failed for {symbol}: {e}")
             return None

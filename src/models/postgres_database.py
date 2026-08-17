@@ -401,6 +401,17 @@ class PostgresDatabase:
                     cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS option_symbol TEXT")
                     cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS pnl_calculation_method TEXT")
 
+                    # Context-aware exit management (opt-in per experiment via
+                    # Experiment.params['exit_management']) — aggregatable across
+                    # the whole book, so these get first-class columns rather than
+                    # living only in the diagnostics JSONB blob.
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS atr_at_entry REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS atr_at_exit REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS tp_expansion_count INTEGER DEFAULT 0")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS atr_at_entry REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS atr_at_exit REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS tp_expansion_count INTEGER DEFAULT 0")
+
                     # Circuit breaker: persisted so a data-feed-down halt survives
                     # a restart and shows up in the dashboard/report, not just logs.
                     cursor.execute('''
@@ -664,6 +675,64 @@ class PostgresDatabase:
                         "ON premarket_snapshots(symbol, date DESC)"
                     )
 
+                    # Historical OHLC candle store — every bar the system has ever
+                    # fetched from Fyers, kept locally so backtests/research replay
+                    # from Postgres instead of re-hitting the live API every run.
+                    # `timeframe` is the Fyers resolution string ("1","5","15","30",
+                    # "60","D") so it lines up 1:1 with FyersDataProvider's res_map.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS candles (
+                            symbol    TEXT        NOT NULL,
+                            timeframe TEXT        NOT NULL,
+                            time      TIMESTAMPTZ NOT NULL,
+                            open      REAL        NOT NULL,
+                            high      REAL        NOT NULL,
+                            low       REAL        NOT NULL,
+                            close     REAL        NOT NULL,
+                            volume    BIGINT,
+                            PRIMARY KEY (symbol, timeframe, time)
+                        )
+                    ''')
+
+                    # Backtest run metadata — one row per src/backtesting/advanced_backtester.py
+                    # run, so results are comparable across runs/parameter iterations instead of
+                    # living only in a throwaway backtest_runs/*.log file.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS backtest_runs (
+                            run_id                TEXT        PRIMARY KEY,
+                            created_at             TIMESTAMPTZ NOT NULL,
+                            days                    INTEGER,
+                            symbols                 TEXT[],
+                            overall_trades          INTEGER,
+                            overall_win_rate        REAL,
+                            overall_total_r         REAL,
+                            overall_expectancy      REAL,
+                            combo_signals_skipped   INTEGER,
+                            eval_errors             INTEGER,
+                            per_experiment          JSONB
+                        )
+                    ''')
+
+                    # Per-trade rows for a backtest run — mirrors trade_performance's shape
+                    # closely enough that parity_engine.py can compare the two directly.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS backtest_trades (
+                            run_id          TEXT        NOT NULL,
+                            entry_time      TIMESTAMPTZ NOT NULL,
+                            exit_time       TIMESTAMPTZ,
+                            symbol          TEXT        NOT NULL,
+                            experiment_name TEXT        NOT NULL,
+                            signal_type     TEXT,
+                            entry_price     REAL,
+                            stop_loss       REAL,
+                            take_profit     REAL,
+                            exit_price      REAL,
+                            exit_reason     TEXT,
+                            pnl_r           REAL,
+                            PRIMARY KEY (run_id, entry_time, symbol, experiment_name)
+                        )
+                    ''')
+
                 conn.commit()
 
                 logger.info("✅ PostgreSQL tables and migrations checked/initialized")
@@ -700,6 +769,14 @@ class PostgresDatabase:
                         pass
                     try:
                         cursor.execute("SELECT create_hypertable('market_events', 'timestamp', if_not_exists => TRUE)")
+                    except Exception:
+                        pass
+                    try:
+                        cursor.execute("SELECT create_hypertable('candles', 'time', if_not_exists => TRUE)")
+                    except Exception:
+                        pass
+                    try:
+                        cursor.execute("SELECT create_hypertable('backtest_trades', 'entry_time', if_not_exists => TRUE)")
                     except Exception:
                         pass
 
@@ -739,6 +816,26 @@ class PostgresDatabase:
                         ''')
                     except Exception as e:
                         logger.warning(f"⚠️ TimescaleDB retention policy not registered: {e}")
+
+                    # Create Retention Policy on option_snapshots (90 days) — it had
+                    # none, growing unbounded at ~60s x ATM+-5 strikes x 2 underlyings
+                    # (see OptionWarehouse). Consuming strategies only ever look back
+                    # 10 minutes (get_atm_oi_series); 90 days keeps months of research
+                    # history without unbounded growth.
+                    try:
+                        cursor.execute('''
+                            DO $$
+                            BEGIN
+                                IF NOT EXISTS (
+                                    SELECT 1 FROM timescaledb_information.jobs
+                                    WHERE proc_name = 'policy_retention' AND hypertable_name = 'option_snapshots'
+                                ) THEN
+                                    PERFORM add_retention_policy('option_snapshots', INTERVAL '90 days');
+                                END IF;
+                            END $$;
+                        ''')
+                    except Exception as e:
+                        logger.warning(f"⚠️ TimescaleDB retention policy not registered for option_snapshots: {e}")
 
                 conn.commit()
                 logger.info("✅ Option snapshots & audits converted to hypertables, indexes generated")
@@ -828,6 +925,129 @@ class PostgresDatabase:
                     ]
         except Exception as e:
             logger.error(f"get_atm_oi_series error: {e}")
+            return []
+
+    def save_candles(self, symbol: str, timeframe: str, rows: List[Dict[str, Any]]):
+        """Upsert OHLCV bars into the local candle cache. `rows` items need
+        time/open/high/low/close/volume keys (as produced by get_candles's
+        reverse — see FyersDataProvider). ON CONFLICT DO NOTHING since a bar's
+        OHLCV never changes once its window has closed; the only bar worth
+        re-fetching is the still-forming one, which the caller re-saves next
+        cycle with the same (symbol, timeframe, time) key harmlessly."""
+        if not rows:
+            return
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    values = [
+                        (symbol, timeframe, r["time"], r["open"], r["high"],
+                         r["low"], r["close"], r.get("volume"))
+                        for r in rows
+                    ]
+                    execute_values(cursor, '''
+                        INSERT INTO candles (symbol, timeframe, time, open, high, low, close, volume)
+                        VALUES %s
+                        ON CONFLICT (symbol, timeframe, time) DO NOTHING
+                    ''', values)
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ save_candles error for {symbol}/{timeframe}: {e}")
+
+    def get_candles(self, symbol: str, timeframe: str, start: datetime, end: datetime) -> List[Dict[str, Any]]:
+        """Fetch cached OHLCV bars for symbol/timeframe within [start, end],
+        ordered by time ASC. Returns raw dicts; caller (FyersDataProvider)
+        builds the DataFrame so this module stays pandas-free."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute('''
+                        SELECT time, open, high, low, close, volume
+                        FROM candles
+                        WHERE symbol = %s AND timeframe = %s
+                          AND time >= %s AND time <= %s
+                        ORDER BY time ASC
+                    ''', (symbol, timeframe, start, end))
+                    return [
+                        {
+                            "time": r[0], "open": r[1], "high": r[2],
+                            "low": r[3], "close": r[4], "volume": r[5],
+                        }
+                        for r in cur.fetchall()
+                    ]
+        except Exception as e:
+            logger.error(f"❌ get_candles error for {symbol}/{timeframe}: {e}")
+            return []
+
+    def save_backtest_run(self, run: Dict[str, Any]):
+        """Persist one src/backtesting/advanced_backtester.py run's config + summary."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute('''
+                        INSERT INTO backtest_runs (
+                            run_id, created_at, days, symbols, overall_trades,
+                            overall_win_rate, overall_total_r, overall_expectancy,
+                            combo_signals_skipped, eval_errors, per_experiment
+                        ) VALUES (%(run_id)s, %(created_at)s, %(days)s, %(symbols)s, %(overall_trades)s,
+                                  %(overall_win_rate)s, %(overall_total_r)s, %(overall_expectancy)s,
+                                  %(combo_signals_skipped)s, %(eval_errors)s, %(per_experiment)s)
+                        ON CONFLICT (run_id) DO UPDATE SET
+                            overall_trades = EXCLUDED.overall_trades,
+                            overall_win_rate = EXCLUDED.overall_win_rate,
+                            overall_total_r = EXCLUDED.overall_total_r,
+                            overall_expectancy = EXCLUDED.overall_expectancy,
+                            combo_signals_skipped = EXCLUDED.combo_signals_skipped,
+                            eval_errors = EXCLUDED.eval_errors,
+                            per_experiment = EXCLUDED.per_experiment
+                    ''', {**run, "per_experiment": json.dumps(run.get("per_experiment", {}), cls=NumpyEncoder)})
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ save_backtest_run error: {e}")
+
+    def save_backtest_trades(self, run_id: str, trades: List[Dict[str, Any]]):
+        """Persist a backtest run's per-trade rows. `trades` items are the
+        TransparentBacktester trade_detail dicts (time/entry_time/exit_time/
+        symbol/experiment/signal/entry/sl_target/tp_target/exit/reason_exit/pnl_r)."""
+        if not trades:
+            return
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    values = [
+                        (run_id, t["entry_time"], t.get("exit_time"), t["symbol"], t["experiment"],
+                         t.get("signal"), t.get("entry"), t.get("sl_target"), t.get("tp_target"),
+                         t.get("exit"), t.get("reason_exit"), t.get("pnl_r"))
+                        for t in trades
+                    ]
+                    execute_values(cursor, '''
+                        INSERT INTO backtest_trades (
+                            run_id, entry_time, exit_time, symbol, experiment_name,
+                            signal_type, entry_price, stop_loss, take_profit,
+                            exit_price, exit_reason, pnl_r
+                        ) VALUES %s
+                        ON CONFLICT (run_id, entry_time, symbol, experiment_name) DO NOTHING
+                    ''', values)
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ save_backtest_trades error: {e}")
+
+    def get_backtest_trades(self, run_id: str) -> List[Dict[str, Any]]:
+        """Fetch every trade row for a given backtest run_id, ordered by entry_time ASC."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute('''
+                        SELECT entry_time, exit_time, symbol, experiment_name, signal_type,
+                               entry_price, stop_loss, take_profit, exit_price, exit_reason, pnl_r
+                        FROM backtest_trades
+                        WHERE run_id = %s
+                        ORDER BY entry_time ASC
+                    ''', (run_id,))
+                    cols = ["entry_time", "exit_time", "symbol", "experiment_name", "signal_type",
+                            "entry_price", "stop_loss", "take_profit", "exit_price", "exit_reason", "pnl_r"]
+                    return [dict(zip(cols, r)) for r in cur.fetchall()]
+        except Exception as e:
+            logger.error(f"❌ get_backtest_trades error for run {run_id}: {e}")
             return []
 
     def get_premarket_data(self, symbol: str, date) -> Optional[Dict[str, Any]]:
@@ -1079,7 +1299,10 @@ class PostgresDatabase:
                         entry_premium = EXCLUDED.entry_premium,
                         exit_premium = EXCLUDED.exit_premium,
                         option_symbol = EXCLUDED.option_symbol,
-                        pnl_calculation_method = EXCLUDED.pnl_calculation_method
+                        pnl_calculation_method = EXCLUDED.pnl_calculation_method,
+                        atr_at_entry = EXCLUDED.atr_at_entry,
+                        atr_at_exit = EXCLUDED.atr_at_exit,
+                        tp_expansion_count = EXCLUDED.tp_expansion_count
                     """
                     cursor.execute(query, perf_copy)
                 conn.commit()
@@ -1478,7 +1701,10 @@ class PostgresDatabase:
                         entry_premium = EXCLUDED.entry_premium,
                         exit_premium = EXCLUDED.exit_premium,
                         option_symbol = EXCLUDED.option_symbol,
-                        pnl_calculation_method = EXCLUDED.pnl_calculation_method
+                        pnl_calculation_method = EXCLUDED.pnl_calculation_method,
+                        atr_at_entry = EXCLUDED.atr_at_entry,
+                        atr_at_exit = EXCLUDED.atr_at_exit,
+                        tp_expansion_count = EXCLUDED.tp_expansion_count
                     """
                     cursor.execute(query, result_copy)
                 conn.commit()

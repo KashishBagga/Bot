@@ -27,7 +27,8 @@
       "Bash(find / -maxdepth 4 -iname \"pandas\" -type d)",
       "Bash(awk 'NR==2512,NR==2700' /Users/kashishbagga/Desktop/Bot/src/trading/indian_trader.py)",
       "Bash(awk -F: '$1>2512')",
-      "Bash(python3 -m py_compile src/config/settings.py src/execution/fyers_order_executor.py src/trading/indian_trader.py src/models/postgres_database.py)"
+      "Bash(python3 -m py_compile src/config/settings.py src/execution/fyers_order_executor.py src/trading/indian_trader.py src/models/postgres_database.py)",
+      "Bash(python3 -c \"import ast; [ast.parse\\(open\\(f\\).read\\(\\)\\) for f in ['src/core/market_geometry.py','src/warehouse/premarket_collector.py','src/reports/sections/executive_summary.py','src/reports/sections/market_state_outlook.py']]\")"
     ]
   }
 }
