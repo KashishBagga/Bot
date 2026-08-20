@@ -37,6 +37,8 @@ class MomentumBurst5mStrategy(BaseStrategy):
             "follow-through, catches fast moves that MTF-gated strategies arrive late to."
         ),
         version="v1.0",
+        archetype="Momentum",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["momentum", "5m_only", "no_mtf_gating"],
     )

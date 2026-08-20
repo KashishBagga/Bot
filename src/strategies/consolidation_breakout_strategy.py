@@ -58,6 +58,8 @@ class ConsolidationBreakoutStrategy(BaseStrategy):
             "RVOL confirmation produce positive expectancy over ≥200 PAPER trades."
         ),
         version="v1.0",
+        archetype="Breakout",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["breakout", "consolidation", "squeeze", "h1", "m5", "rvol"],
         expected_holding=(15, 60),

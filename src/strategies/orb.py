@@ -32,6 +32,8 @@ class OrbStrategy(BaseStrategy):
         hypothesis_family="Breakouts",
         hypothesis_text="Trades momentum breakouts of the session's initial high-low range.",
         version="v1.0",
+        archetype="Breakout",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["orb", "opening", "breakout"]
     )

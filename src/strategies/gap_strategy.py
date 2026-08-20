@@ -43,6 +43,8 @@ class GapStrategy(BaseStrategy):
             "after the open, not assumed in advance."
         ),
         version="v2.0",
+        archetype="Gap",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["gap", "continuation", "reversion", "opening"],
     )

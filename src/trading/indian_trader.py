@@ -1807,6 +1807,14 @@ class StructuralPaperTrader:
             diagnostics = {"raw": diagnostics}
         diagnostics['position_size_inr'] = position_size_inr
         diagnostics['lots'] = lots
+        # Carry OI_Scalping_v1.0's own premium-cost-model inputs through to exit
+        # (see estimate_costs() in options_scalping_strategy.py) — absent (None)
+        # for every other strategy's signal, so this is a no-op elsewhere.
+        if 'stop_premium' in sig:
+            diagnostics['entry_ask'] = sig.get('entry_ask')
+            diagnostics['stop_premium'] = sig.get('stop_premium')
+            diagnostics['target_premium'] = sig.get('target_premium')
+            diagnostics['risk_per_lot'] = sig.get('risk_per_lot')
         if option_contract:
             diagnostics['option_symbol'] = option_contract.symbol
             diagnostics['option_premium'] = option_contract.premium
@@ -2259,7 +2267,31 @@ class StructuralPaperTrader:
         highest = max(pos['highest_price'], exit_price)
         lowest = min(pos['lowest_price'], exit_price)
         is_cf = pos.get('is_counterfactual', False)
-        
+
+        # Statutory transaction costs (brokerage/STT/exchange/GST) for strategies
+        # carrying their own premium cost model (currently only OI_Scalping_v1.0
+        # — see estimate_costs() in options_scalping_strategy.py). Bid/ask spread
+        # cost is deliberately NOT modeled here — it's already priced into pnl_r
+        # via the ask-entry/bid-exit fill convention (_premium_pnl_r /
+        # realistic_fill_price). Applied to both real and CF exits, same as the
+        # index-proxy -0.05 buffer, so real-vs-CF expectancy comparisons in
+        # filter_attribution.py stay on equal footing.
+        diag = pos.get('diagnostics') or {}
+        if diag.get('entry_ask') is not None and pos.get('exit_premium') is not None and pos.get('lot_size'):
+            from src.strategies.options_scalping_strategy import estimate_costs
+            risk_per_lot = diag.get('risk_per_lot') or (stop_loss_distance * pos.get('lot_size', 1))
+            if risk_per_lot > 0:
+                cost_breakdown = estimate_costs(
+                    entry_ask=diag['entry_ask'], exit_bid=pos['exit_premium'],
+                    lot_size=pos['lot_size'], risk_per_lot=risk_per_lot,
+                )
+                statutory_cost_r = round(cost_breakdown['total_cost'] / risk_per_lot, 4)
+                diag['costs'] = cost_breakdown
+                diag['gross_pnl_r_before_costs'] = pnl_r
+                pnl_r = round(pnl_r - statutory_cost_r, 4)
+                diag['net_pnl_r'] = pnl_r
+                pos['diagnostics'] = diag
+
         # Excursions
         if pos['signal'] == 'BUY CALL':
             mfe_r = (highest - entry_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0

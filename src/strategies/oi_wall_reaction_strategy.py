@@ -63,6 +63,8 @@ class OIWallReactionStrategy(BaseStrategy):
             "and continues once an RVOL-confirmed break invalidates the wall."
         ),
         version="v1.0",
+        archetype="Hybrid",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["options", "open-interest", "oi-wall", "fade", "breakout"],
     )

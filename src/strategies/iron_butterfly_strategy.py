@@ -39,6 +39,8 @@ class IronButterflyStrategy(BaseStrategy):
             "tighter band around the short strike."
         ),
         version="v1.0",
+        archetype="Theta-Harvest",
+        exit_profile="PREMIUM_TARGET_R",
         maturity="RESEARCH",
         tags=["options", "iron-butterfly", "combo", "neutral", "theta"],
     )

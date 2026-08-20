@@ -32,6 +32,8 @@ class AtrSqueezeStrategy(BaseStrategy):
         hypothesis_family="Volatility Expansion",
         hypothesis_text="Trades momentum breakouts out of low volatility compression (low ATR percentile) periods.",
         version="v1.0",
+        archetype="Breakout",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["atr", "squeeze", "compression", "breakout"]
     )

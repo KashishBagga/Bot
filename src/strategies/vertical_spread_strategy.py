@@ -39,6 +39,8 @@ class VerticalSpreadStrategy(BaseStrategy):
             "directional thesis, cheaper premium, defined max profit."
         ),
         version="v1.0",
+        archetype="Trend-Continuation",
+        exit_profile="PREMIUM_TARGET_R",
         maturity="RESEARCH",
         tags=["options", "vertical-spread", "combo", "directional"],
     )

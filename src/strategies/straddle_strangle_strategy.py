@@ -48,6 +48,8 @@ class StraddleStrangleStrategy(BaseStrategy):
             "vol as a proxy — this system has no implied-volatility data."
         ),
         version="v1.0",
+        archetype="Volatility",
+        exit_profile="PREMIUM_TARGET_R",
         maturity="RESEARCH",
         tags=["options", "straddle", "strangle", "combo", "volatility"],
     )

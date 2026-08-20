@@ -45,6 +45,8 @@ class StructuralStrategy(BaseStrategy):
         hypothesis_family="Structural",
         hypothesis_text="Trades sweeps, breakouts, and traps aligned with macro structure.",
         version="v3.2",
+        archetype="Structural",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="LIVE",
         tags=["structure", "sweep", "breakout", "trap"]
     )

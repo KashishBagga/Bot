@@ -202,6 +202,8 @@ class GeometryStrategy(BaseStrategy):
             "Narrative bias gates the direction."
         ),
         version="v1.0",
+        archetype="Hybrid",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["geometry", "confluence", "structure", "trendline", "reversal"],
     )

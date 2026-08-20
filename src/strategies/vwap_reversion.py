@@ -29,6 +29,8 @@ class VwapReversionStrategy(BaseStrategy):
         hypothesis_family="Mean Reversion",
         hypothesis_text="Trades reversion to VWAP when price is overstretched and prints a rejection candle.",
         version="v1.0",
+        archetype="Mean-Reversion",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["mean_reversion", "vwap", "stretch"]
     )

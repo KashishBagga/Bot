@@ -150,26 +150,30 @@ def estimate_costs(
     risk_per_lot: float,
 ) -> Dict[str, float]:
     """
-    Realistic per-lot cost model for NSE index options (single-leg long).
-    Returns costs in rupees and as a fraction of risk_per_lot (in R units).
+    Statutory transaction costs for NSE index options (single-leg long):
+    brokerage, STT, exchange charges, GST. Returns costs in rupees and as a
+    fraction of risk_per_lot (in R units).
+
+    Deliberately excludes bid/ask spread cost. A prior version tried to
+    derive it from entry_ask/exit_bid alone via an implied "mid" — but those
+    two numbers can't disentangle "cost of the spread" from "the market
+    moved", so on any winning trade (exit_bid > entry_ask, the normal case
+    for a long option hitting target) it came out strongly *negative*,
+    silently crediting instead of charging. It was also redundant: the real
+    round-trip spread cost is already priced into pnl_r via the ask-in/
+    bid-out fill convention (_premium_pnl_r / realistic_fill_price in
+    indian_trader.py) — charging it again here would double-count it even
+    if the formula were fixed. Removed rather than patched.
     """
-    mid_entry = entry_ask - (entry_ask - exit_bid) / 2  # approximate mid
-    mid_exit  = exit_bid  + (entry_ask - exit_bid) / 2
-
-    entry_slippage = entry_ask - mid_entry
-    exit_slippage  = mid_exit  - exit_bid
-    spread_cost    = (entry_slippage + exit_slippage) * lot_size
-
     brokerage = 20.0 * 2                                    # ₹20 flat per leg
     stt       = exit_bid * lot_size * 0.000625             # 0.0625% on sell
     exchange  = (entry_ask + exit_bid) * lot_size * 0.0006 # ~0.06% turnover
     gst       = (brokerage + exchange) * 0.18
 
-    total = spread_cost + brokerage + stt + exchange + gst
+    total = brokerage + stt + exchange + gst
     cost_in_r = total / risk_per_lot if risk_per_lot > 0 else 0.0
 
     return {
-        "spread_cost":  round(spread_cost, 2),
         "brokerage":    round(brokerage,   2),
         "stt":          round(stt,         2),
         "exchange":     round(exchange,    2),
@@ -201,8 +205,15 @@ class OptionsScalpingStrategy(BaseStrategy):
             "produces positive expectancy after transaction costs."
         ),
         version="v1.0",
+        archetype="OptionsFlow",
+        # Was PREMIUM_UNWIRED: the signal previously had no stop_loss/take_profit/
+        # rr_ratio, which crashed indian_trader.py's market_loop() the moment this
+        # signal was ever accepted (see options_scalping_strategy.py's STEP 9 —
+        # stop_premium/target_premium are now also mapped into index-price terms
+        # via entry delta so the shared single-leg engine can manage the position).
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
-        tags=["options", "oi", "premium", "scalp", "greeks"],
+        tags=["options", "oi", "premium", "scalp", "greeks", "delta_mapped_exit"],
         expected_holding=(5, 15),
     )
 
@@ -398,6 +409,36 @@ class OptionsScalpingStrategy(BaseStrategy):
             risk_per_unit  = entry_ask - stop_premium
             risk_per_lot   = risk_per_unit * lot
 
+            # indian_trader.py's single-leg engine (_enter_position/_update_position)
+            # decides SL/TP hits off INDEX price, not option premium — it has no
+            # combo_legs-style alternate path for a premium-only signal. Without an
+            # index-price stop_loss/take_profit/rr_ratio, an accepted signal here
+            # crashes market_loop() at `sig['stop_loss']`. Translate the premium
+            # stop/target into index-price terms via entry delta (linear
+            # approximation — gamma/theta drift over the trade's life, but this is
+            # a v1/PAPER strategy; an approximate index-mapped exit beats a crash).
+            # The original premium fields are kept below for audit/diagnostics —
+            # this mapping is purely to satisfy the shared exit engine's contract.
+            MIN_DELTA_FOR_INDEX_MAPPING = 0.05
+            abs_delta = abs(greeks.get("delta") or 0.0)
+            if abs_delta < MIN_DELTA_FOR_INDEX_MAPPING:
+                rejection_reasons.append(f"DELTA_TOO_LOW:{abs_delta:.3f}")
+                index_stop_dist = 0.0
+                index_target_dist = 0.0
+            else:
+                index_stop_dist = risk_per_unit / abs_delta
+                index_target_dist = (target_premium - entry_ask) / abs_delta
+
+            if direction == "BUY CALL":
+                stop_loss = spot - index_stop_dist
+                take_profit = spot + index_target_dist
+                tp1 = spot + 1.5 * index_stop_dist
+            else:
+                stop_loss = spot + index_stop_dist
+                take_profit = spot - index_target_dist
+                tp1 = spot - 1.5 * index_stop_dist
+            rr_ratio = round(index_target_dist / index_stop_dist, 3) if index_stop_dist > 0 else 0.0
+
             accepted = len(rejection_reasons) == 0
             candidate_id = (
                 f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}"
@@ -412,6 +453,11 @@ class OptionsScalpingStrategy(BaseStrategy):
                 "option_type":        option_type,
                 "strike":             strike,
                 "price":              spot,
+                # ── Index-price terms for the shared single-leg exit engine ──
+                "stop_loss":          round(stop_loss, 2),
+                "take_profit":        round(take_profit, 2),
+                "tp1":                round(tp1, 2),
+                "rr_ratio":           rr_ratio,
                 # ── Execution prices (executable, not LTP) ────────────────
                 "entry_ask":          entry_ask,
                 "stop_premium":       stop_premium,
@@ -425,11 +471,13 @@ class OptionsScalpingStrategy(BaseStrategy):
                 "gamma":              greeks.get("gamma"),
                 "theta":              greeks.get("theta"),
                 "iv":                 round(iv, 4) if greeks_valid else None,
-                # ── P&L tracking (filled on close) ────────────────────────
-                "realized_pnl":       None,
-                "realized_R":         None,
-                "costs":              None,
-                "net_R":              None,
+                # P&L/cost tracking now happens downstream, at exit, in
+                # indian_trader.py's _exit_position() — it calls estimate_costs()
+                # below with the real exit fill and writes the breakdown into
+                # pos['diagnostics']['costs'] / 'net_pnl_r' / 'gross_pnl_r_before_costs'
+                # (persisted via the standard diagnostics JSON column on both
+                # trade_performance and counterfactual_results). Nothing to
+                # pre-populate here at signal time — the exit fill doesn't exist yet.
                 # ── Signal metadata ───────────────────────────────────────
                 "timestamp":          now.isoformat(),
                 "accepted":           accepted,

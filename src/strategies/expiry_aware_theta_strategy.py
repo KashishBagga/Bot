@@ -53,6 +53,8 @@ class ExpiryAwareThetaStrategy(BaseStrategy):
             "one fixed configuration regardless of where we are in the cycle."
         ),
         version="v1.0",
+        archetype="Theta-Harvest",
+        exit_profile="PREMIUM_TARGET_R",
         maturity="RESEARCH",
         tags=["options", "iron-condor", "combo", "theta", "expiry-aware"],
     )

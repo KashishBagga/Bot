@@ -30,6 +30,8 @@ class PrevDayExtremesStrategy(BaseStrategy):
         hypothesis_family="Liquidity Sweeps",
         hypothesis_text="Trades sweeps (fakeouts) or volume-backed breakouts of the previous day's high/low.",
         version="v1.0",
+        archetype="Hybrid",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["prev_day", "reversal", "breakout", "liquidity"]
     )

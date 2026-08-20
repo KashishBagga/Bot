@@ -32,6 +32,8 @@ class ButterflyStrategy(BaseStrategy):
             "with defined risk if price remains close to the sold strike."
         ),
         version="v1.0",
+        archetype="Theta-Harvest",
+        exit_profile="PREMIUM_TARGET_R",
         maturity="RESEARCH",
         tags=["options", "butterfly", "combo", "neutral", "decay"],
     )

@@ -70,6 +70,8 @@ class PCRExtremeReversalStrategy(BaseStrategy):
             "at a genuine confluence zone is a contrarian reversal signal."
         ),
         version="v1.0",
+        archetype="Mean-Reversion",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["options", "pcr", "put-call-ratio", "reversal", "contrarian"],
     )

@@ -43,6 +43,8 @@ class CprStrategy(BaseStrategy):
             "move away from yesterday's value area."
         ),
         version="v1.0",
+        archetype="Breakout",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["cpr", "pivot", "breakout", "india"],
     )

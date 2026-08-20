@@ -50,6 +50,8 @@ class RelativeValueStrategy(BaseStrategy):
             "either index's own trend or range state."
         ),
         version="v1.0",
+        archetype="RelativeValue",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["relative_value", "pairs", "mean_reversion", "cross_symbol"],
     )

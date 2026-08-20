@@ -29,6 +29,8 @@ class EmaPullbackStrategy(BaseStrategy):
         hypothesis_family="Trend Following",
         hypothesis_text="Trades resumption of established trends after a pullback to the 20 EMA.",
         version="v1.0",
+        archetype="Trend-Continuation",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["trend", "ema", "pullback"]
     )

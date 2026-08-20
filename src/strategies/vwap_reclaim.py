@@ -35,6 +35,8 @@ class VwapReclaimStrategy(BaseStrategy):
             "opposite thesis from fading an overstretched VWAP deviation."
         ),
         version="v1.0",
+        archetype="Trend-Continuation",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["vwap", "reclaim", "continuation", "trend"],
     )

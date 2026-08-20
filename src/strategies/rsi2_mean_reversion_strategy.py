@@ -57,6 +57,8 @@ class Rsi2MeanReversionStrategy(BaseStrategy):
             "back toward the short-term mean (EMA20) rather than continue."
         ),
         version="v1.0",
+        archetype="Mean-Reversion",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["mean_reversion", "rsi", "oscillator"],
     )

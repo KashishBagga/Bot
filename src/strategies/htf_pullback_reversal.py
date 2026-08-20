@@ -36,6 +36,8 @@ class HtfPullbackReversalStrategy(BaseStrategy):
             "from structural zone/fractal breaks."
         ),
         version="v1.0",
+        archetype="Trend-Continuation",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="PAPER",
         tags=["trend_continuation", "mtf", "ema_pullback"],
     )

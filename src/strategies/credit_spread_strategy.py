@@ -43,6 +43,8 @@ class CreditSpreadStrategy(BaseStrategy):
             "unlikely to reach, rather than paying for a directional bet."
         ),
         version="v1.0",
+        archetype="Mean-Reversion",
+        exit_profile="PREMIUM_TARGET_R",
         maturity="RESEARCH",
         tags=["options", "credit-spread", "combo", "mean-reversion", "theta"],
     )

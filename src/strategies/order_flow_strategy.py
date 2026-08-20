@@ -61,6 +61,8 @@ class OrderFlowStrategy(BaseStrategy):
             "Reversal confirmations at these zones yield high-probability, high-R setups."
         ),
         version="v1.0",
+        archetype="Hybrid",
+        exit_profile="INDEX_TP_EXPANSION",
         maturity="RESEARCH",
         tags=["order-flow", "liquidity", "imbalance", "fvg", "sweep"],
     )

@@ -28,6 +28,38 @@ from typing import List, Dict, Any, Tuple, Optional
 
 from src.core.market_snapshot import MarketSnapshot
 
+# Controlled vocabulary for StrategyMetadata.archetype — the entry-thesis
+# category. Mirrors the informal groupings already used as comments in
+# src/core/regime_router.py's EXPERIMENT_REGIME_AFFINITY (kept in sync
+# deliberately, since that file independently arrived at the same clusters
+# while deciding regime eligibility). "Structural" and "Hybrid" are for
+# strategies with two genuinely opposing setup types (break AND fade) rather
+# than a single directional thesis — router marks these regime-unrestricted
+# ("ANY") for exactly that reason.
+ARCHETYPES = frozenset({
+    "Structural",         # sweep/breakout/trap off macro structure (flagship, frozen)
+    "Hybrid",             # dual break-or-fade setups, regime-agnostic by design
+    "Trend-Continuation", # pullback/reclaim/cross in an established trend
+    "Breakout",           # directional break of a level with volume confirmation
+    "Mean-Reversion",     # fade an overextension back toward a reference level
+    "Volatility",         # long-vol bet on realized-vol compression
+    "Theta-Harvest",      # short-vol/premium-selling combo, wants range + decay
+    "Gap",                # opening-gap continuation or fill
+    "Momentum",           # pure range-expansion + follow-through, no HTF gating
+    "RelativeValue",      # cross-symbol divergence from a rolling relationship
+    "OptionsFlow",        # signal derived from OI/premium positioning, not price structure
+})
+
+# Controlled vocabulary for StrategyMetadata.exit_profile — which exit engine
+# in src/trading/indian_trader.py actually manages this strategy's positions
+# today. Describes current wiring, not aspiration: see Tier-1 "Exit
+# Archetypes" in the platform roadmap for differentiating these further.
+EXIT_PROFILES = frozenset({
+    "INDEX_TP_EXPANSION",  # _update_position(): TP_EXPANSION/trailing/session-end on index price
+    "PREMIUM_TARGET_R",    # _update_combo_position(): target_r/stop_r on combined premium P&L
+    "PREMIUM_UNWIRED",     # strategy defines its own premium stop/target, but no consumer wires it up
+})
+
 
 @dataclass(frozen=True)
 class StrategyMetadata:
@@ -37,6 +69,8 @@ class StrategyMetadata:
     hypothesis_family: str
     hypothesis_text: str
     version: str
+    archetype: str = "Trend-Continuation"
+    exit_profile: str = "INDEX_TP_EXPANSION"
     author: str = "Kashish"
     expected_holding: Tuple[int, int] = (5, 15)
     preferred_regimes: List[str] = field(default_factory=list)
@@ -46,6 +80,16 @@ class StrategyMetadata:
     deprecated: bool = False
     maturity: str = "RESEARCH"  # RESEARCH, PAPER, SHADOW_LIVE, LIVE, RETIRED
     extras: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if self.archetype not in ARCHETYPES:
+            raise ValueError(
+                f"{self.id!r}: archetype={self.archetype!r} not in ARCHETYPES {sorted(ARCHETYPES)}"
+            )
+        if self.exit_profile not in EXIT_PROFILES:
+            raise ValueError(
+                f"{self.id!r}: exit_profile={self.exit_profile!r} not in EXIT_PROFILES {sorted(EXIT_PROFILES)}"
+            )
 
 
 @dataclass
