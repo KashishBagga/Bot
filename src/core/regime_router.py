@@ -86,10 +86,9 @@ EXPERIMENT_REGIME_AFFINITY = {
     # (`category not in affinity` is always True for an empty set) — every
     # accepted signal routes to counterfactual only, until the exit-management
     # fix is validated via a replay-harness comparison against the baseline.
-    # NOTE: still fails open to real capital on an UNKNOWN/unclassified regime
-    # (regime_label is None or category resolves to UNKNOWN) per the router's
-    # general fail-open design — an accepted known limitation of this interim
-    # gate, not a full "never trade real" guarantee.
+    # An UNKNOWN/unclassified regime now also fails CLOSED for any explicitly
+    # scoped experiment (see is_regime_eligible) — this is a true "never real
+    # capital" guarantee, not an interim one.
     "Structural_v3.3_ExitMgmt": set(),
     "PrevDay_Extremes_RVOL1.2": "ANY",
     "Geometry_v1.0_Score35":    "ANY",
@@ -103,20 +102,26 @@ def is_regime_eligible(experiment_name: str, regime_label: Optional[object]) -> 
     """True if `experiment_name` should be allowed to deploy REAL capital
     given the current `regime_label` (a RegimeLabel, or None/unavailable).
 
-    Fails open (returns True) when the regime classifier is under-confident
-    (UNKNOWN) or when an experiment has no declared affinity — a missing
-    mapping should never silently block real trades.
+    Fails open (returns True) only when an experiment has no declared
+    affinity, or explicitly declares "ANY" — a missing mapping should never
+    silently block real trades for an experiment nobody has scoped.
+
+    For experiments with an explicitly declared, non-"ANY" affinity set,
+    an under-confident regime read (UNKNOWN, or no regime_label at all)
+    fails CLOSED instead: a strategy that was deliberately scoped to e.g.
+    RANGE-only should not get real capital just because the classifier
+    couldn't confidently label the regime this cycle.
     """
     affinity = EXPERIMENT_REGIME_AFFINITY.get(experiment_name, "ANY")
     if affinity == "ANY":
         return True
 
     if regime_label is None:
-        return True
+        return False
 
     category = REGIME_CATEGORY_MAP.get(getattr(regime_label, "primary", "UNKNOWN"), "UNKNOWN")
     if category == "UNKNOWN":
-        return True
+        return False
 
     if category not in affinity:
         return False

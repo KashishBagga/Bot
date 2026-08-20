@@ -44,7 +44,17 @@
       "Bash(python3 -m pip install --user --break-system-packages pandas numpy ta SQLAlchemy psycopg2-binary python-dotenv requests websockets psutil pytz fyers-apiv3)",
       "Bash(python3 -m pip install --user --break-system-packages scipy)",
       "Bash(PYTHONPATH=. python3 -c ' *)",
-      "Bash(PYTHONPATH=. python3 scratch/verify_new_strategies.py)"
+      "Bash(PYTHONPATH=. python3 scratch/verify_new_strategies.py)",
+      "Bash(git commit -m ' *)",
+      "Bash(docker compose *)",
+      "Bash(PGPASSWORD=trading_pass psql -h 127.0.0.1 -p 5433 -U trader -d trading_warehouse -c \"select 1;\")",
+      "Bash(PYTHONPATH=. python3 src/analytics/strategy_registry_report.py)",
+      "Bash(awk 'NR>=1 && /def [a-zA-Z_]+\\\\\\(/ {print NR\": \"$0}' src/trading/indian_trader.py)",
+      "Bash(awk -F: '$1<734')",
+      "Bash(awk 'NR==497,NR==900 {print NR\": \"$0}' src/trading/indian_trader.py)",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/strategies/options_scalping_strategy.py'\\).read\\(\\)\\)\")",
+      "Bash(python3 -c \"import ast; [ast.parse\\(open\\(f\\).read\\(\\), filename=f\\) for f in ['src/strategies/options_scalping_strategy.py', 'src/trading/indian_trader.py']]\")",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/analytics/filter_attribution.py'\\).read\\(\\)\\)\")"
     ]
   }
 }
