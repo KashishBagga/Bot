@@ -1642,6 +1642,90 @@ class PostgresDatabase:
             logger.error(f"get_strategy_equity_curve failed: {e}", exc_info=True)
             return []
 
+    def get_combo_strategy_metrics(self, days: int = 30) -> list:
+        """Per-experiment performance metrics for multi-leg combo trades
+        (Butterfly/Straddle/IronCondor/etc) — the combo_trades equivalent of
+        get_strategy_metrics(). A separate query, not a UNION into the
+        single-leg one: combo_trades has no market_regime/setup_type-as-family
+        columns to group on the same way, so this aggregates by
+        experiment_name only."""
+        import math
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(f"""
+                        SELECT
+                            experiment_name, combo_type,
+                            COUNT(*) AS total_trades,
+                            SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END) AS wins,
+                            AVG(CASE WHEN final_pnl_r > 0 THEN final_pnl_r END) AS avg_winner,
+                            AVG(CASE WHEN final_pnl_r <= 0 THEN final_pnl_r END) AS avg_loser,
+                            COALESCE(SUM(CASE WHEN final_pnl_r > 0 THEN final_pnl_r END), 0) AS gross_profit,
+                            COALESCE(SUM(CASE WHEN final_pnl_r <= 0 THEN ABS(final_pnl_r) END), 0) AS gross_loss,
+                            AVG(final_pnl_r) AS mean_r,
+                            STDDEV(final_pnl_r) AS stddev_r,
+                            MIN(final_pnl_r) AS worst_r,
+                            MAX(final_pnl_r) AS best_r,
+                            AVG(duration_minutes) AS avg_hold_minutes
+                        FROM combo_trades
+                        WHERE exit_time IS NOT NULL
+                          AND final_pnl_r IS NOT NULL
+                          AND (valid IS NULL OR valid = TRUE)
+                          AND entry_time > NOW() - INTERVAL '{days} days'
+                        GROUP BY experiment_name, combo_type
+                        ORDER BY experiment_name
+                    """)
+                    rows = list(cursor.fetchall())
+            results = []
+            for row in rows:
+                r = dict(row)
+                total  = int(r.get("total_trades") or 0)
+                w      = int(r.get("wins") or 0)
+                losses = total - w
+                gp     = float(r.get("gross_profit") or 0.0)
+                gl     = float(r.get("gross_loss") or 0.0)
+                mr     = float(r.get("mean_r") or 0.0)
+                sr     = float(r.get("stddev_r") or 0.0)
+                win_r  = w / total if total > 0 else 0.0
+                pf     = gp / gl if gl > 0 else (99.0 if gp > 0 else 0.0)
+                sharpe = (mr / sr * math.sqrt(252)) if sr > 0 else 0.0
+                r.update({
+                    "win_rate": round(win_r, 4),
+                    "expectancy": round(mr, 4), "profit_factor": round(min(pf, 99.0), 3),
+                    "sharpe": round(sharpe, 3),
+                    "total_trades": total, "wins": w, "losses": losses,
+                })
+                results.append(r)
+            return results
+        except Exception as e:
+            logger.error(f"get_combo_strategy_metrics failed: {e}", exc_info=True)
+            return []
+
+    def get_combo_equity_curve(self, days: int = 30) -> list:
+        """Time-ordered closed combo trades for plotting cumulative equity
+        curves — the combo_trades equivalent of get_strategy_equity_curve()."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(f"""
+                        SELECT
+                            experiment_name, combo_type, entry_time, exit_time, final_pnl_r,
+                            SUM(final_pnl_r) OVER (
+                                PARTITION BY experiment_name ORDER BY entry_time
+                                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                            ) AS cumulative_r
+                        FROM combo_trades
+                        WHERE exit_time IS NOT NULL
+                          AND final_pnl_r IS NOT NULL
+                          AND (valid IS NULL OR valid = TRUE)
+                          AND entry_time > NOW() - INTERVAL '{days} days'
+                        ORDER BY experiment_name, entry_time
+                    """)
+                    return [dict(r) for r in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"get_combo_equity_curve failed: {e}", exc_info=True)
+            return []
+
 
     def get_open_counterfactuals(self) -> List[Dict[str, Any]]:
         """Fetch all currently open counterfactual positions for recovery"""

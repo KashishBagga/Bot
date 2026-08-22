@@ -1550,8 +1550,13 @@ class StructuralPaperTrader:
             exit_price = current_price
             exit_reason = 'TIME_STOP'
 
-        # Session force exit check (15:25 PM IST)
-        if not is_closed and timestamp.hour == 15 and timestamp.minute >= 25:
+        # Session force exit check (15:25 PM IST onward). Must stay true for
+        # every tick after the cutoff, not just hour==15 — if the tick landing
+        # in that exact window is skipped (e.g. a data-fetch failure leaves
+        # this symbol out of current_prices that pulse), the next successful
+        # tick may already be hour 16+, and an hour==15-only check would then
+        # never force-close the position for the rest of the day.
+        if not is_closed and (timestamp.hour > 15 or (timestamp.hour == 15 and timestamp.minute >= 25)):
             is_closed = True
             exit_price = current_price
             exit_reason = 'SESSION_END'
@@ -2758,7 +2763,7 @@ class StructuralPaperTrader:
         elif pnl_r <= pos['stop_r']:
             is_closed = True
             exit_reason = 'STOP_R'
-        elif timestamp.hour == 15 and timestamp.minute >= 25:
+        elif timestamp.hour > 15 or (timestamp.hour == 15 and timestamp.minute >= 25):
             is_closed = True
             exit_reason = 'SESSION_END'
 

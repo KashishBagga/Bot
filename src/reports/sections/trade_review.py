@@ -44,6 +44,25 @@ class TradeReviewSection(BaseSection):
             (self.date_str,),
         )
 
+        # combo_trades (Butterfly/Straddle/etc) are a separate table with a
+        # different shape (net-premium, no single SL/TP, no MFE/MAE) — merge
+        # them in here too, or this section's count silently disagrees with
+        # §1 Executive Summary, which already counts both (see
+        # executive_summary.py::_fetch_real).
+        combo_rows = self._query(
+            """
+            SELECT combo_id, experiment_name, symbol, combo_type, setup_type,
+                   underlying_entry_price, underlying_exit_price,
+                   final_pnl_r, exit_reason, duration_minutes,
+                   entry_time, exit_time
+            FROM combo_trades
+            WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+              AND valid = TRUE
+            ORDER BY entry_time
+            """,
+            (self.date_str,),
+        )
+
         trades = []
         for r in rows:
             trade_id = r[0]
@@ -75,6 +94,8 @@ class TradeReviewSection(BaseSection):
                 note = "Standard exit"
 
             trades.append({
+                "kind": "single",
+                "entry_time": r[17],
                 "trade_id": trade_id,
                 "experiment": r[1],
                 "symbol": r[2],
@@ -98,6 +119,39 @@ class TradeReviewSection(BaseSection):
                 "note": note,
             })
 
+        for r in combo_rows:
+            pnl_r = float(r[7] or 0)
+            grade, grade_desc = _rate(pnl_r, None)
+            exit_reason = r[8] or ""
+            if exit_reason == "INITIAL_SL" or exit_reason == "STOP_R":
+                note = "Stopped at defined-risk max loss — thesis failed"
+            elif pnl_r > 0:
+                note = "Combo closed profitably"
+            elif exit_reason == "SESSION_END":
+                note = "Held through close — consider whether session exit is optimal"
+            else:
+                note = "Standard exit"
+
+            trades.append({
+                "kind": "combo",
+                "entry_time": r[10],
+                "trade_id": r[0],
+                "experiment": r[1],
+                "symbol": r[2],
+                "signal": r[3],  # combo_type
+                "setup": r[4],
+                "entry": round(float(r[5]), 2) if r[5] is not None else None,
+                "exit": round(float(r[6]), 2) if r[6] is not None else None,
+                "pnl_r": round(pnl_r, 2),
+                "exit_reason": exit_reason,
+                "duration_min": round(float(r[9] or 0), 1),
+                "grade": grade,
+                "grade_desc": grade_desc,
+                "note": note,
+            })
+
+        trades.sort(key=lambda t: t["entry_time"])
+
         return {"trades": trades, "count": len(trades)}
 
     def render_md(self, data: Dict[str, Any]) -> str:
@@ -111,8 +165,21 @@ class TradeReviewSection(BaseSection):
         lines.append(f"*{len(trades)} live trade(s) executed today.*\n")
 
         for i, t in enumerate(trades, 1):
-            cap_str = f"{t['capture_rate']*100:.0f}%" if t["capture_rate"] else "N/A"
             pnl_emoji = "🟢" if t["pnl_r"] > 0 else "🔴"
+            if t["kind"] == "combo":
+                lines += [
+                    f"\n### Trade #{i} — {t['setup']} {t['signal']} (combo) `{t['symbol']}`\n",
+                    f"| Field | Value |\n|---|---|",
+                    f"| Experiment | {t['experiment']} |",
+                    f"| Underlying Entry → Exit | {t['entry']} → {t['exit']} |",
+                    f"| **PnL** | **{pnl_emoji} {self._pnl_str(t['pnl_r'])}** |",
+                    f"| Duration | {t['duration_min']:.0f} min |",
+                    f"| Exit Reason | {t['exit_reason']} |",
+                    f"| **Grade** | **{t['grade']} — {t['grade_desc']}** |",
+                    f"\n> {t['note']}\n",
+                ]
+                continue
+            cap_str = f"{t['capture_rate']*100:.0f}%" if t["capture_rate"] else "N/A"
             lines += [
                 f"\n### Trade #{i} — {t['setup']} {t['signal']} `{t['symbol']}`\n",
                 f"| Field | Value |\n|---|---|",

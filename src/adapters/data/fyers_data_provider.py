@@ -9,12 +9,15 @@ Also satisfies the legacy DataProviderInterface for backwards compatibility.
 import pandas as pd
 import logging
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from typing import Dict, List, Optional, Any
 from src.adapters.data.base_data_provider import BaseDataProvider
 from src.adapters.market_interface import DataProviderInterface, Contract
 from src.api.fyers import FyersClient
 
 logger = logging.getLogger(__name__)
+
+IST = ZoneInfo("Asia/Kolkata")
 
 RES_MAP = {
     "1": "1", "1m": "1",
@@ -67,6 +70,16 @@ class FyersDataProvider(BaseDataProvider, DataProviderInterface):
         what's cached and `end_date` (the "tail") is ever fetched live; a
         fully-cached range makes zero Fyers calls."""
         try:
+            # `candles.time` is TIMESTAMPTZ, so cached_rows[...]["time"] always
+            # comes back tz-aware — but callers building start/end from a plain
+            # `datetime.strptime(...)` (e.g. report sections) pass naive
+            # datetimes, which crashes the tz-aware arithmetic below with
+            # "can't subtract offset-naive and offset-aware datetimes".
+            if start_date.tzinfo is None:
+                start_date = start_date.replace(tzinfo=IST)
+            if end_date.tzinfo is None:
+                end_date = end_date.replace(tzinfo=IST)
+
             fyers_res = RES_MAP.get(resolution, resolution)
             bar_td = timedelta(seconds=BAR_SECONDS.get(fyers_res, 300))
 

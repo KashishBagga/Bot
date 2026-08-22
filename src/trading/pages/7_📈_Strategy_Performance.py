@@ -101,6 +101,16 @@ def load_daily_r(days: int):
     df["entry_date"] = pd.to_datetime(df["entry_time"]).dt.date
     return df
 
+@st.cache_data(ttl=60)
+def load_combo_metrics(days: int):
+    db = PostgresDatabase()
+    return db.get_combo_strategy_metrics(days=days)
+
+@st.cache_data(ttl=60)
+def load_combo_equity(days: int):
+    db = PostgresDatabase()
+    return db.get_combo_equity_curve(days=days)
+
 
 # ────────────────────────────────────────────────────────────────────────────
 # Page header
@@ -299,6 +309,93 @@ else:
                             regime_tbl["Win %"] = regime_tbl["Win %"].map(lambda x: f"{x:.1%}" if pd.notna(x) else "—")
                             regime_tbl["Exp (R)"] = regime_tbl["Exp (R)"].map(lambda x: f"{x:+.3f}" if pd.notna(x) else "—")
                             st.dataframe(regime_tbl[["Regime", "Trades", "Win %", "Exp (R)"]], hide_index=True, use_container_width=True)
+
+st.divider()
+
+# ────────────────────────────────────────────────────────────────────────────
+# Section B2 — Combo / Multi-Leg Strategies
+# ────────────────────────────────────────────────────────────────────────────
+# Butterfly/Straddle/IronCondor/etc are a separate table (combo_trades) with
+# no market_regime/setup_type breakdown — shown here as its own section
+# rather than folded into the single-leg cards above, so these previously
+# invisible strategies (silently excluded from every "strategy" metric on
+# this page until now) get their own visibility without corrupting the
+# single-leg regime-split view.
+st.subheader("🦋 Combo / Multi-Leg Strategies")
+
+combo_metrics_raw = load_combo_metrics(lookback_days)
+combo_metrics_df  = pd.DataFrame(combo_metrics_raw) if combo_metrics_raw else pd.DataFrame()
+
+if combo_metrics_df.empty:
+    st.info("No closed combo trades found for the selected period.")
+else:
+    combo_agg = (
+        combo_metrics_df.groupby("experiment_name")
+        .agg(
+            total_trades=("total_trades", "sum"),
+            wins=("wins", "sum"),
+            gross_profit=("gross_profit", "sum"),
+            gross_loss=("gross_loss", "sum"),
+            mean_r=("mean_r", "mean"),
+            avg_hold_minutes=("avg_hold_minutes", "mean"),
+            combo_type=("combo_type", "first"),
+        )
+        .reset_index()
+    )
+    combo_agg["win_rate"]      = combo_agg["wins"] / combo_agg["total_trades"].replace(0, pd.NA)
+    combo_agg["profit_factor"] = combo_agg["gross_profit"] / combo_agg["gross_loss"].replace(0, pd.NA)
+    combo_agg = combo_agg[combo_agg["total_trades"] >= min_trades]
+
+    if combo_agg.empty:
+        st.warning("No combo strategies match the current Min Trades filter.")
+    else:
+        cols_per_row = 3
+        combo_rows_list = combo_agg.to_dict("records")
+        for i in range(0, len(combo_rows_list), cols_per_row):
+            cols = st.columns(cols_per_row)
+            for j, row in enumerate(combo_rows_list[i:i + cols_per_row]):
+                total = int(row["total_trades"])
+                win_r = row.get("win_rate") or 0.0
+                pf    = row.get("profit_factor") or 0.0
+                exp   = row.get("mean_r") or 0.0
+                sample_warn = " ⚠️ Low sample" if total < 30 else ""
+
+                with cols[j]:
+                    with st.expander(f"{row['experiment_name']}  🔬 Research", expanded=False):
+                        st.markdown(f"**Combo type**: {row['combo_type']}")
+                        st.markdown(f"**Trades**: {total}{sample_warn}")
+                        m1, m2, m3 = st.columns(3)
+                        m1.metric("Win Rate",      f"{win_r:.1%}")
+                        m2.metric("Profit Factor", f"{pf:.2f}")
+                        m3.metric("Expectancy",    f"{exp:+.3f}R")
+                        st.caption(f"Avg Hold: {row.get('avg_hold_minutes') or 0.0:.0f} min")
+
+    combo_equity_rows = load_combo_equity(lookback_days)
+    combo_equity_df = pd.DataFrame(combo_equity_rows) if combo_equity_rows else pd.DataFrame()
+    if not combo_equity_df.empty:
+        combo_equity_df["entry_time"] = pd.to_datetime(combo_equity_df["entry_time"])
+        combo_equity_df["cumulative_r"] = pd.to_numeric(combo_equity_df["cumulative_r"], errors="coerce")
+
+        combo_fig = go.Figure()
+        palette = px.colors.qualitative.Set2
+        for idx, strat in enumerate(sorted(combo_equity_df["experiment_name"].unique())):
+            s_df = combo_equity_df[combo_equity_df["experiment_name"] == strat].sort_values("entry_time")
+            combo_fig.add_trace(go.Scatter(
+                x=s_df["entry_time"], y=s_df["cumulative_r"],
+                mode="lines+markers", name=strat,
+                line=dict(width=1, color=palette[idx % len(palette)], dash="dot"),
+                marker=dict(size=4),
+                hovertemplate="<b>%{fullData.name}</b><br>Time: %{x}<br>Cumulative R: %{y:.2f}R<extra></extra>",
+            ))
+        combo_fig.add_hline(y=0, line_dash="dash", line_color="rgba(255,255,255,0.3)", line_width=1)
+        combo_fig.update_layout(
+            template="plotly_dark", plot_bgcolor="rgba(26,32,44,1)", paper_bgcolor="rgba(26,32,44,1)",
+            height=360, legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+            xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)"),
+            yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)", title="Cumulative R"),
+            margin=dict(l=40, r=20, t=40, b=40), hovermode="x unified",
+        )
+        st.plotly_chart(combo_fig, use_container_width=True)
 
 st.divider()
 

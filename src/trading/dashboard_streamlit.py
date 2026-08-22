@@ -13,6 +13,8 @@ sys.path.insert(0, project_root)
 
 from src.models.postgres_database import PostgresDatabase
 
+logger = logging.getLogger(__name__)
+
 kolkata_tz = ZoneInfo("Asia/Kolkata")
 
 def format_dt(dt):
@@ -107,6 +109,30 @@ def format_event_description(event_type, payload):
                     f"| PnL: **{pnl:+.2f} R** "
                     f"| {get_f('duration_minutes'):.1f} mins")
 
+        return f"🔹 `{event_type}` | {json.dumps(payload)}"
+    except Exception as e:
+        return f"🔹 `{event_type}` | parse error: {e} | {payload}"
+
+def format_combo_event_description(event_type, payload):
+    """Combo (multi-leg) ENTRY/EXIT events share the ENTRY/EXIT event_type
+    names with single-leg trade_events, but a different payload shape
+    (combo_type/legs/net_premium_paid instead of entry_price/stop_loss) —
+    reusing format_event_description() would render bogus 0.00 fields."""
+    if not payload:
+        return "No details provided"
+    try:
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+
+        if event_type == "ENTRY":
+            return (f"📥 **Combo Entry** | Type: `{payload.get('combo_type')}` "
+                    f"| Net premium: `{payload.get('net_premium_paid', 0.0):.2f}` "
+                    f"| Max loss: `{payload.get('max_loss', 0.0):.2f}`")
+        elif event_type == "EXIT":
+            pnl = payload.get('final_pnl_r') or 0.0
+            return (f"🏁 **Combo Exit** | Reason: `{payload.get('exit_reason')}` "
+                    f"| PnL: **{pnl:+.2f} R** "
+                    f"| Duration: `{payload.get('duration_minutes', 0.0):.1f} mins`")
         return f"🔹 `{event_type}` | {json.dumps(payload)}"
     except Exception as e:
         return f"🔹 `{event_type}` | parse error: {e} | {payload}"
@@ -255,6 +281,64 @@ def load_data(report_date):
 
             events = trade_evts + cf_evts + exec_evts
 
+            # 4. Multi-leg combo trades (Butterfly/Straddle/IronCondor/etc) — a
+            # separate table+shape from single-leg trades. Without this, every
+            # combo trade the report/EOD-summary counts is invisible in the
+            # per-trade drill-down below (see trade_review.py's same fix).
+            combo_trades, combo_candidates = [], []
+            combo_events = []
+            try:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT combo_id, entry_time, exit_time, symbol, experiment_name,
+                               combo_type, setup_type, underlying_entry_price, underlying_exit_price,
+                               legs, net_premium_paid, max_loss, max_profit, target_r, stop_r,
+                               final_pnl_r, exit_reason, duration_minutes, diagnostics
+                        FROM combo_trades
+                        WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND (valid IS NULL OR valid = TRUE)
+                        ORDER BY entry_time ASC
+                    """, (report_date,))
+                    cols = [desc[0] for desc in cursor.description]
+                    combo_trades = [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT combo_id, entry_time, exit_time, symbol, experiment_name,
+                               combo_type, setup_type, rejection_reasons, primary_rejection_reason,
+                               underlying_entry_price, underlying_exit_price, legs, net_premium_paid,
+                               max_loss, max_profit, target_r, stop_r, final_pnl_r, exit_reason,
+                               duration_minutes, diagnostics
+                        FROM counterfactual_combo_results
+                        WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
+                          AND (valid IS NULL OR valid = TRUE)
+                        ORDER BY entry_time ASC
+                    """, (report_date,))
+                    cols = [desc[0] for desc in cursor.description]
+                    combo_candidates = [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT event_id, combo_id, timestamp, event_type, payload
+                        FROM combo_trade_events
+                        WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
+                        ORDER BY timestamp ASC
+                    """, (report_date,))
+                    cols = [desc[0] for desc in cursor.description]
+                    combo_events = [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT event_id, combo_id, timestamp, event_type, payload
+                        FROM counterfactual_combo_events
+                        WHERE DATE(timestamp AT TIME ZONE 'Asia/Kolkata') = %s
+                        ORDER BY timestamp ASC
+                    """, (report_date,))
+                    cols = [desc[0] for desc in cursor.description]
+                    combo_events += [dict(zip(cols, row)) for row in cursor.fetchall()]
+            except Exception as combo_err:
+                logger.warning(f"Combo trade query failed: {combo_err}")
+
     except Exception as e:
         st.error(f"Failed to query database: {e}")
 
@@ -262,7 +346,10 @@ def load_data(report_date):
         "eod_report": eod_report,
         "trades": trades,
         "candidates": candidates,
-        "events": events
+        "events": events,
+        "combo_trades": combo_trades,
+        "combo_candidates": combo_candidates,
+        "combo_events": combo_events,
     }
 
 data = load_data(selected_date)
@@ -280,14 +367,16 @@ col1.metric("Realized PnL", f"{real_pnl:+.2f} R", delta=f"{real_pnl:.2f} R" if r
 col2.metric("Win Rate", f"{win_rate:.0f}%")
 col3.metric("Expectancy", f"{expectancy:.2f} R")
 col4.metric("Shadow PnL (Counterfactual)", f"{shadow_pnl:+.2f} R")
-col5.metric("Total Trades", len(data["trades"]))
+col5.metric("Total Trades", len(data["trades"]) + len(data["combo_trades"]))
 
 st.write("---")
 
 # Strategy Bifurcation Selector
 all_strategies = sorted(list(set(
-    [t["strategy"] for t in data["trades"]] + 
-    [c["setup_type"] or c["strategy"] for c in data["candidates"] if c.get("setup_type") or c.get("strategy")]
+    [t["strategy"] for t in data["trades"]] +
+    [c["setup_type"] or c["strategy"] for c in data["candidates"] if c.get("setup_type") or c.get("strategy")] +
+    [c["setup_type"] or c["combo_type"] for c in data["combo_trades"]] +
+    [c["setup_type"] or c["combo_type"] for c in data["combo_candidates"]]
 )))
 all_strategies = ["All"] + all_strategies
 
@@ -300,14 +389,18 @@ selected_strat = st.radio(
 # Filtering helper
 filtered_trades = data["trades"]
 filtered_candidates = data["candidates"]
+filtered_combo_trades = data["combo_trades"]
+filtered_combo_candidates = data["combo_candidates"]
 
 if selected_strat != "All":
     filtered_trades = [t for t in data["trades"] if t["strategy"] == selected_strat]
     filtered_candidates = [c for c in data["candidates"] if (c["setup_type"] or c["strategy"]) == selected_strat]
+    filtered_combo_trades = [c for c in data["combo_trades"] if (c["setup_type"] or c["combo_type"]) == selected_strat]
+    filtered_combo_candidates = [c for c in data["combo_candidates"] if (c["setup_type"] or c["combo_type"]) == selected_strat]
 
 tab1, tab2 = st.tabs([
-    f"📈 Realized Positions ({len(filtered_trades)})", 
-    f"👻 Counterfactual Missed Opportunities ({len(filtered_candidates)})"
+    f"📈 Realized Positions ({len(filtered_trades) + len(filtered_combo_trades)})",
+    f"👻 Counterfactual Missed Opportunities ({len(filtered_candidates) + len(filtered_combo_candidates)})"
 ])
 
 # 1. Realized positions tab
@@ -386,6 +479,72 @@ with tab1:
                         
                         st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_event_description(ev['event_type'], ev['payload'])}")
 
+    # Multi-leg combo trades (Butterfly/Straddle/IronCondor/etc) — same table
+    # shape as the Live Trades page, rendered here for closed/historical combos.
+    if filtered_combo_trades:
+        st.write("---")
+        st.caption("Multi-leg (combo) trades")
+        for c in filtered_combo_trades:
+            pnl_val = c["final_pnl_r"] or 0.0
+            emoji = "🟢" if pnl_val >= 0 else "🔴"
+            c_events = [e for e in data["combo_events"] if e["combo_id"] == c["combo_id"]]
+            c_events = sorted(c_events, key=lambda x: x["timestamp"])
+
+            title = f"{emoji} {c['symbol']} | {c['combo_type']} (combo) | {pnl_val:+.2f} R"
+
+            with st.expander(title):
+                m_col1, m_col2 = st.columns(2)
+
+                with m_col1:
+                    st.subheader("Milestones & Details")
+                    st.write(f"⏱️ **Executed At:** {format_dt(c['entry_time'])}")
+                    st.write(f"🛑 **Outcome/Exit Reason:** {c['exit_reason'] or 'OPEN'}")
+                    st.write(f"💸 **PnL:** {pnl_val:+.2f} R")
+                    st.write(
+                        f"🎯 **Underlying:** Entry: {c['underlying_entry_price'] or 0.0:.2f} "
+                        f"| Exit: {c['underlying_exit_price'] or 0.0:.2f}"
+                    )
+                    max_profit = c.get("max_profit")
+                    st.write(
+                        f"💰 **Net Premium:** {c['net_premium_paid'] or 0.0:.2f} "
+                        f"| Max Loss: {c['max_loss'] or 0.0:.2f} "
+                        f"| Max Profit: {f'{max_profit:.2f}' if max_profit is not None else 'unbounded'}"
+                    )
+                    legs = c.get("legs") or []
+                    if legs:
+                        leg_strs = ", ".join(
+                            f"{leg['side']} {leg['option_type']} @ {leg['strike']:.0f}" for leg in legs
+                        )
+                        st.markdown(f"🦵 **Legs:** {leg_strs}")
+                    st.write(f"📦 **Experiment / Version:** {c['experiment_name']}")
+
+                with m_col2:
+                    st.subheader("Attribution / Trigger Factors")
+                    diag = c["diagnostics"] or {}
+                    if not diag:
+                        st.text("No diagnostic features recorded.")
+                    else:
+                        for k, v in diag.items():
+                            if isinstance(v, (dict, list)):
+                                continue
+                            formatted_k = k.replace("_", " ").upper()
+                            st.markdown(f"<div class='factor-pill'><b>{formatted_k}:</b> {v}</div>", unsafe_allow_html=True)
+
+                st.subheader("Execution Timeline")
+                if not c_events:
+                    st.text("No audit trace events found for this combo trade.")
+                else:
+                    prev_t = None
+                    for ev in c_events:
+                        curr_t = ev["timestamp"]
+                        curr_t_local = curr_t.astimezone(kolkata_tz) if curr_t.tzinfo else curr_t
+                        latency = ""
+                        if prev_t:
+                            diff_ms = int((curr_t - prev_t).total_seconds() * 1000)
+                            latency = f"*(+{diff_ms}ms latency)*"
+                        prev_t = curr_t
+                        st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_combo_event_description(ev['event_type'], ev['payload'])}")
+
 # 2. Counterfactual missed opportunities tab
 with tab2:
     if not filtered_candidates:
@@ -458,5 +617,69 @@ with tab2:
                             diff_ms = int((curr_t - prev_t).total_seconds() * 1000)
                             latency = f"*(+{diff_ms}ms latency)*"
                         prev_t = curr_t
-                        
+
                         st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_event_description(ev['event_type'], ev['payload'])}")
+
+    # Multi-leg combo counterfactuals (rejected combo setups replayed as shadow trades)
+    if filtered_combo_candidates:
+        st.write("---")
+        st.caption("Multi-leg (combo) counterfactuals")
+        for c in filtered_combo_candidates:
+            pnl_val = c["final_pnl_r"] or 0.0
+            c_events = [e for e in data["combo_events"] if e["combo_id"] == c["combo_id"]]
+            c_events = sorted(c_events, key=lambda x: x["timestamp"])
+
+            title = f"👻 {c['symbol']} | {c['combo_type']} (combo) | Blocked: {c['primary_rejection_reason']} | {pnl_val:+.2f} R"
+
+            with st.expander(title):
+                m_col1, m_col2 = st.columns(2)
+
+                with m_col1:
+                    st.subheader("Milestones & Details")
+                    st.write(f"⏱️ **Triggered At:** {format_dt(c['entry_time'])}")
+                    st.write(f"🛑 **Primary Rejection:** {c['primary_rejection_reason']}")
+                    st.write(f"⛔ **All Rejections:** {c['rejection_reasons']}")
+                    st.write(f"💸 **Simulated Outcome:** {pnl_val:+.2f} R")
+                    st.write(
+                        f"🎯 **Underlying:** Entry: {c['underlying_entry_price'] or 0.0:.2f} "
+                        f"| Exit: {c['underlying_exit_price'] or 0.0:.2f}"
+                    )
+                    max_profit = c.get("max_profit")
+                    st.write(
+                        f"💰 **Net Premium:** {c['net_premium_paid'] or 0.0:.2f} "
+                        f"| Max Loss: {c['max_loss'] or 0.0:.2f} "
+                        f"| Max Profit: {f'{max_profit:.2f}' if max_profit is not None else 'unbounded'}"
+                    )
+                    legs = c.get("legs") or []
+                    if legs:
+                        leg_strs = ", ".join(
+                            f"{leg['side']} {leg['option_type']} @ {leg['strike']:.0f}" for leg in legs
+                        )
+                        st.markdown(f"🦵 **Legs:** {leg_strs}")
+
+                with m_col2:
+                    st.subheader("Attribution / Trigger Factors")
+                    diag = c["diagnostics"] or {}
+                    if not diag:
+                        st.text("No diagnostic features recorded.")
+                    else:
+                        for k, v in diag.items():
+                            if isinstance(v, (dict, list)):
+                                continue
+                            formatted_k = k.replace("_", " ").upper()
+                            st.markdown(f"<div class='factor-pill'><b>{formatted_k}:</b> {v}</div>", unsafe_allow_html=True)
+
+                st.subheader("Execution Timeline")
+                if not c_events:
+                    st.text("No audit trace events found for this combo signal.")
+                else:
+                    prev_t = None
+                    for ev in c_events:
+                        curr_t = ev["timestamp"]
+                        curr_t_local = curr_t.astimezone(kolkata_tz) if curr_t.tzinfo else curr_t
+                        latency = ""
+                        if prev_t:
+                            diff_ms = int((curr_t - prev_t).total_seconds() * 1000)
+                            latency = f"*(+{diff_ms}ms latency)*"
+                        prev_t = curr_t
+                        st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_combo_event_description(ev['event_type'], ev['payload'])}")

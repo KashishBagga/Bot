@@ -81,9 +81,12 @@ def validate_trade_data(row: Dict[str, Any]) -> Tuple[bool, List[str]]:
         if exit_price is None or exit_price <= 0:
             errors.append(f"Invalid exit_price for closed trade: {exit_price}")
         
-        # Bars held should be >= 1 for completed trades (per checklist)
-        if bars_held is not None and bars_held < 1:
-            errors.append(f"Closed trade with bars_held < 1: {bars_held}")
+        # bars_held is incremented once per new 5m candle (starts at 0) — a
+        # trade entered and exited (e.g. INITIAL_SL / fast TRAILING_SL) before
+        # the next candle forms legitimately has bars_held == 0. Only negative
+        # values indicate corruption.
+        if bars_held is not None and bars_held < 0:
+            errors.append(f"Closed trade with negative bars_held: {bars_held}")
 
         if highest_price is not None and lowest_price is not None and exit_price is not None:
             if exit_price < lowest_price - 1.0 or exit_price > highest_price + 1.0:
