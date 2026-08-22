@@ -1,0 +1,346 @@
+2026-08-22 00:14:28,136 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 00:10 at 00:14:28...
+2026-08-22 00:30:56,831 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 00:30 at 00:30:56...
+2026-08-22 00:58:42,270 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 00:55 at 00:58:42...
+2026-08-22 01:52:14,664 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 01:50 at 01:52:14...
+2026-08-22 01:57:13,489 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 01:55 at 01:57:13...
+2026-08-22 02:32:10,819 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 02:30 at 02:32:10...
+2026-08-22 03:02:58,286 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 03:00 at 03:02:58...
+2026-08-22 04:25:42,914 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 04:25 at 04:25:42...
+2026-08-22 05:23:58,287 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 05:20 at 05:23:58...
+2026-08-22 05:54:31,888 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 05:50 at 05:54:31...
+2026-08-22 07:25:46,839 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 07:25 at 07:25:46...
+2026-08-22 08:03:06,104 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 08:00 at 08:03:06...
+2026-08-22 08:53:47,153 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 08:50 at 08:53:47...
+2026-08-22 09:28:18,975 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 09:25 at 09:28:18...
+2026-08-22 09:28:18,976 - INFO - 🗓️ Risk day rolled to 2026-08-22 — daily counters reset.
+2026-08-22 09:28:18,976 - INFO - --- 09:28:18 Market Pulse ---
+2026-08-22 09:28:19,090 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 09:28:20,074 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:28:21,180 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:28:22,287 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:28:22,422 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:28:23,545 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:28:24,788 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:28:24,900 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:43:42,602 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:43:43,717 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:43:43,721 - WARNING - ⚠️ Live LTP quote for NSE:NIFTY50-INDEX not available in market_loop; falling back to closed candle close: 24234.75
+2026-08-22 09:43:43,860 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:43:44,980 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:43:46,080 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:43:46,210 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:54:47,547 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:54:48,666 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:54:48,790 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:54:49,906 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:54:51,015 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 09:54:51,020 - WARNING - ⚠️ Live LTP quote for NSE:NIFTYBANK-INDEX not available in market_loop; falling back to closed candle close: 57647.65
+2026-08-22 09:54:55,136 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 09:54:55,136 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 09:54:55,136 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 09:54:55,136 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA'] (0.0ms)
+2026-08-22 09:54:55,148 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26AUG (2026-08-25)
+2026-08-22 09:54:55,148 - INFO - 👻 [ATR_Squeeze_RVOL1.5] CF SQUEEZE_BREAKOUT NSE:NIFTY50-INDEX BUY CALL | Rejected: ['NEUTRAL_TREND', 'LOW_RVOL']
+2026-08-22 09:54:55,148 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_SQBRK_24234.75_20260822_092818_ATR_Squeeze_RVOL1.5, payload={'symbol': 'NSE:NIFTY50-INDEX', 'signal': 'BUY CALL', 'strategy': 'SQUEEZE_BREAKOUT', 'price': 24234.75, 'stop_loss': 24232.765, 'take_profit': 24246.66, 'tp1': 24237.7275, 'rr_ratio': 6.0, 'timestamp': '2026-08-22T09:28:18.976569+05:30', 'accepted': False, 'rejection_reasons': ['NEUTRAL_TREND', 'LOW_RVOL'], 'features': {'atr': 3.97, 'ema20': 24236.25, 'ema50': 24237.63, 'move_efficiency': 0.0576, 'move_efficiency_h1': 0.0211, 'wickiness': 0.7468, 'ema_bullish': False, 'rsi14': 61.0, 'rsi2': 50.0, 'distance_to_vwap': -0.0004, 'atr_percentile': 0.008, 'dist_prev_high': 0.0004, 'dist_prev_low': 0.0015, 'adx': 9.0, 'adx_slope': 0.0303, 'gap_pct': 0.0026, 'regime_primary': 'COMPRESSION', 'regime_vol_state': 'LOW_VOL', 'market_regime': 'COMPRESSION_LOW_VOL'}, 'candidate_id': 'cand_NSE_NIFTY50_INDEX_SQBRK_24234.75_20260822_092818_ATR_Squeeze_RVOL1.5', 'confidence': 0.5, 'diagnostics': {'atr_percentile': 0.008, 'rvol': 1.0, 'atr': 3.97, 'bos_trend': 'NEUTRAL', 'bos_count': 27, 'move_efficiency': 0.058}, 'experiment_name': 'ATR_Squeeze_RVOL1.5', 'strategy_id': 'atr_squeeze', 'version': 'v1.0'}
+2026-08-22 09:54:55,265 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 09:54:56,273 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250CE'] (code=-15, message=Please provide valid token)
+2026-08-22 09:54:56,274 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:NIFTY26AUG24250CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1705, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 339, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 306, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:NIFTY26AUG24250CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 09:54:56,286 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_SQBRK_24234.75_20260822_092818_ATR_Squeeze_RVOL1.5, payload={'price': 24234.75, 'sl': 24232.765, 'tp': 24246.66}
+2026-08-22 09:54:56,314 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTY50_INDEX_SQBRK_24234.75_20260822_092818_ATR_Squeeze_RVOL1.5, payload={'price': 24234.75, 'sl': 24232.765, 'tp': 24246.66}
+2026-08-22 09:54:56,334 - INFO - 💰 Position size [SQUEEZE_BREAKOUT|COMPRESSION_LOW_VOL|conf=0]: frac=0.002 → ₹5,000 (risk/unit=0.01%)
+2026-08-22 09:54:56,369 - INFO - 🟢 ENTRY [CF|ATR_Squeeze_RVOL1.5|_ATR_Squeeze_RVOL1.5]: NSE:NIFTY50-INDEX BUY CALL @ 24234.75 | SL: 24232.76 TP: 24246.66
+2026-08-22 09:54:56,370 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BEAR_PUT_SPREAD NSE:NIFTY50-INDEX BEAR_PUT_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-08-22 09:54:57,274 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:10:19,578 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250PE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:10:19,578 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BEAR_PUT_SPREAD: Could not resolve a real premium for NSE:NIFTY26AUG24250PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:10:19,578 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX LONG_STRADDLE | [Straddle_v1.0_VolCompression]
+2026-08-22 10:10:20,267 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:10:21,265 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250CE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:10:21,266 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY26AUG24250CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:10:21,266 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX LONG_STRANGLE | [Strangle_v1.0_VolCompression]
+2026-08-22 10:10:22,437 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:10:23,277 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24350CE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:10:23,278 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY26AUG24350CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:10:23,278 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 10:10:23,278 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 10:10:23,278 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 10:10:23,279 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX IRON_CONDOR | [IronCondor_v1.0]
+2026-08-22 10:26:28,695 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:26:29,053 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24200PE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:26:29,053 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:NIFTY26AUG24200PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:26:29,054 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX BUTTERFLY_SPREAD | [Butterfly_v1.0]
+2026-08-22 10:26:30,065 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:26:31,073 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24150CE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:26:31,073 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BUTTERFLY_SPREAD: Could not resolve a real premium for NSE:NIFTY26AUG24150CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:26:31,073 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX IRON_BUTTERFLY | [IronButterfly_v1.0]
+2026-08-22 10:26:32,080 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:43:59,714 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250PE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:43:59,714 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_BUTTERFLY: Could not resolve a real premium for NSE:NIFTY26AUG24250PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:43:59,715 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA']
+2026-08-22 10:43:59,715 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX IRON_CONDOR | [ExpiryAwareTheta_v1.0]
+2026-08-22 10:43:59,887 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:44:00,855 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24200PE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:44:00,856 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:NIFTY26AUG24200PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:55:49,494 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 10:55:49,494 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 10:55:49,494 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 10:55:49,494 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA'] (0.0ms)
+2026-08-22 10:55:49,507 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26AUG (2026-08-25)
+2026-08-22 10:55:49,508 - INFO - 👻 [ATR_Squeeze_RVOL1.5] CF SQUEEZE_BREAKOUT NSE:NIFTYBANK-INDEX BUY CALL | Rejected: ['NEUTRAL_TREND', 'LOW_RVOL']
+2026-08-22 10:55:49,508 - INFO - 📊 EXECUTION AUDIT [SIGNAL_GENERATED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_SQBRK_57647.65_20260822_092818_ATR_Squeeze_RVOL1.5, payload={'symbol': 'NSE:NIFTYBANK-INDEX', 'signal': 'BUY CALL', 'strategy': 'SQUEEZE_BREAKOUT', 'price': 57647.65, 'stop_loss': 57640.535, 'take_profit': 57718.8, 'tp1': 57658.3225, 'rr_ratio': 10.0, 'timestamp': '2026-08-22T09:28:18.976569+05:30', 'accepted': False, 'rejection_reasons': ['NEUTRAL_TREND', 'LOW_RVOL'], 'features': {'atr': 14.23, 'ema20': 57658.63, 'ema50': 57659.55, 'move_efficiency': 0.3353, 'move_efficiency_h1': 0.1016, 'wickiness': 0.2874, 'ema_bullish': False, 'rsi14': 54.65, 'rsi2': 50.0, 'distance_to_vwap': -0.0001, 'atr_percentile': 0.016, 'dist_prev_high': 0.0009, 'dist_prev_low': 0.003, 'adx': 8.71, 'adx_slope': 1.0994, 'gap_pct': 0.0004, 'regime_primary': 'COMPRESSION', 'regime_vol_state': 'LOW_VOL', 'market_regime': 'COMPRESSION_LOW_VOL'}, 'candidate_id': 'cand_NSE_NIFTYBANK_INDEX_SQBRK_57647.65_20260822_092818_ATR_Squeeze_RVOL1.5', 'confidence': 0.5, 'diagnostics': {'atr_percentile': 0.016, 'rvol': 1.0, 'atr': 14.23, 'bos_trend': 'NEUTRAL', 'bos_count': 26, 'move_efficiency': 0.335}, 'experiment_name': 'ATR_Squeeze_RVOL1.5', 'strategy_id': 'atr_squeeze', 'version': 'v1.0'}
+2026-08-22 10:55:49,652 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:55:50,622 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600CE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:55:50,623 - ERROR - ❌ Failed to resolve option contract: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600CE (DB warehouse miss/stale AND live quote failed)
+Traceback (most recent call last):
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/trading/indian_trader.py", line 1705, in _enter_position
+    option_contract = self.option_engine.resolve(sig, entry_price)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 339, in resolve
+    premium, bid, ask, volume = resolver.resolve_premium(index_symbol, strike, option_type, expiry, option_symbol)
+  File "/Users/kashishbaggafeast/Desktop/Bot/src/core/options_execution_engine.py", line 306, in resolve_premium
+    raise ValueError(
+ValueError: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:55:50,623 - INFO - 📊 EXECUTION AUDIT [CF_SUBMITTED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_SQBRK_57647.65_20260822_092818_ATR_Squeeze_RVOL1.5, payload={'price': 57647.65, 'sl': 57640.535, 'tp': 57718.8}
+2026-08-22 10:55:50,655 - INFO - 📊 EXECUTION AUDIT [CF_FILLED]: trade_id=None, candidate_id=cand_NSE_NIFTYBANK_INDEX_SQBRK_57647.65_20260822_092818_ATR_Squeeze_RVOL1.5, payload={'price': 57647.65, 'sl': 57640.535, 'tp': 57718.8}
+2026-08-22 10:55:50,677 - INFO - 💰 Position size [SQUEEZE_BREAKOUT|COMPRESSION_LOW_VOL|conf=0]: frac=0.002 → ₹5,000 (risk/unit=0.01%)
+2026-08-22 10:55:50,713 - INFO - 🟢 ENTRY [CF|ATR_Squeeze_RVOL1.5|_ATR_Squeeze_RVOL1.5]: NSE:NIFTYBANK-INDEX BUY CALL @ 57647.65 | SL: 57640.54 TP: 57718.80
+2026-08-22 10:55:50,713 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BEAR_PUT_SPREAD NSE:NIFTYBANK-INDEX BEAR_PUT_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-08-22 10:55:51,631 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:55:52,641 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600PE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:55:52,641 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BEAR_PUT_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:55:52,642 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX LONG_STRADDLE | [Straddle_v1.0_VolCompression]
+2026-08-22 10:55:53,831 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 10:55:54,666 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600CE'] (code=-15, message=Please provide valid token)
+2026-08-22 10:55:54,666 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 10:55:54,666 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX LONG_STRANGLE | [Strangle_v1.0_VolCompression]
+2026-08-22 11:13:22,780 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 11:13:23,311 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57800CE'] (code=-15, message=Please provide valid token)
+2026-08-22 11:13:23,311 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY26AUG57800CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 11:13:23,311 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 11:13:23,311 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 11:13:23,311 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 11:13:23,311 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX IRON_CONDOR | [IronCondor_v1.0]
+2026-08-22 11:13:24,474 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 11:13:25,307 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57500PE'] (code=-15, message=Please provide valid token)
+2026-08-22 11:13:25,308 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:BANKNIFTY26AUG57500PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 11:13:25,308 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX BUTTERFLY_SPREAD | [Butterfly_v1.0]
+2026-08-22 11:13:26,494 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 11:29:10,584 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57400CE'] (code=-15, message=Please provide valid token)
+2026-08-22 11:29:10,585 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BUTTERFLY_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY26AUG57400CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 11:29:10,585 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX IRON_BUTTERFLY | [IronButterfly_v1.0]
+2026-08-22 11:29:11,055 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 11:29:12,030 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600PE'] (code=-15, message=Please provide valid token)
+2026-08-22 11:29:12,031 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_BUTTERFLY: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 11:29:12,031 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA']
+2026-08-22 11:29:12,031 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX IRON_CONDOR | [ExpiryAwareTheta_v1.0]
+2026-08-22 11:29:13,057 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 11:29:14,056 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57500PE'] (code=-15, message=Please provide valid token)
+2026-08-22 11:29:14,056 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:BANKNIFTY26AUG57500PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 11:56:54,898 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 11:55 at 11:56:54...
+2026-08-22 11:56:54,900 - INFO - --- 11:56:54 Market Pulse ---
+2026-08-22 11:56:55,014 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:12:10,595 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:12:11,723 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:12:12,840 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:12:12,969 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:12:14,102 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:28:39,546 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:28:39,702 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:28:40,829 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:28:42,055 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:28:42,059 - WARNING - ⚠️ Live LTP quote for NSE:NIFTY50-INDEX not available in market_loop; falling back to closed candle close: 24234.75
+2026-08-22 12:28:42,197 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:28:43,308 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:43:56,558 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:43:56,684 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:43:57,765 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:43:58,928 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:43:59,069 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:44:00,295 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:57:49,536 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 12:57:49,541 - WARNING - ⚠️ Live LTP quote for NSE:NIFTYBANK-INDEX not available in market_loop; falling back to closed candle close: 57647.65
+2026-08-22 12:57:53,178 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 12:57:53,178 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 12:57:53,178 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 12:57:53,178 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA'] (0.0ms)
+2026-08-22 12:57:53,190 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26AUG (2026-08-25)
+2026-08-22 12:57:53,190 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BEAR_PUT_SPREAD NSE:NIFTY50-INDEX BEAR_PUT_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-08-22 12:57:53,300 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:57:54,299 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250PE'] (code=-15, message=Please provide valid token)
+2026-08-22 12:57:54,299 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BEAR_PUT_SPREAD: Could not resolve a real premium for NSE:NIFTY26AUG24250PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 12:57:54,300 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX LONG_STRADDLE | [Straddle_v1.0_VolCompression]
+2026-08-22 12:57:55,307 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:26,751 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250CE'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:26,752 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY26AUG24250CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 12:58:26,753 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX LONG_STRANGLE | [Strangle_v1.0_VolCompression]
+2026-08-22 12:58:26,962 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:27,949 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24350CE'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:27,949 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY26AUG24350CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 12:58:27,949 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 12:58:27,950 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 12:58:27,950 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 12:58:27,950 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX IRON_CONDOR | [IronCondor_v1.0]
+2026-08-22 12:58:29,134 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:29,911 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24200PE'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:29,911 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:NIFTY26AUG24200PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 12:58:29,911 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX BUTTERFLY_SPREAD | [Butterfly_v1.0]
+2026-08-22 12:58:30,920 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:31,933 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24150CE'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:31,933 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BUTTERFLY_SPREAD: Could not resolve a real premium for NSE:NIFTY26AUG24150CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 12:58:31,934 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX IRON_BUTTERFLY | [IronButterfly_v1.0]
+2026-08-22 12:58:32,933 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:33,936 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250PE'] (code=-15, message=Please provide valid token)
+2026-08-22 12:58:33,937 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_BUTTERFLY: Could not resolve a real premium for NSE:NIFTY26AUG24250PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 12:58:33,937 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA']
+2026-08-22 12:58:33,937 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTY50-INDEX IRON_CONDOR | [ExpiryAwareTheta_v1.0]
+2026-08-22 12:58:34,946 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:15:45,620 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24200PE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:15:45,621 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:NIFTY26AUG24200PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:15:49,423 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 13:15:49,423 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 13:15:49,424 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 13:15:49,424 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA'] (0.0ms)
+2026-08-22 13:15:49,435 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26AUG (2026-08-25)
+2026-08-22 13:15:49,436 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BEAR_PUT_SPREAD NSE:NIFTYBANK-INDEX BEAR_PUT_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-08-22 13:15:49,559 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:32:09,544 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600PE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:32:09,544 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BEAR_PUT_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:32:09,544 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX LONG_STRADDLE | [Straddle_v1.0_VolCompression]
+2026-08-22 13:32:10,288 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:32:11,309 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600CE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:32:11,310 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:32:11,310 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX LONG_STRANGLE | [Strangle_v1.0_VolCompression]
+2026-08-22 13:32:12,313 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:32:13,317 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57800CE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:32:13,317 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY26AUG57800CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:32:13,318 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 13:32:13,318 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 13:32:13,318 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 13:32:13,318 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX IRON_CONDOR | [IronCondor_v1.0]
+2026-08-22 13:49:31,580 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:49:32,067 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57500PE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:49:32,067 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:BANKNIFTY26AUG57500PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:49:32,067 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX BUTTERFLY_SPREAD | [Butterfly_v1.0]
+2026-08-22 13:49:33,052 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:49:34,052 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57400CE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:49:34,052 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BUTTERFLY_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY26AUG57400CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:49:34,052 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX IRON_BUTTERFLY | [IronButterfly_v1.0]
+2026-08-22 13:49:35,063 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:58:49,488 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600PE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:58:49,489 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_BUTTERFLY: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 13:58:49,489 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA']
+2026-08-22 13:58:49,489 - INFO - 🚀 COMBO SIGNAL: NSE:NIFTYBANK-INDEX IRON_CONDOR | [ExpiryAwareTheta_v1.0]
+2026-08-22 13:58:49,650 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 13:58:50,638 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57500PE'] (code=-15, message=Please provide valid token)
+2026-08-22 13:58:50,638 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:BANKNIFTY26AUG57500PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 14:33:41,956 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 14:30 at 14:33:41...
+2026-08-22 14:33:41,957 - INFO - --- 14:33:41 Market Pulse ---
+2026-08-22 14:33:42,064 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX', 'NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 14:50:48,492 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:50:49,616 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:50:50,728 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:50:51,031 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:50:52,141 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:59:50,630 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:59:50,832 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:59:51,942 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:59:53,045 - ERROR - ❌ Historical data request failed for NSE:NIFTY50-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:59:53,049 - WARNING - ⚠️ Live LTP quote for NSE:NIFTY50-INDEX not available in market_loop; falling back to closed candle close: 24234.75
+2026-08-22 14:59:53,182 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 14:59:54,287 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:32:21,063 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -1, 'message': 'Network connection failure before HTTP response', 's': 'error'}
+2026-08-22 15:32:21,212 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:32:22,318 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:32:23,426 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:32:23,568 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 1/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:32:24,671 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 2/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:50:01,581 - ERROR - ❌ Historical data request failed for NSE:NIFTYBANK-INDEX (attempt 3/3): {'code': -16, 'message': 'Could not authenticate the user', 's': 'error'}
+2026-08-22 15:50:01,586 - WARNING - ⚠️ Live LTP quote for NSE:NIFTYBANK-INDEX not available in market_loop; falling back to closed candle close: 57647.65
+2026-08-22 15:50:04,834 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 15:50:04,834 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 15:50:04,834 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 15:50:04,834 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA'] (0.0ms)
+2026-08-22 15:50:04,846 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTY50-INDEX. Falling back to dynamically computed expiry: 26AUG (2026-08-25)
+2026-08-22 15:50:04,846 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BEAR_PUT_SPREAD NSE:NIFTY50-INDEX BEAR_PUT_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-08-22 15:50:04,959 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:51,397 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250PE'] (code=-1, message=Network connection failure before HTTP response)
+2026-08-22 16:00:51,397 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BEAR_PUT_SPREAD: Could not resolve a real premium for NSE:NIFTY26AUG24250PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:00:51,398 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTY50-INDEX LONG_STRADDLE | Rejected: ['LATE_SESSION']
+2026-08-22 16:00:51,562 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:52,542 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250CE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:52,542 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:NIFTY26AUG24250CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:00:52,542 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTY50-INDEX LONG_STRANGLE | Rejected: ['LATE_SESSION']
+2026-08-22 16:00:53,540 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:54,544 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24350CE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:54,544 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:NIFTY26AUG24350CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:00:54,544 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 16:00:54,544 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 16:00:54,545 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 16:00:54,545 - INFO - 👻 [IronCondor_v1.0] CF COMBO IRON_CONDOR NSE:NIFTY50-INDEX IRON_CONDOR | Rejected: ['LATE_SESSION']
+2026-08-22 16:00:55,549 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:56,582 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24200PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:00:56,582 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:NIFTY26AUG24200PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:00:56,582 - INFO - 👻 [Butterfly_v1.0] CF COMBO BUTTERFLY_SPREAD NSE:NIFTY50-INDEX BUTTERFLY_SPREAD | Rejected: ['LATE_SESSION']
+2026-08-22 16:00:57,555 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:26,480 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24150CE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:26,480 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX BUTTERFLY_SPREAD: Could not resolve a real premium for NSE:NIFTY26AUG24150CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:17:26,480 - INFO - 👻 [IronButterfly_v1.0] CF COMBO IRON_BUTTERFLY NSE:NIFTY50-INDEX IRON_BUTTERFLY | Rejected: ['LATE_SESSION']
+2026-08-22 16:17:27,052 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:28,064 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24250PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:28,065 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_BUTTERFLY: Could not resolve a real premium for NSE:NIFTY26AUG24250PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:17:28,065 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA']
+2026-08-22 16:17:28,065 - INFO - 👻 [ExpiryAwareTheta_v1.0] CF COMBO IRON_CONDOR NSE:NIFTY50-INDEX IRON_CONDOR | Rejected: ['LATE_SESSION']
+2026-08-22 16:17:29,076 - WARNING - No quotes data available for ['NSE:NIFTY50-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:30,243 - WARNING - No quotes data available for ['NSE:NIFTY26AUG24200PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:30,244 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTY50-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:NIFTY26AUG24200PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:17:34,227 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 16:17:34,227 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 16:17:34,227 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE'] (0.0ms)
+2026-08-22 16:17:34,227 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA'] (0.0ms)
+2026-08-22 16:17:34,239 - WARNING - [ExpiryResolver] Both DB and API failed for NSE:NIFTYBANK-INDEX. Falling back to dynamically computed expiry: 26AUG (2026-08-25)
+2026-08-22 16:17:34,240 - INFO - 👻 [VerticalSpread_v1.0] CF COMBO BEAR_PUT_SPREAD NSE:NIFTYBANK-INDEX BEAR_PUT_SPREAD | Rejected: ['LOW_EFFICIENCY']
+2026-08-22 16:17:34,522 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:35,352 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:35,352 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BEAR_PUT_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:17:35,352 - INFO - 👻 [Straddle_v1.0_VolCompression] CF COMBO LONG_STRADDLE NSE:NIFTYBANK-INDEX LONG_STRADDLE | Rejected: ['LATE_SESSION']
+2026-08-22 16:17:36,366 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:37,372 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600CE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:17:37,372 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRADDLE: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:17:37,373 - INFO - 👻 [Strangle_v1.0_VolCompression] CF COMBO LONG_STRANGLE NSE:NIFTYBANK-INDEX LONG_STRANGLE | Rejected: ['LATE_SESSION']
+2026-08-22 16:17:38,388 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:35:32,527 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57800CE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:35:32,527 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX LONG_STRANGLE: Could not resolve a real premium for NSE:BANKNIFTY26AUG57800CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:35:32,528 - WARNING - ⚡ [CreditSpread_v1.0_PCRFade] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 16:35:32,528 - WARNING - ⚡ [OIWallReaction_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 16:35:32,528 - WARNING - ⚡ [PCRExtremeReversal_v1.0] errors: ['OPTIONS_DATA_STALE']
+2026-08-22 16:35:32,528 - INFO - 👻 [IronCondor_v1.0] CF COMBO IRON_CONDOR NSE:NIFTYBANK-INDEX IRON_CONDOR | Rejected: ['LATE_SESSION']
+2026-08-22 16:35:33,141 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:35:33,980 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57500PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:35:33,980 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:BANKNIFTY26AUG57500PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:35:33,981 - INFO - 👻 [Butterfly_v1.0] CF COMBO BUTTERFLY_SPREAD NSE:NIFTYBANK-INDEX BUTTERFLY_SPREAD | Rejected: ['LATE_SESSION']
+2026-08-22 16:35:34,989 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:35:36,004 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57400CE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:35:36,004 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX BUTTERFLY_SPREAD: Could not resolve a real premium for NSE:BANKNIFTY26AUG57400CE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:35:36,005 - INFO - 👻 [IronButterfly_v1.0] CF COMBO IRON_BUTTERFLY NSE:NIFTYBANK-INDEX IRON_BUTTERFLY | Rejected: ['LATE_SESSION']
+2026-08-22 16:52:08,448 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:52:08,582 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57600PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:52:08,582 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_BUTTERFLY: Could not resolve a real premium for NSE:BANKNIFTY26AUG57600PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 16:52:08,582 - WARNING - ⚡ [OI_Scalping_v1.0] errors: ['INSUFFICIENT_OI_DATA']
+2026-08-22 16:52:08,582 - INFO - 👻 [ExpiryAwareTheta_v1.0] CF COMBO IRON_CONDOR NSE:NIFTYBANK-INDEX IRON_CONDOR | Rejected: ['LATE_SESSION']
+2026-08-22 16:52:09,586 - WARNING - No quotes data available for ['NSE:NIFTYBANK-INDEX'] (code=-15, message=Please provide valid token)
+2026-08-22 16:52:10,611 - WARNING - No quotes data available for ['NSE:BANKNIFTY26AUG57500PE'] (code=-15, message=Please provide valid token)
+2026-08-22 16:52:10,611 - ERROR - ❌ Failed to resolve combo legs for NSE:NIFTYBANK-INDEX IRON_CONDOR: Could not resolve a real premium for NSE:BANKNIFTY26AUG57500PE (DB warehouse miss/stale AND live quote failed)
+2026-08-22 17:52:05,323 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 17:50 at 17:52:05...
+2026-08-22 18:51:18,616 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 18:50 at 18:51:18...
+2026-08-22 19:35:27,583 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 19:35 at 19:35:27...
+2026-08-22 19:46:11,252 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 19:45 at 19:46:11...
+2026-08-22 20:37:28,841 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 20:35 at 20:37:28...
+2026-08-22 21:05:51,274 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 21:05 at 21:05:51...
+2026-08-22 21:26:10,801 - INFO - 🔔 [New Candle Closed] Running entry pipeline for candle 21:25 at 21:26:10...
