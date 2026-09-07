@@ -20,6 +20,7 @@ Nothing else needs to change — both live and backtest pick it up automatically
 from src.core.experiment import Experiment
 from src.core.experiment_registry import ExperimentRegistry
 from src.strategies.structural_strategy import StructuralStrategy
+from src.strategies.structural_quality_gated_strategy import StructuralQualityGatedStrategy
 from src.strategies.ema_pullback import EmaPullbackStrategy
 from src.strategies.vwap_reversion import VwapReversionStrategy
 from src.strategies.prev_day_extremes import PrevDayExtremesStrategy
@@ -45,6 +46,11 @@ from src.strategies.expiry_aware_theta_strategy import ExpiryAwareThetaStrategy
 from src.strategies.relative_value_strategy import RelativeValueStrategy
 from src.strategies.momentum_burst_5m import MomentumBurst5mStrategy
 from src.strategies.htf_pullback_reversal import HtfPullbackReversalStrategy
+from src.strategies.adx_dmi_cci_strategy import AdxDmiCciStrategy
+from src.strategies.seasonal_strategy import SeasonalStrategy
+from src.strategies.grid_trading_strategy import GridTradingStrategy
+from src.strategies.sma_ladder_strategy import SmaLadderStrategy
+from src.strategies.wedge_breakout_strategy import WedgeBreakoutStrategy
 
 
 def build_registry() -> ExperimentRegistry:
@@ -93,6 +99,30 @@ def build_registry() -> ExperimentRegistry:
             },
         },
         description="Structural_v3.2_RVOL1.0 entry logic + context-aware exit management (shadow-only A/B clone)"
+    ))
+
+    # Structural v3.4 — same entry logic as v3.2_RVOL1.0, but additionally
+    # gates SWEEP/TRAP setups on move_efficiency/wickiness (the frozen engine
+    # only gates these on BREAKOUT — SWEEP/TRAP are exempt by design). Real
+    # losses on 2026-08-24/08-31/09-01/09-04 showed this exemption passing
+    # through choppy candles (wickiness up to 0.71, move_efficiency as low as
+    # 0.085, often with NEUTRAL/NEUTRAL bias both timeframes). Shadow-only
+    # clone — see StructuralQualityGatedStrategy's docstring — to validate the
+    # gate via filter_attribution.py against Structural_v3.2_RVOL1.0 before
+    # ever considering it for real capital.
+    registry.register(Experiment(
+        name="Structural_v3.4_QualityGated",
+        strategy=StructuralQualityGatedStrategy(
+            rvol_threshold=1.0, min_zone_score=50.0,
+            min_move_efficiency=0.6, max_wickiness=0.5,
+        ),
+        params={
+            "rvol_threshold": 1.0,
+            "min_zone_score": 50.0,
+            "min_move_efficiency": 0.6,
+            "max_wickiness": 0.5,
+        },
+        description="Structural_v3.2_RVOL1.0 entry logic + SWEEP/TRAP move_efficiency/wickiness gate (shadow-only A/B clone)"
     ))
 
     # 2. EMA Pullback
@@ -195,7 +225,18 @@ def build_registry() -> ExperimentRegistry:
             "min_body_fraction": 0.40,
             "atr_sl_buffer_mult": 0.15,
             "tp_atr_cap": 3.0,
-            "min_rr": 1.5
+            "min_rr": 1.5,
+            # Real losses gave back real MFE before reversing (e.g. +1.28R on
+            # 2026-08-31, +1.55R on 2026-09-02) under the default trail, which
+            # doesn't tighten below the full entry-risk distance until 1.5R —
+            # both reversed well before that. Expressed in ₹ of real premium
+            # P&L, not R: lock breakeven once ₹750 of profit is banked, start
+            # tightening the trail at ₹1,500. These are flat rupee amounts
+            # (not scaled to each trade's own risk/position size like the R
+            # version was) — a rough translation of the prior 0.5R/1.0R using
+            # this experiment's typical ~₹1,500 per-trade risk; revisit once
+            # real backtest data is available to calibrate properly.
+            "exit_management": {"breakeven_lock_inr": 750, "trail_tighten_inr": 1500},
         },
         description="Order Flow Strategy v1.0 — stop sweeps and imbalance pullbacks (M2C)"
     ))
@@ -376,7 +417,17 @@ def build_registry() -> ExperimentRegistry:
             stop_loss_pct=0.50, target_multiple=2.0,
             min_rvol=1.5, min_votes=3, lookback_minutes=10,
         ),
-        params={"stop_loss_pct": 0.50, "target_multiple": 2.0, "min_rvol": 1.5},
+        params={
+            "stop_loss_pct": 0.50, "target_multiple": 2.0, "min_rvol": 1.5,
+            # The day's worst loss (-0.32R, 2026-08-31) reached +0.63R MFE
+            # before fully reversing under the default trail, which doesn't
+            # tighten below the full entry-risk distance until 1.5R.
+            # Expressed in ₹ of real premium P&L, not R — see OrderFlow_v1.0
+            # above for the same fix and the same calibration caveat (flat
+            # rupee amounts, not scaled per-trade; revisit with real
+            # backtest data).
+            "exit_management": {"breakeven_lock_inr": 750, "trail_tighten_inr": 1500},
+        },
         description=(
             "PAPER: OI×premium 4-quadrant positioning inference scalper. "
             "3/5 windows must agree on direction. BSM Greeks required. "
@@ -492,6 +543,75 @@ def build_registry() -> ExperimentRegistry:
             "target_rr_floor": 1.8, "rvol_threshold": 0.9,
         },
         description="Daily bias + 1H EMA20 pullback + 5M rejection-candle trigger — swing continuation, not structural break"
+    ))
+
+    # ADX/DMI + CCI Trend Strength — ADX-confirmed trend, DMI direction,
+    # CCI momentum trigger. Fills a gap: nothing else reads a DMI/CCI pair.
+    registry.register(Experiment(
+        name="AdxDmiCci_v1.0_ADX20",
+        strategy=AdxDmiCciStrategy(
+            adx_threshold=20.0, cci_period=20, cci_entry_level=100.0,
+            di_period=14, atr_sl_buffer_mult=0.3, tp_atr_cap=3.0, min_rr=1.5,
+        ),
+        params={
+            "adx_threshold": 20.0, "cci_period": 20, "cci_entry_level": 100.0,
+            "di_period": 14, "atr_sl_buffer_mult": 0.3, "tp_atr_cap": 3.0, "min_rr": 1.5,
+        },
+        description="ADX>20 trend confirmation + DMI crossover direction + CCI +-100 momentum trigger"
+    ))
+
+    # Seasonal (Sell in May) — Nov-Apr/May-Oct calendar bias + EMA20 touch/reversal trigger.
+    registry.register(Experiment(
+        name="Seasonal_v1.0_EMA20",
+        strategy=SeasonalStrategy(
+            ema_touch_tolerance_pct=0.0015, min_body_fraction=0.40,
+            atr_sl_buffer_mult=0.4, tp_atr_cap=3.0, min_rr=1.5,
+        ),
+        params={
+            "ema_touch_tolerance_pct": 0.0015, "min_body_fraction": 0.40,
+            "atr_sl_buffer_mult": 0.4, "tp_atr_cap": 3.0, "min_rr": 1.5,
+        },
+        description="Nov-Apr/May-Oct calendar bias gates an EMA20 touch+reversal trigger ('Sell in May')"
+    ))
+
+    # Grid Trading — ATR-spaced buy/sell ladder around the session anchor, range-gated.
+    registry.register(Experiment(
+        name="GridTrading_v1.0_ADX20",
+        strategy=GridTradingStrategy(
+            grid_spacing_atr_mult=0.5, max_grid_levels=3, adx_ceiling=20.0, min_rr=1.2,
+        ),
+        params={
+            "grid_spacing_atr_mult": 0.5, "max_grid_levels": 3, "adx_ceiling": 20.0, "min_rr": 1.2,
+        },
+        description="ATR-spaced grid of buy/sell levels around session anchor, active only when ADX confirms a range"
+    ))
+
+    # SMA Ladder (20/50/100/150/200 daily) — bounce in trend direction, or break against alignment.
+    registry.register(Experiment(
+        name="SmaLadder_v1.0",
+        strategy=SmaLadderStrategy(
+            touch_tolerance_pct=0.002, min_body_fraction=0.40,
+            atr_sl_buffer_mult=0.3, tp_atr_cap=3.0, min_rr=1.5,
+        ),
+        params={
+            "touch_tolerance_pct": 0.002, "min_body_fraction": 0.40,
+            "atr_sl_buffer_mult": 0.3, "tp_atr_cap": 3.0, "min_rr": 1.5,
+        },
+        description="Daily SMA(20/50/100/150/200) ladder — bounce in trend direction, or break against alignment"
+    ))
+
+    # Wedge Compression Breakout — converging-trendline pattern breakout, distinct from ATR-percentile squeeze.
+    registry.register(Experiment(
+        name="WedgeBreakout_v1.0",
+        strategy=WedgeBreakoutStrategy(
+            window=10, rvol_threshold=1.3, min_body_fraction=0.45,
+            atr_sl_buffer_mult=0.2, tp_atr_cap=3.0, min_rr=1.5,
+        ),
+        params={
+            "window": 10, "rvol_threshold": 1.3, "min_body_fraction": 0.45,
+            "atr_sl_buffer_mult": 0.2, "tp_atr_cap": 3.0, "min_rr": 1.5,
+        },
+        description="Falling-highs/rising-lows wedge compression + directional RVOL-confirmed breakout"
     ))
 
     return registry

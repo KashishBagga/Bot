@@ -109,6 +109,15 @@ class CreditSpreadStrategy(BaseStrategy):
                 rejection_reasons.append("LATE_SESSION")
             if self.spread_width_strikes <= 0:
                 rejection_reasons.append("ZERO_WIDTH")
+            # PCR-fade credit spreads need price to stay away from the sold
+            # strike — a gap or a strong trend defeats that regardless of
+            # RVOL/efficiency at the entry candle. See butterfly_strategy.py
+            # for the same fix and the real losses that motivated it.
+            regime = snapshot.regime_detail
+            if regime is not None and regime.primary in (
+                "GAP_UP", "GAP_DOWN", "STRONG_TREND_UP", "STRONG_TREND_DOWN"
+            ):
+                rejection_reasons.append(f"UNFAVORABLE_REGIME:{regime.primary}")
 
             if combo_type == "BULL_PUT_SPREAD":
                 combo_legs = [
@@ -153,6 +162,7 @@ class CreditSpreadStrategy(BaseStrategy):
                     "atr": round(atr, 2),
                     "move_efficiency": round(move_efficiency, 3),
                     "spread_width_strikes": self.spread_width_strikes,
+                    "regime_primary": regime.primary if regime is not None else None,
                     # Research fields, not a filter yet — does OI buildup
                     # direction agreeing with the PCR fade predict a better
                     # win rate for this thesis? See options_intelligence_engine.py.

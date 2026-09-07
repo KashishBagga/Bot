@@ -154,6 +154,15 @@ class ExpiryAwareThetaStrategy(BaseStrategy):
                 rejection_reasons.append("LATE_SESSION")
             if wing_width_strikes <= 0:
                 rejection_reasons.append("ZERO_WIDTH")
+            # This thesis needs price to stay inside the wings — a gap or a
+            # strong trend defeats it regardless of RVOL/efficiency at the
+            # entry candle. See butterfly_strategy.py for the same fix and the
+            # real losses that motivated it.
+            regime = snapshot.regime_detail
+            if regime is not None and regime.primary in (
+                "GAP_UP", "GAP_DOWN", "STRONG_TREND_UP", "STRONG_TREND_DOWN"
+            ):
+                rejection_reasons.append(f"UNFAVORABLE_REGIME:{regime.primary}")
 
             combo_legs = [
                 {"option_type": "PE", "side": "SELL", "strikes_away": -1},
@@ -194,6 +203,7 @@ class ExpiryAwareThetaStrategy(BaseStrategy):
                     "wing_width_strikes": wing_width_strikes,
                     "tte_days": round(tte_days, 2),
                     "rvol_ceiling_used": round(rvol_ceiling, 2),
+                    "regime_primary": regime.primary if regime is not None else None,
                 },
             }
             self._tag_signal(sig, experiment_name)

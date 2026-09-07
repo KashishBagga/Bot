@@ -95,6 +95,15 @@ class VerticalSpreadStrategy(BaseStrategy):
                 rejection_reasons.append("LOW_EFFICIENCY")
             if current_time.hour >= 15:
                 rejection_reasons.append("LATE_SESSION")
+            # This is a directional bet financed as a spread — it still needs an
+            # actual trend to be right about, not just an EMA cross. Added after
+            # this experiment's worst single loss (-0.64R, Aug 24) and two more
+            # losses (Aug 31) all fired on trend-quality-2.4-3.9/10 chop days;
+            # RVOL/efficiency alone didn't catch it because a choppy day can
+            # still produce a brief efficient-looking EMA cross.
+            regime = snapshot.regime_detail
+            if regime is not None and regime.primary in ("RANGE", "COMPRESSION"):
+                rejection_reasons.append(f"LOW_TREND_QUALITY:{regime.primary}")
 
             if combo_type == "BULL_CALL_SPREAD":
                 combo_legs = [
@@ -139,6 +148,7 @@ class VerticalSpreadStrategy(BaseStrategy):
                     "atr": round(atr, 2),
                     "move_efficiency": round(move_efficiency, 3),
                     "spread_width_strikes": self.spread_width_strikes,
+                    "regime_primary": regime.primary if regime is not None else None,
                 },
             }
             self._tag_signal(sig, experiment_name)

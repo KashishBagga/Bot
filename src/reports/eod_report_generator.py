@@ -32,6 +32,7 @@ from src.reports.sections.experiment_ranking import ExperimentRankingSection
 from src.reports.sections.thesis_analysis import ThesisAnalysisSection
 from src.reports.sections.market_behaviour import MarketBehaviourSection
 from src.reports.sections.market_state_outlook import MarketStateOutlookSection
+from src.reports.sections.tomorrow_outlook import TomorrowOutlookSection
 from src.reports.sections.research_queue import ResearchQueueSection
 from src.reports.sections.strategy_health import StrategyHealthSection
 from src.reports.sections.strategic_outlook import StrategicOutlookSection
@@ -84,6 +85,7 @@ class EODReportGenerator:
             ThesisAnalysisSection,
             MarketBehaviourSection,
             MarketStateOutlookSection,
+            TomorrowOutlookSection,
             ResearchQueueSection,
             StrategyHealthSection,
             StrategicOutlookSection,

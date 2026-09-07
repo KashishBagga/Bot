@@ -40,15 +40,30 @@ SHORT_VOL_GROUP_EXPERIMENTS = {
 }
 MAX_SHORT_VOL_GROUP_EXPOSURE = 0.15
 
+# ── Martingale sizing (opt-in, off by default) ─────────────────────────────
+# Requested as a classic/basic strategy (r/algotrading thread), but doubling
+# down after a loss is fundamentally in tension with fixed-fraction risk
+# sizing — a long enough losing streak makes it a certainty, not a tail risk.
+# Never enabled globally: a caller must explicitly pass martingale_enabled=True
+# per get_position_size() call (see indian_trader.py's MARTINGALE_EXPERIMENTS —
+# empty by default, i.e. no experiment opts in unless a human adds it there).
+# Even when enabled, the multiplier is capped at 2**MARTINGALE_MAX_STREAK and
+# the result still passes through every existing hard limit below
+# (MAX_POSITION_AMOUNT, MAX_PORTFOLIO_EXPOSURE, daily-loss halt) unchanged —
+# those limits are the actual backstop, not this cap.
+MARTINGALE_MAX_STREAK = 3
+MARTINGALE_MULTIPLIER_CAP = 2 ** MARTINGALE_MAX_STREAK
+
 
 @dataclass
 class StrategyStats:
     """Running performance stats used for Kelly + capital allocation."""
-    total_trades:   int   = 0
-    winning_trades: int   = 0
-    gross_wins:     float = 0.0   # sum of profitable P&L
-    gross_losses:   float = 0.0   # sum of (abs) losing P&L
-    kelly_fraction: float = RISK_FRACTION  # dynamically updated
+    total_trades:      int   = 0
+    winning_trades:    int   = 0
+    gross_wins:        float = 0.0   # sum of profitable P&L
+    gross_losses:      float = 0.0   # sum of (abs) losing P&L
+    kelly_fraction:    float = RISK_FRACTION  # dynamically updated
+    consecutive_losses: int  = 0     # for the opt-in Martingale multiplier only
 
     @property
     def win_rate(self) -> float:
@@ -71,8 +86,10 @@ class StrategyStats:
         if pnl > 0:
             self.winning_trades += 1
             self.gross_wins     += pnl
+            self.consecutive_losses = 0
         else:
             self.gross_losses   += abs(pnl)
+            self.consecutive_losses += 1
         self._update_kelly()
 
     def _update_kelly(self):
@@ -164,6 +181,7 @@ class PositionSizer:
         regime_primary:   str   = "UNKNOWN",
         regime_vol_state: str   = "NORMAL",
         deployed_capital: float = 0.0,   # already used capital across open trades
+        martingale_enabled: bool = False,  # opt-in only — see MARTINGALE_MAX_STREAK above
     ) -> float:
         """
         Calculate position size (notional capital to deploy) for a new trade.
@@ -222,6 +240,21 @@ class PositionSizer:
             risk_amount   = self.capital * final_fraction
             position_size = risk_amount / risk_per_unit
 
+            # Martingale multiplier — opt-in only (see MARTINGALE_MAX_STREAK
+            # above). Applied BEFORE the hard bounds below, so a losing streak
+            # can double the size a few times but never breach
+            # MAX_POSITION_AMOUNT / MAX_PORTFOLIO_EXPOSURE / the daily-loss halt.
+            martingale_mult = 1.0
+            if martingale_enabled:
+                streak = min(stats.consecutive_losses, MARTINGALE_MAX_STREAK)
+                martingale_mult = 2 ** streak
+                if martingale_mult > 1.0:
+                    logger.warning(
+                        f"🎲 Martingale active [{strategy}]: {streak} consecutive loss(es) "
+                        f"→ {martingale_mult:.0f}x size (capped at {MARTINGALE_MULTIPLIER_CAP:.0f}x)"
+                    )
+                position_size *= martingale_mult
+
             # Apply bounds
             position_size = max(MIN_POSITION_AMOUNT, position_size)
             position_size = min(MAX_POSITION_AMOUNT, position_size)
@@ -229,8 +262,8 @@ class PositionSizer:
 
             logger.info(
                 f"💰 Position size [{strategy}|{regime_primary}_{regime_vol_state}|conf={confidence:.0f}]: "
-                f"frac={final_fraction:.3f} → ₹{position_size:,.0f} "
-                f"(risk/unit={risk_per_unit:.2%})"
+                f"frac={final_fraction:.3f}{f' x{martingale_mult:.0f} martingale' if martingale_mult > 1.0 else ''} "
+                f"→ ₹{position_size:,.0f} (risk/unit={risk_per_unit:.2%})"
             )
             return round(position_size, 2)
 

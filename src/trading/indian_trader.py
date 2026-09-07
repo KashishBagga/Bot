@@ -32,6 +32,7 @@ from src.core.regime_router import is_regime_eligible
 from src.core.indicator_pipeline import IndicatorPipeline
 from src.core.experiment_factory import build_registry
 from src.core.portfolio import PortfolioManager
+from src.trading.hedge_manager import HedgeManager
 from src.core.expiry_blackout import ExpiryBlackoutManager
 from src.warehouse.premarket_collector import PreMarketCollector
 
@@ -146,6 +147,15 @@ class StructuralPaperTrader:
         # Woodchopper protection: (symbol, direction, bucket) -> attempt count for today
         self._daily_level_attempts: Dict[tuple, int] = {}
 
+        # Martingale sizing — opt-in ONLY, off by default (empty set). Add an
+        # experiment_name here to size that specific experiment's real trades
+        # with PositionSizer's capped Martingale multiplier (see
+        # MARTINGALE_MAX_STREAK in position_sizer.py) after consecutive
+        # losses. Every other risk gate above (daily loss halt, exposure cap,
+        # max concurrent real trades) still applies unchanged — this does not
+        # bypass any of them, it only changes the SIZE of a still-gated trade.
+        self.MARTINGALE_EXPERIMENTS: set = set()
+
         # ── Circuit breaker (sustained data-feed failure) ────────────────
         # Separate from trading_halted_today (daily-loss halt) on purpose: a
         # data outage isn't a daily-risk event and shouldn't reset at day-roll,
@@ -195,6 +205,22 @@ class StructuralPaperTrader:
         for _exp in self.registry.experiments:
             self.db.save_experiment(_exp.to_db_dict())
 
+        # ── Protective hedge-on-loss (REAL positions only) ────────────────
+        # Not a registered Experiment (it never runs against a MarketSnapshot
+        # via registry.run() — it reacts to an open position's own unrealized
+        # loss instead), but real hedge trades still need an experiment_name
+        # for portfolio tracking / DB audit, same as every other real trade.
+        from src.core.experiment import Experiment
+        from src.core.base_strategy import BaseStrategy
+        self.hedge_manager = HedgeManager(loss_r_threshold=1.5, hedge_target_r=1.0, hedge_stop_r=-0.5)
+        self._hedged_trade_ids: set = set()
+        self.db.save_experiment(Experiment(
+            name=HedgeManager.EXPERIMENT_NAME,
+            strategy=BaseStrategy(),
+            params={"loss_r_threshold": 1.5, "hedge_target_r": 1.0, "hedge_stop_r": -0.5},
+            description="Protective opposite-side hedge leg once a real position's loss crosses 1.5R",
+        ).to_db_dict())
+
         # Last successfully computed MarketSnapshot per symbol — one candle
         # stale relative to _update_active_trades (which runs before this
         # candle's snapshot exists). Lets _update_position() read live
@@ -235,6 +261,12 @@ class StructuralPaperTrader:
         self.portfolios.register("RelativeValue_NIFTY_BANKNIFTY_v1.0")
         self.portfolios.register("MomentumBurst_5m_v1.0_RVOL2.0")
         self.portfolios.register("HtfPullback_v1.0_Tol0.6pct")
+        self.portfolios.register("AdxDmiCci_v1.0_ADX20")
+        self.portfolios.register("Seasonal_v1.0_EMA20")
+        self.portfolios.register("GridTrading_v1.0_ADX20")
+        self.portfolios.register("SmaLadder_v1.0")
+        self.portfolios.register("WedgeBreakout_v1.0")
+        self.portfolios.register("Hedge_Protective")
 
         # active_trades keyed by (symbol, experiment_name) — independent per experiment
         self.active_trades: Dict[Tuple[str, str], Dict] = {}
@@ -494,12 +526,58 @@ class StructuralPaperTrader:
 
         logger.info("🏛️ Structural Paper Trader Initialized | Active Position Tracking Enabled")
 
+    def _finalize_session_if_due(self, now: datetime) -> None:
+        """Write per-experiment daily metrics and generate the EOD report, once per
+        calendar day. Safe to call from any hour and repeatedly — no-ops once
+        already done for `now`'s date.
+
+        Must be reachable even when candle processing has fallen far behind wall
+        clock (e.g. a backlog of slow sequential combo/counterfactual premium
+        fetches can push a single market_loop() call's wall-clock finish time well
+        past 16:00) — previously this only ran from inside the 09:00-15:59 branch
+        of market_loop(), so a late-running cycle silently skipped the EOD report
+        for the entire day (observed 2026-09-01 and 2026-09-03: report never fired).
+        """
+        today_str = now.strftime("%Y-%m-%d")
+        if self._report_date == today_str and self._report_generated_today:
+            return
+
+        for exp in self.registry.active_experiments:
+            self.db.save_experiment_daily_metrics(
+                date_str=today_str,
+                experiment_name=exp.name,
+                config_hash=exp.config_hash,
+            )
+        try:
+            from src.reports.eod_report_generator import EODReportGenerator
+            gen = EODReportGenerator(self.db, self.data_provider)
+            md_path, json_path = gen.generate(today_str)
+            logger.info(f"📝 EOD report: {md_path}")
+            self._report_generated_today = True
+            self._report_date = today_str
+        except Exception as e:
+            logger.error(f"❌ EOD report generation failed: {e}", exc_info=True)
+
     def market_loop(self):
         """Main loop to be run every 5 minutes during market hours."""
         now = datetime.now(self.tz)
 
-        # Only run between 09:00 and 15:59 IST
+        # Only run between 09:00 and 15:59 IST — but even outside that window,
+        # make sure today's EOD report still fires if a backlogged cycle caused us
+        # to blow past 15:59 without ever generating it (see _finalize_session_if_due).
         if not (9 <= now.hour < 16):
+            if now.hour >= 16:
+                self.position_lock.acquire()
+                try:
+                    # Force one more pass over any still-open positions before
+                    # finalizing — force=True bypasses position_tracking_loop()'s
+                    # own 16:00 ceiling for this one deliberate catch-up call, since
+                    # a backlogged scheduler can land here before any regular
+                    # position_tracking_loop tick had a chance to run.
+                    self.position_tracking_loop(force=True)
+                    self._finalize_session_if_due(now)
+                finally:
+                    self.position_lock.release()
             return
 
         self.position_lock.acquire()
@@ -564,31 +642,12 @@ class StructuralPaperTrader:
                 now.hour == SESSION_CUTOFF_HOUR and now.minute >= SESSION_CUTOFF_MIN
             ):
                 logger.info("🔒 Session cutoff reached (15:25) — no new entries.")
-                # Write one summary row per experiment into experiment_daily_metrics
-                today_str = now.strftime("%Y-%m-%d")
-                for exp in self.registry.active_experiments:
-                    self.db.save_experiment_daily_metrics(
-                        date_str=today_str,
-                        experiment_name=exp.name,
-                        config_hash=exp.config_hash,
-                    )
-                # Generate EOD report at 15:35 — once per session
-                if (
-                    now.minute >= SESSION_REPORT_MIN
-                    and (
-                        not self._report_generated_today
-                        or self._report_date != today_str
-                    )
-                ):
-                    try:
-                        from src.reports.eod_report_generator import EODReportGenerator
-                        gen = EODReportGenerator(self.db, self.data_provider)
-                        md_path, json_path = gen.generate(today_str)
-                        logger.info(f"📝 EOD report: {md_path}")
-                        self._report_generated_today = True
-                        self._report_date = today_str
-                    except Exception as e:
-                        logger.error(f"❌ EOD report generation failed: {e}", exc_info=True)
+                # The report itself only generates once minute >= 35, to give the
+                # 15:30 candle's exits/fills time to land in the DB first; the
+                # out-of-hours branch above has no such constraint since by then
+                # we're catching up well after the fact anyway.
+                if now.minute >= SESSION_REPORT_MIN:
+                    self._finalize_session_if_due(now)
                 return
 
             # 3b. Expiry / event blackout gate (Bug 18 fix). Re-enabled 2026-08-08
@@ -740,14 +799,20 @@ class StructuralPaperTrader:
         finally:
             self.position_lock.release()
 
-    def position_tracking_loop(self):
-        """Lightweight loop to check SL/TP and exit positions in real time (every 30s)."""
+    def position_tracking_loop(self, force: bool = False):
+        """Lightweight loop to check SL/TP and exit positions in real time (every 30s).
+
+        `force=True` bypasses the 09:00-15:59 IST ceiling — used only by
+        market_loop()'s post-16:00 catch-up branch to force one last exit pass on
+        any still-open position before finalizing the day (see
+        _finalize_session_if_due). The regular scheduler-driven call keeps the
+        hard 16:00 ceiling: this loop must never poll on its own past market hours.
+        """
         now = datetime.now(self.tz)
-        
-        # Only run between 09:00 and 15:59 IST
-        if not (9 <= now.hour < 16):
+
+        if not force and not (9 <= now.hour < 16):
             return
-            
+
         with self.position_lock:
             # Check if we have any active trades to update (avoid API overhead if book is empty)
             has_active = (
@@ -1195,6 +1260,10 @@ class StructuralPaperTrader:
                         self.daily_realized_r += pnl_r
                         self.portfolios.on_exit(experiment_name, pnl_r, timestamp)
                         self.active_trades.pop(key)
+                    elif experiment_name != HedgeManager.EXPERIMENT_NAME:
+                        # Protective hedge check — real, still-open, non-hedge
+                        # positions only (a hedge leg never hedges itself).
+                        self._maybe_hedge_position(pos, current_prices[symbol], timestamp)
                 except Exception as e:
                     logger.critical(
                         f"🚨 Position update FAILED for real trade {key}: {e}. "
@@ -1272,6 +1341,44 @@ class StructuralPaperTrader:
                     self.active_cf_combo_theses.pop((exp_name,) + thesis_base, None)
                     self._notify_strategy_exit(exp_name, pos['symbol'], pos.get('_last_pnl_r', 0.0), timestamp)
                     self.active_cf_combos.pop(combo_id)
+
+    def _maybe_hedge_position(self, pos: Dict, current_price: float, timestamp) -> None:
+        """Enter a protective opposite-side leg once `pos`'s unrealized loss
+        crosses HedgeManager's threshold. One hedge per original trade_id —
+        tracked here in self._hedged_trade_ids, not inside HedgeManager
+        itself, so HedgeManager.check_position() stays a pure function of
+        (pos, price, timestamp).
+
+        Deliberately reuses _enter_position() — the exact same real-order
+        entry pipeline (position sizing, option resolution, execution audit,
+        DB persistence) every experiment signal already goes through — so the
+        hedge leg is managed by _update_position() next tick like any other
+        real trade, with zero new position lifecycle code.
+        """
+        trade_id = pos.get('trade_id')
+        if not trade_id or trade_id in self._hedged_trade_ids:
+            return
+        hedge_sig = self.hedge_manager.check_position(pos, current_price, timestamp)
+        if hedge_sig is None:
+            return
+        self._hedged_trade_ids.add(trade_id)
+
+        # Suffix with the original trade_id so two simultaneous hedges on the
+        # same symbol (from two different experiments' real positions) never
+        # collide on the same active_trades key — register a portfolio for
+        # this specific hedge on the fly since the generic "Hedge_Protective"
+        # name registered at startup can't be shared across concurrent hedges.
+        hedge_experiment_name = f"{HedgeManager.EXPERIMENT_NAME}_{trade_id}"
+        hedge_sig['experiment_name'] = hedge_experiment_name
+        if self.portfolios.get(hedge_experiment_name) is None:
+            self.portfolios.register(hedge_experiment_name)
+
+        hedge_key = (hedge_sig['symbol'], hedge_experiment_name)
+        self._enter_position(
+            hedge_sig, timestamp, hedge_key, is_counterfactual=False,
+            snapshot=self._last_snapshot.get(hedge_sig['symbol']),
+        )
+        self.portfolios.on_entry(hedge_experiment_name, timestamp)
 
     def _batch_resolve_option_quotes(self, option_symbols: List[str]) -> Dict[str, Tuple[float, float, float]]:
         """One get_quotes() call for every open position's resolved option leg,
@@ -1360,6 +1467,10 @@ class StructuralPaperTrader:
             return None
         premium_pnl_inr = (current_premium - pos['entry_premium']) * pos['lot_size'] * pos.get('lots', 1.0)
         pos['_last_current_premium'] = current_premium
+        # Absolute ₹ P&L for this tick — used by exit_mgmt's breakeven_lock_inr/
+        # trail_tighten_inr (see _update_position) so those triggers compare
+        # against a real rupee amount instead of the R ratio below.
+        pos['_last_premium_pnl_inr'] = premium_pnl_inr
         return premium_pnl_inr / risk_amount_inr
 
     def _update_position(self, pos: Dict, current_price: float, timestamp, bar: Dict = None,
@@ -1427,8 +1538,38 @@ class StructuralPaperTrader:
         # fabricate a price.
         premium_pnl_r = self._premium_pnl_r(pos, option_quote)
         current_pnl_r = premium_pnl_r if premium_pnl_r is not None else index_pnl_r
+        # Absolute ₹ P&L for this tick — only meaningful when a real option
+        # premium was resolved (see _premium_pnl_r); None otherwise, same as
+        # premium_pnl_r itself, so exit_mgmt's ₹-based checks below skip
+        # cleanly rather than fabricate a price off the index-point proxy.
+        current_pnl_inr = pos.get('_last_premium_pnl_inr') if premium_pnl_r is not None else None
 
         pos['max_closed_profit_r'] = max(pos.get('max_closed_profit_r', 0.0), current_pnl_r)
+
+        # Optional breakeven lock: once this position banks at least
+        # exit_mgmt['breakeven_lock_inr'] rupees of real premium profit,
+        # ratchet the stop up to (at worst) entry price so a give-back can no
+        # longer turn a real gain into a loss. Off by default (preserves
+        # existing behavior for every experiment that hasn't opted in) —
+        # added after MFE-then-reversal losses on OI_Scalping_v1.0/
+        # OrderFlow_v1.0 (e.g. +0.63R/+1.55R MFE reversing to a net loss under
+        # the plain Chandelier trail below, which doesn't tighten below the
+        # full entry-risk distance until current_pnl_inr reaches
+        # trail_tighten_inr). Expressed in ₹, not R — needs a resolved option
+        # premium (current_pnl_inr is None otherwise, e.g. quote temporarily
+        # unavailable), and skips harmlessly in that case.
+        breakeven_lock_inr = exit_mgmt.get('breakeven_lock_inr')
+        if breakeven_lock_inr is not None and current_pnl_inr is not None and current_pnl_inr >= breakeven_lock_inr:
+            entry_price = pos['entry_price']
+            old_sl = pos['stop_loss']
+            if pos['signal'] == 'BUY CALL' and old_sl < entry_price:
+                pos['stop_loss'] = entry_price
+                self._log_position_update(pos, current_price, timestamp, 'BREAKEVEN_LOCK',
+                                          old_sl=old_sl, old_tp=None)
+            elif pos['signal'] == 'BUY PUT' and old_sl > entry_price:
+                pos['stop_loss'] = entry_price
+                self._log_position_update(pos, current_price, timestamp, 'BREAKEVEN_LOCK',
+                                          old_sl=old_sl, old_tp=None)
 
         is_closed = False
         exit_reason = None
@@ -1474,8 +1615,19 @@ class StructuralPaperTrader:
             # Check trailing SL
             elif current_price > old_highest:
                 old_sl = pos['stop_loss']
-                # FIX: Tighten trail step to 0.75× once 1.5R is in the bag
-                trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
+                # FIX: Tighten trail step to 0.75× once enough real profit is
+                # banked. Defaults to the original hardcoded 1.5R for every
+                # experiment that hasn't opted in; exit_mgmt['trail_tighten_inr']
+                # lets a specific experiment trigger this off an absolute ₹
+                # premium profit instead of an R ratio — e.g.
+                # OI_Scalping_v1.0/OrderFlow_v1.0, which kept giving back MFE
+                # below 1.5R. Skips (no tightening) if configured but the
+                # current tick has no resolved premium to compare against.
+                trail_tighten_inr = exit_mgmt.get('trail_tighten_inr')
+                if trail_tighten_inr is not None:
+                    trail_mult = 0.75 if (current_pnl_inr is not None and current_pnl_inr >= trail_tighten_inr) else 1.0
+                else:
+                    trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
                 if exit_mgmt.get('atr_adaptive_trailing') and live_snapshot is not None:
                     current_atr = live_snapshot.features.get_float('atr', pos.get('atr_at_entry') or stop_loss_distance)
                     # k1=1.5: Chandelier-style multiple of CURRENT ATR (replaces the
@@ -1528,8 +1680,19 @@ class StructuralPaperTrader:
             # Check trailing SL
             elif current_price < old_lowest:
                 old_sl = pos['stop_loss']
-                # FIX: Tighten trail step to 0.75× once 1.5R is in the bag
-                trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
+                # FIX: Tighten trail step to 0.75× once enough real profit is
+                # banked. Defaults to the original hardcoded 1.5R for every
+                # experiment that hasn't opted in; exit_mgmt['trail_tighten_inr']
+                # lets a specific experiment trigger this off an absolute ₹
+                # premium profit instead of an R ratio — e.g.
+                # OI_Scalping_v1.0/OrderFlow_v1.0, which kept giving back MFE
+                # below 1.5R. Skips (no tightening) if configured but the
+                # current tick has no resolved premium to compare against.
+                trail_tighten_inr = exit_mgmt.get('trail_tighten_inr')
+                if trail_tighten_inr is not None:
+                    trail_mult = 0.75 if (current_pnl_inr is not None and current_pnl_inr >= trail_tighten_inr) else 1.0
+                else:
+                    trail_mult = 0.75 if current_pnl_r >= 1.5 else 1.0
                 if exit_mgmt.get('atr_adaptive_trailing') and live_snapshot is not None:
                     current_atr = live_snapshot.features.get_float('atr', pos.get('atr_at_entry') or stop_loss_distance)
                     trail_distance = max(current_atr * 1.5, stop_loss_distance * 0.5) * trail_mult
@@ -1677,6 +1840,13 @@ class StructuralPaperTrader:
             'tp_expansion_cap': cfg.get('tp_expansion_cap'),
             'time_stop_bars': cfg.get('time_stop_bars'),
             'time_stop_min_r': cfg.get('time_stop_min_r', 0.3),
+            # breakeven_lock_inr / trail_tighten_inr: both None (off) preserves
+            # today's exact behavior (trail_tighten_inr unset falls back to the
+            # hardcoded 1.5R threshold — see _update_position()'s trailing-SL
+            # block). Expressed in ₹ of real premium P&L, not R, per-experiment
+            # opt-in (currently OI_Scalping_v1.0/OrderFlow_v1.0 only).
+            'breakeven_lock_inr': cfg.get('breakeven_lock_inr'),
+            'trail_tighten_inr': cfg.get('trail_tighten_inr'),
         }
 
     def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool, snapshot=None):
@@ -1784,6 +1954,11 @@ class StructuralPaperTrader:
                 # Pass currently-deployed notional so the 40% portfolio-exposure
                 # cap actually binds. Real trades only; CFs don't consume capital.
                 deployed_capital=(0.0 if is_counterfactual else self._deployed_capital()),
+                # Opt-in only — see self.MARTINGALE_EXPERIMENTS (empty by
+                # default). Even when an experiment name is added there,
+                # PositionSizer's own hard caps (MAX_POSITION_AMOUNT,
+                # MAX_PORTFOLIO_EXPOSURE) still bind unchanged.
+                martingale_enabled=(experiment_name in self.MARTINGALE_EXPERIMENTS),
             )
             
         lot_size = None

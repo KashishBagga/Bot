@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Section 12 — Strategy Health Score.
+"""Section 13 — Strategy Health Score.
 
 Answers the most important question after a bad day:
   "Should I change anything?"

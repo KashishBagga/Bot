@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Section 11 — Research Queue.
+"""Section 12 — Research Queue.
 
 Replaces "Action Items" with a hypothesis-driven priority list.
 Every recommendation is backed by rolling evidence.

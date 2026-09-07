@@ -96,6 +96,16 @@ class ButterflyStrategy(BaseStrategy):
             cooldown_until = self._loss_cooldown_until.get(snapshot.symbol)
             if cooldown_until is not None and current_time < cooldown_until:
                 rejection_reasons.append("COOLDOWN_AFTER_LOSS")
+            # This thesis needs price to stay near the sold strike — a gap or a
+            # strong trend defeats it outright regardless of RVOL/efficiency at
+            # the entry candle (a gap-day print can look locally quiet). Added
+            # after real losses firing straight into GAP_DOWN_HIGH_VOL (Sep 2,
+            # -1.05R) and a 1-minute stop-out (Sep 4, -1.03R).
+            regime = snapshot.regime_detail
+            if regime is not None and regime.primary in (
+                "GAP_UP", "GAP_DOWN", "STRONG_TREND_UP", "STRONG_TREND_DOWN"
+            ):
+                rejection_reasons.append(f"UNFAVORABLE_REGIME:{regime.primary}")
 
             # Butterfly Spread Legs:
             # Buy 1 ITM Call (-wing_width_strikes)
@@ -138,6 +148,7 @@ class ButterflyStrategy(BaseStrategy):
                     "atr": round(atr, 2),
                     "move_efficiency": round(move_efficiency, 3),
                     "wing_width_strikes": self.wing_width_strikes,
+                    "regime_primary": regime.primary if regime is not None else None,
                 },
             }
             self._tag_signal(sig, experiment_name)

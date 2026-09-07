@@ -25,7 +25,8 @@ changes needed.
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from datetime import timedelta
+from typing import List, Dict, Any, Optional, Tuple
 
 import pandas as pd
 
@@ -64,6 +65,9 @@ class RelativeValueStrategy(BaseStrategy):
         z_entry: float = 2.0,
         min_rr: float = 1.2,
         tp_ratio_reversion_fraction: float = 0.6,
+        max_move_wickiness: float = 0.55,
+        min_move_efficiency: float = 0.5,
+        repeat_cooldown_minutes: float = 30.0,
     ):
         self.nifty_symbol = nifty_symbol
         self.banknifty_symbol = banknifty_symbol
@@ -74,7 +78,21 @@ class RelativeValueStrategy(BaseStrategy):
         # distance) — same logic as every other mean-reversion strategy here
         # capping its target rather than assuming a full round-trip.
         self.tp_ratio_reversion_fraction = tp_ratio_reversion_fraction
+        # This strategy had no quality gate at all — real losses showed
+        # move_efficiency as low as 0.19-0.35 and wickiness as high as 0.63
+        # (Sep 2/3 2026), i.e. choppy/indecisive candles a ratio z-score alone
+        # can't distinguish from a clean divergence. Mirrors the frozen
+        # structural engine's BREAKOUT gate (LOW_EFFICIENCY/HIGH_WICKINESS).
+        self.max_move_wickiness = max_move_wickiness
+        self.min_move_efficiency = min_move_efficiency
         self._snapshots: Dict[str, MarketSnapshot] = {}
+        # Same-direction repeat-signal cooldown — Sep 3 2026 fired 6+ same-side
+        # shorts in 65 minutes against a strengthening trend, each weaker
+        # (decaying |z|/confidence) than the last, with nothing flagging "stop
+        # adding to this thesis." Keyed per symbol; only updated on ACCEPTED
+        # signals, so a rejected/weaker repeat never resets the baseline.
+        self.repeat_cooldown = timedelta(minutes=repeat_cooldown_minutes)
+        self._last_signal: Dict[str, Tuple[Any, str, float]] = {}
 
     def _other_symbol(self, symbol: str) -> Optional[str]:
         if symbol == self.nifty_symbol:
@@ -144,6 +162,7 @@ class RelativeValueStrategy(BaseStrategy):
             bank_side = "BUY CALL" if z > 0 else "BUY PUT"
 
             side = nifty_side if snapshot.symbol == self.nifty_symbol else bank_side
+            current_time = snapshot.timestamp
             price = snapshot.current_price
             atr = snapshot.features.get_float("atr")
             if atr <= 0:
@@ -176,9 +195,26 @@ class RelativeValueStrategy(BaseStrategy):
             if reward <= 0:
                 rejection_reasons.append("NO_REVERSION_ROOM")
 
+            move_efficiency = snapshot.features.get_float("move_efficiency")
+            wickiness = snapshot.features.get_float("wickiness")
+            if move_efficiency < self.min_move_efficiency:
+                rejection_reasons.append("LOW_EFFICIENCY")
+            if wickiness >= self.max_move_wickiness:
+                rejection_reasons.append("HIGH_WICKINESS")
+
+            last = self._last_signal.get(snapshot.symbol)
+            if (
+                last is not None
+                and side == last[1]
+                and (current_time - last[0]) <= self.repeat_cooldown
+                and abs(z) <= last[2]
+            ):
+                rejection_reasons.append("DECAYING_REPEAT_SIGNAL")
+
             confidence = round(min(0.5 + 0.1 * (abs(z) - self.z_entry), 0.9), 2)
             accepted = len(rejection_reasons) == 0
-            current_time = snapshot.timestamp
+            if accepted:
+                self._last_signal[snapshot.symbol] = (current_time, side, abs(z))
             candidate_id = (
                 f"cand_{snapshot.symbol.replace(':', '_').replace('-', '_')}_RELVAL_"
                 f"{price:.2f}_{current_time.strftime('%Y%m%d_%H%M%S')}"
@@ -192,6 +228,8 @@ class RelativeValueStrategy(BaseStrategy):
                 "atr": round(atr, 2),
                 "rr_ratio": rr,
                 "other_symbol": other_symbol,
+                "move_efficiency": round(move_efficiency, 3),
+                "wickiness": round(wickiness, 3),
             }
 
             sig = {

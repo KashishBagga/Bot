@@ -63,14 +63,26 @@ logger.addHandler(fh)
 
 def _aggregate(trade_log: List[Dict[str, Any]]) -> Dict[str, float]:
     if not trade_log:
-        return {'expectancy': 0.0, 'win_rate': 0.0, 'total_r': 0.0, 'trades': 0}
+        return {'expectancy': 0.0, 'win_rate': 0.0, 'total_r': 0.0, 'trades': 0, 'max_drawdown_r': 0.0}
     wins = [t for t in trade_log if t['pnl_r'] > 0]
     total_r = sum(t['pnl_r'] for t in trade_log)
+
+    # Max drawdown in R, walked over trades in entry-time order (trade_log is
+    # already appended in chronological replay order).
+    cum_r = 0.0
+    peak_r = 0.0
+    max_dd = 0.0
+    for t in trade_log:
+        cum_r += t['pnl_r']
+        peak_r = max(peak_r, cum_r)
+        max_dd = max(max_dd, peak_r - cum_r)
+
     return {
         'expectancy': total_r / len(trade_log),
         'win_rate': len(wins) / len(trade_log),
         'total_r': total_r,
         'trades': len(trade_log),
+        'max_drawdown_r': round(max_dd, 2),
     }
 
 
@@ -103,12 +115,18 @@ class TransparentBacktester:
             else:
                 logger.warning(f"⚠️ Insufficient data for {symbol} — skipping")
 
-    def simulate_trades(self, verbose: bool = False) -> Dict[str, Any]:
-        """Replays every symbol's 5m bars through IndicatorPipeline + the full
+    def simulate_trades(self, verbose: bool = False, registry=None) -> Dict[str, Any]:
+        """Replays every symbol's 5m bars through IndicatorPipeline + a
         registered Experiment set, in true chronological order ACROSS symbols
         (not one symbol fully then the next) — RelativeValueStrategy needs
         both NIFTY and BANKNIFTY snapshots interleaved in real time order to
         correlate correctly, same as it sees them live.
+
+        registry: defaults to the full production experiment set
+        (build_registry()); pass a custom ExperimentRegistry (e.g. one
+        experiment per param combo) to backtest a different set — used by
+        grid_search.py to sweep one strategy's parameters without touching
+        the rest of the production registry.
         """
         pipeline = IndicatorPipeline(
             pivot_window=3,
@@ -116,7 +134,8 @@ class TransparentBacktester:
             min_zone_score=50.0,
             db=BacktestDBStub(),
         )
-        registry = build_registry()
+        if registry is None:
+            registry = build_registry()
 
         m5_by_symbol = {s: b['5m'] for s, b in self.historical_data.items()}
         h1_by_symbol = {s: b['1h'] for s, b in self.historical_data.items()}
@@ -285,7 +304,8 @@ class TransparentBacktester:
         logger.info("=" * 60)
         for name, m in sorted(result['per_experiment'].items(), key=lambda kv: kv[1]['total_r'], reverse=True):
             logger.info(f"{name:45s} trades={m['trades']:4d}  win%={m['win_rate']*100:5.1f}  "
-                        f"total_r={m['total_r']:8.2f}  exp={m['expectancy']:6.2f}R")
+                        f"total_r={m['total_r']:8.2f}  exp={m['expectancy']:6.2f}R  "
+                        f"max_dd={m.get('max_drawdown_r', 0.0):6.2f}R")
         logger.info("=" * 60)
 
         self._persist_results(result)

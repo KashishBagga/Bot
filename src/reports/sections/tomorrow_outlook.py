@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
-"""Section 10 — Tomorrow's Outlook.
+"""Section 11 — Tomorrow's Outlook.
 
 Scenarios-based, not predictive. Derived from:
   - Today's close position and trend quality (reused from the Market Narrative
     section's intraday snapshot — see rolling["market_narrative"]["by_symbol"])
   - Session OHLC for structural levels
+  - Daily-timeframe supply/demand zones (ZoneEngine) for break-and-target levels
   - CF pattern (bias from today's dominant direction)
 
-Wording is always conditional: "If X, then watch Y."
+There is no overnight/global-cues data feed (no GIFT Nifty/SGX), so the gap
+call below is a structural probability read from today's own close, not a
+live overnight prediction. Wording is always conditional: "If X, then watch Y."
 """
 
 import logging
-from typing import Any, Dict
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from src.reports.base_section import BaseSection
+from src.core.zone_engine import ZoneEngine, Zone
 
 logger = logging.getLogger(__name__)
+
+SYMBOLS = {"nifty": "NSE:NIFTY50-INDEX", "banknifty": "NSE:NIFTYBANK-INDEX"}
 
 
 class TomorrowOutlookSection(BaseSection):
@@ -46,6 +55,12 @@ class TomorrowOutlookSection(BaseSection):
             self._build_scenarios(nifty_data, bn_data, best_signal)
         )
 
+        playbooks = {}
+        for key, session in (("nifty", nifty_data), ("banknifty", bn_data)):
+            pb = self._build_playbook(key, session)
+            if pb:
+                playbooks[key] = pb
+
         return {
             "nifty": nifty_data,
             "banknifty": bn_data,
@@ -55,7 +70,180 @@ class TomorrowOutlookSection(BaseSection):
             "watch_levels": watch_levels,
             "avoid": avoid,
             "prefer": prefer,
+            "playbooks": playbooks,
         }
+
+    # ── Structural playbook: gap call + zone targets + conditional trades ──
+
+    def _build_playbook(self, key: str, session: Optional[dict]) -> Optional[Dict[str, Any]]:
+        if not session:
+            return None
+
+        cp = session["close_position"]
+        tq = session["trend_quality"]
+        today_high = session["high"]
+        today_low = session["low"]
+        today_close = session["close"]
+
+        gap_call = self._gap_call(cp, tq)
+
+        daily_df = self._fetch_daily(SYMBOLS[key])
+        res_target, sup_target = self._zone_targets(daily_df, today_close)
+        weekly = self._weekly_view(daily_df)
+
+        trades = self._trade_conditions(
+            key, today_high, today_low, today_close, res_target, sup_target, gap_call
+        )
+
+        return {
+            "gap_call": gap_call,
+            "resistance_break_target": res_target,
+            "support_break_target": sup_target,
+            "weekly": weekly,
+            "trade_conditions": trades,
+        }
+
+    @staticmethod
+    def _gap_call(cp: float, tq: float) -> Dict[str, Any]:
+        """Structural (not overnight-data-driven) read on tomorrow's likely open.
+        No SGX/GIFT-Nifty feed exists in this system — this is a probability
+        call from today's own close, framed as likely/low-chance, not a forecast."""
+        if cp > 0.75 and tq > 0.55:
+            return {
+                "label": "Gap-up / higher open",
+                "likely_pct": 55,
+                "low_chance_label": "Flat or gap-down open",
+                "low_chance_pct": 45,
+                "reason": f"Strong close near highs ({cp*100:.0f}% of range) with high trend quality ({tq*100:.0f}%)",
+            }
+        if cp < 0.25 and tq > 0.55:
+            return {
+                "label": "Gap-down / lower open",
+                "likely_pct": 55,
+                "low_chance_label": "Flat or gap-up open",
+                "low_chance_pct": 45,
+                "reason": f"Weak close near lows ({cp*100:.0f}% of range) with high trend quality ({tq*100:.0f}%)",
+            }
+        return {
+            "label": "Flat / normal open (within yesterday's range)",
+            "likely_pct": 60,
+            "low_chance_label": "Gap (either direction)",
+            "low_chance_pct": 40,
+            "reason": f"Neutral close ({cp*100:.0f}% of range) or choppy session (trend quality {tq*100:.0f}%) — no strong directional conviction into the close",
+        }
+
+    def _fetch_daily(self, symbol: str) -> Optional[pd.DataFrame]:
+        try:
+            dt = datetime.strptime(self.date_str, "%Y-%m-%d")
+            df = self.data_provider.get_historical_data(
+                symbol, dt - timedelta(days=150), dt + timedelta(days=1), "D"
+            )
+            return df
+        except Exception as e:
+            logger.warning(f"[tomorrow_outlook] daily fetch failed for {symbol}: {e}")
+            return None
+
+    @staticmethod
+    def _zone_targets(daily_df: Optional[pd.DataFrame], close: float):
+        """Nearest supply zone above close (break-of-high target) and nearest
+        demand zone below close (break-of-low target), from daily-timeframe
+        ZoneEngine zones."""
+        if daily_df is None or len(daily_df) < 30:
+            return None, None
+        try:
+            zones: List[Zone] = ZoneEngine().detect_zones(daily_df, timeframe="d1")
+        except Exception as e:
+            logger.warning(f"[tomorrow_outlook] zone detection failed: {e}")
+            return None, None
+
+        above = [z for z in zones if z.zone_type == "SUPPLY" and z.level > close]
+        below = [z for z in zones if z.zone_type == "DEMAND" and z.level < close]
+
+        res_target = None
+        if above:
+            z = min(above, key=lambda z: z.level)
+            res_target = {"level": round(z.level, 0), "score": z.score,
+                          "distance_pct": round((z.level - close) / close * 100, 2)}
+
+        sup_target = None
+        if below:
+            z = max(below, key=lambda z: z.level)
+            sup_target = {"level": round(z.level, 0), "score": z.score,
+                          "distance_pct": round((close - z.level) / close * 100, 2)}
+
+        return res_target, sup_target
+
+    @staticmethod
+    def _weekly_view(daily_df: Optional[pd.DataFrame]) -> Optional[Dict[str, Any]]:
+        """Coarser 2-day/weekly framing from the last 5 daily candles: weekly
+        range and a bias read using the same close-position/trend-quality
+        heuristic as the single-day view, applied to the week's OHLC."""
+        if daily_df is None or len(daily_df) < 5:
+            return None
+        week = daily_df.tail(5)
+        w_high = float(week["high"].max())
+        w_low = float(week["low"].min())
+        w_open = float(week.iloc[0]["open"])
+        w_close = float(week.iloc[-1]["close"])
+        rng = w_high - w_low + 0.01
+        cp = (w_close - w_low) / rng
+        tq = abs(w_close - w_open) / rng
+
+        if cp > 0.70 and tq > 0.5:
+            bias = "Bullish — week closed strong near highs"
+        elif cp < 0.30 and tq > 0.5:
+            bias = "Bearish — week closed weak near lows"
+        else:
+            bias = "Range-bound — no clear weekly directional edge yet"
+
+        return {
+            "week_high": round(w_high, 0),
+            "week_low": round(w_low, 0),
+            "week_close": round(w_close, 0),
+            "bias": bias,
+        }
+
+    @staticmethod
+    def _trade_conditions(key, today_high, today_low, today_close, res_target, sup_target, gap_call):
+        sym = key.upper()
+        rows = []
+
+        res_desc = (f"toward {res_target['level']} ({res_target['distance_pct']}% away, "
+                    f"zone score {res_target['score']})") if res_target else "toward the next unfilled supply zone"
+        sup_desc = (f"toward {sup_target['level']} ({sup_target['distance_pct']}% away, "
+                    f"zone score {sup_target['score']})") if sup_target else "toward the next unfilled demand zone"
+
+        rows.append({
+            "condition": f"{sym} opens above today's high ({round(today_high,0)}) and the first 15-min candle "
+                          f"closes above it — confirms gap-up holding, not fading",
+            "trade": f"BUY CALL on the first pullback toward {round(today_high,0)}",
+            "stop_loss": f"Below {round(today_high,0)} (structure invalidation)",
+            "target": res_desc,
+        })
+        rows.append({
+            "condition": f"{sym} opens below today's low ({round(today_low,0)}) and the first 15-min candle "
+                          f"closes below it — confirms gap-down holding, not fading",
+            "trade": f"BUY PUT on the first pullback toward {round(today_low,0)}",
+            "stop_loss": f"Above {round(today_low,0)} (structure invalidation)",
+            "target": sup_desc,
+        })
+        rows.append({
+            "condition": f"{sym} opens within today's range ({round(today_low,0)}–{round(today_high,0)}) — flat/normal open",
+            "trade": "No trade until the opening range (09:15–09:45) breaks with RVOL confirmation, "
+                     "then trade in the breakout direction",
+            "stop_loss": "Opposite side of the opening range",
+            "target": f"{res_desc} on an upside break, {sup_desc} on a downside break",
+        })
+        rows.append({
+            "condition": f"{sym} gaps (either direction) but reclaims today's close ({round(today_close,0)}) "
+                          f"within the first 30 minutes — the gap is failing",
+            "trade": "Fade the gap: trade back toward today's close/midpoint instead of the gap direction",
+            "stop_loss": "Beyond the gap extreme",
+            "target": f"Today's close {round(today_close,0)}, then session midpoint",
+        })
+        return rows
+
+    # ── Existing single-day scenario logic (unchanged) ──────────────────────
 
     def _build_scenarios(self, nifty, bn, best_signal):
         observations = []
@@ -153,8 +341,10 @@ class TomorrowOutlookSection(BaseSection):
     def render_md(self, data: Dict[str, Any]) -> str:
         lines = ["\n---\n\n## 10. Tomorrow's Outlook\n"]
         lines.append(
-            "> *This is scenario preparation, not prediction. "
-            "The goal is to know what you're watching and why.*\n"
+            "> *This is scenario preparation, not prediction. There is no overnight/global-cues "
+            "feed in this system, so the gap call below is a structural read from today's own "
+            "close — not a live overnight forecast. The goal is to know what you're watching, "
+            "why, and what you'd actually do about it.*\n"
         )
 
         obs = data.get("observations", [])
@@ -180,5 +370,44 @@ class TomorrowOutlookSection(BaseSection):
 
         lines.append(f"**Prefer:** {data.get('prefer', '—')}  \n")
         lines.append(f"**Avoid:** {data.get('avoid', '—')}\n")
+
+        playbooks = data.get("playbooks", {})
+        for key, pb in playbooks.items():
+            sym = key.upper()
+            gap = pb["gap_call"]
+            lines.append(f"\n### {sym} — Tomorrow's Playbook\n")
+            lines.append(
+                f"**Gap call:** {gap['label']} — **{gap['likely_pct']}% likely** "
+                f"(vs. {gap['low_chance_label']}, {gap['low_chance_pct']}%)  \n"
+                f"*Reason:* {gap['reason']}\n"
+            )
+
+            res_t = pb.get("resistance_break_target")
+            sup_t = pb.get("support_break_target")
+            if res_t or sup_t:
+                lines.append("**Break-and-target levels:**\n")
+                if res_t:
+                    lines.append(f"- If today's high breaks and holds → next supply zone at "
+                                  f"**{res_t['level']}** ({res_t['distance_pct']}% away, zone score {res_t['score']})")
+                if sup_t:
+                    lines.append(f"- If today's low breaks and holds → next demand zone at "
+                                  f"**{sup_t['level']}** ({sup_t['distance_pct']}% away, zone score {sup_t['score']})")
+                lines.append("")
+
+            trades = pb.get("trade_conditions", [])
+            if trades:
+                lines.append("**If this happens → take this trade:**\n")
+                lines.append("| Condition | Trade | Stop Loss | Target |\n|---|---|---|---|")
+                for t in trades:
+                    lines.append(f"| {t['condition']} | {t['trade']} | {t['stop_loss']} | {t['target']} |")
+                lines.append("")
+
+            weekly = pb.get("weekly")
+            if weekly:
+                lines.append(
+                    f"**Week-ahead framing:** {weekly['bias']}  \n"
+                    f"Weekly range: {weekly['week_low']}–{weekly['week_high']}, last close {weekly['week_close']}. "
+                    f"A break of this range (not just today's) is the higher-conviction 2–5 day signal.\n"
+                )
 
         return "\n".join(lines)

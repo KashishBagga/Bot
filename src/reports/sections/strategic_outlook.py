@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Section 13 — Strategic Outlook (Day / Week / Month).
+"""Section 14 — Strategic Outlook (Day / Week / Month).
 
 Answers: "based on past trends, what's realistically likely next?"
 

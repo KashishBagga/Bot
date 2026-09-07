@@ -82,6 +82,15 @@ class IronCondorStrategy(BaseStrategy):
                 rejection_reasons.append("LATE_SESSION")
             if self.spread_width_strikes <= 0:
                 rejection_reasons.append("ZERO_WIDTH")
+            # This thesis needs price to stay inside the wings — a gap or a
+            # strong trend defeats it regardless of RVOL/efficiency at the
+            # entry candle. See butterfly_strategy.py for the same fix and the
+            # real losses that motivated it.
+            regime = snapshot.regime_detail
+            if regime is not None and regime.primary in (
+                "GAP_UP", "GAP_DOWN", "STRONG_TREND_UP", "STRONG_TREND_DOWN"
+            ):
+                rejection_reasons.append(f"UNFAVORABLE_REGIME:{regime.primary}")
 
             # Legs for Iron Condor:
             # Sell -1 Put, Buy -1-width Put
@@ -123,6 +132,7 @@ class IronCondorStrategy(BaseStrategy):
                     "atr": round(atr, 2),
                     "move_efficiency": round(move_efficiency, 3),
                     "spread_width_strikes": self.spread_width_strikes,
+                    "regime_primary": regime.primary if regime is not None else None,
                 },
             }
             self._tag_signal(sig, experiment_name)
