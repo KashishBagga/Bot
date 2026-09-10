@@ -108,7 +108,7 @@ class MarketSnapshot:
     timestamp: datetime
 
     # ── Raw OHLCV DataFrames ───────────────────────────────────────────────
-    d1: Optional[pd.DataFrame]   # Daily — 40 days of history
+    d1: Optional[pd.DataFrame]   # Daily — 310 days of history
     h1: Optional[pd.DataFrame]   # Hourly — 10 days of history
     m5: Optional[pd.DataFrame]   # 5-minute — 5 days of history
 

@@ -105,7 +105,9 @@ class TransparentBacktester:
         start_date = end_date - timedelta(days=self.days)
 
         for symbol in self.symbols:
-            d1 = self.data_provider.get_historical_data(symbol, start_date - timedelta(days=100), end_date, "D")
+            # 310 calendar days of D1 lookback (kept in sync with
+            # indian_trader.py) covers SmaLadder_v1.0's SMA(200) requirement.
+            d1 = self.data_provider.get_historical_data(symbol, start_date - timedelta(days=310), end_date, "D")
             h1 = self.data_provider.get_historical_data(symbol, start_date, end_date, "60")
             m5 = self.data_provider.get_historical_data(symbol, start_date, end_date, "5")
 

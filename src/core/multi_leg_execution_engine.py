@@ -38,6 +38,27 @@ from src.core.options_execution_engine import (
 
 logger = logging.getLogger("MultiLegExecution")
 
+# A credit spread's real max loss is spread_width - credit_received. If a
+# quote glitch prices the credit received at close to (or above) the full
+# spread width, that division-by-near-zero denominator turns a normal small
+# loss into a hundreds-of-R blowup (e.g. a real -570R print from a max_loss
+# that floored at 0.01). Below this fraction of spread_width, the credit is
+# not credible — reject the combo the same way an unresolved leg premium is
+# rejected, rather than silently sizing R off a near-zero denominator.
+MIN_MAX_LOSS_FRACTION_OF_WIDTH = 0.05
+
+
+def _defined_risk_max_loss(spread_width: float, credit_received: float, combo_type: str) -> float:
+    max_loss = spread_width - credit_received
+    floor = spread_width * MIN_MAX_LOSS_FRACTION_OF_WIDTH
+    if max_loss < floor:
+        raise ValueError(
+            f"{combo_type}: credit_received={credit_received:.2f} leaves max_loss="
+            f"{max_loss:.2f} on spread_width={spread_width:.2f} — below "
+            f"{MIN_MAX_LOSS_FRACTION_OF_WIDTH:.0%} floor, likely a stale/bad quote"
+        )
+    return max_loss
+
 
 @dataclass
 class ComboLeg:
@@ -147,7 +168,7 @@ class MultiLegExecutionEngine:
             strikes_away_values = [leg.strikes_away for leg in legs]
             spread_width = (max(strikes_away_values) - min(strikes_away_values)) * interval
             credit_received = -net_premium_paid
-            max_loss = max(spread_width - credit_received, 0.01)
+            max_loss = _defined_risk_max_loss(spread_width, credit_received, combo_type)
             max_profit = credit_received
             return max_loss, max_profit
 
@@ -162,7 +183,7 @@ class MultiLegExecutionEngine:
             call_width = (max(call_legs) - min(call_legs)) * interval if len(call_legs) >= 2 else 0.0
             spread_width = max(put_width, call_width)
             credit_received = -net_premium_paid
-            max_loss = max(spread_width - credit_received, 0.01)
+            max_loss = _defined_risk_max_loss(spread_width, credit_received, combo_type)
             max_profit = credit_received
             return max_loss, max_profit
 

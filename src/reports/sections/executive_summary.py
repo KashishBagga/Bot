@@ -107,7 +107,9 @@ class ExecutiveSummarySection(BaseSection):
             SELECT COUNT(*),
                    SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END),
                    SUM(CASE WHEN final_pnl_r <= 0 THEN 1 ELSE 0 END),
-                   COALESCE(SUM(final_pnl_r), 0)
+                   COALESCE(SUM(final_pnl_r), 0),
+                   COALESCE(SUM(pnl_inr), 0),
+                   SUM(CASE WHEN pnl_inr IS NOT NULL THEN 1 ELSE 0 END)
             FROM trade_performance
             WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
               AND valid = TRUE
@@ -119,7 +121,9 @@ class ExecutiveSummarySection(BaseSection):
             SELECT COUNT(*),
                    SUM(CASE WHEN final_pnl_r > 0 THEN 1 ELSE 0 END),
                    SUM(CASE WHEN final_pnl_r <= 0 THEN 1 ELSE 0 END),
-                   COALESCE(SUM(final_pnl_r), 0)
+                   COALESCE(SUM(final_pnl_r), 0),
+                   COALESCE(SUM(pnl_inr), 0),
+                   SUM(CASE WHEN pnl_inr IS NOT NULL THEN 1 ELSE 0 END)
             FROM combo_trades
             WHERE DATE(entry_time AT TIME ZONE 'Asia/Kolkata') = %s
               AND valid = TRUE
@@ -130,6 +134,8 @@ class ExecutiveSummarySection(BaseSection):
         wins = int(single[1] or 0) + int(combo[1] or 0)
         losses = int(single[2] or 0) + int(combo[2] or 0)
         total_pnl_r = float(single[3] or 0) + float(combo[3] or 0)
+        total_pnl_inr = float(single[4] or 0) + float(combo[4] or 0)
+        priced_trades = int(single[5] or 0) + int(combo[5] or 0)
         return {
             "trades": n,
             "wins": wins,
@@ -137,6 +143,12 @@ class ExecutiveSummarySection(BaseSection):
             "win_rate": round(wins / n, 2) if n > 0 else 0.0,
             "total_pnl_r": round(total_pnl_r, 2),
             "expectancy": round(total_pnl_r / n, 2) if n > 0 else 0.0,
+            # Real rupee P&L — only over trades that priced off an actual
+            # resolved option premium (pnl_inr IS NOT NULL); index-point-proxy
+            # trades never fabricate one. priced_trades lets the report say
+            # "N of M trades" instead of silently understating the real total.
+            "total_pnl_inr": round(total_pnl_inr, 2),
+            "priced_trades": priced_trades,
         }
 
     def _fetch_cf(self, date_str: str) -> dict:
@@ -227,14 +239,20 @@ class ExecutiveSummarySection(BaseSection):
         # Real trades
         lines.append("\n### Real Trades\n")
         lines.append(
-            f"| Trades | Wins | Losses | Win Rate | PnL | Expectancy |\n"
-            f"|---|---|---|---|---|---|\n"
+            f"| Trades | Wins | Losses | Win Rate | PnL | Expectancy | Real ₹ PnL |\n"
+            f"|---|---|---|---|---|---|---|\n"
             f"| {r['trades']} | {r['wins']} | {r['losses']} | "
             f"{self._pct(r['win_rate'])} | {self._pnl_str(r['total_pnl_r'])} | "
-            f"**{self._pnl_str(r['expectancy'])}** |\n"
+            f"**{self._pnl_str(r['expectancy'])}** | {self._inr_str(r['total_pnl_inr'])} |\n"
         )
         if r["trades"] == 0:
             lines.append("*No live trades executed today.*\n")
+        elif r["priced_trades"] < r["trades"]:
+            lines.append(
+                f"*₹ P&L reflects {r['priced_trades']}/{r['trades']} trades that priced off a "
+                f"resolved option premium; the rest used the index-point R proxy and have no real "
+                f"₹ figure to report.*\n"
+            )
 
         # Counterfactuals
         lines.append("\n### Counterfactual Research\n")

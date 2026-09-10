@@ -593,7 +593,10 @@ class StructuralPaperTrader:
 
             # 1. Fetch Multi-Timeframe Data (once per symbol)
             end_date = datetime.now(self.tz)
-            start_date_d1 = end_date - timedelta(days=40)
+            # 310 calendar days covers SmaLadder_v1.0's SMA(200) requirement
+            # (max(SMA_PERIODS)+1 = 201 trading days) with headroom for
+            # weekends/holidays — keep in sync with advanced_backtester.py.
+            start_date_d1 = end_date - timedelta(days=310)
             start_date_h1 = end_date - timedelta(days=10)
             start_date_m5 = end_date - timedelta(days=5)
 
@@ -1571,6 +1574,48 @@ class StructuralPaperTrader:
                 self._log_position_update(pos, current_price, timestamp, 'BREAKEVEN_LOCK',
                                           old_sl=old_sl, old_tp=None)
 
+        # Optional profit ladder: a staircase generalization of
+        # breakeven_lock_inr — instead of one all-or-nothing lock at
+        # breakeven, ratchet the stop up through a series of
+        # (mfe_r trigger -> lock_r) tiers as the position's running best
+        # favorable excursion (MFE, in R — same units as current_pnl_r,
+        # works whether or not a real option premium is resolved) climbs.
+        # e.g. exit_mgmt['profit_ladder_r'] = [(0.4, -0.1), (0.6, 0.2), (1.0, 0.5)]
+        # means: once MFE reaches +0.4R, cap the worst case at -0.1R; once it
+        # reaches +0.6R, secure +0.2R; once +1.0R, secure +0.5R — cutting
+        # losses and locking a growing share of profit as the move extends,
+        # instead of giving back a flat R (or 0.75R past 1.5R) of whatever
+        # high was just made, as the plain Chandelier trail below does. Off
+        # by default; ratchets only (never loosens an existing stop) and
+        # stacks with — doesn't replace — that trail, since both write to
+        # the same pos['stop_loss'] and only the tighter of the two survives
+        # each tick.
+        profit_ladder_r = exit_mgmt.get('profit_ladder_r')
+        if profit_ladder_r:
+            entry_price = pos['entry_price']
+            if pos['signal'] == 'BUY CALL':
+                mfe_r = (pos['highest_price'] - entry_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
+            else:  # BUY PUT
+                mfe_r = (entry_price - pos['lowest_price']) / stop_loss_distance if stop_loss_distance > 0 else 0.0
+            lock_r = None
+            for mfe_trigger, tier_lock_r in profit_ladder_r:
+                if mfe_r >= mfe_trigger:
+                    lock_r = tier_lock_r if lock_r is None else max(lock_r, tier_lock_r)
+            if lock_r is not None:
+                old_sl = pos['stop_loss']
+                if pos['signal'] == 'BUY CALL':
+                    floor_sl = entry_price + lock_r * stop_loss_distance
+                    if floor_sl > old_sl:
+                        pos['stop_loss'] = floor_sl
+                        self._log_position_update(pos, current_price, timestamp, 'PROFIT_LADDER',
+                                                  old_sl=old_sl, old_tp=None)
+                else:  # BUY PUT
+                    floor_sl = entry_price - lock_r * stop_loss_distance
+                    if floor_sl < old_sl:
+                        pos['stop_loss'] = floor_sl
+                        self._log_position_update(pos, current_price, timestamp, 'PROFIT_LADDER',
+                                                  old_sl=old_sl, old_tp=None)
+
         is_closed = False
         exit_reason = None
         exit_price = current_price
@@ -1847,6 +1892,11 @@ class StructuralPaperTrader:
             # opt-in (currently OI_Scalping_v1.0/OrderFlow_v1.0 only).
             'breakeven_lock_inr': cfg.get('breakeven_lock_inr'),
             'trail_tighten_inr': cfg.get('trail_tighten_inr'),
+            # profit_ladder_r: list of (mfe_r, lock_r) tiers — see
+            # _update_position()'s profit-ladder block. None/empty (off)
+            # preserves today's exact behavior for every experiment that
+            # hasn't opted in.
+            'profit_ladder_r': cfg.get('profit_ladder_r'),
         }
 
     def _enter_position(self, sig: Dict, timestamp, trade_key: Tuple, is_counterfactual: bool, snapshot=None):
@@ -2472,6 +2522,21 @@ class StructuralPaperTrader:
                 diag['net_pnl_r'] = pnl_r
                 pos['diagnostics'] = diag
 
+        # Real rupee P&L alongside pnl_r — only when this exit actually priced
+        # off a resolved option premium (_premium_pnl_inr set in this same tick
+        # by _premium_pnl_r, see _update_position). The index-point-proxy path
+        # has no real premium to report from, so pnl_inr stays None rather than
+        # being fabricated off the index move — same convention as
+        # pnl_calculation_method.
+        pnl_inr = None
+        if pos.get('pnl_calculation_method') == 'premium':
+            pnl_inr = pos.get('_last_premium_pnl_inr')
+            if pnl_inr is not None:
+                if diag.get('costs'):
+                    pnl_inr = round(pnl_inr - diag['costs']['total_cost'], 2)
+                else:
+                    pnl_inr = round(pnl_inr, 2)
+
         # Excursions
         if pos['signal'] == 'BUY CALL':
             mfe_r = (highest - entry_price) / stop_loss_distance if stop_loss_distance > 0 else 0.0
@@ -2619,6 +2684,8 @@ class StructuralPaperTrader:
                 'diagnostics': pos.get('diagnostics'),
                 'position_size_inr': pos.get('position_size_inr', 0.0),
                 'lots': pos.get('lots', 1.0),
+                'lot_size': pos.get('lot_size'),
+                'pnl_inr': pnl_inr,
                 'entry_premium': pos.get('entry_premium'),
                 'exit_premium': pos.get('exit_premium'),
                 'option_symbol': pos.get('option_symbol'),
@@ -2681,6 +2748,9 @@ class StructuralPaperTrader:
                 'version': pos.get('version', ''),
                 'confidence': pos.get('confidence'),
                 'diagnostics': pos.get('diagnostics'),
+                'lots': pos.get('lots', 1.0),
+                'lot_size': pos.get('lot_size'),
+                'pnl_inr': pnl_inr,
                 'entry_premium': pos.get('entry_premium'),
                 'exit_premium': pos.get('exit_premium'),
                 'option_symbol': pos.get('option_symbol'),
@@ -2807,6 +2877,11 @@ class StructuralPaperTrader:
                 return
 
         from src.core.options_execution_engine import realistic_fill_price
+        from src.core.options_mapper import OptionsMapper
+        # All legs share one underlying/expiry, so any leg's symbol gives the
+        # right lot size — needed (alongside lots) to turn net_premium_paid
+        # (per lot) into a real rupee P&L, same as the single-leg convention.
+        lot_size = OptionsMapper.get_lot_size(resolved.legs[0].contract.symbol) if resolved.legs else None
         combo_id = sig.get('candidate_id') or f"combo_{symbol.replace(':', '_').replace('-', '_')}_{experiment_name}_{int(timestamp.timestamp())}"
         legs_payload = [
             {
@@ -2835,6 +2910,7 @@ class StructuralPaperTrader:
             'underlying_entry_price': underlying_price,
             'legs': legs_payload,
             'lots': lots,
+            'lot_size': lot_size,
             'net_premium_paid': resolved.net_premium_paid,
             'max_loss': resolved.max_loss,
             'max_profit': resolved.max_profit,
@@ -2915,6 +2991,10 @@ class StructuralPaperTrader:
         pnl = current_net_value - pos['net_premium_paid']
         pnl_r = round(pnl / pos['max_loss'], 3) if pos['max_loss'] > 0 else 0.0
         pos['current_pnl_r'] = pnl_r
+        # pnl is per lot (see ResolvedCombo docstring) — scale by lot size and
+        # lot count for the real rupee figure alongside pnl_r.
+        if pos.get('lot_size'):
+            pos['pnl_inr'] = round(pnl * pos['lot_size'] * pos.get('lots', 1), 2)
 
         is_closed = False
         exit_reason = None
