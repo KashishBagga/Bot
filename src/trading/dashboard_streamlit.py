@@ -398,9 +398,10 @@ if selected_strat != "All":
     filtered_combo_trades = [c for c in data["combo_trades"] if (c["setup_type"] or c["combo_type"]) == selected_strat]
     filtered_combo_candidates = [c for c in data["combo_candidates"] if (c["setup_type"] or c["combo_type"]) == selected_strat]
 
-tab1, tab2 = st.tabs([
+tab1, tab2, tab3 = st.tabs([
     f"📈 Realized Positions ({len(filtered_trades) + len(filtered_combo_trades)})",
-    f"👻 Counterfactual Missed Opportunities ({len(filtered_candidates) + len(filtered_combo_candidates)})"
+    f"👻 Counterfactual Missed Opportunities ({len(filtered_candidates) + len(filtered_combo_candidates)})",
+    "🔮 Tomorrow's Outlook & Accuracy",
 ])
 
 # 1. Realized positions tab
@@ -683,3 +684,117 @@ with tab2:
                             latency = f"*(+{diff_ms}ms latency)*"
                         prev_t = curr_t
                         st.markdown(f"- **{curr_t_local.strftime('%H:%M:%S.%f')[:-3]}** {latency} &mdash; {format_combo_event_description(ev['event_type'], ev['payload'])}")
+
+# 3. Tomorrow's Outlook & Accuracy tab — what the system expects next session,
+# and whether the outlook it wrote for *this* session actually came true.
+with tab3:
+    outlook_sections = eod.get("sections", {})
+    market_state = outlook_sections.get("market_state_outlook", {})
+    tomorrow = outlook_sections.get("tomorrow_outlook", {})
+    accuracy = outlook_sections.get("outlook_accuracy", {})
+
+    st.subheader(f"What the system expects after {selected_date}")
+    st.caption(
+        "Scenario preparation, not prediction — same convention used in the report itself. "
+        "No overnight/global-cues feed exists, so the gap call is a structural read from "
+        "the session's own close."
+    )
+
+    obs = market_state.get("observations") or tomorrow.get("observations") or []
+    if obs:
+        for o in obs:
+            st.markdown(f"- {o}")
+
+    scenarios = market_state.get("scenarios") or tomorrow.get("scenarios") or []
+    if scenarios:
+        st.markdown("**Scenarios:**")
+        for s in scenarios:
+            st.markdown(f"**{s['name']} ({s['pct']}%)** — {s['desc']}")
+
+    watch_levels = market_state.get("watch_levels") or tomorrow.get("watch_levels") or []
+    if watch_levels:
+        st.markdown("**Key levels to watch:**")
+        st.dataframe(pd.DataFrame(watch_levels), use_container_width=True, hide_index=True)
+
+    pref_col, avoid_col = st.columns(2)
+    pref_col.success(f"**Prefer:** {market_state.get('prefer') or tomorrow.get('prefer') or '—'}")
+    avoid_col.error(f"**Avoid:** {market_state.get('avoid') or tomorrow.get('avoid') or '—'}")
+
+    playbooks = tomorrow.get("playbooks") or {}
+    for key, pb in playbooks.items():
+        gap = pb.get("gap_call") or {}
+        with st.expander(f"{key.upper()} — Gap call & trade conditions"):
+            st.markdown(
+                f"**Gap call:** {gap.get('label', 'N/A')} — **{gap.get('likely_pct', '—')}% likely** "
+                f"(vs. {gap.get('low_chance_label', 'N/A')}, {gap.get('low_chance_pct', '—')}%)"
+            )
+            st.caption(gap.get("reason", ""))
+            res_t = pb.get("resistance_break_target")
+            sup_t = pb.get("support_break_target")
+            if res_t:
+                st.markdown(f"- Resistance break target: **{res_t['level']}** ({res_t['distance_pct']}% away)")
+            if sup_t:
+                st.markdown(f"- Support break target: **{sup_t['level']}** ({sup_t['distance_pct']}% away)")
+            trades = pb.get("trade_conditions") or []
+            if trades:
+                st.dataframe(pd.DataFrame(trades), use_container_width=True, hide_index=True)
+
+    st.write("---")
+    st.subheader("Was yesterday's outlook right?")
+
+    graded = accuracy.get("graded") or {}
+    if not graded:
+        st.info(
+            f"No prior report was found to grade against {selected_date} "
+            "(first day of data, or a gap in report history)."
+        )
+    else:
+        gen_from = accuracy.get("generated_from_date")
+        st.caption(f"Grading the outlook generated on {gen_from} against what actually happened on {selected_date}.")
+        grade_rows = []
+        for sym, r in graded.items():
+            grade_rows.append({
+                "Symbol": sym.upper(),
+                "Gap call": f"{'✅' if r['gap_call_correct'] else '❌'} {r['gap_call_predicted']} → {r['gap_call_actual']}",
+                "Bias": f"{'✅' if r['bias_correct'] else '❌'} {r['bias_predicted']} → {r['bias_actual']}",
+                "Resistance target": (
+                    f"{r['resistance_target']} ({'hit' if r['resistance_hit'] else 'missed'})"
+                    if r.get("resistance_target") is not None else "—"
+                ),
+                "Support target": (
+                    f"{r['support_target']} ({'hit' if r['support_hit'] else 'missed'})"
+                    if r.get("support_target") is not None else "—"
+                ),
+                "Watch levels hit": f"{r['watch_levels_hit']}/{r['watch_levels_total']}",
+            })
+        st.dataframe(pd.DataFrame(grade_rows), use_container_width=True, hide_index=True)
+
+    # Rolling hit-rate trend, queried directly (not just the single day's report)
+    try:
+        trailing_rows = db.get_outlook_accuracy_trailing(selected_date, days=60)
+    except Exception as e:
+        trailing_rows = []
+        st.warning(f"Could not load rolling accuracy history: {e}")
+
+    if trailing_rows:
+        st.markdown("**Rolling accuracy trend (last 60 graded sessions):**")
+        trend_df = pd.DataFrame(trailing_rows)
+        trend_df["outlook_date"] = pd.to_datetime(trend_df["outlook_date"])
+        summary = (
+            trend_df.groupby("symbol")[["gap_call_correct", "bias_correct"]]
+            .mean()
+            .mul(100)
+            .round(1)
+            .rename(columns={"gap_call_correct": "Gap-call hit rate %", "bias_correct": "Bias hit rate %"})
+        )
+        st.dataframe(summary, use_container_width=True)
+
+        for sym in trend_df["symbol"].unique():
+            sym_df = trend_df[trend_df["symbol"] == sym].sort_values("outlook_date")
+            chart_df = sym_df.set_index("outlook_date")[["gap_call_correct", "bias_correct"]].astype(float)
+            chart_df = chart_df.rolling(window=10, min_periods=1).mean() * 100
+            chart_df.columns = ["Gap-call hit rate % (10d rolling)", "Bias hit rate % (10d rolling)"]
+            st.caption(f"{sym.upper()}")
+            st.line_chart(chart_df)
+    else:
+        st.info("No accuracy history yet — it accumulates one row per graded session.")
