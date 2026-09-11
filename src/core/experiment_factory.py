@@ -21,6 +21,7 @@ from src.core.experiment import Experiment
 from src.core.experiment_registry import ExperimentRegistry
 from src.strategies.structural_strategy import StructuralStrategy
 from src.strategies.structural_quality_gated_strategy import StructuralQualityGatedStrategy
+from src.strategies.structural_regime_gated_strategy import StructuralRegimeGatedStrategy
 from src.strategies.ema_pullback import EmaPullbackStrategy
 from src.strategies.vwap_reversion import VwapReversionStrategy
 from src.strategies.prev_day_extremes import PrevDayExtremesStrategy
@@ -123,6 +124,27 @@ def build_registry() -> ExperimentRegistry:
             "max_wickiness": 0.5,
         },
         description="Structural_v3.2_RVOL1.0 entry logic + SWEEP/TRAP move_efficiency/wickiness gate (shadow-only A/B clone)"
+    ))
+
+    # Structural v3.5 — same entry logic as v3.2_RVOL1.0, but additionally
+    # rejects SWEEP/TRAP signals fired counter to a STRONG_TREND_UP/DOWN
+    # regime (e.g. BUY CALL SWEEP on a STRONG_TREND_DOWN day). Real trades on
+    # 2026-09-08 (STRONG_TREND_DOWN_NORMAL) show 11 of 13 SWEEP/TRAP/
+    # LIQUIDITY_SWEEP signals were BUY CALL against the day's trend, and all
+    # but one lost. Distinct hypothesis from Structural_v3.4_QualityGated
+    # (candle-quality gate, not regime-direction) — kept as its own shadow-only
+    # clone so filter_attribution.py can isolate which gate (if either) helps,
+    # rather than conflating the two. See StructuralRegimeGatedStrategy's
+    # docstring. Shadow-only — do not consider for real capital until
+    # validated against Structural_v3.2_RVOL1.0 over a real sample.
+    registry.register(Experiment(
+        name="Structural_v3.5_RegimeGated",
+        strategy=StructuralRegimeGatedStrategy(rvol_threshold=1.0, min_zone_score=50.0),
+        params={
+            "rvol_threshold": 1.0,
+            "min_zone_score": 50.0,
+        },
+        description="Structural_v3.2_RVOL1.0 entry logic + SWEEP/TRAP counter-trend regime gate (shadow-only A/B clone)"
     ))
 
     # 2. EMA Pullback
@@ -382,19 +404,22 @@ def build_registry() -> ExperimentRegistry:
         description="Iron Condor (OTM Call spread + OTM Put spread) sideways credit play"
     ))
 
-    # 18. Butterfly Spread — Sideways/Range market defined-risk debit play
-    registry.register(Experiment(
-        name="Butterfly_v1.0",
-        strategy=ButterflyStrategy(
-            rvol_ceiling=1.3, max_efficiency=0.55,
-            wing_width_strikes=2, target_r=1.5, stop_r=-0.5,
-        ),
-        params={
-            "rvol_ceiling": 1.3, "max_efficiency": 0.55,
-            "wing_width_strikes": 2, "target_r": 1.5, "stop_r": -0.5,
-        },
-        description="Butterfly Spread (Long ITM Call + 2x Short ATM Call + Long OTM Call) sideways debit play"
-    ))
+    # 18. Butterfly Spread — retired 2026-09-10: 395 trades, 1.8% win rate,
+    # -291R total, -0.738R expectancy across the full paper-trading history.
+    # Not a filter-tuning problem, the setup itself doesn't work. Re-enable
+    # only alongside a redesign of the entry/exit logic.
+    # registry.register(Experiment(
+    #     name="Butterfly_v1.0",
+    #     strategy=ButterflyStrategy(
+    #         rvol_ceiling=1.3, max_efficiency=0.55,
+    #         wing_width_strikes=2, target_r=1.5, stop_r=-0.5,
+    #     ),
+    #     params={
+    #         "rvol_ceiling": 1.3, "max_efficiency": 0.55,
+    #         "wing_width_strikes": 2, "target_r": 1.5, "stop_r": -0.5,
+    #     },
+    #     description="Butterfly Spread (Long ITM Call + 2x Short ATM Call + Long OTM Call) sideways debit play"
+    # ))
 
     # 18b. Iron Butterfly — ATM-centered credit theta-harvest.
     registry.register(Experiment(
@@ -556,6 +581,18 @@ def build_registry() -> ExperimentRegistry:
         params={
             "adx_threshold": 20.0, "cci_period": 20, "cci_entry_level": 100.0,
             "di_period": 14, "atr_sl_buffer_mult": 0.3, "tp_atr_cap": 3.0, "min_rr": 1.5,
+            # Real losses on 2026-09-07/09 gave back real MFE before reversing
+            # (e.g. +1.35R, +0.99R, +0.78R MFE all closed at -0.01..-0.02R)
+            # under the default trail, which doesn't tighten below the full
+            # entry-risk distance until 1.5R. Staircase profit ladder (see
+            # _update_position()'s profit_ladder_r block): as running MFE
+            # climbs through each (mfe_r, lock_r) tier, ratchet the stop to
+            # secure that much — caps the worst case sooner, then locks in a
+            # growing share of profit, instead of giving back a flat R (or
+            # 0.75R past 1.5R) of whatever high was just made. R-based (not
+            # ₹), so it applies whether or not a real option premium is
+            # resolved this tick, unlike breakeven_lock_inr/trail_tighten_inr.
+            "exit_management": {"profit_ladder_r": [(0.5, 0.3), (0.75, 0.5), (1.0, 0.8), (1.5, 1.2), (2.0, 1.7)]},
         },
         description="ADX>20 trend confirmation + DMI crossover direction + CCI +-100 momentum trigger"
     ))
@@ -570,6 +607,12 @@ def build_registry() -> ExperimentRegistry:
         params={
             "ema_touch_tolerance_pct": 0.0015, "min_body_fraction": 0.40,
             "atr_sl_buffer_mult": 0.4, "tp_atr_cap": 3.0, "min_rr": 1.5,
+            # Real losses on 2026-09-07/08/09 repeatedly gave back real MFE
+            # before reversing (e.g. +0.62R, +0.86R, +0.90R MFE all closed
+            # negative) under the default trail, which doesn't tighten below
+            # the full entry-risk distance until 1.5R. Staircase profit ladder
+            # — see AdxDmiCci_v1.0_ADX20 above for the same fix and rationale.
+            "exit_management": {"profit_ladder_r": [(0.5, 0.3), (0.75, 0.5), (1.0, 0.8), (1.5, 1.2), (2.0, 1.7)]},
         },
         description="Nov-Apr/May-Oct calendar bias gates an EMA20 touch+reversal trigger ('Sell in May')"
     ))

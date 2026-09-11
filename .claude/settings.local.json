@@ -54,7 +54,11 @@
       "Bash(awk 'NR==497,NR==900 {print NR\": \"$0}' src/trading/indian_trader.py)",
       "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/strategies/options_scalping_strategy.py'\\).read\\(\\)\\)\")",
       "Bash(python3 -c \"import ast; [ast.parse\\(open\\(f\\).read\\(\\), filename=f\\) for f in ['src/strategies/options_scalping_strategy.py', 'src/trading/indian_trader.py']]\")",
-      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/analytics/filter_attribution.py'\\).read\\(\\)\\)\")"
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/analytics/filter_attribution.py'\\).read\\(\\)\\)\")",
+      "Bash(psql \"postgresql://trader:trading_pass@127.0.0.1:5433/trading_warehouse\" -c \"\\\\dt\")",
+      "Bash(docker info *)",
+      "Bash(python3 -c \"import psycopg2\")",
+      "Bash(python3)"
     ]
   }
 }

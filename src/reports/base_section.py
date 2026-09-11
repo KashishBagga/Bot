@@ -106,3 +106,11 @@ class BaseSection(ABC):
         if v is None:
             return "N/A"
         return f"{v*100:.0f}%"
+
+    @staticmethod
+    def _inr_str(v: float) -> str:
+        """Format a real rupee P&L value with sign and thousands separator."""
+        if v is None:
+            return "N/A"
+        sign = "+" if v >= 0 else "-"
+        return f"{sign}₹{abs(v):,.0f}"

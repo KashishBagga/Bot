@@ -31,6 +31,7 @@ from src.reports.sections.counterfactual_insights import CounterfactualInsightsS
 from src.reports.sections.experiment_ranking import ExperimentRankingSection
 from src.reports.sections.thesis_analysis import ThesisAnalysisSection
 from src.reports.sections.market_behaviour import MarketBehaviourSection
+from src.reports.sections.outlook_accuracy import OutlookAccuracySection
 from src.reports.sections.market_state_outlook import MarketStateOutlookSection
 from src.reports.sections.tomorrow_outlook import TomorrowOutlookSection
 from src.reports.sections.research_queue import ResearchQueueSection
@@ -84,6 +85,7 @@ class EODReportGenerator:
             ExperimentRankingSection,
             ThesisAnalysisSection,
             MarketBehaviourSection,
+            OutlookAccuracySection,
             MarketStateOutlookSection,
             TomorrowOutlookSection,
             ResearchQueueSection,

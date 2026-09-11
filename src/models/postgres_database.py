@@ -675,6 +675,39 @@ class PostgresDatabase:
                         "ON premarket_snapshots(symbol, date DESC)"
                     )
 
+                    # Scores each day's "Tomorrow's Outlook" / "Market State & Outlook"
+                    # report sections against what actually happened the next session —
+                    # written by OutlookAccuracySection so the forecast isn't generated
+                    # and forgotten. One row per (outlook_date, symbol): outlook_date is
+                    # the day the prediction was FOR (i.e. "today" when graded),
+                    # generated_from_date is the prior report date that produced it.
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS outlook_accuracy (
+                            outlook_date         DATE    NOT NULL,
+                            symbol                TEXT    NOT NULL,
+                            generated_from_date   DATE,
+                            gap_call_predicted    TEXT,
+                            gap_call_actual       TEXT,
+                            gap_call_correct      BOOLEAN,
+                            bias_predicted        TEXT,
+                            bias_actual           TEXT,
+                            bias_correct          BOOLEAN,
+                            resistance_target     REAL,
+                            resistance_hit        BOOLEAN,
+                            support_target        REAL,
+                            support_hit           BOOLEAN,
+                            watch_levels_hit      INTEGER,
+                            watch_levels_total    INTEGER,
+                            details               JSONB,
+                            created_at            TIMESTAMPTZ DEFAULT NOW(),
+                            PRIMARY KEY (outlook_date, symbol)
+                        )
+                    ''')
+                    cursor.execute(
+                        "CREATE INDEX IF NOT EXISTS idx_outlook_accuracy_date "
+                        "ON outlook_accuracy(outlook_date DESC)"
+                    )
+
                     # Historical OHLC candle store — every bar the system has ever
                     # fetched from Fyers, kept locally so backtests/research replay
                     # from Postgres instead of re-hitting the live API every run.
@@ -732,6 +765,31 @@ class PostgresDatabase:
                             PRIMARY KEY (run_id, entry_time, symbol, experiment_name)
                         )
                     ''')
+
+                    # Real rupee P&L alongside every existing R-multiple column.
+                    # R stays the basis for cross-strategy/cross-experiment
+                    # research (filter_attribution.py, experiment_rankings) since
+                    # it normalizes away position-size differences between
+                    # strategies — pnl_inr answers the separate question "how much
+                    # actual money did this make", which nothing previously
+                    # tracked. NULL where no real premium was resolved for that
+                    # trade (index-point-proxy fallback) — never fabricated from
+                    # the index move, same convention as pnl_calculation_method.
+                    # lot_size/lots are what pnl_inr is derived from, added here
+                    # for the same reason and because combo_trades /
+                    # counterfactual_combo_results never had either column despite
+                    # combos always trading in real premium terms.
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS lot_size REAL")
+                    cursor.execute("ALTER TABLE trade_performance ADD COLUMN IF NOT EXISTS pnl_inr REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS lots REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS lot_size REAL")
+                    cursor.execute("ALTER TABLE counterfactual_results ADD COLUMN IF NOT EXISTS pnl_inr REAL")
+                    cursor.execute("ALTER TABLE combo_trades ADD COLUMN IF NOT EXISTS lots REAL")
+                    cursor.execute("ALTER TABLE combo_trades ADD COLUMN IF NOT EXISTS lot_size REAL")
+                    cursor.execute("ALTER TABLE combo_trades ADD COLUMN IF NOT EXISTS pnl_inr REAL")
+                    cursor.execute("ALTER TABLE counterfactual_combo_results ADD COLUMN IF NOT EXISTS lots REAL")
+                    cursor.execute("ALTER TABLE counterfactual_combo_results ADD COLUMN IF NOT EXISTS lot_size REAL")
+                    cursor.execute("ALTER TABLE counterfactual_combo_results ADD COLUMN IF NOT EXISTS pnl_inr REAL")
 
                 conn.commit()
 
@@ -1302,7 +1360,9 @@ class PostgresDatabase:
                         pnl_calculation_method = EXCLUDED.pnl_calculation_method,
                         atr_at_entry = EXCLUDED.atr_at_entry,
                         atr_at_exit = EXCLUDED.atr_at_exit,
-                        tp_expansion_count = EXCLUDED.tp_expansion_count
+                        tp_expansion_count = EXCLUDED.tp_expansion_count,
+                        lot_size = EXCLUDED.lot_size,
+                        pnl_inr = EXCLUDED.pnl_inr
                     """
                     cursor.execute(query, perf_copy)
                 conn.commit()
@@ -1788,7 +1848,10 @@ class PostgresDatabase:
                         pnl_calculation_method = EXCLUDED.pnl_calculation_method,
                         atr_at_entry = EXCLUDED.atr_at_entry,
                         atr_at_exit = EXCLUDED.atr_at_exit,
-                        tp_expansion_count = EXCLUDED.tp_expansion_count
+                        tp_expansion_count = EXCLUDED.tp_expansion_count,
+                        lots = EXCLUDED.lots,
+                        lot_size = EXCLUDED.lot_size,
+                        pnl_inr = EXCLUDED.pnl_inr
                     """
                     cursor.execute(query, result_copy)
                 conn.commit()
@@ -1832,7 +1895,8 @@ class PostgresDatabase:
                 'underlying_entry_price', 'underlying_exit_price', 'legs',
                 'net_premium_paid', 'max_loss', 'max_profit', 'target_r', 'stop_r',
                 'current_pnl_r', 'final_pnl_r', 'exit_reason', 'duration_minutes',
-                'confidence', 'diagnostics', 'valid', 'validation_errors'
+                'confidence', 'diagnostics', 'valid', 'validation_errors',
+                'lots', 'lot_size', 'pnl_inr',
             }
 
             with self._get_connection() as conn:
@@ -1857,7 +1921,10 @@ class PostgresDatabase:
                         duration_minutes = EXCLUDED.duration_minutes,
                         diagnostics = EXCLUDED.diagnostics,
                         valid = EXCLUDED.valid,
-                        validation_errors = EXCLUDED.validation_errors
+                        validation_errors = EXCLUDED.validation_errors,
+                        lots = EXCLUDED.lots,
+                        lot_size = EXCLUDED.lot_size,
+                        pnl_inr = EXCLUDED.pnl_inr
                     """
                     cursor.execute(query, c)
                 conn.commit()
@@ -1901,7 +1968,8 @@ class PostgresDatabase:
                 'underlying_entry_price', 'underlying_exit_price', 'legs',
                 'net_premium_paid', 'max_loss', 'max_profit', 'target_r', 'stop_r',
                 'current_pnl_r', 'final_pnl_r', 'exit_reason', 'duration_minutes',
-                'confidence', 'diagnostics', 'valid', 'validation_errors'
+                'confidence', 'diagnostics', 'valid', 'validation_errors',
+                'lots', 'lot_size', 'pnl_inr',
             }
 
             with self._get_connection() as conn:
@@ -1928,7 +1996,10 @@ class PostgresDatabase:
                         duration_minutes = EXCLUDED.duration_minutes,
                         diagnostics = EXCLUDED.diagnostics,
                         valid = EXCLUDED.valid,
-                        validation_errors = EXCLUDED.validation_errors
+                        validation_errors = EXCLUDED.validation_errors,
+                        lots = EXCLUDED.lots,
+                        lot_size = EXCLUDED.lot_size,
+                        pnl_inr = EXCLUDED.pnl_inr
                     """
                     cursor.execute(query, c)
                 conn.commit()
@@ -2287,6 +2358,72 @@ class PostgresDatabase:
                 conn.commit()
         except Exception as e:
             logger.error(f"❌ Failed to batch-upsert {len(zones)} sr_zones: {e}")
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Outlook Accuracy (grades yesterday's "Tomorrow's Outlook" vs today)
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def save_outlook_accuracy(self, row: Dict[str, Any]) -> None:
+        """Insert or update one symbol's outlook-accuracy grade for a given date.
+
+        row keys mirror the outlook_accuracy table columns; 'details' is a
+        JSON-serializable dict (raw watch-level hits, targets, etc).
+        """
+        try:
+            row = dict(row)
+            row["details"] = json.dumps(row.get("details") or {}, cls=NumpyEncoder)
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO outlook_accuracy
+                            (outlook_date, symbol, generated_from_date,
+                             gap_call_predicted, gap_call_actual, gap_call_correct,
+                             bias_predicted, bias_actual, bias_correct,
+                             resistance_target, resistance_hit,
+                             support_target, support_hit,
+                             watch_levels_hit, watch_levels_total, details)
+                        VALUES
+                            (%(outlook_date)s, %(symbol)s, %(generated_from_date)s,
+                             %(gap_call_predicted)s, %(gap_call_actual)s, %(gap_call_correct)s,
+                             %(bias_predicted)s, %(bias_actual)s, %(bias_correct)s,
+                             %(resistance_target)s, %(resistance_hit)s,
+                             %(support_target)s, %(support_hit)s,
+                             %(watch_levels_hit)s, %(watch_levels_total)s, %(details)s)
+                        ON CONFLICT (outlook_date, symbol) DO UPDATE SET
+                            generated_from_date = EXCLUDED.generated_from_date,
+                            gap_call_predicted  = EXCLUDED.gap_call_predicted,
+                            gap_call_actual     = EXCLUDED.gap_call_actual,
+                            gap_call_correct    = EXCLUDED.gap_call_correct,
+                            bias_predicted      = EXCLUDED.bias_predicted,
+                            bias_actual         = EXCLUDED.bias_actual,
+                            bias_correct        = EXCLUDED.bias_correct,
+                            resistance_target   = EXCLUDED.resistance_target,
+                            resistance_hit      = EXCLUDED.resistance_hit,
+                            support_target      = EXCLUDED.support_target,
+                            support_hit         = EXCLUDED.support_hit,
+                            watch_levels_hit    = EXCLUDED.watch_levels_hit,
+                            watch_levels_total  = EXCLUDED.watch_levels_total,
+                            details             = EXCLUDED.details
+                    """, row)
+                conn.commit()
+        except Exception as e:
+            logger.error(f"❌ Failed to save outlook_accuracy for {row.get('symbol')} {row.get('outlook_date')}: {e}")
+
+    def get_outlook_accuracy_trailing(self, date_str: str, days: int = 20) -> List[Dict[str, Any]]:
+        """Trailing N days of outlook_accuracy rows up to and including date_str,
+        used for the rolling hit-rate shown in the report and dashboard."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT * FROM outlook_accuracy
+                        WHERE outlook_date BETWEEN %s::date - %s AND %s::date
+                        ORDER BY outlook_date ASC
+                    """, (date_str, days - 1, date_str))
+                    return [dict(r) for r in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"❌ Failed to fetch trailing outlook_accuracy: {e}")
+            return []
 
     def get_sr_zones(
         self,
